@@ -67,7 +67,7 @@ int main (int argc, char** argv){
 	#endif // #ifdef LIBMESH_HAVE_VTK
 
 	return 0;
-}
+} // end main
 
 
 
