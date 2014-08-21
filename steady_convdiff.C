@@ -21,6 +21,8 @@
 
 #include "libmesh/dof_map.h"
 
+#include "libmesh/exodusII_io.h"
+
 using namespace libMesh;
 
 void assemble_convdiff(EquationSystems& es,
@@ -39,13 +41,10 @@ int main (int argc, char** argv){
 		std::cout << " " << argv[i];
 	std::cout << std::endl << std::endl;
 
-	//libmesh should not have been compiled as 2D only...
-	libmesh_example_assert(2 <= LIBMESH_DIM, "2D support"); 
-
 	Mesh mesh(init.comm());
 
 	MeshTools::Generation::build_square (mesh,
-		                                   15, 15, //15x15 elements
+		                                   40, 40, //40x40 elements
 		                                   -1., 1., //from x=-1 to x=1
 		                                   -1., 1., //from y=-1 to y=1
 		                                   QUAD9); //quadrilaterals with 9 DOF instead of default 4
@@ -65,6 +64,10 @@ int main (int argc, char** argv){
 	#if defined(LIBMESH_HAVE_VTK) && !defined(LIBMESH_ENABLE_PARMESH)
 	VTKIO (mesh).write_equation_systems ("out.pvtu", equation_systems);
 	#endif // #ifdef LIBMESH_HAVE_VTK
+	
+	#ifdef LIBMESH_HAVE_EXODUS_API
+    ExodusII_IO (mesh).write_equation_systems("concentration.exo",equation_systems);
+  #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
 	return 0;
 } // end main
@@ -134,13 +137,14 @@ void assemble_convdiff(EquationSystems& es, const std::string& system_name){
       for (unsigned int i=0; i<phi.size(); i++){ 
         for (unsigned int j=0; j<phi.size(); j++){
           Ke(i,j) += JxW[qp]*(dphi[i][qp]*dphi[j][qp]) //diffusion term
-          	+ JxW[qp]*(xvel*dphi[i][qp](0)*phi[j][qp](0) + yvel*dphi[i][qp](1)*phi[j][qp](1)); //convection term
+          	- JxW[qp]*(xvel*dphi[i][qp](0)*phi[j][qp] + yvel*dphi[i][qp](1)*phi[j][qp]); //convection term
+          		//?!? this gives the right state but the sign doesn't seem right...??
         }
 			}
 			
       { //scope bubble
 			//forcing function
-      const Real fxy = -(x+y+2-x*x-y*y)*exp(-0.5*(x*x+y*y));
+      const Real fxy = -(x+y-2+x*x+y*y)*exp(-0.5*(x*x+y*y));
       for (unsigned int i=0; i<phi.size(); i++)
         Fe(i) += JxW[qp]*fxy*phi[i][qp];
       } //end scope bubble
