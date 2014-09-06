@@ -1,0 +1,2 @@
+steady_convdiffstokes.$(obj-suffix):\
+    steady_convdiffstokes.C

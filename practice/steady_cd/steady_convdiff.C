@@ -30,6 +30,7 @@ void assemble_convdiff(EquationSystems& es,
 
 Real exact_solution (const Real x, const Real y, const Real z = 0.0){
 	return exp(-0.5*(x*x+y*y));
+	//return x+y;
 }
 
 int main (int argc, char** argv){
@@ -145,6 +146,7 @@ void assemble_convdiff(EquationSystems& es, const std::string& system_name){
       { //scope bubble
 			//forcing function
       const Real fxy = -(x+y-2+x*x+y*y)*exp(-0.5*(x*x+y*y));
+      //const Real fxy = 2;
       for (unsigned int i=0; i<phi.size(); i++)
         Fe(i) += JxW[qp]*fxy*phi[i][qp];
       } //end scope bubble

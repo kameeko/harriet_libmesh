@@ -1,0 +1,2 @@
+steady_stokes_ex.$(obj-suffix):\
+    steady_stokes_ex.C
