@@ -1,0 +1,10 @@
+# Regularization parameter
+alpha = 1.e-4
+
+#verify_analytic_jacobians = 1.e-1
+print_jacobians = false
+print_element_jacobians = false
+
+# The polynomial order and finite element type to use for the pressure
+# variable.
+fe_family = 'LAGRANGE'
