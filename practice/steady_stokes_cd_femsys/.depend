@@ -1,0 +1,2 @@
+steady_convdiffstokes_femsys.$(obj-suffix):\
+    steady_convdiffstokes_femsys.C
