@@ -285,7 +285,7 @@ void StokesConvDiffSys::postprocess (){
 Point StokesConvDiffSys::forcing(const Point& pt){
 	Point f;
 	//f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
-	f(0) = 0.75**exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
+	f(0) = 0.75*exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
 	return f;
 }
 
