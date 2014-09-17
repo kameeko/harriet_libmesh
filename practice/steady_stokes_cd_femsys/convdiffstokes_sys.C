@@ -77,6 +77,7 @@ void StokesConvDiffSys::init_data (){
 	std::vector<unsigned int> u_only(1, u_var);
 	std::vector<unsigned int> v_only(1, v_var);
 	std::vector<unsigned int> uv(1, u_var); uv.push_back(v_var);
+	std::vector<unsigned int> c_only(1, c_var);
 
 	ZeroFunction<Number> zero;
 	ConstFunction<Number> one(1);
@@ -88,6 +89,9 @@ void StokesConvDiffSys::init_data (){
 	  (DirichletBoundary (top_bdys, v_only, &zero));
 	this->get_dof_map().add_dirichlet_boundary
 	  (DirichletBoundary (nontop_bdys, uv, &zero));
+	  
+	//c=0 on boundary, cuz I feel like it...
+	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, c_only, &zero));
 	  
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -243,7 +247,7 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	    //loop over p and c degrees of freedom
 	    for (unsigned int i=0; i != n_p_dofs; i++){ 
 	      Fp(i) += JxW[qp] * (u_x*psi[i][qp] + v_y*psi[i][qp]);
-	      Fc(i) += JxW[qp] * (-grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] + f(0)*psi[i][qp]);
+	      Fc(i) += JxW[qp] * (grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] + f(0)*psi[i][qp]);
 	      
 	      if (request_jacobian && ctxt.elem_solution_derivative){
 	        for(unsigned int j=0; j != n_u_dofs; j++){
@@ -253,7 +257,7 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	        	Kcv(i,j) += JxW[qp]*(phi[j][qp]*c_y*psi[i][qp]);
 	       	}
 	       	for(unsigned int j=0; j != n_c_dofs; j++){
-	       		Kcc(i,j) += JxW[qp]*(-dpsi[j][qp]*dpsi[i][qp] + U*dpsi[j][qp]*psi[i][qp]);
+	       		Kcc(i,j) += JxW[qp]*(dpsi[j][qp]*dpsi[i][qp] + U*dpsi[j][qp]*psi[i][qp]);
 	       	}
 	      }
 	    }
@@ -262,22 +266,18 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	return request_jacobian;
 }
 
-// Postprocessed output
+// Postprocessed output - generate data for inference run
 void StokesConvDiffSys::postprocess (){
-	const unsigned int dim = this->get_mesh().mesh_dimension();
+	//const unsigned int dim = this->get_mesh().mesh_dimension();
 
-	Point pt(1./3., 1./3.);
-	Number u = point_value(u_var, pt),
-	  v = point_value(v_var, pt),
-	  p = point_value(p_var, pt),
-	  c = point_value(c_var, pt);
-
-	std::cout << "u(1/3,1/3) = ("
-	          << u << ", "
-	          << v << ", "
-	          << ")" << std::endl;
-	std::cout << "p(1/3,1/3) = (" << p << ")" << std::endl;
-	std::cout << "c(1/3,1/3) = (" << c << ")" << std::endl;
+	for(int i=1; i<4; i++){
+		for(int j=1; j<4; j++){
+			Point pt(i/4.0, j/4.0);
+			Number c = point_value(c_var, pt);
+			std::cout << "c(" << i/4.0 << ", " << j/4.0 << ") = " << c << std::endl;
+		}
+	}
+	
 }
 
 // Returns the value of a forcing function at point p.  This value
@@ -285,7 +285,7 @@ void StokesConvDiffSys::postprocess (){
 Point StokesConvDiffSys::forcing(const Point& pt){
 	Point f;
 	//f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
-	f(0) = 0.75*exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
+	f(0) = -1.0*exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
 	return f;
 }
 

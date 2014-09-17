@@ -1,5 +1,4 @@
-//reproducing steady coupled stokes-conveciton-diffusion with FEMSystem framework
-//(not quite, cuz lack of BCs on concentration makes things screwy...)
+//inference with steady coupled stokes-convection-diffusion
 
 // C++ includes
 #include <iomanip>
@@ -19,7 +18,7 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/newton_solver.h"
-#include "convdiffstokes_sys.h"
+#include "convdiffstokes_optsys.h"
 
 
 int main(int argc, char** argv){
@@ -33,7 +32,7 @@ int main(int argc, char** argv){
   const unsigned int nelem_target      = infile("n_elements", 400);
   const bool transient                 = infile("transient", true);
   const Real deltat                    = infile("deltat", 0.005);
-  unsigned int n_timesteps             = infile("n_timesteps", 20);
+  unsigned int n_timesteps             = infile("n_timesteps", 1);
   const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
@@ -73,7 +72,8 @@ int main(int argc, char** argv){
   //name system
   StokesConvDiffSys & system = 
   	equation_systems.add_system<StokesConvDiffSys>("StokesConvDiff");
-  	
+  
+  //steady-state problem	
  	system.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
@@ -82,12 +82,11 @@ int main(int argc, char** argv){
   equation_systems.init ();
 
   // Set the time stepping options
-  system.deltat = deltat;
+  system.deltat = deltat; //this is ignored for SteadySolver...right?
 
   // And the nonlinear solver options
-  //DiffSolver &solver = *(system.time_solver->diff_solver().get());
-  NewtonSolver *solver = new NewtonSolver(system); //
-  system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver); //
+  NewtonSolver *solver = new NewtonSolver(system); 
+  system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver); 
   solver->quiet = infile("solver_quiet", true);
   solver->verbose = !solver->quiet;
   solver->max_nonlinear_iterations =
@@ -119,13 +118,9 @@ int main(int argc, char** argv){
     unsigned int a_step = 0;
     for (; a_step != max_adaptivesteps; ++a_step)
       {
-
         system.solve();
-
         system.postprocess();
-
         ErrorVector error;
-
         AutoPtr<ErrorEstimator> error_estimator;
 
         // To solve to a tolerance in this problem we
@@ -159,7 +154,7 @@ int main(int argc, char** argv){
           }
 
         // Calculate error
-        std::vector<Real> weights(4,1.0);  // based on u, v, p, c
+        std::vector<Real> weights(9,1.0);  // based on u, v, p, c, their adjoints, and source parameter
 
         // Keep the same default norm type.
         std::vector<FEMNormType>
