@@ -59,8 +59,9 @@ void StokesConvDiffSys::init_data (){
 	//source parameter in same space as the thing it spews...
 	fc_var = this->add_variable("fc", static_cast<Order>(pressure_p), fefamily);        
 
-	//regularization parameter
+	//regularization
 	beta = infile("beta",0.1);
+	regtype = infile("regularization_option",1);
 
 	//indicate variables that change in time
 	this->time_evolving(u_var);
@@ -114,6 +115,11 @@ void StokesConvDiffSys::init_data (){
 	
 	//corresponding BCs on for adjoints
 	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, z_forDiri, &zero));
+	
+	if(regtype == 1){
+		std::vector<unsigned int> fc_only(1, fc_var);
+		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, fc_only, &zero));
+	}
 	  
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -259,7 +265,8 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zu = ctxt.interior_gradient(zu_var, qp),
 	      grad_zv = ctxt.interior_gradient(zv_var, qp),
-	      grad_zc = ctxt.interior_gradient(zc_var, qp);
+	      grad_zc = ctxt.interior_gradient(zc_var, qp),
+	      grad_fc = ctxt.interior_gradient(fc_var, qp);
 
 	    // Definitions for convenience.  It is sometimes simpler to do a
 	    // dot product if you have the full vector at your disposal.
@@ -309,10 +316,13 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	    //things in pressure's family
 	    for (unsigned int i=0; i != n_p_dofs; i++){ 
 	      Rp(i) += JxW[qp]*(u_x*psi[i][qp] + v_y*psi[i][qp]);
-	      Rc(i) += JxW[qp]*(grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] + fc*psi[i][qp]);
+	      Rc(i) += JxW[qp]*(grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] - fc*psi[i][qp]);
 	      Rzp(i) += JxW[qp]*(-zu*dpsi[i][qp](0) - zv*dpsi[i][qp](1));
 	      Rzc(i) += JxW[qp]*(grad_zc*dpsi[i][qp] - (U*grad_zc + zc*(u_x + v_y))*psi[i][qp]);
-	      Rfc(i) += JxW[qp]*(beta*fc*psi[i][qp] + zc*psi[i][qp]);
+	      if(regtype == 0)
+	      	Rfc(i) += JxW[qp]*(beta*fc*psi[i][qp] + zc*psi[i][qp]);
+	     	else if(regtype == 1)
+	     		Rfc(i) += JxW[qp]*(beta*grad_fc*dpsi[i][qp] + zc*psi[i][qp]);
 	      
 	      if (request_jacobian && ctxt.elem_solution_derivative){
 	        for(unsigned int j=0; j != n_u_dofs; j++){
@@ -330,26 +340,33 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	       	for(unsigned int j=0; j != n_p_dofs; j++){
 	       		Jcc(i,j) += JxW[qp]*(dpsi[j][qp]*dpsi[i][qp] + U*dpsi[j][qp]*psi[i][qp]);
 	       		
-	       		J_c_fc(i,j) += JxW[qp]*(psi[j][qp]*psi[i][qp]);
+	       		J_c_fc(i,j) += -JxW[qp]*(psi[j][qp]*psi[i][qp]);
 	       		J_zc_zc(i,j) += JxW[qp]*(dpsi[j][qp]*dpsi[i][qp] - (U*dpsi[j][qp] + psi[j][qp]*(u_x + v_y))*psi[i][qp]);
 	       		J_fc_zc(i,j) += JxW[qp]*(psi[j][qp]*psi[i][qp]);
-	       		J_fc_fc(i,j) += JxW[qp]*(beta*psi[j][qp]*psi[i][qp]);
+	       		if(regtype == 0)
+	       			J_fc_fc(i,j) += JxW[qp]*(beta*psi[j][qp]*psi[i][qp]);
+	       		else if(regtype == 1)
+	       			J_fc_fc(i,j) += JxW[qp]*(beta*dpsi[j][qp]*dpsi[i][qp]);
 	       	}
 	      }
 	    }
 	  } // end of the quadrature point qp-loop
 	  
 	  //add contributions from data (from steady_stokes_cd_femsys)
-	  std::vector<Point> datapts; std::vector<Real> datavals;
-	  datapts.push_back(Point(0.25,0.25)); datavals.push_back(0.0253837);
-	  datapts.push_back(Point(0.25,0.5)); datavals.push_back(0.219173); 
-	  datapts.push_back(Point(0.25,0.75)); datavals.push_back(0.00929956); 
-	  datapts.push_back(Point(0.5,0.25)); datavals.push_back(0.0219174); 
-	  datapts.push_back(Point(0.5,0.5)); datavals.push_back(0.0206927); 
-	  datapts.push_back(Point(0.5,0.75)); datavals.push_back(0.00980547); 
-	  datapts.push_back(Point(0.75,0.25)); datavals.push_back(0.00929959); 
-	  datapts.push_back(Point(0.75,0.5)); datavals.push_back(0.00980552); 
-	  datapts.push_back(Point(0.75,0.75)); datavals.push_back(0.00522137); 
+	  /*std::vector<Point> datapts; 
+	  std::vector<Real> datavals;
+	  if(FILE *fp=fopen("Measurements.dat","r")){
+	  	Real x, y, value;
+	  	int flag = 1;
+	  	while(flag != -1){
+	  		flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
+	  		if(flag != -1){
+					datapts.push_back(Point(x,y));
+					datavals.push_back(value);
+	  		}
+	  	}
+	  	fclose(fp);
+	  }*/
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
 	  	Point data_point = datapts[dnum];
 	  	if(ctxt.get_elem().contains_point(data_point)){
@@ -386,13 +403,21 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 // Postprocessed output
 void StokesConvDiffSys::postprocess (){
 
-	for(int i=1; i<4; i++){
-		for(int j=1; j<4; j++){
-			Point pt(i/4.0, j/4.0);
-			Number c = point_value(c_var, pt);
-			std::cout << "c(" << i/4.0 << ", " << j/4.0 << ") = " << c << std::endl;
-		}
-	}
+	/*if(FILE *fp=fopen("Measurements.dat","r")){
+  	Real x, y, value;
+  	int flag = 1;
+  	while(flag != -1){
+  		flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
+  		if(flag != -1){
+  			Point pt(x,y);
+				Number c = point_value(c_var, pt);
+				std::cout << "c(" << x << ", " << y << ") = " << c << std::endl;
+  		}
+  	}
+	  fclose(fp);
+  }
+  */
+  std::cout << "meepmeep ";
 }
 
 // Returns the value of a forcing function at point p.  This value

@@ -21,7 +21,7 @@ n_timesteps = 1
 write_interval = 1
 
 # The coarse grid size from which to start adaptivity
-coarsegridsize = 20
+coarsegridsize = 40
 
 # The maximum number of adaptive steps per timestep
 max_adaptivesteps = 0

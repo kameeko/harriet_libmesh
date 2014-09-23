@@ -247,7 +247,7 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 	    //loop over p and c degrees of freedom
 	    for (unsigned int i=0; i != n_p_dofs; i++){ 
 	      Fp(i) += JxW[qp] * (u_x*psi[i][qp] + v_y*psi[i][qp]);
-	      Fc(i) += JxW[qp] * (grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] + f(0)*psi[i][qp]);
+	      Fc(i) += JxW[qp] * (grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] - f(0)*psi[i][qp]);
 	      
 	      if (request_jacobian && ctxt.elem_solution_derivative){
 	        for(unsigned int j=0; j != n_u_dofs; j++){
@@ -269,14 +269,18 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 // Postprocessed output - generate data for inference run
 void StokesConvDiffSys::postprocess (){
 	//const unsigned int dim = this->get_mesh().mesh_dimension();
-
-	for(int i=1; i<4; i++){
-		for(int j=1; j<4; j++){
-			Point pt(i/4.0, j/4.0);
+	std::ofstream output ("Measurements.dat");
+	for(int i=1; i<9; i++){
+		for(int j=1; j<9; j++){
+			Point pt(i/9.0, j/9.0);
 			Number c = point_value(c_var, pt);
-			std::cout << "c(" << i/4.0 << ", " << j/4.0 << ") = " << c << std::endl;
+			std::cout << "c(" << pt(0) << ", " << pt(1)<< ") = " << c << std::endl;
+			if(output.is_open()){
+        output << pt(0) << "  " << pt(1) << "  " << c << "\n";
+      }
 		}
 	}
+	output.close();
 	
 }
 
@@ -284,8 +288,7 @@ void StokesConvDiffSys::postprocess (){
 // depends on which application is being used.
 Point StokesConvDiffSys::forcing(const Point& pt){
 	Point f;
-	//f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
-	f(0) = -1.0*exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
+	f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
 	return f;
 }
 

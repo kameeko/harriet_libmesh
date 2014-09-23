@@ -1,2 +1,6 @@
+convdiffstokes_sys.$(obj-suffix):\
+    convdiffstokes_sys.C\
+    convdiffstokes_sys.h
 steady_convdiffstokes_femsys.$(obj-suffix):\
-    steady_convdiffstokes_femsys.C
+    steady_convdiffstokes_femsys.C\
+    convdiffstokes_sys.h

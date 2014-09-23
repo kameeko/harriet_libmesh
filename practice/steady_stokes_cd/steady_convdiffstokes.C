@@ -301,7 +301,7 @@ void assemble_stokesConvDiff (EquationSystems& es, const std::string& system_nam
 		    } //end scope bubble
       } // end of the quadrature point qp-loop
 
-      { //boundary conditions - lid-cavity for velocity, neumann for concentration...
+      { //boundary conditions - lid-cavity for velocity, natural for pressure, concentration...
         for (unsigned int s=0; s<elem->n_sides(); s++)
           if (elem->neighbor(s) == NULL)
             {

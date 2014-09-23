@@ -8,4 +8,7 @@ pressure_p = 1
 fe_family = 'LAGRANGE'
 
 #regularization parameter
-beta = 0.0001
+beta = 0.001
+
+#regularization option
+regularization_option = 1 #0 = squared L2 norm; 1 = penalize first derivative
