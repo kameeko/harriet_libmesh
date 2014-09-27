@@ -3,6 +3,8 @@
 
 using namespace libMesh;
 
+//this one is for the optimality system, not just the forward
+
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
 // but we must specify element residuals
 class StokesConvDiffSys : public FEMSystem

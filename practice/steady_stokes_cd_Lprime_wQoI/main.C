@@ -22,6 +22,10 @@
 #include "libmesh/adjoint_residual_error_estimator.h"
 #include "libmesh/qoi_set.h"
 
+// Sensitivity Calculation related includes
+#include "libmesh/parameter_vector.h"
+#include "libmesh/sensitivity_data.h"
+
 // libMesh I/O includes
 #include "libmesh/getpot.h"
 #include "libmesh/gmv_io.h"
@@ -276,20 +280,29 @@ int main (int argc, char** argv)
         // estimate to be used for flagging elements for refinement
         qois.set_weight(0, 1.0);
 
+				// A SensitivityData object to hold the qois and parameters
+        SensitivityData sensitivities(qois, system, system.get_parameter_vector());
+
         // Make sure we get the contributions to the adjoint RHS from the sides
-        system.assemble_qoi_sides = true;
+        system.assemble_qoi_sides = true; //does nothing anyways...
 
         // We are about to solve the adjoint system, but before we do this we see the same preconditioner
         // flag to reuse the preconditioner from the forward solver
         linear_solver->reuse_preconditioner(param.reuse_preconditioner);
 
-        // Solve the adjoint system. This takes the transpose of the stiffness matrix and then
-        // solves the resulting system
-        system.adjoint_solve();
+        // Here we solve the adjoint problem inside the adjoint_qoi_parameter_sensitivity
+        // function, so we have to set the adjoint_already_solved boolean to false
+        system.set_adjoint_already_solved(false);
+
+        // Compute the sensitivities
+        system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, 
         //so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
+        
+        Number sensit = sensitivities[0][0];
+        std::cout << "Sensitivity of QoI to Peclet number is " << sensit << std::endl;
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
         NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
@@ -380,16 +393,23 @@ int main (int argc, char** argv)
 
         qoi_indices.push_back(0);
         qois.add_indices(qoi_indices);
-
         qois.set_weight(0, 1.0);
+        
+        SensitivityData sensitivities(qois, system, system.get_parameter_vector());
 
         system.assemble_qoi_sides = false; //QoI doesn't involve sides
         linear_solver->reuse_preconditioner(param.reuse_preconditioner);
-        system.adjoint_solve();
+        
+        system.set_adjoint_already_solved(false);
+
+        system.adjoint_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities);
 
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, 
         //so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
+        
+        Number sensit = sensitivities[0][0];
+        std::cout << "Sensitivity of QoI to Peclet number is " << sensit << std::endl;
 
         NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
 

@@ -1,0 +1,16 @@
+convdiffstokes_sys.$(obj-suffix):\
+    convdiffstokes_sys.C\
+    convdiffstokes_sys.h
+element_qoi.$(obj-suffix):\
+    element_qoi.C\
+    convdiffstokes_sys.h
+element_qoi_derivative.$(obj-suffix):\
+    element_qoi_derivative.C\
+    convdiffstokes_sys.h
+femparameters.$(obj-suffix):\
+    femparameters.C\
+    femparameters.h
+main.$(obj-suffix):\
+    main.C\
+    convdiffstokes_sys.h\
+    femparameters.h
