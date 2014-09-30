@@ -32,7 +32,7 @@
 
 // Local includes
 #include "femparameters.h"
-#include "convdiffstokes_sys.h"
+#include "convdiffnavstokes_sys.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -58,7 +58,7 @@ void write_output(EquationSystems &es,
 }
 
 // Set the parameters for the nonlinear and linear solvers to be used during the simulation
-void set_system_parameters(StokesConvDiffSys &system, FEMParameters &param)
+void set_system_parameters(NavStokesConvDiffSys &system, FEMParameters &param)
 {
   // Use analytical jacobians?
   system.analytic_jacobians() = param.analytic_jacobians;
@@ -229,7 +229,7 @@ int main (int argc, char** argv)
   std::cout << "Building system" << std::endl;
 
   // Build the FEMSystem
-  StokesConvDiffSys &system = equation_systems.add_system<StokesConvDiffSys> ("StokesConvDiffSys");
+  NavStokesConvDiffSys &system = equation_systems.add_system<NavStokesConvDiffSys> ("NavStokesConvDiffSys");
 
   // Set its parameters
   set_system_parameters(system, param);
@@ -303,10 +303,10 @@ int main (int argc, char** argv)
         //so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
         
-        Number sensit_adj = sensitivities_adj[0][0];
-        Number sensit_for = sensitivities_for[0][0];
-        std::cout << "Sensitivity of QoI to Peclet number is " << sensit_adj << std::endl;
-        std::cout << "Sensitivity of QoI to Peclet number is " << sensit_for << std::endl;
+        std::cout << "(Adjoint) Sensitivity of QoI to rho is " << sensitivities_adj[0][0] << std::endl;
+        std::cout << "(Adjoint) Sensitivity of QoI to mu is " << sensitivities_adj[0][1] << std::endl;
+        std::cout << "(Forward) Sensitivity of QoI to rho is " << sensitivities_for[0][0] << std::endl;
+        std::cout << "(Forward) Sensitivity of QoI to mu is " << sensitivities_for[0][1] << std::endl;
 
         // Get a pointer to the solution vector of the adjoint problem for QoI 0
         NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
@@ -411,13 +411,13 @@ int main (int argc, char** argv)
         system.forward_qoi_parameter_sensitivity(qois, system.get_parameter_vector(), sensitivities_for);
 
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, 
-        //so we dont solve unneccesarily in the error estimator
+        // so we dont solve unneccesarily in the error estimator
         system.set_adjoint_already_solved(true);
         
-        Number sensit_adj = sensitivities_adj[0][0];
-        Number sensit_for = sensitivities_for[0][0];
-        std::cout << "Sensitivity of QoI to Peclet number is " << sensit_adj << std::endl;
-        std::cout << "Sensitivity of QoI to Peclet number is " << sensit_for << std::endl;
+        std::cout << "(Adjoint) Sensitivity of QoI to rho is " << sensitivities_adj[0][0] << std::endl;
+        std::cout << "(Adjoint) Sensitivity of QoI to mu is " << sensitivities_adj[0][1] << std::endl;
+        std::cout << "(Forward) Sensitivity of QoI to rho is " << sensitivities_for[0][0] << std::endl;
+        std::cout << "(Forward) Sensitivity of QoI to mu is " << sensitivities_for[0][1] << std::endl;
 
         NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
 
