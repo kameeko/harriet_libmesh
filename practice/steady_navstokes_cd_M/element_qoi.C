@@ -66,6 +66,7 @@ void NavStokesConvDiffSys::element_postprocess (DiffContext &context)
 	      auxfc = ctxt.interior_value(aux_fc_var, qp);
 	    Gradient grad_u = ctxt.interior_gradient(u_var, qp),
 	      grad_v = ctxt.interior_gradient(v_var, qp),
+	      grad_p = ctxt.interior_gradient(p_var, qp),
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zu = ctxt.interior_gradient(zu_var, qp),
 	      grad_zv = ctxt.interior_gradient(zv_var, qp),
@@ -86,6 +87,7 @@ void NavStokesConvDiffSys::element_postprocess (DiffContext &context)
 
 	    const Number u_x = grad_u(0); const Number u_y = grad_u(1);
 	    const Number v_x = grad_v(0); const Number v_y = grad_v(1);
+	    const Number p_x = grad_p(0); const Number p_y = grad_p(1);
 	    const Number c_x = grad_c(0); const Number c_y = grad_c(1);
 	    const Number zc_x = grad_zc(0); const Number zc_y = grad_zc(1);
 	    const Number zu_x = grad_zu(0); const Number zu_y = grad_zu(1);
@@ -100,57 +102,60 @@ void NavStokesConvDiffSys::element_postprocess (DiffContext &context)
 	    const Number auxzv_x = grad_auxzv(0); const Number auxzv_y = grad_auxzv(1);
 	    const Number auxzp_x = grad_auxzv(0); const Number auxzp_y = grad_auxzv(1);
 	    
-      dQoI += JxW[qp]*(-params[0]*U*grad_u*u + p*u_x - params[1]*(grad_u*grad_u));
-      dQoI += JxW[qp]*(-params[0]*U*grad_v*v + p*v_y - params[1]*(grad_v*grad_v));
-      dQoI += JxW[qp]*(params[1]*grad_zu*grad_zu - zp*zu_x - zc*c_x*zu
-      										+ params[0]*(-U*grad_zu - v_y*zu)*zu);
-      dQoI += JxW[qp]*(params[1]*grad_zv*grad_zv - zp*zv_y - zc*c_y*zv
-      										+ params[0]*(-U*grad_zv - u_x*zv)*zv);
-      										
-     	dQoI += JxW[qp]*(params[0]*(U*grad_auxu + v_y*auxu - auxv*v_x - auxzu*zu_x + zv*auxzv_x)*auxu 
-     											- params[1]*grad_auxu*grad_auxu
-     											+ auxp*auxu_x + auxc*c_x*auxu + zc*auxzc_x*auxu);
-     	dQoI += JxW[qp]*(params[0]*(U*grad_auxv + u_x*auxv - auxu*u_y - auxzv*zv_y + zu*auxzu_y)*auxv
-     											- params[1]*grad_auxv*grad_auxv
-     											+ auxp*auxv_y + auxc*c_y*auxv + zc*auxzc_y*auxv);
-     	dQoI += JxW[qp]*(params[0]*(U*grad_auxzu + u_x*auxzu)*auxzu
-     											+ params[1]*grad_auxzu*grad_auxzu - auxzp*auxzu_x);
-     	dQoI += JxW[qp]*(params[0]*(U*grad_auxzv + v_y*auxzv)*auxzv
-     											+ params[1]*grad_auxzv*grad_auxzv - auxzp*auxzv_y);
-
-      dQoI += JxW[qp]*(-u_x*p + v_y*p);
-      dQoI += JxW[qp]*(grad_c*grad_c + U*grad_c*c - fc*c);
-      dQoI += JxW[qp]*(zu*zp_x + zv*zp_y);
-      dQoI += JxW[qp]*(grad_zc*grad_zc - (U*grad_zc + zc*(u_x + v_y))*zc);
+	    dQoI += JxW[qp]*(params[0]*U*grad_u*auxzu - p*auxzu_x + params[1]*grad_u*grad_auxzu);
+    	dQoI += JxW[qp]*(params[0]*U*grad_v*auxzv - p*auxzv_y + params[1]*grad_v*grad_auxzv);
+    	dQoI += JxW[qp]*(params[1]*grad_zu*grad_auxu - zp*auxu_x - zc*c_x*auxu
+														+ params[0]*(-U*grad_zu - v_y*zu)*auxu);
+    	dQoI += JxW[qp]*(params[1]*grad_zv*grad_auxv - zp*auxv_y - zc*c_y*auxv
+      										+ params[0]*(-U*grad_zv - u_x*zv)*auxv);
+    		
+     	dQoI += JxW[qp]*(params[0]*(-U*grad_auxzu - v_y*auxzu + auxzv*v_x - auxu*zu_x + zv*auxv_x)*u 
+     											+ params[1]*grad_auxzu*grad_u
+     											- auxzp*u_x - auxzc*c_x*u - zc*auxc_x*u);
+     	dQoI += JxW[qp]*(params[0]*(-U*grad_auxzv - u_x*auxzv + auxzu*u_y - auxv*zv_y + zu*auxu_y)*v
+     											+ params[1]*grad_auxzv*grad_v
+     											- auxzp*v_y - auxzc*c_y*v - zc*auxc_y*v);
+     	dQoI += JxW[qp]*(params[0]*(U*grad_auxu + u_x*auxu)*zu
+     											+ params[1]*grad_auxu*grad_zu - auxp*zu_x);
+     	dQoI += JxW[qp]*(params[0]*(U*grad_auxv + v_y*auxv)*zv
+     											+ params[1]*grad_auxv*grad_zv - auxp*zv_y);
+	    
+	    
+			dQoI += JxW[qp]*(-u_x*auxzp - v_y*auxzp);
+      dQoI += JxW[qp]*(-grad_c*grad_auxzc - U*grad_c*auxzc + fc*auxzc);
+      dQoI += JxW[qp]*(-zu_x*auxp - zv_y*auxp);
+      dQoI += JxW[qp]*(-grad_zc*grad_auxc + (U*grad_zc + zc*(u_x + v_y))*auxc);
       if(regtype == 0)
-      	dQoI += JxW[qp]*(beta*fc*fc + zc*fc);
+      	dQoI += JxW[qp]*(beta*fc*auxfc + zc*auxfc);
      	else if(regtype == 1)
-     		dQoI += JxW[qp]*(beta*grad_fc*grad_fc + zc*fc);
-     	dQoI += JxW[qp]*(-auxu*auxp_x - auxv*auxp_y);
-     	dQoI += JxW[qp]*(grad_auxc*grad_auxc - (U*grad_auxc + auxc*(u_x + v_y))*auxc
-   									+ (zc*auxzu_x + zc_x*auxzu + zc*auxzv_y + zc_y*auxzv)*auxc
-   									- auxzc*auxc);
-   		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)
-   			dQoI += JxW[qp]*auxc;
-     	dQoI += JxW[qp]*(auxzu*auxzp_x + auxzv*auxzp_y);
-     	dQoI += JxW[qp]*((-auxzu*c_x - auxzv*c_y + auxfc + U*grad_auxzc)*auxzc
-     								+ grad_auxzc*grad_auxzc);
+     		dQoI += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
+     		
+     	dQoI += JxW[qp]*(auxzu*p_x + auxzv*p_y);
+     	dQoI += JxW[qp]*(-grad_auxzc*grad_c + (U*grad_auxzc + auxzc*(u_x + v_y))*c
+   									+ (zc*auxu_x + zc_x*auxu + zc*auxv_y + zc_y*auxv)*c
+   									+ auxc*c);
+   		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
+   			dQoI += JxW[qp];
+     	dQoI += JxW[qp]*(auxu*zp_x + auxv*zp_y);
+     	dQoI += JxW[qp]*((-auxu*c_x - auxv*c_y + auxfc - U*grad_auxc)*zc
+     								- grad_auxc*grad_zc);
      	if(regtype == 0)
-     		dQoI += JxW[qp]*((-auxc + beta*auxfc)*auxfc);
+     		dQoI += JxW[qp]*((auxzc + beta*auxfc)*fc);
      	else if(regtype == 1)
-     		dQoI += JxW[qp]*(-auxc*auxfc + beta*grad_auxfc*grad_auxfc);
+     		dQoI += JxW[qp]*(auxzc*fc + beta*grad_auxfc*grad_fc);	
      
-     	for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
-				Point data_point = datapts[dnum];
-				if(ctxt.get_elem().contains_point(data_point)){
-					Number cpred = ctxt.point_value(c_var, data_point);
-					Number cstar = datavals[dnum];
-		      
-		  		dQoI += (cstar - cpred)*cpred;
-				}
-			}	
-
     }
+    for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+			Point data_point = datapts[dnum];
+			if(ctxt.get_elem().contains_point(data_point)){
+				Number cpred = ctxt.point_value(c_var, data_point);
+				Number cstar = datavals[dnum];
+				Number auxc = ctxt.point_value(aux_c_var, data_point);
+	      
+	  		dQoI += (cpred - cstar)*auxc;
+			}
+		}	
+
 
   // Update the computed value of the global functional R, by adding the contribution from this element
 

@@ -123,70 +123,73 @@ void NavStokesConvDiffSys::element_qoi_derivative (DiffContext &context,
 	    const Number auxzv_x = grad_auxzv(0); const Number auxzv_y = grad_auxzv(1);
 	    
 	    for (unsigned int i=0; i != n_u_dofs; i++){ 
-	      Qu(i) += JxW[qp]*(-params[0]*U*grad_u*phi[i][qp] + p*dphi[i][qp](0) - params[1]*(grad_u*dphi[i][qp]));
-	      Qv(i) += JxW[qp]*(-params[0]*U*grad_v*phi[i][qp] + p*dphi[i][qp](1) - params[1]*(grad_v*dphi[i][qp]));
-	      Qzu(i) += JxW[qp]*(params[1]*grad_zu*dphi[i][qp] - zp*dphi[i][qp](0) - zc*c_x*phi[i][qp]
-	      										+ params[0]*(-U*grad_zu - v_y*zu)*phi[i][qp]);
-	      Qzv(i) += JxW[qp]*(params[1]*grad_zv*dphi[i][qp] - zp*dphi[i][qp](1) - zc*c_y*phi[i][qp]
+				Qauxzu(i) += JxW[qp]*(params[0]*U*grad_u*phi[i][qp] - p*dphi[i][qp](0) + params[1]*grad_u*dphi[i][qp]);
+	    	Qauxzv(i) += JxW[qp]*(params[0]*U*grad_v*phi[i][qp] - p*dphi[i][qp](1) + params[1]*grad_v*dphi[i][qp]);
+	    	Qauxu(i) += JxW[qp]*(params[1]*grad_zu*dphi[i][qp] - zp*dphi[i][qp](0) - zc*c_x*phi[i][qp]
+  														+ params[0]*(-U*grad_zu - v_y*zu)*phi[i][qp]);
+	    	Qauxv(i) += JxW[qp]*(params[1]*grad_zv*dphi[i][qp] - zp*dphi[i][qp](1) - zc*c_y*phi[i][qp]
 	      										+ params[0]*(-U*grad_zv - u_x*zv)*phi[i][qp]);
-	      										
-	     	Qauxu(i) += JxW[qp]*(params[0]*(U*grad_auxu + v_y*auxu - auxv*v_x - auxzu*zu_x + zv*auxzv_x)*phi[i][qp] 
-	     											- params[1]*grad_auxu*dphi[i][qp]
-	     											+ auxp*dphi[i][qp](0) + auxc*c_x*phi[i][qp] + zc*auxzc_x*phi[i][qp]);
-	     	Qauxv(i) += JxW[qp]*(params[0]*(U*grad_auxv + u_x*auxv - auxu*u_y - auxzv*zv_y + zu*auxzu_y)*phi[i][qp]
-	     											- params[1]*grad_auxv*dphi[i][qp]
-	     											+ auxp*dphi[i][qp](1) + auxc*c_y*phi[i][qp] + zc*auxzc_y*phi[i][qp]);
-	     	Qauxzu(i) += JxW[qp]*(params[0]*(U*grad_auxzu + u_x*auxzu)*phi[i][qp]
-	     											+ params[1]*grad_auxzu*dphi[i][qp] - auxzp*dphi[i][qp](0));
-	     	Qauxzv(i) += JxW[qp]*(params[0]*(U*grad_auxzv + v_y*auxzv)*phi[i][qp]
-	     											+ params[1]*grad_auxzv*dphi[i][qp] - auxzp*dphi[i][qp](1));
+	    	
+	    	//other parts in M'		
+	     	Qu(i) += JxW[qp]*(params[0]*(-U*grad_auxzu - v_y*auxzu + auxzv*v_x - auxu*zu_x + zv*auxv_x)*phi[i][qp] 
+	     											+ params[1]*grad_auxzu*dphi[i][qp]
+	     											- auxzp*dphi[i][qp](0) - auxzc*c_x*phi[i][qp] - zc*auxc_x*phi[i][qp]);
+	     	Qv(i) += JxW[qp]*(params[0]*(-U*grad_auxzv - u_x*auxzv + auxzu*u_y - auxv*zv_y + zu*auxu_y)*phi[i][qp]
+	     											+ params[1]*grad_auxzv*dphi[i][qp]
+	     											- auxzp*dphi[i][qp](1) - auxzc*c_y*phi[i][qp] - zc*auxc_y*phi[i][qp]);
+	     	Qzu(i) += JxW[qp]*(params[0]*(U*grad_auxu + u_x*auxu)*phi[i][qp]
+	     											+ params[1]*grad_auxu*dphi[i][qp] - auxp*dphi[i][qp](0));
+	     	Qzv(i) += JxW[qp]*(params[0]*(U*grad_auxv + v_y*auxv)*phi[i][qp]
+	     											+ params[1]*grad_auxv*dphi[i][qp] - auxp*dphi[i][qp](1));
 			}
 			for (unsigned int i=0; i != n_p_dofs; i++){ 
-	      Qp(i) += JxW[qp]*(-u_x*psi[i][qp] + v_y*psi[i][qp]);
-	      Qc(i) += JxW[qp]*(grad_c*dpsi[i][qp] + U*grad_c*psi[i][qp] - fc*psi[i][qp]);
-	      Qzp(i) += JxW[qp]*(zu*dpsi[i][qp](0) + zv*dpsi[i][qp](1));
-	      Qzc(i) += JxW[qp]*(grad_zc*dpsi[i][qp] - (U*grad_zc + zc*(u_x + v_y))*psi[i][qp]);
+	      Qauxzp(i) += JxW[qp]*(-u_x*psi[i][qp] - v_y*psi[i][qp]);
+	      Qauxzc(i) += JxW[qp]*(-grad_c*dpsi[i][qp] - U*grad_c*psi[i][qp] + fc*psi[i][qp]);
+	      Qauxp(i) += JxW[qp]*(-zu_x*psi[i][qp] - zv_y*psi[i][qp]);
+	      Qauxc(i) += JxW[qp]*(-grad_zc*dpsi[i][qp] + (U*grad_zc + zc*(u_x + v_y))*psi[i][qp]);
 	      if(regtype == 0)
-	      	Qfc(i) += JxW[qp]*(beta*fc*psi[i][qp] + zc*psi[i][qp]);
+	      	Qauxfc(i) += JxW[qp]*(beta*fc*psi[i][qp] + zc*psi[i][qp]);
 	     	else if(regtype == 1)
-	     		Qfc(i) += JxW[qp]*(beta*grad_fc*dpsi[i][qp] + zc*psi[i][qp]);
-	     	Qauxp(i) += JxW[qp]*(-auxu*dpsi[i][qp](0) - auxv*dpsi[i][qp](1));
-	     	Qauxc(i) += JxW[qp]*(grad_auxc*dpsi[i][qp] - (U*grad_auxc + auxc*(u_x + v_y))*psi[i][qp]
-     									+ (zc*auxzu_x + zc_x*auxzu + zc*auxzv_y + zc_y*auxzv)*psi[i][qp]
-     									- auxzc*psi[i][qp]);
-     		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)
-     			Qauxc(i) += JxW[qp]*psi[i][qp];
-	     	Qauxzp(i) += JxW[qp]*(auxzu*dpsi[i][qp](0) + auxzv*dpsi[i][qp](1));
-	     	Qauxzc(i) += JxW[qp]*((-auxzu*c_x - auxzv*c_y + auxfc + U*grad_auxzc)*psi[i][qp]
-	     								+ grad_auxzc*dpsi[i][qp]);
+	     		Qauxfc(i) += JxW[qp]*(beta*grad_fc*dpsi[i][qp] + zc*psi[i][qp]);
+	     		
+	     	//other parts in M'
+	     	Qp(i) += JxW[qp]*(auxzu*dpsi[i][qp](0) + auxzv*dpsi[i][qp](1));
+	     	Qc(i) += JxW[qp]*(-grad_auxzc*dpsi[i][qp] + (U*grad_auxzc + auxzc*(u_x + v_y))*psi[i][qp]
+     									+ (zc*auxu_x + zc_x*auxu + zc*auxv_y + zc_y*auxv)*psi[i][qp]
+     									+ auxc*psi[i][qp]);
+     		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
+     			Qc(i) += JxW[qp];
+	     	Qzp(i) += JxW[qp]*(auxu*dpsi[i][qp](0) + auxv*dpsi[i][qp](1));
+	     	Qzc(i) += JxW[qp]*((-auxu*c_x - auxv*c_y + auxfc - U*grad_auxc)*psi[i][qp]
+	     								- grad_auxc*dpsi[i][qp]);
 	     	if(regtype == 0)
-	     		Qauxfc(i) += JxW[qp]*((-auxc + beta*auxfc)*psi[i][qp]);
+	     		Qfc(i) += JxW[qp]*((auxzc + beta*auxfc)*psi[i][qp]);
 	     	else if(regtype == 1)
-	     		Qauxfc(i) += JxW[qp]*(-auxc*psi[i][qp] + beta*grad_auxfc*dpsi[i][qp]);
+	     		Qfc(i) += JxW[qp]*(auxzc*psi[i][qp] + beta*grad_auxfc*dpsi[i][qp]);
    		}
-   		for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
-				Point data_point = datapts[dnum];
-				if(ctxt.get_elem().contains_point(data_point)){
-					Number cpred = ctxt.point_value(c_var, data_point);
-					Number cstar = datavals[dnum];
-					
-					unsigned int dim = get_mesh().mesh_dimension();
-				  FEType fe_type = p_elem_fe->get_fe_type();
-				  
-				  //go between physical and reference element
-				  Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
-				  
-		      std::vector<Real> point_phi(n_p_dofs);
-		    	for (unsigned int i=0; i != n_p_dofs; i++){
-		    		//get value of basis function at mapped point in reference (master) element
-		        point_phi[i] = FEInterface::shape(dim, fe_type, &ctxt.get_elem(), i, c_master); 
-		      }
-		      
-		      for (unsigned int i=0; i != n_p_dofs; i++){
-			  		Qzc(i) += (cstar - cpred)*point_phi[i];
-					}
+    } // end of the quadrature point qp-loop
+    
+ 		for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+			Point data_point = datapts[dnum];
+			if(ctxt.get_elem().contains_point(data_point)){
+				Number cpred = ctxt.point_value(c_var, data_point);
+				Number cstar = datavals[dnum];
+				
+				unsigned int dim = get_mesh().mesh_dimension();
+			  FEType fe_type = p_elem_fe->get_fe_type();
+			  
+			  //go between physical and reference element
+			  Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
+			  
+	      std::vector<Real> point_phi(n_p_dofs);
+	    	for (unsigned int i=0; i != n_p_dofs; i++){
+	    		//get value of basis function at mapped point in reference (master) element
+	        point_phi[i] = FEInterface::shape(dim, fe_type, &ctxt.get_elem(), i, c_master); 
+	      }
+	      
+	      for (unsigned int i=0; i != n_p_dofs; i++){
+		  		Qauxc(i) += (cpred - cstar)*point_phi[i];
 				}
 			}
-
-    } // end of the quadrature point qp-loop
+		}
 }
