@@ -533,13 +533,13 @@ bool NavStokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffC
 	     		Rauxfc(i) += JxW[qp]*(beta*grad_fc*dpsi[i][qp] + zc*psi[i][qp]);
 	     		
 	     	//other parts in M'
-	     	Rp(i) += JxW[qp]*(auxzu*dpsi[i][qp](0) + auxzv*dpsi[i][qp](1));
+	     	Rp(i) += JxW[qp]*(-auxzu_x*psi[i][qp] - auxzv_y*psi[i][qp]);
 	     	Rc(i) += JxW[qp]*(-grad_auxzc*dpsi[i][qp] + (U*grad_auxzc + auxzc*(u_x + v_y))*psi[i][qp]
      									+ (zc*auxu_x + zc_x*auxu + zc*auxv_y + zc_y*auxv)*psi[i][qp]
      									+ auxc*psi[i][qp]);
      		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
      			Rc(i) += JxW[qp];
-	     	Rzp(i) += JxW[qp]*(auxu*dpsi[i][qp](0) + auxv*dpsi[i][qp](1));
+	     	Rzp(i) += JxW[qp]*(-auxu_x*psi[i][qp] - auxv_y*psi[i][qp]);
 	     	Rzc(i) += JxW[qp]*((-auxu*c_x - auxv*c_y + auxfc - U*grad_auxc)*psi[i][qp]
 	     								- grad_auxc*dpsi[i][qp]);
 	     	if(regtype == 0)
@@ -559,16 +559,16 @@ bool NavStokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffC
 	        	J_auxc_u(i,j) += JxW[qp]*(phi[j][qp]*zc_x*psi[i][qp] + zc*dphi[j][qp](0)*psi[i][qp]);
 	        	J_auxc_v(i,j) += JxW[qp]*(phi[j][qp]*zc_y*psi[i][qp] + zc*dphi[j][qp](1)*psi[i][qp]);
 	        	
-	        	J_p_auxzu(i,j) += JxW[qp]*(phi[j][qp]*dpsi[i][qp](0));
-	        	J_p_auxzv(i,j) += JxW[qp]*(phi[j][qp]*dpsi[i][qp](1));
+	        	J_p_auxzu(i,j) += JxW[qp]*(-dphi[j][qp](0)*psi[i][qp]);
+	        	J_p_auxzv(i,j) += JxW[qp]*(-dphi[j][qp](1)*psi[i][qp]);
 	        	
 	        	J_c_u(i,j) += JxW[qp]*(phi[j][qp]*auxzc_x + auxzc*dphi[j][qp](0))*psi[i][qp];
 	        	J_c_v(i,j) += JxW[qp]*(phi[j][qp]*auxzc_y + auxzc*dphi[j][qp](1))*psi[i][qp];
 	        	J_c_auxu(i,j) += JxW[qp]*(zc*dphi[j][qp](0) + zc_x*phi[j][qp])*psi[i][qp];
 	        	J_c_auxv(i,j) += JxW[qp]*(zc*dphi[j][qp](1) + zc_y*phi[j][qp])*psi[i][qp];
 	        	
-	        	J_zp_auxu(i,j) += JxW[qp]*phi[j][qp]*dpsi[i][qp](0);
-	        	J_zp_auxv(i,j) += JxW[qp]*phi[j][qp]*dpsi[i][qp](1);	
+	        	J_zp_auxu(i,j) += JxW[qp]*(-dphi[j][qp](0)*psi[i][qp]);
+	        	J_zp_auxv(i,j) += JxW[qp]*(-dphi[j][qp](1)*psi[i][qp]);	
 	     								      	
 	        	J_zc_u(i,j) += JxW[qp]*(-phi[j][qp]*auxc_x*psi[i][qp]);
 	        	J_zc_v(i,j) += JxW[qp]*(-phi[j][qp]*auxc_y*psi[i][qp]);
@@ -656,5 +656,76 @@ void NavStokesConvDiffSys::postprocess()
 
   this->comm().sum(computed_QoI[0]);
 
+}
+
+bool NavStokesConvDiffSys::side_constraint (bool request_jacobian,
+                                    DiffContext &context)
+{
+  FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  FEBase* p_elem_fe;
+
+  ctxt.get_element_fe( p_var, p_elem_fe );
+
+  // Pin p = 0 at the origin
+  const Point zero(0.,0.);
+
+  if( ctxt.get_elem().contains_point(zero))
+    {
+      // The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
+      const Real penalty = 1.e9;
+
+      DenseSubMatrix<Number> &Jpp = ctxt.get_elem_jacobian( p_var, p_var );
+      DenseSubMatrix<Number> &Jzpzp = ctxt.get_elem_jacobian( zp_var, zp_var );
+      DenseSubMatrix<Number> &Japap = ctxt.get_elem_jacobian( aux_p_var, aux_p_var );
+      DenseSubMatrix<Number> &Jazpazp = ctxt.get_elem_jacobian( aux_zp_var, aux_zp_var );
+      
+      DenseSubVector<Number> &Rp = ctxt.get_elem_residual( p_var );
+      DenseSubVector<Number> &Rzp = ctxt.get_elem_residual( zp_var );
+      DenseSubVector<Number> &Rap = ctxt.get_elem_residual( aux_p_var );
+      DenseSubVector<Number> &Razp = ctxt.get_elem_residual( aux_zp_var );
+      
+      const unsigned int n_p_dofs = ctxt.get_dof_indices( p_var ).size();
+
+      Number p = ctxt.point_value(p_var, zero);
+      Number p_pin = 0.;
+      Number zp = ctxt.point_value(zp_var, zero);
+      Number zp_pin = 0.;
+      Number auxp = ctxt.point_value(aux_p_var, zero);
+      Number auxp_pin = 0.;
+      Number auxzp = ctxt.point_value(aux_zp_var, zero);
+      Number auxzp_pin = 0.;
+
+      unsigned int dim = get_mesh().mesh_dimension();
+      FEType fe_type = p_elem_fe->get_fe_type();
+      Point p_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), zero);
+
+      std::vector<Real> point_phi(n_p_dofs);
+      for (unsigned int i=0; i != n_p_dofs; i++)
+        {
+          point_phi[i] = FEInterface::shape(dim, fe_type, &ctxt.get_elem(), i, p_master);
+        }
+
+      for (unsigned int i=0; i != n_p_dofs; i++)
+        {
+          Rp(i) += penalty * (p - p_pin) * point_phi[i];
+          Rzp(i) += penalty*(zp - zp_pin)*point_phi[i];
+          Rap(i) += penalty*(auxp - auxp_pin)*point_phi[i];
+          Razp(i) += penalty*(auxzp - auxzp_pin)*point_phi[i];
+          if (request_jacobian && ctxt.get_elem_solution_derivative())
+            {
+              libmesh_assert_equal_to (ctxt.get_elem_solution_derivative(), 1.0);
+
+              for (unsigned int j=0; j != n_p_dofs; j++){
+                Jpp(i,j) += penalty * point_phi[i] * point_phi[j];
+                Jzpzp(i,j) += penalty * point_phi[i] * point_phi[j];
+                Japap(i,j) += penalty * point_phi[i] * point_phi[j];
+                Jazpazp(i,j) += penalty * point_phi[i] * point_phi[j];
+              }
+            }
+        }
+    }
+
+  return request_jacobian;
 }
 

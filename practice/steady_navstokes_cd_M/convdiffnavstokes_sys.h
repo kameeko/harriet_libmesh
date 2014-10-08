@@ -104,4 +104,8 @@ protected:
   // The ParameterVector object that will contain pointers to
   // the system parameters
   ParameterVector param_vector;
+  
+  //pin pressure and friends
+  virtual bool side_constraint (bool request_jacobian,
+                                DiffContext& context);
 };

@@ -220,7 +220,7 @@ int main (int argc, char** argv)
                                          20,
                                          0., 1.,
                                          0., 1.,
-                                         QUAD9);
+                                         QUAD9); //if changed, check pressure pinning
 
   // Create a mesh refinement object to do the initial uniform refinements
   //MeshRefinement initial_uniform_refinements(mesh);

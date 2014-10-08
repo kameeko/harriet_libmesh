@@ -145,6 +145,7 @@ void NavStokesConvDiffSys::element_postprocess (DiffContext &context)
      		dQoI += JxW[qp]*(auxzc*fc + beta*grad_auxfc*grad_fc);	
      
     }
+
     for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
 			Point data_point = datapts[dnum];
 			if(ctxt.get_elem().contains_point(data_point)){
