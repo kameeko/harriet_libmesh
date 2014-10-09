@@ -7,7 +7,7 @@ print_element_jacobians = false
 pressure_p = 1
 fe_family = 'LAGRANGE'
 
-rho = 1 #density; set to 0 to recover Stoke's
+rho = 0 #density; set to 0 to recover Stoke's
 mu = 1 #viscosity
 
 #regularization parameter

@@ -270,9 +270,9 @@ bool StokesConvDiffSys::element_time_derivative (bool request_jacobian, DiffCont
 void StokesConvDiffSys::postprocess (){
 	//const unsigned int dim = this->get_mesh().mesh_dimension();
 	std::ofstream output ("Measurements.dat");
-	for(int i=1; i<9; i++){
-		for(int j=1; j<9; j++){
-			Point pt(i/9.0, j/9.0);
+	for(int i=1; i<4; i++){
+		for(int j=1; j<4; j++){
+			Point pt(i/4.0, j/4.0);
 			Number c = point_value(c_var, pt);
 			std::cout << "c(" << pt(0) << ", " << pt(1)<< ") = " << c << std::endl;
 			if(output.is_open()){

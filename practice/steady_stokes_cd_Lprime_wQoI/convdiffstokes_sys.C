@@ -415,3 +415,62 @@ void StokesConvDiffSys::postprocess()
 
 }
 
+bool StokesConvDiffSys::side_constraint (bool request_jacobian,
+                                    DiffContext &context)
+{
+  FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  FEBase* p_elem_fe;
+
+  ctxt.get_element_fe( p_var, p_elem_fe );
+
+  // Pin p = 0 at the origin
+  const Point zero(0.,0.);
+
+  if( ctxt.get_elem().contains_point(zero))
+    {
+      // The pressure penalty value.  \f$ \frac{1}{\epsilon} \f$
+      const Real penalty = 1.e9;
+
+      DenseSubMatrix<Number> &Jpp = ctxt.get_elem_jacobian( p_var, p_var );
+      DenseSubMatrix<Number> &Jzpzp = ctxt.get_elem_jacobian( zp_var, zp_var );
+      
+      DenseSubVector<Number> &Rp = ctxt.get_elem_residual( p_var );
+			DenseSubVector<Number> &Rzp = ctxt.get_elem_residual( zp_var );
+			
+      const unsigned int n_p_dofs = ctxt.get_dof_indices( p_var ).size();
+
+      Number p = ctxt.point_value(p_var, zero);
+      Number zp = ctxt.point_value(zp_var, zero);
+      Number p_pin = 0.;
+
+      unsigned int dim = get_mesh().mesh_dimension();
+      FEType fe_type = p_elem_fe->get_fe_type();
+      Point p_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), zero);
+
+      std::vector<Real> point_phi(n_p_dofs);
+      for (unsigned int i=0; i != n_p_dofs; i++)
+        {
+          point_phi[i] = FEInterface::shape(dim, fe_type, &ctxt.get_elem(), i, p_master);
+        }
+
+      for (unsigned int i=0; i != n_p_dofs; i++)
+        {
+          Rp(i) += penalty * (p - p_pin) * point_phi[i];
+          Rzp(i) += penalty*(zp - p_pin)*point_phi[i];
+          if (request_jacobian && ctxt.get_elem_solution_derivative())
+            {
+              libmesh_assert_equal_to (ctxt.get_elem_solution_derivative(), 1.0);
+
+              for (unsigned int j=0; j != n_p_dofs; j++){
+                Jpp(i,j) += penalty * point_phi[i] * point_phi[j];
+                Jzpzp(i,j) += penalty*point_phi[i]*point_phi[j];
+              }
+            }
+        }
+    }
+
+  return request_jacobian;
+}
+
+
