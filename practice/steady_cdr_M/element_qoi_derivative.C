@@ -72,17 +72,19 @@ void ConvDiffSys::element_qoi_derivative (DiffContext &context,
 	    NumberVectorValue U     (u,     v);
 	    
 	    for (unsigned int i=0; i != n_c_dofs; i++){ 
-	      Qauxc(i) += JxW[qp]*(-(1/params[0])*grad_zc*dpsi[i][qp] + U*grad_zc*psi[i][qp]);
-	      Qauxzc(i) += JxW[qp]*(-(1/params[0])*grad_c*dpsi[i][qp] - U*grad_c*psi[i][qp] + fc*psi[i][qp]);
+	      Qauxc(i) += JxW[qp]*(-(1/params[0])*grad_zc*dpsi[i][qp] + U*grad_zc*psi[i][qp] + 2*R*zc*c*psi[i][qp]);
+	      Qauxzc(i) += JxW[qp]*(-(1/params[0])*grad_c*dpsi[i][qp] - U*grad_c*psi[i][qp] + R*c*c*psi[i][qp] + fc*psi[i][qp]);
 	      if(regtype == 0)
 	      	Qauxfc(i) += JxW[qp]*(beta*fc*psi[i][qp] + zc*psi[i][qp]);
 	     	else if(regtype == 1)
 	     		Qauxfc(i) += JxW[qp]*(beta*grad_fc*dpsi[i][qp] + zc*psi[i][qp]);
 	     		
-	      Qc(i) += JxW[qp]*(-(1/params[0])*grad_auxzc*dpsi[i][qp] + U*grad_auxzc*psi[i][qp] + auxc*psi[i][qp]);
+	      Qc(i) += JxW[qp]*(-(1/params[0])*grad_auxzc*dpsi[i][qp] + U*grad_auxzc*psi[i][qp] 
+	      						+ auxc*psi[i][qp] + 2*R*zc*auxc*psi[i][qp]);
 	      if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
      			Qc(i) += JxW[qp]*psi[i][qp]; //Rc(i) += JxW[qp]?
-	      Qzc(i) += JxW[qp]*(-(1/params[0])*grad_auxc*dpsi[i][qp] - U*grad_auxc*psi[i][qp] + auxfc*psi[i][qp]);
+	      Qzc(i) += JxW[qp]*(-(1/params[0])*grad_auxc*dpsi[i][qp] - U*grad_auxc*psi[i][qp] 
+	      						+ auxfc*psi[i][qp] + 2*R*c*auxc*psi[i][qp]);
 	     	if(regtype == 0)
    				Qfc(i) += JxW[qp]*((auxzc + beta*auxfc)*psi[i][qp]);
 	     	else if(regtype == 1)

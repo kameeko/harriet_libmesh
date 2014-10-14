@@ -64,17 +64,17 @@ void ConvDiffSys::element_postprocess (DiffContext &context)
 	    Real u = -(pty-0.5); Real v = ptx-0.5;
 	    NumberVectorValue U     (u,     v);
 	    
-      dQoI += JxW[qp]*(-(1/params[0])*grad_zc*grad_auxc + U*grad_zc*auxc);
-      dQoI += JxW[qp]*(-(1/params[0])*grad_c*grad_auxzc - U*grad_c*auxzc + fc*auxzc);
+      dQoI += JxW[qp]*(-(1/params[0])*grad_zc*grad_auxc + U*grad_zc*auxc + 2*R*zc*c*auxc);
+      dQoI += JxW[qp]*(-(1/params[0])*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
       if(regtype == 0)
       	dQoI += JxW[qp]*(beta*fc*auxfc + zc*auxfc);
      	else if(regtype == 1)
      		dQoI += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
      		
-      dQoI += JxW[qp]*(-(1/params[0])*grad_auxzc*grad_c + U*grad_auxzc*c + auxc*c);
+      dQoI += JxW[qp]*(-(1/params[0])*grad_auxzc*grad_c + U*grad_auxzc*c + auxc*c + 2*R*zc*auxc*c);
       if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
    			dQoI += JxW[qp]*c; //?
-      dQoI += JxW[qp]*(-(1/params[0])*grad_auxc*grad_zc - U*grad_auxc*zc + auxfc*zc);
+      dQoI += JxW[qp]*(-(1/params[0])*grad_auxc*grad_zc - U*grad_auxc*zc + auxfc*zc  + 2*R*c*auxc*zc);
      	if(regtype == 0)
  				dQoI += JxW[qp]*((auxzc + beta*auxfc)*fc);
      	else if(regtype == 1)
