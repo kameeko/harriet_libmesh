@@ -68,7 +68,35 @@ void ConvDiffSys::element_qoi_derivative (DiffContext &context,
 	      grad_auxzc = ctxt.interior_gradient(aux_zc_var, qp),
 	      grad_auxfc = ctxt.interior_gradient(aux_fc_var, qp);
 
-	    Real u = -(pty-0.5); Real v = ptx-0.5;
+	    Real u, v;
+	    if(vel_option == 0){
+	    	u = -(pty-0.5); 
+	    	v = ptx-0.5;
+	   	}
+	   	else if(vel_option == 1){
+	   		int xind, yind;
+	   		Real xdist = 1.e10; Real ydist = 1.e10;
+	   		for(int ii=0; ii<x_pts.size(); ii++){
+	   			Real tmp = std::abs(ptx - x_pts[ii]);
+	   			if(xdist > tmp){
+	   				xdist = tmp;
+	   				xind = ii;
+	   			}
+	   			else
+	   				break;
+	   		} 
+	   		for(int jj=0; jj<y_pts[xind].size(); jj++){
+	   			Real tmp = std::abs(pty - y_pts[xind][jj]);
+	   			if(ydist > tmp){
+	   				ydist = tmp;
+	   				yind = jj;
+	   			}
+	   			else
+	   				break;
+	   		}
+	   		u = vel_field[xind][yind](0);
+	   		v = vel_field[xind][yind](1);
+	   	}
 	    NumberVectorValue U     (u,     v);
 	    
 	    for (unsigned int i=0; i != n_c_dofs; i++){ 

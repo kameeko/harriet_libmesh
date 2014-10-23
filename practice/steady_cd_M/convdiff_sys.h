@@ -4,6 +4,8 @@
 #include "libmesh/qoi_set.h"
 #include "libmesh/system.h"
 
+#include "libmesh/getpot.h"
+
 using namespace libMesh;
 
 // FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
@@ -32,6 +34,41 @@ public:
 	  		}
 	  	}
 	  	fclose(fp);
+	  }
+	  
+	  GetPot infile("convdiff.in");
+	  vel_option = infile("velocity_field",1);
+	  if(vel_option == 1){
+	  	if(FILE *fp=fopen("vels0.txt","r")){
+	  		Real u, v, x, y;
+	  		Real prevx = 1.e10;
+	  		std::vector<Real> tempvecy;
+	  		std::vector<NumberVectorValue> tempvecvel;
+	  		int flag = 1;
+	  		while(flag != -1){
+	  			flag = fscanf(fp, "%lf %lf %lf %lf",&u,&v,&x,&y);
+	  			if(flag != -1){
+	  				if(x != prevx){
+	  					x_pts.push_back(x);
+	  					prevx = x;
+	  					if(x_pts.size() > 1){
+	  						y_pts.push_back(tempvecy);
+	  						vel_field.push_back(tempvecvel);
+  						}
+	  					tempvecy.clear(); 
+	  					tempvecvel.clear();
+	  					tempvecy.push_back(y); 
+	  					tempvecvel.push_back(NumberVectorValue(u,v));
+	  				}
+	  				else{
+	  					tempvecy.push_back(y); 
+	  					tempvecvel.push_back(NumberVectorValue(u,v));
+	  				}
+	  			}
+	  		}
+	  		y_pts.push_back(tempvecy);
+	  		vel_field.push_back(tempvecvel);
+	  	}
 	  }
   } //end constructor
   
@@ -103,5 +140,11 @@ protected:
   // The ParameterVector object that will contain pointers to
   // the system parameters
   ParameterVector param_vector;
+  
+  //velocity field
+  int vel_option;
+  std::vector<Real> x_pts;
+  std::vector<std::vector<Real> > y_pts;
+  std::vector<std::vector<NumberVectorValue> > vel_field;
 
 };

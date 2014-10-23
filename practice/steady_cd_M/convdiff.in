@@ -12,3 +12,6 @@ beta = 0.01
 
 #regularization option
 regularization_option = 1 #0 = squared L2 norm; 1 = penalize first derivative
+
+#velocity field
+velocity_field = 1 #0 = centered irrotational vortex; 1 = from lid-cavity NS, Re=1
