@@ -1,0 +1,12 @@
+FEMSystem (http://libmesh.sourceforge.net/systems_of_equations_ex2.php) vs 
+EquationSystems (http://libmesh.sourceforge.net/adjoints_ex3.php) classes?
+
+
+from example 2:
+mesh_dimension()=2
+spatial_dimension()=3
+-> why would a 2D mesh have 3 spatial dimensions
+
+why does the output of example 3 say
+ Approximation Orders="SECOND", "THIRD"
+when there's only one variable and it's set to second order?
