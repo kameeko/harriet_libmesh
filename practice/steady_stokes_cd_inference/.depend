@@ -1,0 +1,6 @@
+convdiffstokes_optsys.$(obj-suffix):\
+    convdiffstokes_optsys.C\
+    convdiffstokes_optsys.h
+steady_convdiffstokes_opt.$(obj-suffix):\
+    steady_convdiffstokes_opt.C\
+    convdiffstokes_optsys.h

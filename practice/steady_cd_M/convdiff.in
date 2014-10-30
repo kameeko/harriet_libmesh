@@ -1,0 +1,17 @@
+verify_analytic_jacobians = 1.0e-6 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+
+# The polynomial order and finite element type to use for the concentration variable.
+fe_family = 'LAGRANGE'
+
+Pe = 1 #Peclet number
+
+#regularization parameter
+beta = 0.01
+
+#regularization option
+regularization_option = 1 #0 = squared L2 norm; 1 = penalize first derivative
+
+#velocity field
+velocity_field = 1 #0 = centered irrotational vortex; 1 = from lid-cavity NS, Re=1

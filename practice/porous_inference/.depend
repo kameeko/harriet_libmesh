@@ -1,0 +1,10 @@
+initial.$(obj-suffix):\
+    initial.C\
+    initial.h
+main.$(obj-suffix):\
+    main.C\
+    initial.h\
+    porous_high_fidelity.h
+porous_high_fidelity.$(obj-suffix):\
+    porous_high_fidelity.C\
+    porous_high_fidelity.h

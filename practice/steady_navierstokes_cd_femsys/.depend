@@ -1,0 +1,6 @@
+convdiffnavstokes_sys.$(obj-suffix):\
+    convdiffnavstokes_sys.C\
+    convdiffnavstokes_sys.h
+steady_convdiffnavstokes_femsys.$(obj-suffix):\
+    steady_convdiffnavstokes_femsys.C\
+    convdiffnavstokes_sys.h
