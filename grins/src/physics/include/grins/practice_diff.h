@@ -2,7 +2,12 @@
 #define GRINS_PRAC_DIFF_H
 
 // GRINS
+#include "grins/grins_enums.h"
 #include "grins/physics.h"
+
+//libMesh
+#include "libmesh/enum_order.h"
+#include "libmesh/enum_fe_family.h"
 
 namespace GRINS{
 
@@ -31,7 +36,7 @@ namespace GRINS{
 		libMesh::Number _k; //diffusion coefficient
 		VariableIndex _c_var; //index for concentration
 		
-		
+		GRINSEnums::FEFamily _fefamily; //element type
 	
 	private:
 	

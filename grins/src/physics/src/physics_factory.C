@@ -70,8 +70,9 @@
 #include "grins/antioch_constant_transport_mixture.h"
 #include "grins/antioch_constant_transport_evaluator.h"
 
-//#include "grins/practice_diff.h"
-//#include "grins/practice_convdiff.h"
+#include "grins/practice_diff.h"
+#include "grins/practice_convdiff.h"
+#include "grins/practice_cdr_inv.h"
 
 // libMesh
 #include "libmesh/getpot.h"
@@ -328,12 +329,15 @@ namespace GRINS
       {
         this->add_reacting_low_mach( input, physics_to_add, physics_list );
       }
-   /* else if(physics_to_add == prac_diff){
+   	else if(physics_to_add == prac_diff){
     	physics_list[physics_to_add] = PhysicsPtr(new PracticeDiff(physics_to_add,input) );
     }
-    else if(phyics_to_add == prac_convdiff){
+    else if(physics_to_add == prac_convdiff){
     	physics_list[physics_to_add] = PhysicsPtr(new PracticeConvDiff(physics_to_add,input) );
-    }*/
+    }
+    else if(physics_to_add == prac_cdr_inv){
+    	physics_list[physics_to_add] = PhysicsPtr(new PracticeCDRinv(physics_to_add,input));
+    }
     else
       {
         std::cerr << "Error: Invalid physics name " << physics_to_add << std::endl;

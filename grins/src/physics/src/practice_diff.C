@@ -17,7 +17,9 @@ namespace GRINS{
 
 	PracticeDiff::PracticeDiff( const GRINS::PhysicsName& physics_name, const GetPot& input )
 		: Physics(physics_name,input), 
-			_k(input("k", 1.0)){
+			_k(input("Physics/PracticeDiffusion/k", 1.0)),
+			_fefamily( libMesh::Utility::string_to_enum<GRINSEnums::FEFamily>( 
+					input("Physics/"+physics_name+"/fe_family", "LAGRANGE"))){
 		
 		this->_bc_handler = new PracticeBCHandling( physics_name, input );
     this->_ic_handler = new GenericICHandler( physics_name, input );
@@ -30,14 +32,8 @@ namespace GRINS{
 	void PracticeDiff::init_variables( libMesh::FEMSystem* system ){
 		//polynomial order and finite element type for concentration variable
 		unsigned int conc_p = 1;
-		GetPot infile("diff.in");
-		std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
-	
-		_k = infile("k", 1.0);
-
-		GRINSEnums::FEFamily fefamily = libMesh::Utility::string_to_enum<GRINSEnums::FEFamily>(fe_family);
-			                                                    
-		_c_var = system->add_variable("c", static_cast<GRINSEnums::Order>(conc_p), fefamily); 
+		
+		_c_var = system->add_variable("c", static_cast<GRINSEnums::Order>(conc_p), _fefamily); 
 	}
 	
 	void PracticeDiff::init_context( AssemblyContext& context){

@@ -11,13 +11,37 @@ namespace GRINS
 
 	PracticeBCHandling::PracticeBCHandling(const std::string& physics_name,
 						 const GetPot& input)
-    : BCHandlingBase(physics_name){return;}
+    : BCHandlingBase(physics_name){
+    
+    std::string id_str = "Physics/"+_physics_name+"/bc_ids";
+    std::string bc_str = "Physics/"+_physics_name+"/bc_types";
+    std::string var_str = "Physics/"+_physics_name+"/bc_variables";
+    std::string val_str = "Physics/"+_physics_name+"/bc_values";
+    
+    this->read_bc_data( input, id_str, bc_str, var_str, val_str );
+    
+    return;
+  }
 
 	PracticeBCHandling::~PracticeBCHandling(){return;}
 	
 	void PracticeBCHandling::init_bc_data( const libMesh::FEMSystem& system ){
 		libmesh_assert( system.has_variable("c"));
 		_c_var = system.variable_number("c");
+		if(system.has_variable("zc")){
+			_zc_var = system.variable_number("zc");
+			_has_zc = true;
+		}
+		else
+			_has_zc = false;
+			
+		if(system.has_variable("fc")){
+			_fc_var = system.variable_number("fc");
+			_has_fc = true;
+		}
+		else
+			_has_fc = false;
+			
 		return;
 	}
 	
@@ -29,8 +53,8 @@ namespace GRINS
 					      const GetPot& input ){
 					      
     this->set_dirichlet_bc_type( bc_id, bc_type );
-	  this->set_dirichlet_bc_value( bc_id, 0.0 );
-					      
+	  this->set_dirichlet_bc_value( bc_id, 0.0 ); //true for all variables in practice cases
+				      
 	}
 	
 	void PracticeBCHandling::user_init_dirichlet_bcs( libMesh::FEMSystem* /*system*/,
@@ -40,9 +64,13 @@ namespace GRINS
 	
 		std::set<BoundaryID> dbc_ids;
 	  dbc_ids.insert(bc_id);
-	
+
 	  std::vector<VariableIndex> dbc_vars;
 	  dbc_vars.push_back(_c_var);
+	  if(_has_zc)
+	  	dbc_vars.push_back(_zc_var);
+	  if(_has_fc)
+	  	dbc_vars.push_back(_fc_var);
 	
     libMesh::ConstFunction<libMesh::Number> c_func(this->get_dirichlet_bc_value(bc_id));
 	
