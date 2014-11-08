@@ -42,6 +42,27 @@ namespace GRINS
 		else
 			_has_fc = false;
 			
+		if(system.has_variable("auxc")){
+			_aux_c_var = system.variable_number("auxc");
+			_has_auxc = true;
+		}
+		else
+			_has_auxc = false;
+			
+		if(system.has_variable("auxzc")){
+			_aux_zc_var = system.variable_number("auxzc");
+			_has_auxzc = true;
+		}
+		else
+			_has_auxzc = false;
+			
+		if(system.has_variable("auxfc")){
+			_aux_fc_var = system.variable_number("auxfc");
+			_has_auxfc = true;
+		}
+		else
+			_has_auxfc = false;
+			
 		return;
 	}
 	
@@ -71,6 +92,12 @@ namespace GRINS
 	  	dbc_vars.push_back(_zc_var);
 	  if(_has_fc)
 	  	dbc_vars.push_back(_fc_var);
+	  if(_has_auxc)
+	  	dbc_vars.push_back(_aux_c_var);
+	  if(_has_auxzc)
+	  	dbc_vars.push_back(_aux_zc_var);
+	  if(_has_auxfc)
+	  	dbc_vars.push_back(_aux_fc_var);
 	
     libMesh::ConstFunction<libMesh::Number> c_func(this->get_dirichlet_bc_value(bc_id));
 	

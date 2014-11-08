@@ -73,6 +73,7 @@
 #include "grins/practice_diff.h"
 #include "grins/practice_convdiff.h"
 #include "grins/practice_cdr_inv.h"
+#include "grins/practice_cdr_Mprime.h"
 
 // libMesh
 #include "libmesh/getpot.h"
@@ -329,6 +330,7 @@ namespace GRINS
       {
         this->add_reacting_low_mach( input, physics_to_add, physics_list );
       }
+///////// practice physics /////////
    	else if(physics_to_add == prac_diff){
     	physics_list[physics_to_add] = PhysicsPtr(new PracticeDiff(physics_to_add,input) );
     }
@@ -338,6 +340,10 @@ namespace GRINS
     else if(physics_to_add == prac_cdr_inv){
     	physics_list[physics_to_add] = PhysicsPtr(new PracticeCDRinv(physics_to_add,input));
     }
+    else if(physics_to_add == prac_cdr_Mprime){
+    	physics_list[physics_to_add] = PhysicsPtr(new PracticeCDR_Mprime(physics_to_add,input));
+    }
+///////// practice physics /////////
     else
       {
         std::cerr << "Error: Invalid physics name " << physics_to_add << std::endl;

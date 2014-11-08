@@ -34,8 +34,8 @@ namespace GRINS
 
     PracticeBCHandling();
     
-    VariableIndex _c_var, _zc_var, _fc_var;
-    bool _has_zc, _has_fc;
+    VariableIndex _c_var, _zc_var, _fc_var, _aux_c_var, _aux_zc_var, _aux_fc_var;
+    bool _has_zc, _has_fc, _has_auxc, _has_auxzc, _has_auxfc;
 
   };
 }

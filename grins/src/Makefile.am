@@ -107,6 +107,7 @@ libgrins_la_SOURCES += physics/src/velocity_penalty_base.C
 libgrins_la_SOURCES += physics/src/practice_diff.C
 libgrins_la_SOURCES += physics/src/practice_convdiff.C
 libgrins_la_SOURCES += physics/src/practice_cdr_inv.C
+libgrins_la_SOURCES += physics/src/practice_cdr_Mprime.C
 
 # src/properties files
 libgrins_la_SOURCES += properties/src/constant_conductivity.C
@@ -273,6 +274,7 @@ include_HEADERS += physics/include/grins/velocity_penalty_base.h
 include_HEADERS += physics/include/grins/practice_diff.h
 include_HEADERS += physics/include/grins/practice_convdiff.h
 include_HEADERS += physics/include/grins/practice_cdr_inv.h
+include_HEADERS += physics/include/grins/practice_cdr_Mprime.h
 
 # src/properties headers
 include_HEADERS += properties/include/grins/property_types.h
