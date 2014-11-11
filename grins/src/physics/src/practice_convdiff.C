@@ -18,6 +18,8 @@ namespace GRINS{
 	PracticeConvDiff::PracticeConvDiff( const GRINS::PhysicsName& physics_name, const GetPot& input )
 		: Physics(physics_name,input), 
 			_k(input("Physics/PracticeConvectionDiffusion/k", 1.0)),
+			_source_x(input("Physics/"+physics_name+"/source_x", 0.25)),
+			_source_y(input("Physics/"+physics_name+"/source_y", 0.25)),
 			_fefamily( libMesh::Utility::string_to_enum<GRINSEnums::FEFamily>( 
 					input("Physics/"+physics_name+"/fe_family", "LAGRANGE"))){
 		
@@ -174,7 +176,7 @@ namespace GRINS{
 	
 	inline
 	libMesh::Real PracticeConvDiff::forcing( const libMesh::Point& p){
-		return exp(-10*(pow(p(0)-0.25,2)+pow(p(1)-0.25,2)));
+		return exp(-10*(pow(p(0)-_source_x,2)+pow(p(1)-_source_y,2)));
 	}
 
 } //namespace GRINS

@@ -36,6 +36,8 @@ namespace GRINS{
 		libMesh::Number _k; //diffusion coefficient
 		VariableIndex _c_var; //index for concentration
 		
+		libMesh::Real _source_x, _source_y; //center of source
+		
 		GRINSEnums::FEFamily _fefamily; //element type
 	
 	private:
