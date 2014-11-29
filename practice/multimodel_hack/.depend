@@ -1,0 +1,6 @@
+diff_convdiff_inv.$(obj-suffix):\
+    diff_convdiff_inv.C\
+    diff_convdiff_inv.h
+main.$(obj-suffix):\
+    main.C\
+    diff_convdiff_inv.h
