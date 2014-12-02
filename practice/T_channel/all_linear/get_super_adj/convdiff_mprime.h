@@ -5,12 +5,12 @@
 
 using namespace libMesh;
 
-class ConvDiff_MprimeSys : public FEMSystem
+class Diff_ConvDiff_MprimeSys : public FEMSystem
 {
 public:
 
   // Constructor
-  ConvDiff_MprimeSys(EquationSystems& es,
+  Diff_ConvDiff_MprimeSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){

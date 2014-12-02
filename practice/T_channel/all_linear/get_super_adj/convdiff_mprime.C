@@ -17,7 +17,7 @@
 using namespace libMesh;
 
 // System initialization
-void ConvDiff_MprimeSys::init_data (){
+void Diff_ConvDiff_MprimeSys::init_data (){
 	const unsigned int dim = this->get_mesh().mesh_dimension();
 
 	//polynomial order and finite element type
@@ -32,20 +32,20 @@ void ConvDiff_MprimeSys::init_data (){
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
                          
-  //std::cout << "siamese? " << this->has_variable("c") << "\n"; //DEBUG
+  std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
 	fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
 	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
 	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily); 
 	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);         
-
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	//regularization
 	beta = infile("beta",0.1);
 	
 	//diffusion coefficient
 	k = infile("k", 1.0);
-
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	//indicate variables that change in time
 	this->time_evolving(c_var);
 	this->time_evolving(zc_var);
@@ -53,36 +53,37 @@ void ConvDiff_MprimeSys::init_data (){
 	this->time_evolving(aux_c_var);
 	this->time_evolving(aux_zc_var);
 	this->time_evolving(aux_fc_var);
-
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	// Useful debugging options
 	// Set verify_analytic_jacobians to 1e-6 to use
 	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
 	this->print_jacobians = infile("print_jacobians", false);
 	this->print_element_jacobians = infile("print_element_jacobians", false);
-
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	// Set Dirichlet boundary conditions
 	//const boundary_id_type all_ids[8] = {0, 1, 2, 3, 4, 5, 6, 7};
 	//std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2));
 	std::set<boundary_id_type> all_bdys;
 	all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
 	all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);   
-
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 	std::vector<unsigned int> all_of_em;
 	all_of_em.push_back(c_var); all_of_em.push_back(zc_var); all_of_em.push_back(fc_var);
 	all_of_em.push_back(aux_c_var); all_of_em.push_back(aux_zc_var); all_of_em.push_back(aux_fc_var);
-	
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG	
 	ZeroFunction<Number> zero;
 	ConstFunction<Number> one(1);
-	
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG	
 	//c=0 on boundary, cuz I feel like it...
 	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, all_of_em, &zero));
-	  
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG	  
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
+std::cout << "~*~**~*~*~~*~*~*~*~**~*~*~*~\n"; //DEBUG
 }
 
 // Context initialization
-void ConvDiff_MprimeSys::init_context(DiffContext &context){
+void Diff_ConvDiff_MprimeSys::init_context(DiffContext &context){
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
   
 	//stuff for things of pressure's family
@@ -103,7 +104,7 @@ void ConvDiff_MprimeSys::init_context(DiffContext &context){
 
 // Element residual and jacobian calculations
 // Time dependent parts
-bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffContext& context){
+bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffContext& context){
 
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
@@ -297,13 +298,13 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 }
 
 // Postprocessed output
-void ConvDiff_MprimeSys::postprocess (){
+void Diff_ConvDiff_MprimeSys::postprocess (){
   std::cout << "meepmeep "; //placeholder
 }
 
 // Returns the value of a forcing function at point p.  This value
 // depends on which application is being used. - vestigial
-Point ConvDiff_MprimeSys::forcing(const Point& pt){
+Point Diff_ConvDiff_MprimeSys::forcing(const Point& pt){
 	Point f;
 	//f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
 	//f(0) = -1.0*exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));

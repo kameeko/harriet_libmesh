@@ -1,5 +1,3 @@
-//inference with steady coupled stokes-convection-diffusion
-
 // C++ includes
 #include <iomanip>
 
@@ -70,8 +68,8 @@ int main(int argc, char** argv){
   EquationSystems equation_systems (mesh);
     std::cout << "DEBUG 1----------\n";  
   //name system
-  ConvDiff_MprimeSys & system = 
-  	equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
+  Diff_ConvDiff_MprimeSys & system = 
+  	equation_systems.add_system<Diff_ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
       std::cout << "DEBUG 2----------\n";
 
   std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");

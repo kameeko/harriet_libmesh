@@ -15,7 +15,7 @@ using namespace libMesh;
 // Define the postprocess function to compute QoI 0, the integral of the the solution
 // over a subdomain
 
-void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
+void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 
 {
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
