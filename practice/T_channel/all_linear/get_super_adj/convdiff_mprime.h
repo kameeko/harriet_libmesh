@@ -1,6 +1,7 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/getpot.h"
 #include "libmesh/fem_context.h"
+#include "libmesh/equation_systems.h"
 
 using namespace libMesh;
 
@@ -12,13 +13,17 @@ public:
   ConvDiff_MprimeSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
-    : FEMSystem(es, name_in, number_in),
-    psiMF(FEMSystem(es, "psiMF", number_in)){ //if I change psiMF, will that change ConvDiff_MprimeSys through their shared es? try, convdiff_mprime.C has a debugging line..
-    
+    : FEMSystem(es, name_in, number_in){
+    //: FEMSystem(es, name_in, number_in),
+    //psiMF(FEMSystem(EquationSystems(this->get_mesh()), "psiMF", number_in)){ 
+    	//if I change psiMF, will that change ConvDiff_MprimeSys through their shared es? 
+    	//try, convdiff_mprime.C has a debugging line...
+    	//psiMF(FEMSystem(es, "psiMF", number_in)) this won't even run...segfault of some sort...
+    //std::cout << "meep\n";
     GetPot infile("convdiff_mprime.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
-		std::string find_psiMF_here = infile("psiMF_file","psiMF.exo");
+		//std::string find_psiMF_here = infile("psiMF_file","psiMF.exo");
     
     if(FILE *fp=fopen(find_velocity_here.c_str(),"r")){
   		Real u, v, x, y;
@@ -115,7 +120,7 @@ public:
   Number computed_QoI[1];
   
   //lower-fidelity solution to linearize about
-  FEMContext psiMF; //has no argument-less constructor...?!?!
+  //FEMContext psiMF; //has no argument-less constructor...?!?!
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.

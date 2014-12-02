@@ -14,7 +14,5 @@ k = 0.1
 velocity_file = velsTtrim.txt
 data_file = Measurements_bottom6.dat
 
-#subdomains
-diff_id = 0
-convdiff_id = 2
-divided_mesh = plain_T.exo
+mesh = psiLF_mesh.xda
+psiLF_file = psiLF.xda

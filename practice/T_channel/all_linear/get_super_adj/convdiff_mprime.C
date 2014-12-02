@@ -32,7 +32,7 @@ void ConvDiff_MprimeSys::init_data (){
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
                          
-  std::cout << "siamese? " << this->has_variable("c") << "\n"; //DEBUG
+  //std::cout << "siamese? " << this->has_variable("c") << "\n"; //DEBUG
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
 	fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
@@ -183,6 +183,9 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 	  	//location of quadrature point
 	  	const Real ptx = qpoint[qp](0);
 	  	const Real pty = qpoint[qp](1);
+	  	
+	  	if(ptx > 0.0 & ptx < 1.0 & pty > 0.0)
+	  	std::cout << "c at " << ptx << ", " << pty << ": " << c << "\n";//DEBUG
 			
 			Real u, v;
 			

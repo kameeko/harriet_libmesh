@@ -45,11 +45,12 @@ int main (int argc, char** argv){
   const MeshBase::element_iterator elem_end = mesh.elements_end();
   for (; elem_it != elem_end; ++elem_it){
     Elem* elem = *elem_it;
-    double d = elem->centroid().size();
-    if(d<0.8)
-        elem->subdomain_id() = 1;
-    else
-    		elem->subdomain_id() = 2;
+    Point c = elem->centroid();
+    //if(c.size()<0.8)
+    //if(c(0)<0)
+        elem->subdomain_id() = 0;
+    //else
+    		//elem->subdomain_id() = 2;
   }
 
 

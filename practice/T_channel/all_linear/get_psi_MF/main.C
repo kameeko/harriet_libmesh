@@ -231,6 +231,9 @@ int main(int argc, char** argv){
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
+     		mesh.write("psiLF_mesh.xda");
+     		equation_systems.write("psiLF.xda", WRITE, EquationSystems::WRITE_DATA |
+               EquationSystems::WRITE_ADDITIONAL_DATA);
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }

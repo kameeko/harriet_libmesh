@@ -13,6 +13,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
+#include "libmesh/enum_xdr_mode.h"
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
@@ -46,7 +47,7 @@ int main(int argc, char** argv){
   // across the default MPI communicator.
   Mesh mesh(init.comm());
   GetPot infileForMesh("convdiff_mprime.in");
-  std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
+  std::string find_mesh_here = infileForMesh("mesh","psiLF_mesh.xda");
 	mesh.read(find_mesh_here);
 
   // And an object to refine it
@@ -66,21 +67,42 @@ int main(int argc, char** argv){
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   
+  //Mesh psiLF(init.comm());
+  std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
+  equation_systems.read(find_psiLF_here, READ,
+    EquationSystems::READ_HEADER |
+    EquationSystems::READ_DATA |
+    EquationSystems::READ_ADDITIONAL_DATA);
+    
+  // Print information about the system to the screen.
+  equation_systems.print_info();
+  std::cout << "\n\n\n\n" << "done reading" << "\n\n\n\n";  
   //name system
   ConvDiff_MprimeSys & system = 
-  	equation_systems.add_system<ConvDiff_MprimeSys>("ConvDiff_MprimeSys");
-  
-  //steady-state problem	
+  	equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
+  	
+ 	// Print information about the system to the screen.
+  equation_systems.print_info();
+  std::cout << "\n\n\n\n" << "done adding" << "\n\n\n\n";
+  	
+  //NumericVector<Number> &old_sol = *(equation_systems.get_system(0).solution);
+  //NumericVector<Number> &new_sol = *(equation_systems.get_system(1).solution);
+  //new_sol.swap(old_sol);
+  //DEBUG
+  equation_systems.write("lalala.xda", WRITE, EquationSystems::WRITE_DATA |
+               EquationSystems::WRITE_ADDITIONAL_DATA);
+               
+ 	//steady-state problem	
  	system.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
-  
+    std::cout << "DEBUG 1----------\n";
   // Initialize the system
-  equation_systems.init ();
-
+  equation_systems.init ();  
+std::cout << "DEBUG 2----------\n";
   // Set the time stepping options
   system.deltat = deltat; //this is ignored for SteadySolver...right?
-
+std::cout << "DEBUG 3----------\n";
   // And the nonlinear solver options
   NewtonSolver *solver = new NewtonSolver(system); 
   system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver); 

@@ -206,6 +206,7 @@ int main(int argc, char** argv){
         system.solve();
 
         system.postprocess();
+
       }
 
     // Advance to the next timestep in a transient problem
