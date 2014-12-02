@@ -47,7 +47,8 @@ int main(int argc, char** argv){
   Mesh mesh(init.comm());
   GetPot infileForMesh("diff_convdiff_mprime.in");
   std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
-	mesh.read(find_mesh_here);
+	//mesh.read(find_mesh_here);
+	mesh.read("psiLF_mesh.xda");
 
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);
@@ -69,6 +70,14 @@ int main(int argc, char** argv){
   //name system
   Diff_ConvDiff_MprimeSys & system = 
   	equation_systems.add_system<Diff_ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
+  	
+ 	//DEBUG
+ 	std::string find_psiLF_here = "psiLF.xda";
+  equation_systems.read(find_psiLF_here, READ,
+    EquationSystems::READ_HEADER |
+    EquationSystems::READ_DATA |
+    EquationSystems::READ_ADDITIONAL_DATA);
+ 	//DEBUG
   
   //steady-state problem	
  	system.time_solver =
