@@ -66,37 +66,32 @@ int main(int argc, char** argv){
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-    std::cout << "DEBUG 1----------\n";  
+ 
   //name system
-  Diff_ConvDiff_MprimeSys & system = 
-  	equation_systems.add_system<Diff_ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
-      std::cout << "DEBUG 2----------\n";
-
-  std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
-          std::cout << "Looking for psiLF at: " << find_psiLF_here << "\n\n";
-  equation_systems.read(find_psiLF_here, READ,
-    EquationSystems::READ_HEADER |
-    EquationSystems::READ_DATA |
-    EquationSystems::READ_ADDITIONAL_DATA);
-        std::cout << "DEBUG 3----------\n";
-  // Print information about the system to the screen.
-  //equation_systems.print_info();
-  std::cout << "\n\n\n\n" << "done reading" << "\n\n\n\n";  
-  	
-  //NumericVector<Number> &old_sol = *(equation_systems.get_system(0).solution);
-  //NumericVector<Number> &new_sol = *(equation_systems.get_system(1).solution);
-  //new_sol.swap(old_sol);
-  //DEBUG
-  equation_systems.write("lalala.xda", WRITE, EquationSystems::WRITE_DATA |
-               EquationSystems::WRITE_ADDITIONAL_DATA);
-               
+  ConvDiff_MprimeSys & system = 
+  	equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
+      
  	//steady-state problem	
  	system.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
 
+  std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
+  std::cout << "Looking for psiLF at: " << find_psiLF_here << "\n\n";
+  equation_systems.read(find_psiLF_here, READ,
+    EquationSystems::READ_HEADER |
+    EquationSystems::READ_DATA |
+    EquationSystems::READ_ADDITIONAL_DATA);
+    
+  Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);
+	std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
+
+  equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
+               EquationSystems::WRITE_ADDITIONAL_DATA);
+
+
   // Initialize the system
-  equation_systems.init ();  
+  //equation_systems.init ();  //already initialized by read-in
 
   // Set the time stepping options
   system.deltat = deltat; //this is ignored for SteadySolver...right?
@@ -134,7 +129,10 @@ int main(int argc, char** argv){
     // Adaptively solve the timestep
     unsigned int a_step = 0;
     for (; a_step != max_adaptivesteps; ++a_step)
-      {
+      { //VESTIGIAL for now
+      
+      	std::cout << "\n\n I should be skipped what are you doing here lalalalalalala *!**!*!*!*!*!* \n\n";
+      
         system.solve();
         system.postprocess();
         ErrorVector error;
@@ -224,7 +222,30 @@ int main(int argc, char** argv){
     // Do one last solve if necessary
     if (a_step == max_adaptivesteps)
       {
-        system.solve();
+        QoISet qois;
+        std::vector<unsigned int> qoi_indices;
+
+        qoi_indices.push_back(0);
+        qois.add_indices(qoi_indices);
+
+        qois.set_weight(0, 1.0);
+std::cout << "lalallalala\n";
+        system.assemble_qoi_sides = false; //QoI doesn't involve sides
+        system.adjoint_solve();
+ std::cout << "lalallalala\n";       
+        NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
+				NumericVector<Number> &primal_solution = *system.solution;
+				
+        primal_solution.swap(dual_solution);
+        ExodusII_IO(mesh).write_timestep("super_adjoint",
+                                         equation_systems,
+                                         1, /* This number indicates how many time steps
+                                               are being written to the file */
+                                         system.time);
+        primal_solution.swap(dual_solution);
+        
+        Real QoI_error_estimate = (system.rhs)->dot(system.get_adjoint_solution(0));
+        std::cout << "\n\n QoI error estimate: " << QoI_error_estimate << "\n\n";
 
         system.postprocess();
       }
