@@ -15,9 +15,11 @@ public:
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
 
+    qoi.resize(1);
+
     GetPot infile("convdiff_mprime.in");
-		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
-		std::string find_data_here = infile("data_file","Measurements_top6.dat");
+    std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
+    std::string find_data_here = infile("data_file","Measurements_top6.dat");
     
     if(FILE *fp=fopen(find_velocity_here.c_str(),"r")){
   		Real u, v, x, y;
@@ -60,7 +62,7 @@ public:
 	  		}
 	  	}
 	  	fclose(fp);
-	  }
+		}
 
   }
 
