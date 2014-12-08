@@ -91,6 +91,7 @@ int main(int argc, char** argv)
   Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);  
   std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
 
+	//DEBUG
   equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
 			 EquationSystems::WRITE_ADDITIONAL_DATA);
 
@@ -232,24 +233,32 @@ int main(int argc, char** argv)
 	  qois.add_indices(qoi_indices);
 	  
 	  qois.set_weight(0, 1.0);
-	  std::cout << "lalallalala\n";
+
 	  system.assemble_qoi_sides = false; //QoI doesn't involve sides
 	  system.adjoint_solve();
-	  std::cout << "lalallalala\n";       
+ 
 	  NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
 	  NumericVector<Number> &primal_solution = *system.solution;
 				
 	  primal_solution.swap(dual_solution);
-	  //ExodusII_IO(mesh).write_timestep("super_adjoint",
-	  //                               equation_systems,
-	  //                               1, /* This number indicates how many time steps
-	  //                                     are being written to the file */
-	  //                               system.time);
+	  ExodusII_IO(mesh).write_timestep("super_adjoint.exo",
+	                                 equation_systems,
+	                                 1, /* This number indicates how many time steps
+	                                       are being written to the file */
+	                                 system.time);
 	  primal_solution.swap(dual_solution);
+
+    system.assemble(); //overwrite residual read in from psiLF solve
         
 	  // The total error estimate
-	  Real QoI_error_estimate = (system.rhs)->dot(system.get_adjoint_solution(0));
-	  std::cout << "\n\n QoI error estimate: " << QoI_error_estimate << "\n\n";
+	  system.postprocess(); //to compute M_HF(psiLF) and M_LF(psiLF) terms
+	  Real QoI_error_estimate = (0.5*(system.rhs)->dot(dual_solution)) + system.get_MHF_psiLF() - system.get_MLF_psiLF();
+	  std::cout << "\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << 0.5*(system.rhs)->dot(dual_solution) << "\n";
+	  std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
+  	std::cout << " M_LF(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
+	  //std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
+	  //std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
+	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
 
 	  // The cell wise breakdown
 	  ErrorVector cell_wise_error;
@@ -257,7 +266,8 @@ int main(int argc, char** argv)
 	  
 	  for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
 	    {
-	      cell_wise_error[i] = fabs((system.rhs)->el(i) * (system.get_adjoint_solution(0))(i));
+	      cell_wise_error[i] = fabs(0.5*((system.rhs)->el(i) * dual_solution(i)) 
+	      		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i));
 	    }
 
 	  // Plot it
@@ -266,8 +276,8 @@ int main(int argc, char** argv)
 	  
 	  cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
 	  
+
 	  
-	  system.postprocess();
 	} // End if at max adaptive steps
       
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -283,12 +293,12 @@ int main(int argc, char** argv)
                   << std::right
                   << t_step+1
                   << ".e";
-	
-        // ExodusII_IO(mesh).write_timestep(file_name.str(),
-        //                                  equation_systems,
-        //                                  1, /* This number indicates how many time steps
-        //                                        are being written to the file */
-        //                                  system.time);
+				//this should write out the primal which should be the same as what's read in...
+				ExodusII_IO(mesh).write_timestep(file_name.str(),
+								                        equation_systems,
+								                        1, /* This number indicates how many time steps
+								                              are being written to the file */
+								                        system.time);
 	}
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }

@@ -3,6 +3,8 @@
 #include "libmesh/fem_context.h"
 #include "libmesh/equation_systems.h"
 
+#include <numeric>
+
 using namespace libMesh;
 
 class ConvDiff_MprimeSys : public FEMSystem
@@ -86,9 +88,20 @@ public:
   //for adjoint
   virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);
   
-  //return QoI
-  Number &get_QoI_value(std::string type, unsigned int QoI_index){
-      return computed_QoI[QoI_index]; //no exact QoI available
+  //get cell's constribution to M_HF(psiLF) term of QoI error estimate
+  double get_MHF_psiLF(int elem_ind){
+  	return MHF_psiLF[elem_ind];
+  }
+  double get_MHF_psiLF(){
+  	return std::accumulate(MHF_psiLF.begin(),MHF_psiLF.end(),0.0);
+  }
+  
+  //get cell's constribution to M_LF(psiLF) term of QoI error estimate
+  double get_MLF_psiLF(int elem_ind){
+  	return MLF_psiLF[elem_ind];
+  }
+  double get_MLF_psiLF(){
+  	return std::accumulate(MLF_psiLF.begin(),MLF_psiLF.end(),0.0);
   }
 
   // Indices for each variable;
@@ -106,11 +119,9 @@ public:
 	std::vector<std::vector<Real> > y_pts;
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
-  //to hold computed QoI
-  Number computed_QoI[1];
-  
-  //lower-fidelity solution to linearize about
-  //FEMContext psiMF; //has no argument-less constructor...?!?!
+	//M_HF(psiLF) and M_LF(psiLF) terms of QoI error estimate
+	std::vector<Real> MHF_psiLF;
+	std::vector<Real> MLF_psiLF;
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.

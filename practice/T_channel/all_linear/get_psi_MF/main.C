@@ -47,8 +47,8 @@ int main(int argc, char** argv){
   Mesh mesh(init.comm());
   GetPot infileForMesh("diff_convdiff_mprime.in");
   std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
-	//mesh.read(find_mesh_here);
-	mesh.read("psiLF_mesh.xda");
+	mesh.read(find_mesh_here);
+	//mesh.read("psiLF_mesh.xda");
 
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);
@@ -72,11 +72,11 @@ int main(int argc, char** argv){
   	equation_systems.add_system<Diff_ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
   	
  	//DEBUG
- 	std::string find_psiLF_here = "psiLF.xda";
-  equation_systems.read(find_psiLF_here, READ,
-    EquationSystems::READ_HEADER |
-    EquationSystems::READ_DATA |
-    EquationSystems::READ_ADDITIONAL_DATA);
+ 	//std::string find_psiLF_here = "psiLF.xda";
+  //equation_systems.read(find_psiLF_here, READ,
+  //  EquationSystems::READ_HEADER |
+  //  EquationSystems::READ_DATA |
+  //  EquationSystems::READ_ADDITIONAL_DATA);
  	//DEBUG
   
   //steady-state problem	
@@ -214,7 +214,7 @@ int main(int argc, char** argv){
     if (a_step == max_adaptivesteps)
       {
         system.solve();
-
+				std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n";
         system.postprocess();
       }
 
@@ -225,17 +225,18 @@ int main(int argc, char** argv){
     // Write out this timestep if we're requested to
     if ((t_step+1)%write_interval == 0)
       {
-        std::ostringstream file_name;
+        //std::ostringstream file_name;
 
         // We write the file in the ExodusII format.
-        file_name << "out_"
-                  << std::setw(3)
-                  << std::setfill('0')
-                  << std::right
-                  << t_step+1
-                  << ".e";
+        //file_name << "out_"
+        //          << std::setw(3)
+        //          << std::setfill('0')
+        //          << std::right
+        //          << t_step+1
+        //          << ".e";
 
-        ExodusII_IO(mesh).write_timestep(file_name.str(),
+        //ExodusII_IO(mesh).write_timestep(file_name.str(),
+        ExodusII_IO(mesh).write_timestep("psiLF.exo",
                                          equation_systems,
                                          1, /* This number indicates how many time steps
                                                are being written to the file */

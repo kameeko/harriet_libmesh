@@ -109,8 +109,6 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 
   FEBase* c_elem_fe = NULL; 
   ctxt.get_element_fe( c_var, c_elem_fe );
-  
-  int subdomain = ctxt.get_elem().subdomain_id();
 
 	// Element Jacobian * quadrature weights for interior integration
 	const std::vector<Real> &JxW = c_elem_fe->get_JxW();
@@ -295,7 +293,13 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 
 // Postprocessed output
 void ConvDiff_MprimeSys::postprocess (){
-  std::cout << "meepmeep "; //placeholder
+
+	MHF_psiLF.resize(this->rhs->size());
+	std::fill(MHF_psiLF.begin(), MHF_psiLF.end(), 0); //zero out
+	MLF_psiLF.resize(this->rhs->size());
+	std::fill(MLF_psiLF.begin(), MLF_psiLF.end(), 0); //zero out
+	
+  FEMSystem::postprocess();
 }
 
 // Returns the value of a forcing function at point p.  This value

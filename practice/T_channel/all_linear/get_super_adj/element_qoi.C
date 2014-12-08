@@ -12,52 +12,97 @@
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
-// Define the postprocess function to compute QoI 0, the integral of the the solution
-// over a subdomain
+//to compute M_HF(psiLF) and M_LF(psiLF) terms of QoI error estimate
 
 void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 
 {
+	
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
   FEBase* elem_fe = NULL;
   ctxt.get_element_fe( c_var , elem_fe );
+  
+  int myElemID = ctxt.get_elem().id();
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> &JxW = elem_fe->get_JxW();
 
+	//get location of quadrature points
   const std::vector<Point> &xyz = elem_fe->get_xyz();
 
   // The number of local degrees of freedom in each variable
-
   unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
 
-  // The function R = int_{omega} T dR
-  // omega is a subset of Omega (the whole domain)
-
-  Number dQoI = 0.;
+	//this element's contribution to MHF(psiLF) and MLF(psiLF)
+  Number MHF_psiLF_elem = 0.;
+  Number MLF_psiLF_elem = 0.;
 
   // Loop over quadrature points
-
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
     {
       // Get co-ordinate locations of the current quadrature point
-      const Real x = xyz[qp](0);
-      const Real y = xyz[qp](1);
+      const Real ptx = xyz[qp](0);
+      const Real pty = xyz[qp](1);
+      
+      Number 
+	      c = ctxt.interior_value(c_var, qp),
+	      zc = ctxt.interior_value(zc_var, qp),
+	      fc = ctxt.interior_value(fc_var, qp),
+	      auxc = ctxt.interior_value(aux_c_var, qp),
+	      auxzc = ctxt.interior_value(aux_zc_var, qp),
+	      auxfc = ctxt.interior_value(aux_fc_var, qp);
+	    Gradient 
+	      grad_c = ctxt.interior_gradient(c_var, qp),
+	      grad_zc = ctxt.interior_gradient(zc_var, qp),
+	      grad_fc = ctxt.interior_gradient(fc_var, qp),
+	      grad_auxc = ctxt.interior_gradient(aux_c_var, qp),
+	      grad_auxzc = ctxt.interior_gradient(aux_zc_var, qp),
+	      grad_auxfc = ctxt.interior_gradient(aux_fc_var, qp);
 
-      // If in the sub-domain omega, add the contribution to the integral R
-      if(fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)
-        {
-          // Get the solution value at the quadrature point
-          Number c = ctxt.interior_value(c_var, qp);
+			Real u, v;
+	 		int xind, yind;
+	 		Real xdist = 1.e10; Real ydist = 1.e10;
+	 		for(int ii=0; ii<x_pts.size(); ii++){
+	 			Real tmp = std::abs(ptx - x_pts[ii]);
+	 			if(xdist > tmp){
+	 				xdist = tmp;
+	 				xind = ii;
+	 			}
+	 			else
+	 				break;
+	 		} 
+	 		for(int jj=0; jj<y_pts[xind].size(); jj++){
+	 			Real tmp = std::abs(pty - y_pts[xind][jj]);
+	 			if(ydist > tmp){
+	 				ydist = tmp;
+	 				yind = jj;
+	 			}
+	 			else
+	 				break;
+	 		}
+	 		u = vel_field[xind][yind](0);
+	 		v = vel_field[xind][yind](1);
 
-          // Update the elemental increment dR for each qp
-          dQoI += JxW[qp] * c;
-        }
+	    NumberVectorValue U     (u,     v);
+			Real R = 0.0; //reaction coefficient
+
+			//MHF_psiHF = I(q_LF, u_LF) + L'_HF(q_LF, u_LF, z_LF)(p_LF, v_LF, y_LF)
+			MHF_psiLF_elem += JxW[qp]*(-k*grad_zc*grad_auxc + U*grad_zc*auxc + 2*R*zc*c*auxc);
+      MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
+   		MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
+   		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125){
+        MHF_psiLF_elem += JxW[qp] * c;
+			}
+
+			//MLF_psiLF = I(q_LF, u_LF)
+      if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125){
+        MLF_psiLF_elem += JxW[qp] * c;
+			}
     }
 
-  // Update the computed value of the global functional R, by adding the contribution from this element
+  MHF_psiLF[myElemID] += MHF_psiLF_elem;
+  MLF_psiLF[myElemID] += MLF_psiLF_elem;
 
-  computed_QoI[0] = computed_QoI[0] + dQoI;
 
 }
