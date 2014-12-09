@@ -1,0 +1,22 @@
+LF: Computed QoI is 0.0015782611526088093
+HF: Computed QoI is 0.0013656455027004559
+
+error ought to be I_HF-I_LF -0.00021261564
+
+-does penalizing derivative of source make things nonlinear? shouldn't...RtR will just include a differencing matrix...
+-is the adjoint being resolved accurately enough? (yes, to 3 sig figs)
+-what things can we solve for two ways, to compare?
+	-adjoint-residual calculation? swap adjoint with forward, dot residual with adjoint in element_postprocess? are they properly matched-up? (matched up the same way as in 1D...)
+	-does M_HF(psiLF) give I_HF if psiLF replaced with psiHF? (yes; correct to machine precision when psiLF=psiHF)
+-how different are primal variables when solved as part of psi versus when auxiliary variables are not solved for?
+		-same up to 3-4 sig figs...I(q,u,v) and I(psi) match up to 13 sig figs...
+-elemental contributions to MHF_psiLF seem to be of an order so that elemental contributions are being properly summed...
+
+-M_HF(psiLF)-I(psiLF) contributed most of the estimate in the 1D case... 
+
+
+current output:
+0.5*M'_HF(psiLF)(superadj): -1.9493516019282498e-05
+M_HF(psiLF): 0.0015741119531960598
+I(psiLF): 0.0015782611526087805
+QoI error estimate: -2.364271543200307e-05
