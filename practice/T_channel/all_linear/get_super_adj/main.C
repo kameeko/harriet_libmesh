@@ -253,11 +253,11 @@ int main(int argc, char** argv)
 	  // The total error estimate
 	  system.postprocess(); //to compute M_HF(psiLF) and M_LF(psiLF) terms
 	  Real QoI_error_estimate = (0.5*(system.rhs)->dot(dual_solution)) + system.get_MHF_psiLF() - system.get_MLF_psiLF();
-	  std::cout << "\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << 0.5*(system.rhs)->dot(dual_solution) << "\n";
+	  std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << 0.5*(system.rhs)->dot(dual_solution) << "\n";
 	  std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
   	std::cout << " M_LF(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
-	  //std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
-	  //std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
+	  std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
+	  std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
 	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
 
 	  // The cell wise breakdown

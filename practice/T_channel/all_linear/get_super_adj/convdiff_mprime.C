@@ -294,9 +294,9 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 // Postprocessed output
 void ConvDiff_MprimeSys::postprocess (){
 
-	MHF_psiLF.resize(this->rhs->size());
+	MHF_psiLF.resize(round(this->rhs->size()/6)); //upper-bound on size needed
 	std::fill(MHF_psiLF.begin(), MHF_psiLF.end(), 0); //zero out
-	MLF_psiLF.resize(this->rhs->size());
+	MLF_psiLF.resize(round(this->rhs->size()/6)); //upper-bound on size needed
 	std::fill(MLF_psiLF.begin(), MLF_psiLF.end(), 0); //zero out
 	
   FEMSystem::postprocess();

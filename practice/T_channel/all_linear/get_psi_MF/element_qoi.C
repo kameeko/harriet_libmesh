@@ -8,14 +8,14 @@
 #include "libmesh/fe_interface.h"
 
 // Local includes
-#include "convdiff_mprime.h"
+#include "diff_convdiff_mprime.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
 //to compute M_HF(psiLF) and M_LF(psiLF) terms of QoI error estimate
 
-void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
+void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 
 {
 	
@@ -25,6 +25,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
   ctxt.get_element_fe( c_var , elem_fe );
   
   int myElemID = ctxt.get_elem().id();
+  //std::cout << myElemID << "\n"; //DEBUG
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> &JxW = elem_fe->get_JxW();
@@ -102,24 +103,24 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
         MLF_psiLF_elem += JxW[qp] * c;
 			}
     } //end of quadrature loop
-  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
-		Point data_point = datapts[dnum];
-		if(ctxt.get_elem().contains_point(data_point)){
-			Number cpred = ctxt.point_value(c_var, data_point);
-			Number cstar = datavals[dnum];
-			
-			unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
-		  FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
-		  
-		  //go between physical and reference element
-		  Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
-		  
-    	Number auxc_point = ctxt.point_value(aux_c_var, data_point);	      
+  	for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+			Point data_point = datapts[dnum];
+			if(ctxt.get_elem().contains_point(data_point)){
+				Number cpred = ctxt.point_value(c_var, data_point);
+				Number cstar = datavals[dnum];
+				
+				unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
+			  FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
+			  
+			  //go between physical and reference element
+			  Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
+			  
+	    	Number auxc_point = ctxt.point_value(aux_c_var, data_point);	      
 
-	  	MHF_psiLF_elem += (cpred - cstar)*auxc_point;
+		  	MHF_psiLF_elem += (cpred - cstar)*auxc_point;
 
+			}
 		}
-	}
 
   MHF_psiLF[myElemID] += MHF_psiLF_elem;
   MLF_psiLF[myElemID] += MLF_psiLF_elem;

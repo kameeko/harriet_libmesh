@@ -74,6 +74,21 @@ public:
 
   // Postprocessed output
   virtual void postprocess();
+  
+  //DEBUG
+  virtual void element_postprocess(DiffContext &context);
+  double get_MHF_psiLF(int elem_ind){
+  	return MHF_psiLF[elem_ind];
+  }
+  double get_MHF_psiLF(){
+  	return std::accumulate(MHF_psiLF.begin(),MHF_psiLF.end(),0.0);
+  }
+  double get_MLF_psiLF(int elem_ind){
+  	return MLF_psiLF[elem_ind];
+  }
+  double get_MLF_psiLF(){
+  	return std::accumulate(MLF_psiLF.begin(),MLF_psiLF.end(),0.0);
+  }
 
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
@@ -91,6 +106,10 @@ public:
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
 	int diff_subdomain_id, convdiff_subdomain_id;
+
+	//DEBUG
+	std::vector<Real> MHF_psiLF;
+	std::vector<Real> MLF_psiLF;
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.

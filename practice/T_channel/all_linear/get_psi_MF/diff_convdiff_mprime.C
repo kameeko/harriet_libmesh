@@ -303,7 +303,14 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 
 // Postprocessed output
 void Diff_ConvDiff_MprimeSys::postprocess (){
-  std::cout << "meepmeep "; //placeholder
+	MHF_psiLF.resize(this->rhs->size());
+	std::fill(MHF_psiLF.begin(), MHF_psiLF.end(), 0); //zero out
+	MLF_psiLF.resize(this->rhs->size());
+	std::fill(MLF_psiLF.begin(), MLF_psiLF.end(), 0); //zero out
+	
+	//std::cout << this->rhs->size() << " ~!~!~!~!~!~!~!~!~\n"; //DEBUG
+	
+  FEMSystem::postprocess();
 }
 
 // Returns the value of a forcing function at point p.  This value

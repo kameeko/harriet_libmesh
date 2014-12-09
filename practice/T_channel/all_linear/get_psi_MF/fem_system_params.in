@@ -30,6 +30,6 @@ max_adaptivesteps = 0
 solver_quiet = false
 
 # Nonlinear solver tolerance
-relative_step_tolerance = 1e-3
+relative_step_tolerance = 1e-6
 
-relative_residual_tolerance = 1.e-3
+relative_residual_tolerance = 1.e-6
