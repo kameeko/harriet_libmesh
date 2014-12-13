@@ -36,10 +36,22 @@ int main (int argc, char** argv){
 	std::cout << std::endl << std::endl;
 
 	Mesh mesh(init.comm());
-	mesh.read("mesh.e");
 	
-	MeshRefinement meshRefinement(mesh);
-	meshRefinement.uniformly_refine(3);
+	//T-channel
+	//mesh.read("mesh.e");
+	//MeshRefinement meshRefinement(mesh);
+	//meshRefinement.uniformly_refine(3);
+	
+	//1D - for debugging
+	//int n = 200;
+	//MeshTools::Generation::build_line(mesh, n, 0.0, 1.0, EDGE2); //n linear elements from 0 to 1
+	
+	//nice geometry for debugging
+	MeshTools::Generation::build_square (mesh, 
+																					120, 40,
+                                         -1.0, 2.0,
+                                         -1.0, 1.0,
+                                         QUAD9);
 
 	MeshBase::element_iterator       elem_it  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end = mesh.elements_end();

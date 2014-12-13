@@ -292,14 +292,34 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 }
 
 // Postprocessed output
-void ConvDiff_MprimeSys::postprocess (){
-
-	MHF_psiLF.resize(round(this->rhs->size()/6)); //upper-bound on size needed
+void ConvDiff_MprimeSys::postprocess (unsigned int dbg_step){
+	debug_step = dbg_step;
+	
+if(debug_step == 0){
+	MHF_psiLF.resize(this->get_mesh().n_elem()); //upper-bound on size needed
 	std::fill(MHF_psiLF.begin(), MHF_psiLF.end(), 0); //zero out
-	MLF_psiLF.resize(round(this->rhs->size()/6)); //upper-bound on size needed
+	MLF_psiLF.resize(this->get_mesh().n_elem()); //upper-bound on size needed
 	std::fill(MLF_psiLF.begin(), MLF_psiLF.end(), 0); //zero out
 	
   FEMSystem::postprocess();
+}
+  
+  //DEBUGGING
+else if(debug_step == 1){
+	sadj_c_stash.resize(this->get_mesh().n_elem()); sadj_gradc_stash.resize(this->get_mesh().n_elem());
+	sadj_zc_stash.resize(this->get_mesh().n_elem()); sadj_gradzc_stash.resize(this->get_mesh().n_elem());
+	sadj_fc_stash.resize(this->get_mesh().n_elem()); sadj_gradfc_stash.resize(this->get_mesh().n_elem());
+	sadj_auxc_stash.resize(this->get_mesh().n_elem()); sadj_gradauxc_stash.resize(this->get_mesh().n_elem());
+	sadj_auxzc_stash.resize(this->get_mesh().n_elem()); sadj_gradauxzc_stash.resize(this->get_mesh().n_elem());
+	sadj_auxfc_stash.resize(this->get_mesh().n_elem()); sadj_gradauxfc_stash.resize(this->get_mesh().n_elem());
+	FEMSystem::postprocess();
+}
+else if(debug_step == 2){	
+	half_sadj_resid.resize(this->get_mesh().n_elem());
+	std::fill(half_sadj_resid.begin(), half_sadj_resid.end(), 0);
+	FEMSystem::postprocess();
+}
+
 }
 
 // Returns the value of a forcing function at point p.  This value

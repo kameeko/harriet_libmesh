@@ -36,6 +36,8 @@ void Diff_ConvDiff_InvSys::element_postprocess (DiffContext &context)
   // omega is a subset of Omega (the whole domain)
 
   Number dQoI = 0.;
+  
+  const unsigned int dim = this->get_mesh().mesh_dimension();
 
   // Loop over quadrature points
 
@@ -43,17 +45,18 @@ void Diff_ConvDiff_InvSys::element_postprocess (DiffContext &context)
     {
       // Get co-ordinate locations of the current quadrature point
       const Real x = xyz[qp](0);
-      const Real y = xyz[qp](1);
+      const Real y = (dim == 2)?xyz[qp](1):0;
 
       // If in the sub-domain omega, add the contribution to the integral R
-      if(fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)
-        {
-          // Get the solution value at the quadrature point
-          Number c = ctxt.interior_value(c_var, qp);
+      if((dim == 2 && (fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)) || 
+      	(dim == 1 && x >= 0.7 && x <= 0.9)){
+      	
+        // Get the solution value at the quadrature point
+        Number c = ctxt.interior_value(c_var, qp);
 
-          // Update the elemental increment dR for each qp
-          dQoI += JxW[qp] * c;
-        }
+        // Update the elemental increment dR for each qp
+        dQoI += JxW[qp] * c;
+      }
     }
 
   // Update the computed value of the global functional R, by adding the contribution from this element

@@ -215,11 +215,11 @@ int main(int argc, char** argv){
       {
         system.solve();
 				std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n";
-        //system.postprocess();
+        system.postprocess();
         
         //DEBUG
-        //std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
-  			//std::cout << " M_LF(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
+        std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
+  			std::cout << " I(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
       }
 
     // Advance to the next timestep in a transient problem

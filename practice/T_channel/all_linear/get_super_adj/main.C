@@ -234,7 +234,7 @@ int main(int argc, char** argv)
 	  
 	  qois.set_weight(0, 1.0);
 
-	  system.assemble_qoi_sides = false; //QoI doesn't involve sides
+	  system.assemble_qoi_sides = true; //QoI doesn't involve sides
 	  system.adjoint_solve();
  
 	  NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
@@ -259,6 +259,14 @@ int main(int argc, char** argv)
 	  std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
 	  std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
 	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
+	  
+	  //DEBUG
+	  primal_solution.swap(dual_solution);
+	 	system.postprocess(1);
+	 	primal_solution.swap(dual_solution);
+	 	system.postprocess(2);
+	 	std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
+	 	primal_solution.swap(dual_solution);
 
 	  // The cell wise breakdown
 	  ErrorVector cell_wise_error;

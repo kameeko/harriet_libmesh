@@ -1,3 +1,14 @@
+1D debug
+
+Jacobian disagreement (see get_psi_MF/meep.txt)
+J_zc_fc1,2,3,4,5
+J_auxfc1,2,3,4,5_fc1,2,3,4,5
+
+
+
+
+
+
 LF: Computed QoI is 0.0015782611526088093
 HF: Computed QoI is 0.0013656455027004559
 
@@ -14,9 +25,22 @@ error ought to be I_HF-I_LF -0.00021261564
 
 -M_HF(psiLF)-I(psiLF) contributed most of the estimate in the 1D case... 
 
+-parameters are totally different in 1D case...how to replicate in libMesh? how to designate parameters as not a field?
+-don't forget alpha vs beta/2 (nah they the same)...and diffusion coeff...
+
+-in 1D case...is enrichment necessary?
 
 current output:
 0.5*M'_HF(psiLF)(superadj): -1.9493516019282498e-05
 M_HF(psiLF): 0.0015741119531960598
 I(psiLF): 0.0015782611526087805
 QoI error estimate: -2.364271543200307e-05
+
+
+-try adj-resid dot as an intergral (step through elements in a post-process...)  -> matches
+-if that doesn't turn up anything, try things on a straight channel, in case T is messing up physics...
+	HF: 0.00091998571954313526
+	LF: 0.0012916704969018959
+	QoI error estimate: 1.6480614004099224e-05
+		-> it ain't the T-channel screwing things up...
+	

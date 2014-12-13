@@ -20,48 +20,66 @@ public:
     GetPot infile("diff_convdiff_inv.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
+		
+		const unsigned int dim = this->get_mesh().mesh_dimension();
     
     if(FILE *fp=fopen(find_velocity_here.c_str(),"r")){
-  		Real u, v, x, y;
-  		Real prevx = 1.e10;
-  		std::vector<Real> tempvecy;
-  		std::vector<NumberVectorValue> tempvecvel;
-  		int flag = 1;
-  		while(flag != -1){
-  			flag = fscanf(fp, "%lf %lf %lf %lf",&u,&v,&x,&y);
-  			if(flag != -1){
-  				if(x != prevx){
-  					x_pts.push_back(x);
-  					prevx = x;
-  					if(x_pts.size() > 1){
-  						y_pts.push_back(tempvecy);
-  						vel_field.push_back(tempvecvel);
+    	if(dim == 2){
+				Real u, v, x, y;
+				Real prevx = 1.e10;
+				std::vector<Real> tempvecy;
+				std::vector<NumberVectorValue> tempvecvel;
+				int flag = 1;
+				while(flag != -1){
+					flag = fscanf(fp, "%lf %lf %lf %lf",&u,&v,&x,&y);
+					if(flag != -1){
+						if(x != prevx){
+							x_pts.push_back(x);
+							prevx = x;
+							if(x_pts.size() > 1){
+								y_pts.push_back(tempvecy);
+								vel_field.push_back(tempvecvel);
+							}
+							tempvecy.clear(); 
+							tempvecvel.clear();
+							tempvecy.push_back(y); 
+							tempvecvel.push_back(NumberVectorValue(u,v));
 						}
-  					tempvecy.clear(); 
-  					tempvecvel.clear();
-  					tempvecy.push_back(y); 
-  					tempvecvel.push_back(NumberVectorValue(u,v));
-  				}
-  				else{
-  					tempvecy.push_back(y); 
-  					tempvecvel.push_back(NumberVectorValue(u,v));
-  				}
-  			}
+						else{
+							tempvecy.push_back(y); 
+							tempvecvel.push_back(NumberVectorValue(u,v));
+						}
+					}
+				}
+				y_pts.push_back(tempvecy);
+				vel_field.push_back(tempvecvel);
   		}
-  		y_pts.push_back(tempvecy);
-  		vel_field.push_back(tempvecvel);
   	}
 		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
-	  	Real x, y, value;
-	  	int flag = 1;
-	  	while(flag != -1){
-	  		flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
-	  		if(flag != -1){
-					datapts.push_back(Point(x,y));
-					datavals.push_back(value);
-	  		}
+			if(dim == 2){
+				Real x, y, value;
+				int flag = 1;
+				while(flag != -1){
+					flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
+					if(flag != -1){
+						datapts.push_back(Point(x,y));
+						datavals.push_back(value);
+					}
+				}
+				fclose(fp);
 	  	}
-	  	fclose(fp);
+	  	else if(dim == 1){
+	  		Real x, value;
+				int flag = 1;
+				while(flag != -1){
+					flag = fscanf(fp,"%lf %lf",&x,&value);
+					if(flag != -1){
+						datapts.push_back(Point(x));
+						datavals.push_back(value);
+					}
+				}
+				fclose(fp);
+	  	}
 	  }
   }
 
@@ -87,10 +105,14 @@ public:
       return computed_QoI[QoI_index]; //no exact QoI available
   }
   
+  //calculate forcing function corresponding to basis coefficients; 1D debugging
+  Real f_from_coeff(Real fc1, Real fc2, Real fc3, Real fc4, Real fc5, Real x);
+  
   
 
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var;
+  unsigned int fc1_var, fc2_var, fc3_var, fc4_var, fc5_var; //for 1D debugging
   
   Real beta; //regularization parameter
   Real k; //diffusion coefficient
@@ -108,8 +130,4 @@ public:
 	
   //to hold computed QoI
   Number computed_QoI[1];
-
-  // Returns the value of a forcing function at point p.  This value
-  // depends on which application is being used.
-  Point forcing(const Point& p);
 };

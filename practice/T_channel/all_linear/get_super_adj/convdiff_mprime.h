@@ -65,6 +65,8 @@ public:
 	  	}
 	  	fclose(fp);
 		}
+		
+		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
 
   }
 
@@ -80,7 +82,8 @@ public:
                                         DiffContext& context);
 
   // Postprocessed output
-  virtual void postprocess();
+  //virtual void postprocess();
+  void postprocess(unsigned int dbg_step = 0); //DEBUG
   
   //to calculate QoI
   virtual void element_postprocess(DiffContext &context);
@@ -103,6 +106,14 @@ public:
   double get_MLF_psiLF(){
   	return std::accumulate(MLF_psiLF.begin(),MLF_psiLF.end(),0.0);
   }
+  
+  //DEBUGGING
+  double get_half_adj_weighted_resid(int elem_ind){
+  	return half_sadj_resid[elem_ind];
+  }
+  double get_half_adj_weighted_resid(){
+  	return std::accumulate(half_sadj_resid.begin(), half_sadj_resid.end(), 0.0);
+  }
 
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
@@ -122,6 +133,17 @@ public:
 	//M_HF(psiLF) and M_LF(psiLF) terms of QoI error estimate
 	std::vector<Real> MHF_psiLF;
 	std::vector<Real> MLF_psiLF;
+	
+	//DEBUGGING
+	std::vector<Real> half_sadj_resid;
+	std::vector<std::vector<Real> > sadj_c_stash; std::vector<std::vector<Gradient> > sadj_gradc_stash;
+	std::vector<std::vector<Real> > sadj_zc_stash; std::vector<std::vector<Gradient> > sadj_gradzc_stash;
+	std::vector<std::vector<Real> > sadj_fc_stash; std::vector<std::vector<Gradient> > sadj_gradfc_stash;
+	std::vector<std::vector<Real> > sadj_auxc_stash; std::vector<std::vector<Gradient> > sadj_gradauxc_stash;
+	std::vector<std::vector<Real> > sadj_auxzc_stash; std::vector<std::vector<Gradient> > sadj_gradauxzc_stash;
+	std::vector<std::vector<Real> > sadj_auxfc_stash; std::vector<std::vector<Gradient> > sadj_gradauxfc_stash;
+	std::vector<Real> sadj_auxc_point_stash;
+	unsigned int debug_step; //if 1, fill up sadj stash; if 2, calculate half_sadj_resid
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.
