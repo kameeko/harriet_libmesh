@@ -81,7 +81,7 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	    	auxfc = f_from_coeff(auxf1, auxf2, auxf3, auxf4, auxf5, ptx);
 	    	
 	    	std::cout << f1 << " " << f2 << " " << f3 << " " << f4 << " " << f5 << "\n"; //DEBUG
-   			std::cout << auxf1 << " " << auxf2 << " " << auxf3 << " " << auxf4 << " " << auxf5 << "\n"; //DEBUG
+   			//std::cout << auxf1 << " " << auxf2 << " " << auxf3 << " " << auxf4 << " " << auxf5 << "\n"; //DEBUG
 	    }
 
 			Real u, v;
@@ -125,9 +125,6 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
    		else if(dim == 1)
    			MHF_psiLF_elem += JxW[qp]*(beta*fc*auxfc + zc*auxfc);
-   		
-   		//std::cout << MHF_psiLF_elem << " " << grad_zc << " " << auxc << " " << U << "\n"; //DEBUG
-   		
    		if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)|| 
       	(dim == 1 && ptx >= 0.7 && ptx <= 0.9)){
         MHF_psiLF_elem += JxW[qp] * c;

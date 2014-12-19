@@ -1,13 +1,45 @@
+changed Rc to include pointyness of observations...
+
+0.5*M'_HF(psiLF)(superadj): -0.00044311842783695103
+M_HF(psiLF): 0.0014934996188950226
+M_LF(psiLF): 0.0015782611553820456
+
+QoI error estimate: -0.00052787996432397395
+
+-> still wrong, but much closer than before...
+...but 1D example still won't solve (zero pivot in LU, inexact newton fails...)
+	-if you ignore forcing term for auxiliary equations (so that all auxiliary variables are zero), using gmres gets very different parameters but residual still small (e-14) (q=(-1.26126 2.42304 0.102468 0.0701751 -0.553671)); same with default (residual e-19, but q=(-0.00810372 0.00245963 -0.00773981 0.00483283 -0.00649891))...can't seem to get correct parameters even though primary equations unchanged...
+	-upping regularization to beta = 0.001 doesn't help...
+
+
+----
 1D debug
 
 Jacobian disagreement (see get_psi_MF/meep.txt)
-J_zc_fc1,2,3,4,5
+J_auxzc_fc1,2,3,4,5
 J_auxfc1,2,3,4,5_fc1,2,3,4,5
+(same if order shuffled)
+	-these are the primary equations and shouldn't be affected at all change to Rc...and they were copy and pasted over from cd_all...maybe during the solve it hits nan or something very large and that screws up the FD numerical approximation? what if you read in the matlab output as an initial guess? scalar variables don't seem to be saved into xda file...but it's read in...
+	-removing forcing for primary equations and leaving only Rc, Rzc, Rfc's still gives Jaconian disagreement...
+	
+try it on a two element mesh and print out analytic and numeric...if you make it ignore analytic check, is psi correct?
+	-will not solve if use analytic only...lu gives zero pivot (both orderings)
 
+-if you ignore forcing term for auxiliary equations (so that all auxiliary variables are zero), and then switch the order of the equations so that primary and auxiliary are grouped, it takes a lot longer to solve...and though it gets to a similar residual norm (e-19 instead of e-20), the resulting parameters are very different(q=(-0.32565 -0.128374 0.396075 0.168661 0.197997) vs (-0.00696052 0.0020067 -0.00668027 0.00395938 -0.0057315))
+	-grouped ordering, with gmres flags: q = (-0.326201 -0.12694 0.395587 0.168817 0.197956); I(psiLF): 0.15353773078867183
+	
+-what if you solved the two chunks separately? solve for state, then read in to solve for auxiliary? how to combine though?
 
+./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4
+./progname -pc_type lu
+./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal (might require recompiling petsc)
 
-
-
+LF: Computed QoI is 0.15355109395460917 (diff_all)
+HF: Computed QoI is 0.13894656673895892 (cd_all)
+matlab:
+ypLF = 0.153551212372836
+qLF =(-0.3256 -0.1284 0.3961 0.1686 0.1980)
+----
 
 LF: Computed QoI is 0.0015782611526088093
 HF: Computed QoI is 0.0013656455027004559

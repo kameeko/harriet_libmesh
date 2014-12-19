@@ -106,7 +106,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 			}
 		}
 		else if(debug_step == 1){
-	      sadj_c_stash[myElemID].push_back(c);
+	     /* sadj_c_stash[myElemID].push_back(c);
 	      sadj_zc_stash[myElemID].push_back(zc);
 	      sadj_fc_stash[myElemID].push_back(fc);
 	      sadj_auxc_stash[myElemID].push_back(auxc);
@@ -118,11 +118,12 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	      sadj_gradfc_stash[myElemID].push_back(grad_fc);
 	      sadj_gradauxc_stash[myElemID].push_back(grad_auxc);
 	      sadj_gradauxzc_stash[myElemID].push_back(grad_auxzc);
-	      sadj_gradauxfc_stash[myElemID].push_back(grad_auxfc);
+	      sadj_gradauxfc_stash[myElemID].push_back(grad_auxfc); */
+	      std::cout << "\nNOT UP TO DATE!!!!!!!\n";
 		}
 		else if(debug_step == 2){		
 			//DEBUG - 0.5*superadj*resid ; half of this needs forward, half of this needs adj...
-
+			/*
    		Number 
 	      sadj_c = sadj_c_stash[myElemID][qp],
 	      sadj_zc = sadj_zc_stash[myElemID][qp],
@@ -147,7 +148,8 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    			half_sadj_resid_elem += JxW[qp]*sadj_c; //Rc(i) += JxW[qp]?
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxc*sadj_grad_zc - U*grad_auxc*sadj_zc 
       						+ auxfc*sadj_zc + 2*R*c*auxc*sadj_zc);
-   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc);
+   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc); */
+   		std::cout << "\nNOT UP TO DATE!!!!!!!\n";
 		}		
 		
     } //end of quadrature loop

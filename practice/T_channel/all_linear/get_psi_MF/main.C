@@ -13,6 +13,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
+#include "libmesh/enum_xdr_mode.h" //DEBUG
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
@@ -70,19 +71,20 @@ int main(int argc, char** argv){
   //name system
   Diff_ConvDiff_MprimeSys & system = 
   	equation_systems.add_system<Diff_ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
-  	
+  
+  //steady-state problem	
+ 	system.time_solver =
+    AutoPtr<TimeSolver>(new SteadySolver(system));
+  libmesh_assert_equal_to (n_timesteps, 1);
+  
  	//DEBUG
  	//std::string find_psiLF_here = "psiLF.xda";
   //equation_systems.read(find_psiLF_here, READ,
   //  EquationSystems::READ_HEADER |
   //  EquationSystems::READ_DATA |
   //  EquationSystems::READ_ADDITIONAL_DATA);
+  //std::cout << "\n\n" << "DEBUG reading in " << find_psiLF_here << "\n\n";
  	//DEBUG
-  
-  //steady-state problem	
- 	system.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system));
-  libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
   equation_systems.init ();
@@ -240,13 +242,13 @@ int main(int argc, char** argv){
         //          << ".e";
 
         //ExodusII_IO(mesh).write_timestep(file_name.str(),
-        ExodusII_IO(mesh).write_timestep("psiLF.exo",
+        ExodusII_IO(mesh).write_timestep("psiLF_1D.exo", //DEBUG name
                                          equation_systems,
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
-     		mesh.write("psiLF_mesh.xda");
-     		equation_systems.write("psiLF.xda", WRITE, EquationSystems::WRITE_DATA |
+     		mesh.write("psiLF_1D_mesh.xda"); //DEBUG name
+     		equation_systems.write("psiLF_1D.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG name
                EquationSystems::WRITE_ADDITIONAL_DATA);
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

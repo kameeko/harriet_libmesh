@@ -34,13 +34,9 @@ void Diff_ConvDiff_MprimeSys::init_data (){
                          
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
-	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
-	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
-		aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
 		fc1_var = c_var; fc2_var = c_var; fc3_var = c_var; fc4_var = c_var; fc5_var = c_var; 
-		aux_fc1_var = c_var; aux_fc2_var = c_var; aux_fc3_var = c_var; aux_fc4_var = c_var; aux_fc5_var = c_var;       
 	}
 	else if(dim == 1){
 		FEFamily meep = Utility::string_to_enum<FEFamily>(std::string("SCALAR"));
@@ -49,12 +45,22 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 		fc3_var = this->add_variable("fc3", static_cast<Order>(conc_p), meep);
 		fc4_var = this->add_variable("fc4", static_cast<Order>(conc_p), meep);
 		fc5_var = this->add_variable("fc5", static_cast<Order>(conc_p), meep);
+		fc_var = c_var;
+	}
+	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
+	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
+	if(dim == 2){ 
+		aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
+		aux_fc1_var = c_var; aux_fc2_var = c_var; aux_fc3_var = c_var; aux_fc4_var = c_var; aux_fc5_var = c_var;       
+	}
+	else if(dim == 1){
+		FEFamily meep = Utility::string_to_enum<FEFamily>(std::string("SCALAR"));
 		aux_fc1_var = this->add_variable("aux_fc1", static_cast<Order>(conc_p), meep);
 		aux_fc2_var = this->add_variable("aux_fc2", static_cast<Order>(conc_p), meep);
 		aux_fc3_var = this->add_variable("aux_fc3", static_cast<Order>(conc_p), meep);
 		aux_fc4_var = this->add_variable("aux_fc4", static_cast<Order>(conc_p), meep);
 		aux_fc5_var = this->add_variable("aux_fc5", static_cast<Order>(conc_p), meep);
-		fc_var = c_var; aux_fc_var = c_var;
+		aux_fc_var = c_var;
 	}
 
 	//regularization
@@ -396,10 +402,10 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 		   		Rauxfc5(i) += JxW[qp]*(beta*basis5*fc + zc*basis5); 
      		}
      		
-	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
-	      						+ auxc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]);
-	      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) || (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){ 
-	      //IF YOU TAKE OUT THE SECOND POSSIBLITY, THE (analytical vs numerical) JACOBIAN CHECKS OUT??? or maybe everything just previously collapsed to zero when this was accidentally skipped...
+	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]); 
+	      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      	|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){ 
+	      	
      			Rc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
      		}
 	      Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
@@ -417,7 +423,7 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
         		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp]);
-						J_c_auxc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp] + 2*R*zc*phi[j][qp]*phi[i][qp]);
+						J_c_auxc(i,j) += JxW[qp]*(2*R*zc*phi[j][qp]*phi[i][qp]);
 						J_c_zc(i,j) += JxW[qp]*(2*R*phi[j][qp]*auxc*phi[i][qp]);
      				if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)|| 
       					(dim == 1 && ptx >= 0.7 && ptx <= 0.9)){				
@@ -487,10 +493,10 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 												
 						if(dim == 2){
 							J_auxzc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-			     		J_auxfc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-		     			J_auxfc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]);
-       			}
-       			else if(dim == 1){
+		      		J_auxfc_zc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
+				    	J_auxfc_fc(i,j) += JxW[qp]*beta*dphi[j][qp]*dphi[i][qp];
+		      	}
+		      	else if(dim == 1){
        				if(j == 0){
 		     				J_auxzc_fc1(i,j) += JxW[qp]*(basis1*phi[i][qp]);
 		     				J_auxzc_fc2(i,j) += JxW[qp]*(basis2*phi[i][qp]);
@@ -546,6 +552,7 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	  	if(ctxt.get_elem().contains_point(data_point)){
 	  		Number cpred = ctxt.point_value(c_var, data_point);
 	  		Number cstar = datavals[dnum];
+	  		Number auxc_pointy = ctxt.point_value(aux_c_var, data_point);
 	  		
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
 		    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
@@ -561,10 +568,13 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
         
         for (unsigned int i=0; i != n_c_dofs; i++){
   	  		Rauxc(i) += (cpred - cstar)*point_phi[i];
+  	  		Rc(i) += auxc_pointy*point_phi[i];
 	  
 					if (request_jacobian){
-						for (unsigned int j=0; j != n_c_dofs; j++)
-							J_auxc_c(i,j) += point_phi[j]*point_phi[i] ;
+						for (unsigned int j=0; j != n_c_dofs; j++){
+							J_auxc_c(i,j) += point_phi[j]*point_phi[i]; 
+							J_c_auxc(i,j) += point_phi[j]*point_phi[i];
+						}
 				  }
 	  
   			}

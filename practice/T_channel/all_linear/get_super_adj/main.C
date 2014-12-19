@@ -261,12 +261,12 @@ int main(int argc, char** argv)
 	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
 	  
 	  //DEBUG
-	  primal_solution.swap(dual_solution);
-	 	system.postprocess(1);
-	 	primal_solution.swap(dual_solution);
-	 	system.postprocess(2);
-	 	std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
-	 	primal_solution.swap(dual_solution);
+	  //primal_solution.swap(dual_solution);
+	 	//system.postprocess(1);
+	 	//primal_solution.swap(dual_solution);
+	 	//system.postprocess(2);
+	 	//std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
+	 	//primal_solution.swap(dual_solution);
 
 	  // The cell wise breakdown
 	  ErrorVector cell_wise_error;

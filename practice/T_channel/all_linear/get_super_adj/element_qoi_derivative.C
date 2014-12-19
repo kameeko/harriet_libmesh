@@ -110,8 +110,7 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 				 	
 				Qauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]);
 				 		
-				Qc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
-					  						+ auxc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]);
+				Qc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]);
 			
 				if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
 					Qc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
@@ -130,6 +129,7 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
       if(ctxt.get_elem().contains_point(data_point)){
 				Number cpred = ctxt.point_value(c_var, data_point);
 				Number cstar = datavals[dnum];
+				Number auxc_pointy = ctxt.point_value(aux_c_var, data_point);
 			
 				unsigned int dim = get_mesh().mesh_dimension();
 				FEType fe_type = c_elem_fe->get_fe_type();
@@ -147,6 +147,7 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 				for (unsigned int i=0; i != n_c_dofs; i++)
 					{
 					  Qauxc(i) += (cpred - cstar)*point_phi[i];
+					  Qc(i) += auxc_pointy*point_phi[i];
 					}
 			}
     } // end loop over datavals
