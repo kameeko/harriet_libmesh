@@ -107,7 +107,8 @@ void Diff_ConvDiff_InvSys::init_data (){
 		std::set<boundary_id_type> left_bdy; left_bdy.insert(0);
 		std::set<boundary_id_type> right_bdy; right_bdy.insert(1);
 		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(left_bdy, just_c, &zero));
-		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(right_bdy, just_c, &one));
+		//this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(right_bdy, just_c, &one));
+		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(right_bdy, just_c, &zero));
 		
 		std::vector<unsigned int> just_zc; just_zc.push_back(zc_var);
 		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_zc, &zero));
@@ -301,7 +302,14 @@ bool Diff_ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffC
 			// First, an i-loop over the  degrees of freedom.
 			for (unsigned int i=0; i != n_c_dofs; i++){
 				
+				//reaction bits not quite symmetric with equations for primary variables, but zero for now...
 				Rc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] + 2*R*zc*c*phi[i][qp]);
+				if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){ 
+	      	//std::cout << ctxt.get_elem().id() << "\n";	
+     			Rc(i) += JxW[qp]*phi[i][qp]; 
+     				//if this is added even throughout the whole domain (so no issues of things getting cut off by subdomain boundary), Jacobian check still complains...
+     		}
 	      Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
 	      if(dim == 2)
      			Rfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]); 
@@ -400,8 +408,9 @@ bool Diff_ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffC
         }
         
         for (unsigned int i=0; i != n_c_dofs; i++){
-  	  		Rc(i) += (cpred - cstar)*point_phi[i];
-	  
+  	  		//Rc(i) += (cpred - cstar)*point_phi[i];
+	  			Rc(i) += cpred*point_phi[i];
+	  			
 					if (request_jacobian){
 						for (unsigned int j=0; j != n_c_dofs; j++)
 							J_c_c(i,j) += point_phi[j]*point_phi[i] ;

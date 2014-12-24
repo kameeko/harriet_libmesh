@@ -14,12 +14,14 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
 #include "libmesh/enum_xdr_mode.h" //DEBUG
+#include "libmesh/gmv_io.h" //DEBUG
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/newton_solver.h"
 #include "diff_convdiff_mprime.h"
+#include "initial.h" //DEBUG
 
 
 int main(int argc, char** argv){
@@ -37,7 +39,7 @@ int main(int argc, char** argv){
   //const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
-  const unsigned int dim               = 2;
+  //const unsigned int dim               = 2;
   
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -49,7 +51,7 @@ int main(int argc, char** argv){
   GetPot infileForMesh("diff_convdiff_mprime.in");
   std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
 	mesh.read(find_mesh_here);
-	//mesh.read("psiLF_mesh.xda");
+	//mesh.read("psiHF_mesh_1Dfused.xda");
 
   // And an object to refine it
   MeshRefinement mesh_refinement(mesh);
@@ -78,12 +80,14 @@ int main(int argc, char** argv){
   libmesh_assert_equal_to (n_timesteps, 1);
   
  	//DEBUG
- 	//std::string find_psiLF_here = "psiLF.xda";
+ 	//std::string find_psiLF_here = "psiHF_1D_fused.xda";
   //equation_systems.read(find_psiLF_here, READ,
   //  EquationSystems::READ_HEADER |
   //  EquationSystems::READ_DATA |
   //  EquationSystems::READ_ADDITIONAL_DATA);
   //std::cout << "\n\n" << "DEBUG reading in " << find_psiLF_here << "\n\n";
+  //Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);  
+  //std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
  	//DEBUG
   
   // Initialize the system
@@ -111,9 +115,28 @@ int main(int argc, char** argv){
     infile("max_linear_iterations", 50000);
   solver->initial_linear_tolerance =
     infile("initial_linear_tolerance", 1.e-3);
+  
+  //FOR 1D DEBUG
+  read_initial_parameters();
+  system.project_solution(initial_value, initial_grad,
+                          equation_systems.parameters);
+  finish_initialization();
+#ifdef LIBMESH_HAVE_GMV
+  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
+#endif
+	equation_systems.write("psiLF_1D_fused.xda", WRITE, EquationSystems::WRITE_DATA | 
+               EquationSystems::WRITE_ADDITIONAL_DATA);
+  mesh.write("psiLF_mesh_1Dfused.xda");
+                          
 
   // Print information about the system to the screen.
   equation_systems.print_info();
+  
+  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
+  //system.assemble(); //DEBUG
+  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
+  //equation_systems.write("rhs.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG
+  //             EquationSystems::WRITE_ADDITIONAL_DATA);
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations...not that this is transient, but eh, why not...
@@ -242,13 +265,13 @@ int main(int argc, char** argv){
         //          << ".e";
 
         //ExodusII_IO(mesh).write_timestep(file_name.str(),
-        ExodusII_IO(mesh).write_timestep("psiLF_1D.exo", //DEBUG name
+        ExodusII_IO(mesh).write_timestep("psiLF.exo",
                                          equation_systems,
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
-     		mesh.write("psiLF_1D_mesh.xda"); //DEBUG name
-     		equation_systems.write("psiLF_1D.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG name
+     		mesh.write("psiLF_mesh.xda");
+     		equation_systems.write("psiLF.xda", WRITE, EquationSystems::WRITE_DATA | 
                EquationSystems::WRITE_ADDITIONAL_DATA);
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

@@ -13,12 +13,15 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
+#include "libmesh/enum_xdr_mode.h" //DEBUG
+#include "libmesh/gmv_io.h" //DEBUG
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/newton_solver.h"
 #include "diff_convdiff_inv.h"
+#include "initial.h" //DEBUG
 
 
 int main(int argc, char** argv){
@@ -101,10 +104,25 @@ int main(int argc, char** argv){
     infile("max_linear_iterations", 50000);
   solver->initial_linear_tolerance =
     infile("initial_linear_tolerance", 1.e-3);
+    
+  //FOR 1D DEBUG
+  read_initial_parameters();
+  system.project_solution(initial_value, initial_grad,
+                          equation_systems.parameters);
+  finish_initialization();
+#ifdef LIBMESH_HAVE_GMV
+  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
+#endif
 
   // Print information about the system to the screen.
   equation_systems.print_info();
-
+  
+  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
+  //system.assemble(); //DEBUG
+  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
+  //equation_systems.write("rhs.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG
+  //             EquationSystems::WRITE_ADDITIONAL_DATA);
+  
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations...not that this is transient, but eh, why not...
 	for (unsigned int t_step=0; t_step != n_timesteps; ++t_step){
@@ -235,6 +253,9 @@ int main(int argc, char** argv){
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
+        equation_systems.write("primaryHF.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG
+               EquationSystems::WRITE_ADDITIONAL_DATA);
+
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }

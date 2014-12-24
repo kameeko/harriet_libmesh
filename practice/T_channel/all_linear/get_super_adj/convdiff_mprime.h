@@ -67,6 +67,8 @@ public:
 		}
 		
 		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
+		
+		accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
 
   }
 
@@ -115,8 +117,13 @@ public:
   	return std::accumulate(half_sadj_resid.begin(), half_sadj_resid.end(), 0.0);
   }
 
+	//calculate forcing function corresponding to basis coefficients; 1D debugging
+  Real f_from_coeff(Real fc1, Real fc2, Real fc3, Real fc4, Real fc5, Real x);
+
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
+  unsigned int fc1_var, fc2_var, fc3_var, fc4_var, fc5_var,
+  							aux_fc1_var, aux_fc2_var, aux_fc3_var, aux_fc4_var, aux_fc5_var; //for 1D debugging
   
   Real beta; //regularization parameter
   Real k; //diffusion coefficient
@@ -144,6 +151,9 @@ public:
 	std::vector<std::vector<Real> > sadj_auxfc_stash; std::vector<std::vector<Gradient> > sadj_gradauxfc_stash;
 	std::vector<Real> sadj_auxc_point_stash;
 	unsigned int debug_step; //if 1, fill up sadj stash; if 2, calculate half_sadj_resid
+	
+	//avoid assigning data point to two elements in on their boundary
+	std::vector<int> accounted_for;
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.

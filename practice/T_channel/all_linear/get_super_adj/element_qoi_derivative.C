@@ -17,6 +17,10 @@ using namespace libMesh;
 void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
                                             const QoISet & /* qois */)
 {
+
+	const unsigned int dim = this->get_mesh().mesh_dimension();
+	Real PI = 3.14159265359;
+	
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
   //some cell-specific stuff, for u's family and p's family
@@ -45,6 +49,18 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
   DenseSubVector<Number> &Qauxc = ctxt.get_qoi_derivatives(0, aux_c_var);
   DenseSubVector<Number> &Qauxzc = ctxt.get_qoi_derivatives(0, aux_zc_var);
   DenseSubVector<Number> &Qauxfc = ctxt.get_qoi_derivatives(0, aux_fc_var);
+  
+  //1D DEBUG
+  DenseSubVector<Number> &Qfc1 = ctxt.get_qoi_derivatives(0, fc1_var);
+  DenseSubVector<Number> &Qfc2 = ctxt.get_qoi_derivatives(0, fc2_var);
+  DenseSubVector<Number> &Qfc3 = ctxt.get_qoi_derivatives(0, fc3_var);
+  DenseSubVector<Number> &Qfc4 = ctxt.get_qoi_derivatives(0, fc4_var);
+  DenseSubVector<Number> &Qfc5 = ctxt.get_qoi_derivatives(0, fc5_var);
+  DenseSubVector<Number> &Qauxfc1 = ctxt.get_qoi_derivatives(0, aux_fc1_var);
+  DenseSubVector<Number> &Qauxfc2 = ctxt.get_qoi_derivatives(0, aux_fc2_var);
+  DenseSubVector<Number> &Qauxfc3 = ctxt.get_qoi_derivatives(0, aux_fc3_var);
+  DenseSubVector<Number> &Qauxfc4 = ctxt.get_qoi_derivatives(0, aux_fc4_var);
+  DenseSubVector<Number> &Qauxfc5 = ctxt.get_qoi_derivatives(0, aux_fc5_var);
 
   // Loop over the qps
   for (unsigned int qp=0; qp != n_qpoints; qp++)
@@ -69,37 +85,68 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
       const Real ptx = qpoint[qp](0);
       const Real pty = qpoint[qp](1);
 	  	
+	  	//for 1D debug
+			Real basis1, basis2, basis3, basis4, basis5;
+	    if(dim == 1){
+	    	Number f1 = ctxt.interior_value(fc1_var, qp);
+	    	Number f2 = ctxt.interior_value(fc2_var, qp);
+	    	Number f3 = ctxt.interior_value(fc3_var, qp);
+	    	Number f4 = ctxt.interior_value(fc4_var, qp);
+	    	Number f5 = ctxt.interior_value(fc5_var, qp);
+	    	Number auxf1 = ctxt.interior_value(aux_fc1_var, qp);
+	    	Number auxf2 = ctxt.interior_value(aux_fc2_var, qp);
+	    	Number auxf3 = ctxt.interior_value(aux_fc3_var, qp);
+	    	Number auxf4 = ctxt.interior_value(aux_fc4_var, qp);
+	    	Number auxf5 = ctxt.interior_value(aux_fc5_var, qp);
+
+	    	basis1 = 1.0;
+	    	basis2 = sin(2*PI*ptx);
+	    	basis3 = cos(2*PI*ptx);
+	    	basis4 = sin(4*PI*ptx);
+	    	basis5 = cos(4*PI*ptx);
+	    	
+	    	fc = f_from_coeff(f1, f2, f3, f4, f5, ptx);
+	    	auxfc = f_from_coeff(auxf1, auxf2, auxf3, auxf4, auxf5, ptx);
+	    }
+	  	
       Real u, v;
       
       int xind, yind;
       Real xdist = 1.e10; Real ydist = 1.e10;
       
-      for(int ii=0; ii<x_pts.size(); ii++){
-				Real tmp = std::abs(ptx - x_pts[ii]);
-				if(xdist > tmp)
-					{
-					xdist = tmp;
-					xind = ii;
-				}
-				else
-					break;
-			}
-      
-      for(int jj=0; jj<y_pts[xind].size(); jj++){
-				Real tmp = std::abs(pty - y_pts[xind][jj]);
-				if(ydist > tmp)
-					{
-					  ydist = tmp;
-					  yind = jj;
+      if(dim == 2){
+		    for(int ii=0; ii<x_pts.size(); ii++){
+					Real tmp = std::abs(ptx - x_pts[ii]);
+					if(xdist > tmp)
+						{
+						xdist = tmp;
+						xind = ii;
 					}
-				else
-					break;
+					else
+						break;
+				}
+		    
+		    for(int jj=0; jj<y_pts[xind].size(); jj++){
+					Real tmp = std::abs(pty - y_pts[xind][jj]);
+					if(ydist > tmp)
+						{
+							ydist = tmp;
+							yind = jj;
+						}
+					else
+						break;
+				}
+		    
+		    u = vel_field[xind][yind](0);
+		    v = vel_field[xind][yind](1);
 			}
-      
-      u = vel_field[xind][yind](0);
-      v = vel_field[xind][yind](1);
-
-      NumberVectorValue U     (u,     v);
+			else if(dim == 1){
+				u = 2.0; v = 0.0;
+			}
+      NumberVectorValue U(u);
+	    if(dim == 2)
+	    	U(1) = v;
+	    	
       Real R = 0.0; //reaction coefficient
       
       for (unsigned int i=0; i != n_c_dofs; i++){ 
@@ -107,18 +154,36 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 				Qauxc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] + 2*R*zc*c*phi[i][qp]);
 			
 				Qauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
-				 	
-				Qauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]);
+				
+				if(dim == 2) 	
+					Qauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]);
+				else if(dim == 1 && i == 0){
+					Qauxfc1(i) += JxW[qp]*(beta*basis1*fc + zc*basis1);
+		   		Qauxfc2(i) += JxW[qp]*(beta*basis2*fc + zc*basis2); 
+		   		Qauxfc3(i) += JxW[qp]*(beta*basis3*fc + zc*basis3); 
+		   		Qauxfc4(i) += JxW[qp]*(beta*basis4*fc + zc*basis4); 
+		   		Qauxfc5(i) += JxW[qp]*(beta*basis5*fc + zc*basis5); 
+				}
 				 		
 				Qc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]);
-			
-				if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
-					Qc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
-					
+				if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)) {
+	      		
+					Qc(i) += JxW[qp]*phi[i][qp]; 
+				}
+				
 				Qzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 					  						+ auxfc*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-				 	
-				Qfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp]);
+				
+				if(dim == 2) 	
+					Qfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp]);
+				else if(dim == 1 && i == 0){
+					Qfc1(i) += JxW[qp]*(beta*basis1*auxfc + auxzc*basis1);
+		   		Qfc2(i) += JxW[qp]*(beta*basis2*auxfc + auxzc*basis2); 
+		   		Qfc3(i) += JxW[qp]*(beta*basis3*auxfc + auxzc*basis3); 
+		   		Qfc4(i) += JxW[qp]*(beta*basis4*auxfc + auxzc*basis4); 
+		   		Qfc5(i) += JxW[qp]*(beta*basis5*auxfc + auxzc*basis5); 
+				}
 			
 			} // end loop over n_c_dofs
     } // end of the quadrature point qp-loop

@@ -1,0 +1,67 @@
+libMesh-0.7.4 with infinite elements	 # File Format Identifier
+1	 # No. of Equation Systems
+Diff_ConvDiff_InvSys	 # Name, System No. 0
+Implicit	 # Type, System No. 0
+7	 # No. of Variables in System "Diff_ConvDiff_InvSys"
+c	 #   Name, Variable No. 0, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "c", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "c", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "c", System "Diff_ConvDiff_InvSys"
+0	 #     FE Family, Variable "c", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "c", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "c", System "Diff_ConvDiff_InvSys"
+zc	 #   Name, Variable No. 1, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "zc", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "zc", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "zc", System "Diff_ConvDiff_InvSys"
+0	 #     FE Family, Variable "zc", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "zc", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "zc", System "Diff_ConvDiff_InvSys"
+fc1	 #   Name, Variable No. 2, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "fc1", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "fc1", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "fc1", System "Diff_ConvDiff_InvSys"
+31	 #     FE Family, Variable "fc1", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "fc1", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "fc1", System "Diff_ConvDiff_InvSys"
+fc2	 #   Name, Variable No. 3, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "fc2", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "fc2", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "fc2", System "Diff_ConvDiff_InvSys"
+31	 #     FE Family, Variable "fc2", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "fc2", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "fc2", System "Diff_ConvDiff_InvSys"
+fc3	 #   Name, Variable No. 4, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "fc3", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "fc3", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "fc3", System "Diff_ConvDiff_InvSys"
+31	 #     FE Family, Variable "fc3", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "fc3", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "fc3", System "Diff_ConvDiff_InvSys"
+fc4	 #   Name, Variable No. 5, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "fc4", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "fc4", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "fc4", System "Diff_ConvDiff_InvSys"
+31	 #     FE Family, Variable "fc4", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "fc4", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "fc4", System "Diff_ConvDiff_InvSys"
+fc5	 #   Name, Variable No. 6, System "Diff_ConvDiff_InvSys"
+0	 # vector length
+	 #     Subdomains, Variable "fc5", System "Diff_ConvDiff_InvSys"
+1	 #     Approximation Order, Variable "fc5", System "Diff_ConvDiff_InvSys"
+3	 #     Radial Approximation Order, Variable "fc5", System "Diff_ConvDiff_InvSys"
+31	 #     FE Family, Variable "fc5", System "Diff_ConvDiff_InvSys"
+12	 #     Radial FE Family, Variable "fc5", System "Diff_ConvDiff_InvSys"
+0	 #     Infinite Mapping Type, Variable "fc5", System "Diff_ConvDiff_InvSys"
+1	 # No. of Additional Vectors, System "Diff_ConvDiff_InvSys"
+RHS Vector	 # Name of 0th vector
+47	 # vector length
+0.0000000000000000e+00 0.0000000000000000e+00 -5.4500614902438394e+02 8.7502451778046549e-03 5.7299210294291669e-01 1.6667133672008869e-02 5.7514139620728292e+02 -3.4553054495671779e-03 -2.8179923392595329e+03 -1.5202111085979412e-02 -4.8155773555923953e-01 -2.1661321797659793e-02 -5.8105631450044973e+04 8.9576796627393613e-03 -4.3618370143450884e+04 5.0416048193451636e-03 -2.9705245460409042e+04 7.1331157138315553e-04 -1.7731360713004597e+04 -4.0705914921538048e-03 -8.6457496887051693e+03 -9.3580632992209690e-03 -9.1148271039881525e+04 2.2414743705257357e-02 -9.3160833391715685e+04 2.1230991392654525e-02 -9.0179140713299072e+04 1.8606844099777715e-02 -8.2718543164446848e+04 1.5706470776071763e-02 -7.1627300602009956e+04 1.2500794997238876e-02 -8.3866718926711430e+04 2.1104805321421817e-02 -7.1171552163101922e+04 1.7538670593189670e-02 -5.2973418060287477e+04 1.1931215362884384e-02 -2.9229974073914109e+04 5.6673272973700901e-03 0.0000000000000000e+00 0.0000000000000000e+00 -6.6542222662282025e+05 1.4886468204430514e+06 6.1333571228353787e+04 -1.8775590943858208e+05 -2.2752518789193479e+05 	 # System "Diff_ConvDiff_InvSys" Solution Vector
+47	 # vector length
+0.0000000000000000e+00 0.0000000000000000e+00 -5.5511151231257827e-17 -1.8189894035458565e-12 1.6653345369377348e-16 0.0000000000000000e+00 -5.5511151231257827e-17 9.0949470177292824e-12 2.7755575615628914e-17 1.4551915228366852e-11 -5.5511151231257827e-17 7.2759576141834259e-12 -2.7755575615628914e-17 -2.3283064365386963e-10 -1.3877787807814457e-17 1.1641532182693481e-10 0.0000000000000000e+00 0.0000000000000000e+00 -2.7755575615628914e-17 5.8207660913467407e-11 2.7755575615628914e-17 -2.9103830456733704e-11 -4.8572257327350599e-17 -1.7462298274040222e-10 1.3877787807814457e-17 6.9121597334742546e-11 6.9388939039072284e-17 8.7311491370201111e-11 -4.1633363423443370e-17 -2.3283064365386963e-10 2.7755575615628914e-17 2.3283064365386963e-10 4.1633363423443370e-17 -8.7311491370201111e-11 -4.1633363423443370e-17 1.1641532182693481e-10 0.0000000000000000e+00 5.8207660913467407e-11 -1.3877787807814457e-17 -2.3283064365386963e-10 0.0000000000000000e+00 0.0000000000000000e+00 1.0842021724855044e-19 7.3183646642771549e-19 5.4210108624275222e-20 -4.3368086899420177e-19 3.2526065174565133e-19 	 # System "Diff_ConvDiff_InvSys" Additional Vector "RHS Vector"

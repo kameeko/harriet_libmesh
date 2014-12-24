@@ -18,6 +18,8 @@ using namespace libMesh;
 void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 
 {
+	const unsigned int dim = this->get_mesh().mesh_dimension();
+	Real PI = 3.14159265359;
 	
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
@@ -63,45 +65,88 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	      grad_auxzc = ctxt.interior_gradient(aux_zc_var, qp),
 	      grad_auxfc = ctxt.interior_gradient(aux_fc_var, qp);
 
-			Real u, v;
-	 		int xind, yind;
-	 		Real xdist = 1.e10; Real ydist = 1.e10;
-	 		for(int ii=0; ii<x_pts.size(); ii++){
-	 			Real tmp = std::abs(ptx - x_pts[ii]);
-	 			if(xdist > tmp){
-	 				xdist = tmp;
-	 				xind = ii;
-	 			}
-	 			else
-	 				break;
-	 		} 
-	 		for(int jj=0; jj<y_pts[xind].size(); jj++){
-	 			Real tmp = std::abs(pty - y_pts[xind][jj]);
-	 			if(ydist > tmp){
-	 				ydist = tmp;
-	 				yind = jj;
-	 			}
-	 			else
-	 				break;
-	 		}
-	 		u = vel_field[xind][yind](0);
-	 		v = vel_field[xind][yind](1);
+			//for 1D debug
+			Real basis1, basis2, basis3, basis4, basis5;
+	    if(dim == 1){
+	    	Number f1 = ctxt.interior_value(fc1_var, qp);
+	    	Number f2 = ctxt.interior_value(fc2_var, qp);
+	    	Number f3 = ctxt.interior_value(fc3_var, qp);
+	    	Number f4 = ctxt.interior_value(fc4_var, qp);
+	    	Number f5 = ctxt.interior_value(fc5_var, qp);
+	    	Number auxf1 = ctxt.interior_value(aux_fc1_var, qp);
+	    	Number auxf2 = ctxt.interior_value(aux_fc2_var, qp);
+	    	Number auxf3 = ctxt.interior_value(aux_fc3_var, qp);
+	    	Number auxf4 = ctxt.interior_value(aux_fc4_var, qp);
+	    	Number auxf5 = ctxt.interior_value(aux_fc5_var, qp);
 
-	    NumberVectorValue U     (u,     v);
+	    	basis1 = 1.0;
+	    	basis2 = sin(2*PI*ptx);
+	    	basis3 = cos(2*PI*ptx);
+	    	basis4 = sin(4*PI*ptx);
+	    	basis5 = cos(4*PI*ptx);
+	    	
+	    	fc = f_from_coeff(f1, f2, f3, f4, f5, ptx);
+	    	auxfc = f_from_coeff(auxf1, auxf2, auxf3, auxf4, auxf5, ptx);
+	    }
+	  	
+      Real u, v;
+      
+      int xind, yind;
+      Real xdist = 1.e10; Real ydist = 1.e10;
+      
+      if(dim == 2){
+		    for(int ii=0; ii<x_pts.size(); ii++){
+					Real tmp = std::abs(ptx - x_pts[ii]);
+					if(xdist > tmp)
+						{
+						xdist = tmp;
+						xind = ii;
+					}
+					else
+						break;
+				}
+		    
+		    for(int jj=0; jj<y_pts[xind].size(); jj++){
+					Real tmp = std::abs(pty - y_pts[xind][jj]);
+					if(ydist > tmp)
+						{
+							ydist = tmp;
+							yind = jj;
+						}
+					else
+						break;
+				}
+		    
+		    u = vel_field[xind][yind](0);
+		    v = vel_field[xind][yind](1);
+			}
+			else if(dim == 1){
+				u = 2.0; v = 0.0;
+			}
+      NumberVectorValue U(u);
+	    if(dim == 2)
+	    	U(1) = v;
+	    	
 			Real R = 0.0; //reaction coefficient
 
 		if(debug_step == 0){ //DEBUG
 			//MHF_psiHF = I(q_LF, u_LF) + L'_HF(q_LF, u_LF, z_LF)(p_LF, v_LF, y_LF)
 			MHF_psiLF_elem += JxW[qp]*(-k*grad_zc*grad_auxc + U*grad_zc*auxc + 2*R*zc*c*auxc);
       MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
-   		MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
+      if(dim == 2)
+   			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
+   		else if(dim == 1){
+   			MHF_psiLF_elem += JxW[qp]*(beta*auxfc*fc + zc*auxfc);
+   		}
    		
-   		if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125){
+   		if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){
         MHF_psiLF_elem += JxW[qp] * c;
 			}
 
 			//MLF_psiLF = I(q_LF, u_LF)
-      if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125){
+      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){
         MLF_psiLF_elem += JxW[qp] * c;
 			}
 		}

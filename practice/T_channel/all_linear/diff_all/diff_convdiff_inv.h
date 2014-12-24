@@ -81,6 +81,7 @@ public:
 				fclose(fp);
 	  	}
 	  }
+	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
   }
 
   // System initialization
@@ -127,6 +128,9 @@ public:
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
 	int diff_subdomain_id, convdiff_subdomain_id;
+	
+	//avoid assigning data point to two elements in on their boundary
+	std::vector<int> accounted_for;
 	
   //to hold computed QoI
   Number computed_QoI[1];

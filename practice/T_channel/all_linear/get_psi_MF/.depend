@@ -6,4 +6,5 @@ element_qoi.$(obj-suffix):\
     diff_convdiff_mprime.h
 main.$(obj-suffix):\
     main.C\
-    diff_convdiff_mprime.h
+    diff_convdiff_mprime.h\
+    initial.h

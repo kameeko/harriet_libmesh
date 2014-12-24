@@ -77,6 +77,7 @@ public:
 				fclose(fp);
 	  	}
 	  }
+	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
   }
 
   // System initialization
@@ -133,6 +134,9 @@ public:
 	//DEBUG
 	std::vector<Real> MHF_psiLF;
 	std::vector<Real> MLF_psiLF;
+	
+	//avoid assigning data point to two elements in on their boundary
+	std::vector<int> accounted_for;
 
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.

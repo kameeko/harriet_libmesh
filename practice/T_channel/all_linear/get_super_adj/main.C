@@ -12,6 +12,7 @@
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
 #include "libmesh/enum_xdr_mode.h"
+#include "libmesh/gmv_io.h" //DEBUG
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
   //const unsigned int coarsegridsize    = infile("coarsegridsize", 1);
   const unsigned int coarserefinements = infile("coarserefinements", 0);
   const unsigned int max_adaptivesteps = infile("max_adaptivesteps", 10);
-  const unsigned int dim               = 2;
+  //const unsigned int dim               = 2;
   
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -94,6 +95,9 @@ int main(int argc, char** argv)
 	//DEBUG
   equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
 			 EquationSystems::WRITE_ADDITIONAL_DATA);
+#ifdef LIBMESH_HAVE_GMV
+  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
+#endif
 
   // Initialize the system
   //equation_systems.init ();  //already initialized by read-in

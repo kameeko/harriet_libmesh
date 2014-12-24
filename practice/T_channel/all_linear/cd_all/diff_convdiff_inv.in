@@ -17,4 +17,4 @@ data_file = data_1D.dat #Measurements_bottom6.dat
 #subdomains
 diff_id = 2
 convdiff_id = 0
-divided_mesh = unit_interval.exo #plain_T.exo
+divided_mesh = unit_interval_coarse.exo   #unit_interval.exo #plain_T.exo

@@ -34,6 +34,8 @@ void Diff_ConvDiff_MprimeSys::init_data (){
                          
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
+	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
+	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
 		fc1_var = c_var; fc2_var = c_var; fc3_var = c_var; fc4_var = c_var; fc5_var = c_var; 
@@ -47,8 +49,6 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 		fc5_var = this->add_variable("fc5", static_cast<Order>(conc_p), meep);
 		fc_var = c_var;
 	}
-	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
-	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
 		aux_fc1_var = c_var; aux_fc2_var = c_var; aux_fc3_var = c_var; aux_fc4_var = c_var; aux_fc5_var = c_var;       
@@ -100,6 +100,7 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
 	this->print_jacobians = infile("print_jacobians", false);
 	this->print_element_jacobians = infile("print_element_jacobians", false);
+	this->print_element_residuals = infile("print_residuals", false);
 
 	// Set Dirichlet boundary conditions
 	//const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
@@ -549,7 +550,11 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
     
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
 	  	Point data_point = datapts[dnum];
-	  	if(ctxt.get_elem().contains_point(data_point)){
+	  	if(ctxt.get_elem().contains_point(data_point) && (accounted_for[dnum]>=ctxt.get_elem().id()) ){
+	  	
+	  		//help avoid double-counting if data from edge of elements, but may mess with jacobian check
+	  		accounted_for[dnum] = ctxt.get_elem().id(); 
+	  		
 	  		Number cpred = ctxt.point_value(c_var, data_point);
 	  		Number cstar = datavals[dnum];
 	  		Number auxc_pointy = ctxt.point_value(aux_c_var, data_point);
