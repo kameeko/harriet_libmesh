@@ -88,6 +88,7 @@ int main(int argc, char** argv){
   //std::cout << "\n\n" << "DEBUG reading in " << find_psiLF_here << "\n\n";
   //Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);  
   //std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
+  //GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
  	//DEBUG
   
   // Initialize the system

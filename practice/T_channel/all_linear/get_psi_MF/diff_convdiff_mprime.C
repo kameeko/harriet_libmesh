@@ -324,7 +324,7 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 			
 	  	//location of quadrature point
 	  	const Real ptx = qpoint[qp](0);
-	  	const Real pty = qpoint[qp](1);
+	  	const Real pty = (dim == 2) ? qpoint[qp](1) : 0.0;
 			
 			//for 1D debug
 			Real basis1, basis2, basis3, basis4, basis5;
@@ -402,6 +402,26 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 		   		Rauxfc4(i) += JxW[qp]*(beta*basis4*fc + zc*basis4); 
 		   		Rauxfc5(i) += JxW[qp]*(beta*basis5*fc + zc*basis5); 
      		}
+     		/*
+     		//reaction bits not quite symmetric with equations for primary variables, but zero for now...
+     		//(copied over from aux-only)
+				Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*auxzc*auxc*phi[i][qp]);
+				if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
+	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){ 
+
+     			Rc(i) += JxW[qp]*phi[i][qp]; 
+
+     		}
+	      Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] + R*auxc*auxc*phi[i][qp] + auxfc*phi[i][qp]);
+	      if(dim == 2)
+     			Rfc(i) += JxW[qp]*(beta*grad_auxfc*dphi[i][qp] + auxzc*phi[i][qp]); 
+     		else if(dim == 1 && i == 0){ 
+		   		Rfc1(i) += JxW[qp]*(beta*basis1*auxfc + auxzc*basis1);
+		   		Rfc2(i) += JxW[qp]*(beta*basis2*auxfc + auxzc*basis2); 
+		   		Rfc3(i) += JxW[qp]*(beta*basis3*auxfc + auxzc*basis3); 
+		   		Rfc4(i) += JxW[qp]*(beta*basis4*auxfc + auxzc*basis4); 
+		   		Rfc5(i) += JxW[qp]*(beta*basis5*auxfc + auxzc*basis5); 
+     		}*/
      		
 	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]); 
 	      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
@@ -423,6 +443,63 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
+					/*
+						J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] 
+															+ 2*R*phi[j][qp]*auxc*phi[i][qp]);
+						J_c_auxc(i,j) += JxW[qp]*(2*R*auxzc*phi[j][qp]*phi[i][qp]);
+
+						J_zc_auxc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
+																+ 2*R*auxc*phi[j][qp]*phi[i][qp]);
+						if(dim == 2){
+							J_zc_auxfc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
+						
+			     		J_fc_auxzc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
+		     			J_fc_auxfc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]);
+       			}
+       			else if(dim == 1){
+       				if(j == 0){
+		     				J_zc_auxfc1(i,j) += JxW[qp]*(basis1*phi[i][qp]);
+		     				J_zc_auxfc2(i,j) += JxW[qp]*(basis2*phi[i][qp]);
+		     				J_zc_auxfc3(i,j) += JxW[qp]*(basis3*phi[i][qp]);
+		     				J_zc_auxfc4(i,j) += JxW[qp]*(basis4*phi[i][qp]);
+		     				J_zc_auxfc5(i,j) += JxW[qp]*(basis5*phi[i][qp]);
+  						}
+  						if(i == 0){
+		     				J_fc1_auxzc(i,j) += JxW[qp]*(phi[j][qp]*basis1);
+		     				J_fc2_auxzc(i,j) += JxW[qp]*(phi[j][qp]*basis2);
+		     				J_fc3_auxzc(i,j) += JxW[qp]*(phi[j][qp]*basis3);
+		     				J_fc4_auxzc(i,j) += JxW[qp]*(phi[j][qp]*basis4);
+		     				J_fc5_auxzc(i,j) += JxW[qp]*(phi[j][qp]*basis5);
+		     				
+		     				if(j == 0){
+				   				J_fc1_auxfc1(i,j) += JxW[qp]*(beta*basis1*basis1);
+				   				J_fc1_auxfc2(i,j) += JxW[qp]*(beta*basis1*basis2);
+				   				J_fc1_auxfc3(i,j) += JxW[qp]*(beta*basis1*basis3);
+				   				J_fc1_auxfc4(i,j) += JxW[qp]*(beta*basis1*basis4);
+				   				J_fc1_auxfc5(i,j) += JxW[qp]*(beta*basis1*basis5);
+				   				J_fc2_auxfc1(i,j) += JxW[qp]*(beta*basis2*basis1);
+				   				J_fc2_auxfc2(i,j) += JxW[qp]*(beta*basis2*basis2);
+				   				J_fc2_auxfc3(i,j) += JxW[qp]*(beta*basis2*basis3);
+				   				J_fc2_auxfc4(i,j) += JxW[qp]*(beta*basis2*basis4);
+				   				J_fc2_auxfc5(i,j) += JxW[qp]*(beta*basis2*basis5);
+				   				J_fc3_auxfc1(i,j) += JxW[qp]*(beta*basis3*basis1);
+				   				J_fc3_auxfc2(i,j) += JxW[qp]*(beta*basis3*basis2);
+				   				J_fc3_auxfc3(i,j) += JxW[qp]*(beta*basis3*basis3);
+				   				J_fc3_auxfc4(i,j) += JxW[qp]*(beta*basis3*basis4);
+				   				J_fc3_auxfc5(i,j) += JxW[qp]*(beta*basis3*basis5);
+				   				J_fc4_auxfc1(i,j) += JxW[qp]*(beta*basis4*basis1);
+				   				J_fc4_auxfc2(i,j) += JxW[qp]*(beta*basis4*basis2);
+				   				J_fc4_auxfc3(i,j) += JxW[qp]*(beta*basis4*basis3);
+				   				J_fc4_auxfc4(i,j) += JxW[qp]*(beta*basis4*basis4);
+				   				J_fc4_auxfc5(i,j) += JxW[qp]*(beta*basis4*basis5);
+				   				J_fc5_auxfc1(i,j) += JxW[qp]*(beta*basis5*basis1);
+				   				J_fc5_auxfc2(i,j) += JxW[qp]*(beta*basis5*basis2);
+				   				J_fc5_auxfc3(i,j) += JxW[qp]*(beta*basis5*basis3);
+				   				J_fc5_auxfc4(i,j) += JxW[qp]*(beta*basis5*basis4);
+				   				J_fc5_auxfc5(i,j) += JxW[qp]*(beta*basis5*basis5);
+		     				}
+       				}
+       			}*/
         		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp]);
 						J_c_auxc(i,j) += JxW[qp]*(2*R*zc*phi[j][qp]*phi[i][qp]);
 						J_c_zc(i,j) += JxW[qp]*(2*R*phi[j][qp]*auxc*phi[i][qp]);
