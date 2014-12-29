@@ -78,6 +78,7 @@ void Diff_ConvDiff_InvSys::init_data (){
 	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
 	this->print_jacobians = infile("print_jacobians", false);
 	this->print_element_jacobians = infile("print_element_jacobians", false);
+	this->print_residuals = infile("print_residuals", false);
 
 	// Set Dirichlet boundary conditions
 	//const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};

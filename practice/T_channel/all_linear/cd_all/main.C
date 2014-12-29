@@ -106,22 +106,15 @@ int main(int argc, char** argv){
     infile("initial_linear_tolerance", 1.e-3);
     
   //FOR 1D DEBUG
-  read_initial_parameters();
-  system.project_solution(initial_value, initial_grad,
-                          equation_systems.parameters);
-  finish_initialization();
+  //read_initial_parameters();
+  //system.project_solution(initial_value, initial_grad, equation_systems.parameters);
+  //finish_initialization();
 #ifdef LIBMESH_HAVE_GMV
-  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
+  //GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
 #endif
 
   // Print information about the system to the screen.
   equation_systems.print_info();
-  
-  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
-  //system.assemble(); //DEBUG
-  //std::cout << "\n~~~~~~~~~~~~~~~~\n"; //DEBUG
-  //equation_systems.write("rhs.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG
-  //             EquationSystems::WRITE_ADDITIONAL_DATA);
   
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations...not that this is transient, but eh, why not...

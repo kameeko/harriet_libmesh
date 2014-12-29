@@ -1,6 +1,7 @@
 verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
 print_jacobians = false
 print_element_jacobians = false
+print_residuals = true
 
 fe_family = 'LAGRANGE'
 

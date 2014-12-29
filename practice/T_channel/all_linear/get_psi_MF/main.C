@@ -118,16 +118,15 @@ int main(int argc, char** argv){
     infile("initial_linear_tolerance", 1.e-3);
   
   //FOR 1D DEBUG
-  read_initial_parameters();
-  system.project_solution(initial_value, initial_grad,
-                          equation_systems.parameters);
-  finish_initialization();
+  //read_initial_parameters();
+  //system.project_solution(initial_value, initial_grad, equation_systems.parameters);
+  //finish_initialization();
 #ifdef LIBMESH_HAVE_GMV
-  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
+  //GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);
 #endif
-	equation_systems.write("psiLF_1D_fused.xda", WRITE, EquationSystems::WRITE_DATA | 
-               EquationSystems::WRITE_ADDITIONAL_DATA);
-  mesh.write("psiLF_mesh_1Dfused.xda");
+	//equation_systems.write("psiLF_1D_fused.xda", WRITE, EquationSystems::WRITE_DATA | 
+  //             EquationSystems::WRITE_ADDITIONAL_DATA);
+  //mesh.write("psiLF_mesh_1Dfused.xda");
                           
 
   // Print information about the system to the screen.

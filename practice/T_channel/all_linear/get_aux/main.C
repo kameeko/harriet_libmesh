@@ -78,6 +78,13 @@ int main(int argc, char** argv){
     AutoPtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
   
+  //1D DEBUG
+  //std::string find_psiLF_here = "aux.xda";
+  //equation_systems.read(find_psiLF_here, READ,
+  //  EquationSystems::READ_HEADER |
+  //  EquationSystems::READ_DATA |
+  //  EquationSystems::READ_ADDITIONAL_DATA);
+  
   // Initialize the system
   equation_systems.init ();
 
@@ -106,8 +113,7 @@ int main(int argc, char** argv){
     
  	//FOR 1D DEBUG
   read_initial_parameters();
-  system.project_solution(initial_value, initial_grad,
-                          equation_systems.parameters);
+  system.project_solution(initial_value, initial_grad, equation_systems.parameters);
   finish_initialization();
 #ifdef LIBMESH_HAVE_GMV
   GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("psiHF_readin_1d.gmv"), equation_systems);

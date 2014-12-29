@@ -239,8 +239,11 @@ int main(int argc, char** argv)
 	  qois.set_weight(0, 1.0);
 
 	  system.assemble_qoi_sides = true; //QoI doesn't involve sides
+	  
+	  std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n";
 	  system.adjoint_solve();
- 
+ 		std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~\n";
+ 		
 	  NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
 	  NumericVector<Number> &primal_solution = *system.solution;
 				
@@ -263,6 +266,12 @@ int main(int argc, char** argv)
 	  std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
 	  std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
 	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
+	  
+	  //DEBUG
+	  std::cout << "\n------------ herp derp ------------\n";
+	  dual_solution.print();
+	  //system.get_adjoint_rhs().print();
+	  std::cout << "\n------------ herp derp ------------\n";
 	  
 	  //DEBUG
 	  //primal_solution.swap(dual_solution);

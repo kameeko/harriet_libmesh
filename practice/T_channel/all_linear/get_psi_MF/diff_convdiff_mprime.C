@@ -34,8 +34,6 @@ void Diff_ConvDiff_MprimeSys::init_data (){
                          
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
-	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
-	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
 		fc1_var = c_var; fc2_var = c_var; fc3_var = c_var; fc4_var = c_var; fc5_var = c_var; 
@@ -49,6 +47,8 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 		fc5_var = this->add_variable("fc5", static_cast<Order>(conc_p), meep);
 		fc_var = c_var;
 	}
+	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
+	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
 		aux_fc1_var = c_var; aux_fc2_var = c_var; aux_fc3_var = c_var; aux_fc4_var = c_var; aux_fc5_var = c_var;       
@@ -100,20 +100,22 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
 	this->print_jacobians = infile("print_jacobians", false);
 	this->print_element_jacobians = infile("print_element_jacobians", false);
-	this->print_element_residuals = infile("print_residuals", false);
+	this->print_residuals = infile("print_residuals", false);
+	this->print_solutions = infile("print_solutions", false);
 
 	// Set Dirichlet boundary conditions
-	//const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
-	//std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2));
-	std::set<boundary_id_type> all_bdys;
+	const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+	std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2)); std::cout << "\n\nCHANNEL DEBUG\n\n";
+	//std::set<boundary_id_type> all_bdys;
+	
 	if(dim == 2){ //T-channel
-		all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
-		all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);
+	//	all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
+	//	all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);
 	}  
 	else if(dim == 1){
 		all_bdys.insert(0); all_bdys.insert(1);
-	} 
-
+	}
+	
 	std::vector<unsigned int> all_of_em;
 	all_of_em.push_back(c_var); all_of_em.push_back(zc_var); all_of_em.push_back(fc_var);
 	all_of_em.push_back(aux_c_var); all_of_em.push_back(aux_zc_var); all_of_em.push_back(aux_fc_var);
