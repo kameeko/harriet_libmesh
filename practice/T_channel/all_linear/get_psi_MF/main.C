@@ -239,7 +239,7 @@ int main(int argc, char** argv){
     if (a_step == max_adaptivesteps)
       {
         system.solve();
-				std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n";
+				std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, L2) << "\n";
         system.postprocess();
         
         //DEBUG

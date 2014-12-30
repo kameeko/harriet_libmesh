@@ -88,16 +88,19 @@ int main(int argc, char** argv)
 			EquationSystems::READ_HEADER |
 			EquationSystems::READ_DATA |
 			EquationSystems::READ_ADDITIONAL_DATA);
+	
+	system.postprocess(1); //stash psi values
+	std::cout << "\n\n SWOOOOOOOOSH \n\n" << std::endl;
   
   // Check that the norm of the solution read in is what we expect it to be
-  Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);  
-  std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
+  //Real readin_L2 = system.calculate_norm(*system.solution, 0, L2);  
+  //std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
 
 	//DEBUG
-  equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
-			 EquationSystems::WRITE_ADDITIONAL_DATA);
+  //equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
+	//		 EquationSystems::WRITE_ADDITIONAL_DATA);
 #ifdef LIBMESH_HAVE_GMV
-  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
+  //GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
 #endif
 
   // Initialize the system
@@ -231,35 +234,37 @@ int main(int argc, char** argv)
       // Do one last solve if necessary
       if (a_step == max_adaptivesteps)
 	{	  
-	  QoISet qois;
-	  std::vector<unsigned int> qoi_indices;
+	  //QoISet qois;
+	  //std::vector<unsigned int> qoi_indices;
 	  
-	  qoi_indices.push_back(0);
-	  qois.add_indices(qoi_indices);
+	  //qoi_indices.push_back(0);
+	  //qois.add_indices(qoi_indices);
 	  
-	  qois.set_weight(0, 1.0);
+	  //qois.set_weight(0, 1.0);
 
-	  system.assemble_qoi_sides = true; //QoI doesn't involve sides
+	  //system.assemble_qoi_sides = true; //QoI doesn't involve sides
 	  
-	  std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
-	  std::pair<unsigned int, Real> adjsolve = system.adjoint_solve();
-	  std::cout << "number of iterations to solve adjoint: " << adjsolve.first << std::endl;
-	  std::cout << "final residual of adjoint solve: " << adjsolve.second << std::endl;
- 		std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
+	  //std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
+	  //std::pair<unsigned int, Real> adjsolve = system.adjoint_solve();
+	  //std::cout << "number of iterations to solve adjoint: " << adjsolve.first << std::endl;
+	  //std::cout << "final residual of adjoint solve: " << adjsolve.second << std::endl;
+ 		//std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
+ 		system.solve();
  		
-	  NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
+	  //NumericVector<Number> &dual_solution = system.get_adjoint_solution(0);
 	  NumericVector<Number> &primal_solution = *system.solution;
 				
-	  primal_solution.swap(dual_solution);
+	  //primal_solution.swap(dual_solution);
 	  ExodusII_IO(mesh).write_timestep("super_adjoint.exo",
 	                                 equation_systems,
 	                                 1, /* This number indicates how many time steps
 	                                       are being written to the file */
 	                                 system.time);
-	  primal_solution.swap(dual_solution);
+	  primal_solution.print();                               
+	  //primal_solution.swap(dual_solution);
 
-    system.assemble(); //overwrite residual read in from psiLF solve
-        
+    //system.assemble(); //overwrite residual read in from psiLF solve
+/*        
 	  // The total error estimate
 	  system.postprocess(); //to compute M_HF(psiLF) and M_LF(psiLF) terms
 	  Real QoI_error_estimate = (0.5*(system.rhs)->dot(dual_solution)) + system.get_MHF_psiLF() - system.get_MLF_psiLF();
@@ -314,35 +319,6 @@ int main(int argc, char** argv)
 		//adjresid_matlab->print();
 		std::cout << "\n\nmatlab import adjoint system residual (discrete L2): " << system.calculate_norm(*adjresid_matlab,DISCRETE_L2) << "\n" << std::endl;
 		
-		AutoPtr<NumericVector<Number> > sadj_fwd_hack = system.solution->clone();
-		AutoPtr<NumericVector<Number> > adjresid_fwd_hack = system.solution->clone();
-		if(FILE *fp=fopen("superadj_forward_hack.txt","r")){
-	  	Real value;
-	  	int counter = 0;
-	  	int flag = 1;
-	  	while(flag != -1){
-	  		flag = fscanf(fp,"%lf",&value);
-	  		if(flag != -1){
-					sadj_fwd_hack->set(counter, value);
-					counter += 1;
-	  		}
-	  	}
-	  	fclose(fp);
-		}
-		(system.matrix)->vector_mult(*adjresid_fwd_hack,*sadj_fwd_hack);
-		//std::cout << "******************** matrix-superadj product (fwd_hack) ***********************" << std::endl;
-		//adjresid_fwd_hack->print();
-		adjresid_fwd_hack->add(-1.0, system.get_adjoint_rhs(0));
-		//std::cout << "******************** superadjoint system residual (fwd_hack) ***********************" << std::endl;
-		//adjresid_fwd_hack->print();
-		std::cout << "\n\nfwd_hack import adjoint system residual (discrete L2): " << system.calculate_norm(*adjresid_fwd_hack,DISCRETE_L2) << "\n" << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 0): " << system.calculate_norm(*adjresid_fwd_hack,0,L2) << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 1): " << system.calculate_norm(*adjresid_fwd_hack,1,L2) << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 2): " << system.calculate_norm(*adjresid_fwd_hack,2,L2) << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 3): " << system.calculate_norm(*adjresid_fwd_hack,3,L2) << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 4): " << system.calculate_norm(*adjresid_fwd_hack,4,L2) << std::endl;
-		std::cout << "fwd_hack adjoint system residual (L2, 5): " << system.calculate_norm(*adjresid_fwd_hack,5,L2) << std::endl;
-		
 		//std::cout << "************************ system.matrix ***********************" << std::endl;
 		//system.matrix->print();
 	  std::cout << "\n------------ herp derp ------------" << std::endl;
@@ -370,7 +346,7 @@ int main(int argc, char** argv)
 	  error_gmv << "error.gmv";
 	  
 	  cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
-	  
+*/	  
 
 	  
 	} // End if at max adaptive steps
