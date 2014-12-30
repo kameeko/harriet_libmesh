@@ -285,7 +285,9 @@ int main (int argc, char** argv)
 
         // Solve the adjoint system. This takes the transpose of the stiffness matrix and then
         // solves the resulting system
-        system.adjoint_solve();
+        std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
+	  		system.adjoint_solve();
+ 				std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
 
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, 
         //so we dont solve unneccesarily in the error estimator
@@ -385,7 +387,9 @@ int main (int argc, char** argv)
 
         system.assemble_qoi_sides = false; //QoI doesn't involve sides
         linear_solver->reuse_preconditioner(param.reuse_preconditioner);
-        system.adjoint_solve();
+        std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
+	  		system.adjoint_solve();
+ 				std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
 
         // Now that we have solved the adjoint, set the adjoint_already_solved boolean to true, 
         //so we dont solve unneccesarily in the error estimator

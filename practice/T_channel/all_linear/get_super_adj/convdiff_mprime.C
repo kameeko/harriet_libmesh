@@ -34,8 +34,6 @@ void ConvDiff_MprimeSys::init_data (){
                          
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
-	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
-	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
 		fc1_var = c_var; fc2_var = c_var; fc3_var = c_var; fc4_var = c_var; fc5_var = c_var; 
@@ -49,6 +47,8 @@ void ConvDiff_MprimeSys::init_data (){
 		fc5_var = this->add_variable("fc5", static_cast<Order>(conc_p), meep);
 		fc_var = c_var;
 	}
+	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
+	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
 	if(dim == 2){ 
 		aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
 		aux_fc1_var = c_var; aux_fc2_var = c_var; aux_fc3_var = c_var; aux_fc4_var = c_var; aux_fc5_var = c_var;       
@@ -62,7 +62,7 @@ void ConvDiff_MprimeSys::init_data (){
 		aux_fc5_var = this->add_variable("aux_fc5", static_cast<Order>(conc_p), meep);
 		aux_fc_var = c_var;
 	}
-
+	
 	//regularization
 	beta = infile("beta",0.1);
 	
