@@ -16,6 +16,7 @@ public:
     GetPot infile("diff_convdiff_mprime.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
+		qoi_option = infile("QoI_option",1);
     
     const unsigned int dim = this->get_mesh().mesh_dimension();
     
@@ -137,8 +138,7 @@ public:
 	
 	//avoid assigning data point to two elements in on their boundary
 	std::vector<int> accounted_for;
-
-  // Returns the value of a forcing function at point p.  This value
-  // depends on which application is being used.
-  Point forcing(const Point& p);
+  
+  //options for QoI location and nature
+  int qoi_option;
 };

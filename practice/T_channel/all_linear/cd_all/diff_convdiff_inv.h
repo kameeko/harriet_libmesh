@@ -20,6 +20,7 @@ public:
     GetPot infile("diff_convdiff_inv.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
+		qoi_option = infile("QoI_option",1);
 		
 		const unsigned int dim = this->get_mesh().mesh_dimension();
     
@@ -134,4 +135,7 @@ public:
 	
   //to hold computed QoI
   Number computed_QoI[1];
+  
+  //options for QoI location and nature
+  int qoi_option;
 };

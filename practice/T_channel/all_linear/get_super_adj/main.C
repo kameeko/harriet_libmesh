@@ -386,7 +386,7 @@ int main(int argc, char** argv)
       if ((t_step+1)%write_interval == 0)
 	{
         std::ostringstream file_name;
-	
+	/*
         // We write the file in the ExodusII format.
         file_name << "out_"
                   << std::setw(3)
@@ -397,9 +397,9 @@ int main(int argc, char** argv)
 				//this should write out the primal which should be the same as what's read in...
 				ExodusII_IO(mesh).write_timestep(file_name.str(),
 								                        equation_systems,
-								                        1, /* This number indicates how many time steps
-								                              are being written to the file */
+								                        1, //number of time steps written to file
 								                        system.time);
+	*/
 	}
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }

@@ -1,20 +1,8 @@
+long channel: for QoI options 1+2, refining from 10x50 to 20x100 makes the QoI error estimate off (by about 5% for option 2, order of magnitude off for option 1, even though every residual check looks fine...)...15x75 is okay for both...
+
 ************ 1/8/15 ***********
 
-There's probably something up with the libmesh-petsc interface, or a bug in petsc...use '-pc_type jacobi'...
-
-T-channel:
-trice-refined
-	HF: Computed QoI is 0.0013656455027004559
-	LF: Computed QoI is 0.0015782611526088093
-	error ought to be I_HF-I_LF -0.00021261564
-twice-refined
-	HF: Computed QoI is 0.0013808005439723511
-	LF: Computed QoI is 0.0015730362120877667
-once-refined
-	HF: Computed QoI is 0.0019496943628202435
-	LF:
-
-once-refined already has 10 times the number of degrees of freedom as coarse channel...do with no-refinement, just to see that the numbers work out?
+There's probably something up with the libmesh-petsc interface, or a bug in petsc...
 -------
 
 

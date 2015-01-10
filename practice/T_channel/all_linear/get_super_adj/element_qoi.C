@@ -138,15 +138,22 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    		else if(dim == 1){
    			MHF_psiLF_elem += JxW[qp]*(beta*auxfc*fc + zc*auxfc);
    		}
-   		
-   		if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
-	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){
+   		if((qoi_option == 1 && 
+						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
+						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
+		  		(qoi_option == 2 &&
+		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
+		  			
         MHF_psiLF_elem += JxW[qp] * c;
 			}
 
 			//MLF_psiLF = I(q_LF, u_LF)
-      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
-	      		|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){
+      if((qoi_option == 1 && 
+						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
+						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
+		  		(qoi_option == 2 &&
+		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
+		  			
         MLF_psiLF_elem += JxW[qp] * c;
 			}
 		}

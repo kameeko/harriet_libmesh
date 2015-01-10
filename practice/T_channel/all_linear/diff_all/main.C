@@ -246,8 +246,6 @@ int main(int argc, char** argv){
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
-        equation_systems.write("primaryHF.xda", WRITE, EquationSystems::WRITE_DATA | //DEBUG
-               EquationSystems::WRITE_ADDITIONAL_DATA);
 
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

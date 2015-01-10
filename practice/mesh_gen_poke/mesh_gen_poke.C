@@ -48,7 +48,7 @@ int main (int argc, char** argv){
 	
 	//nice geometry (straight channel) 
 	MeshTools::Generation::build_square (mesh, 
-																					50, 10,
+																					75, 15,
                                          -0.0, 5.0,
                                          -0.0, 1.0,
                                          QUAD9);
@@ -58,11 +58,12 @@ int main (int argc, char** argv){
   for (; elem_it != elem_end; ++elem_it){
     Elem* elem = *elem_it;
     Point c = elem->centroid();
-    //if(c.size()<0.8)
-    //if(c(0)<0)
-        elem->subdomain_id() = 0;
-    //else
-    		//elem->subdomain_id() = 2;
+    Point cshift1(c(0)-1.8, c(1)-0.5);
+    Point cshift2(c(0)-0.4, c(1)-0.433);
+    if(c(0) <= 2.17)
+        elem->subdomain_id() = 1;
+    else
+    		elem->subdomain_id() = 0;
   }
 
 

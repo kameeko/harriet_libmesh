@@ -11,9 +11,12 @@ beta = 0.001   #1.0e-8 #0.001
 #diffusion coefficient
 k = 0.1   #1.0 #0.1
 
+#QoI option
+QoI_option = 2
+
 #where to find files
 velocity_file = channel_long_vel.csv #dummy_vel.txt #velsTtrim.txt
-data_file = dummy_data.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
+data_file = long_channel_data.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
 
 #subdomains
 diff_id = 2

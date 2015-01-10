@@ -406,8 +406,11 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
      		}
      		
 	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]); 
-	      if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) 
-	      	|| (dim == 1 && ptx >= 0.7 && ptx <= 0.9)){ 
+	      if((qoi_option == 1 && 
+						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
+						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
+		  		(qoi_option == 2 &&
+		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
 	      	
      			Rc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
      		}
@@ -428,8 +431,12 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
         		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp]);
 						J_c_auxc(i,j) += JxW[qp]*(2*R*zc*phi[j][qp]*phi[i][qp]);
 						J_c_zc(i,j) += JxW[qp]*(2*R*phi[j][qp]*auxc*phi[i][qp]);
-     				if((dim == 2 && fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)|| 
-      					(dim == 1 && ptx >= 0.7 && ptx <= 0.9)){				
+     				if((qoi_option == 1 && 
+							((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
+							(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
+						(qoi_option == 2 &&
+							(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){			
+							
 							J_c_c(i,j) += 0.0; //no dependence on c here if QoI is integral of c over subdomain
 						}
 						

@@ -48,8 +48,11 @@ void Diff_ConvDiff_InvSys::element_postprocess (DiffContext &context)
       const Real y = (dim == 2)?xyz[qp](1):0;
 
       // If in the sub-domain omega, add the contribution to the integral R
-      if((dim == 2 && (fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)) || 
-      	(dim == 1 && x >= 0.7 && x <= 0.9)){
+      if((qoi_option == 1 && 
+      		((dim == 2 && (fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)) || 
+      		(dim == 1 && x >= 0.7 && x <= 0.9))) ||
+      		(qoi_option == 2 &&
+      		(dim == 2 && (fabs(x - 2.0) <= 0.125 && fabs(y - 0.5) <= 0.125)))){
       	
         // Get the solution value at the quadrature point
         Number c = ctxt.interior_value(c_var, qp);
