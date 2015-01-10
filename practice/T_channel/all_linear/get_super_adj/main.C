@@ -262,7 +262,7 @@ int main(int argc, char** argv)
         
 	  // The total error estimate
 	  system.postprocess(); //to compute M_HF(psiLF) and M_LF(psiLF) terms
-	  Real QoI_error_estimate = (0.5*(system.rhs)->dot(dual_solution)) + system.get_MHF_psiLF() - system.get_MLF_psiLF();
+	  Real QoI_error_estimate = (-0.5*(system.rhs)->dot(dual_solution)) + system.get_MHF_psiLF() - system.get_MLF_psiLF();
 	  std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << 0.5*(system.rhs)->dot(dual_solution) << "\n";
 	  std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
   	std::cout << " M_LF(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
@@ -272,11 +272,15 @@ int main(int argc, char** argv)
 	  
 	  //DEBUG
 	  std::cout << "\n------------ herp derp ------------" << std::endl;
+	  //libMesh::out.precision(16);
 	  //dual_solution.print();
 	  //system.get_adjoint_rhs().print();
 
 		AutoPtr<NumericVector<Number> > adjresid = system.solution->clone();
 		(system.matrix)->vector_mult(*adjresid,system.get_adjoint_solution(0));
+		SparseMatrix<Number>& adjmat = *system.matrix; 
+		(system.matrix)->get_transpose(adjmat);
+		adjmat.vector_mult(*adjresid,system.get_adjoint_solution(0));
 		//std::cout << "******************** matrix-superadj product (libmesh) ************************" << std::endl;
 		//adjresid->print();
 		adjresid->add(-1.0, system.get_adjoint_rhs(0));
@@ -290,7 +294,7 @@ int main(int argc, char** argv)
 		std::cout << "adjoint system residual (L2, 3): " << system.calculate_norm(*adjresid,3,L2) << std::endl;
 		std::cout << "adjoint system residual (L2, 4): " << system.calculate_norm(*adjresid,4,L2) << std::endl;
 		std::cout << "adjoint system residual (L2, 5): " << system.calculate_norm(*adjresid,5,L2) << std::endl;
-		
+	/*	
 		AutoPtr<NumericVector<Number> > sadj_matlab = system.solution->clone();
 		AutoPtr<NumericVector<Number> > adjresid_matlab = system.solution->clone();
 		if(FILE *fp=fopen("superadj_matlab.txt","r")){
@@ -313,7 +317,8 @@ int main(int argc, char** argv)
 		//std::cout << "******************** superadjoint system residual (matlab) ***********************" << std::endl;
 		//adjresid_matlab->print();
 		std::cout << "\n\nmatlab import adjoint system residual (discrete L2): " << system.calculate_norm(*adjresid_matlab,DISCRETE_L2) << "\n" << std::endl;
-		
+	*/
+	/*	
 		AutoPtr<NumericVector<Number> > sadj_fwd_hack = system.solution->clone();
 		AutoPtr<NumericVector<Number> > adjresid_fwd_hack = system.solution->clone();
 		if(FILE *fp=fopen("superadj_forward_hack.txt","r")){
@@ -342,9 +347,10 @@ int main(int argc, char** argv)
 		std::cout << "fwd_hack adjoint system residual (L2, 3): " << system.calculate_norm(*adjresid_fwd_hack,3,L2) << std::endl;
 		std::cout << "fwd_hack adjoint system residual (L2, 4): " << system.calculate_norm(*adjresid_fwd_hack,4,L2) << std::endl;
 		std::cout << "fwd_hack adjoint system residual (L2, 5): " << system.calculate_norm(*adjresid_fwd_hack,5,L2) << std::endl;
-		
+	*/	
 		//std::cout << "************************ system.matrix ***********************" << std::endl;
 		//system.matrix->print();
+		
 	  std::cout << "\n------------ herp derp ------------" << std::endl;
 	  
 	  //DEBUG
@@ -361,7 +367,7 @@ int main(int argc, char** argv)
 	  
 	  for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
 	    {
-	      cell_wise_error[i] = fabs(0.5*((system.rhs)->el(i) * dual_solution(i)) 
+	      cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
 	      		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i));
 	    }
 

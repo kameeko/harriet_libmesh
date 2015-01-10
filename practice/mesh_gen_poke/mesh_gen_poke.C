@@ -40,17 +40,17 @@ int main (int argc, char** argv){
 	//T-channel
 	//mesh.read("mesh.e");
 	//MeshRefinement meshRefinement(mesh);
-	//meshRefinement.uniformly_refine(3);
+	//meshRefinement.uniformly_refine(0);
 	
 	//1D - for debugging
 	//int n = 20;
 	//MeshTools::Generation::build_line(mesh, n, 0.0, 1.0, EDGE2); //n linear elements from 0 to 1
 	
-	//nice geometry (straight channel) for debugging
+	//nice geometry (straight channel) 
 	MeshTools::Generation::build_square (mesh, 
-																					6, 6,
-                                         -1.0, 2.0,
-                                         -1.0, 1.0,
+																					50, 10,
+                                         -0.0, 5.0,
+                                         -0.0, 1.0,
                                          QUAD9);
 
 	MeshBase::element_iterator       elem_it  = mesh.elements_begin();

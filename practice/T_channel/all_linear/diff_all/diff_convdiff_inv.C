@@ -81,13 +81,18 @@ void Diff_ConvDiff_InvSys::init_data (){
 	this->print_residuals = infile("print_residuals", false);
 
 	// Set Dirichlet boundary conditions
-	const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
-	std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2)); std::cout << "\n\nCHANNEL DEBUG\n\n";
-	//std::set<boundary_id_type> all_bdys;
+	//const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+	//std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2)); std::cout << "\n\nCHANNEL DEBUG\n\n";
+	std::set<boundary_id_type> all_bdys;
 	
-	if(dim == 2){ //T-channel
-	//	all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
-	//	all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);
+	if(dim == 2){ 
+		if(this->get_mesh().get_boundary_info().n_boundary_ids() == 9){ //T-channel
+			all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
+			all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);
+		}
+		else if(this->get_mesh().get_boundary_info().n_boundary_ids() == 4){ //straight channel
+			all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3);
+		}
 	}  
 	else if(dim == 1){
 		all_bdys.insert(0); all_bdys.insert(1);

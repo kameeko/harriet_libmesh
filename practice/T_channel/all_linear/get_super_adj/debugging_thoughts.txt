@@ -1,3 +1,23 @@
+************ 1/8/15 ***********
+
+There's probably something up with the libmesh-petsc interface, or a bug in petsc...use '-pc_type jacobi'...
+
+T-channel:
+trice-refined
+	HF: Computed QoI is 0.0013656455027004559
+	LF: Computed QoI is 0.0015782611526088093
+	error ought to be I_HF-I_LF -0.00021261564
+twice-refined
+	HF: Computed QoI is 0.0013808005439723511
+	LF: Computed QoI is 0.0015730362120877667
+once-refined
+	HF: Computed QoI is 0.0019496943628202435
+	LF:
+
+once-refined already has 10 times the number of degrees of freedom as coarse channel...do with no-refinement, just to see that the numbers work out?
+-------
+
+
 changed Rc to include pointyness of observations...
 
 0.5*M'_HF(psiLF)(superadj): -0.00044311842783695103
@@ -41,7 +61,7 @@ try it on a two element mesh and print out analytic and numeric...if you make it
 
 ./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4
 ./progname -pc_type lu
-./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal (might require recompiling petsc)
+./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal (might require recompiling petsc) (SHOULD YOU BE USING superlu_dist?
 
 LF: Computed QoI is 0.15355109395460917 (diff_all)
 HF: Computed QoI is 0.13894656673895892 (cd_all)

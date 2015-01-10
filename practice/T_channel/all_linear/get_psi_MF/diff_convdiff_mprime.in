@@ -2,7 +2,7 @@ verify_analytic_jacobians = 1.0e-6 #if too large, will print out jacobians that 
 print_jacobians = false
 print_element_jacobians = false
 print_residuals = false
-print_solutions = true
+print_solutions = false
 
 fe_family = 'LAGRANGE'
 
@@ -13,10 +13,10 @@ beta = 0.001   #1.0e-8 #0.001
 k = 0.1   #1.0 #0.1
 
 #where to find files
-velocity_file = dummy_vel.txt   #velsTtrim.txt
-data_file = dummy_data.dat   #data_1D.dat #Measurements_bottom6.dat
+velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
+data_file = dummy_data.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
 
 #subdomains
 diff_id = 0
 convdiff_id = 2
-divided_mesh = coarse_channel.exo   #unit_interval_coarse.exo #unit_interval.exo #plain_T.exo
+divided_mesh = channel_long.exo #plain_T_ref2.exo #coarse_channel.exo #unit_interval_coarse.exo #unit_interval.exo #plain_T.exo
