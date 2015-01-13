@@ -1,0 +1,95 @@
+long channel: for QoI options 1+2, refining from 10x50 to 20x100 makes the QoI error estimate off...15x75 is okay...
+
+************ 1/8/15 ***********
+
+There's probably something up with the libmesh-petsc interface, or a bug in petsc...
+-------
+
+
+changed Rc to include pointyness of observations...
+
+0.5*M'_HF(psiLF)(superadj): -0.00044311842783695103
+M_HF(psiLF): 0.0014934996188950226
+M_LF(psiLF): 0.0015782611553820456
+
+QoI error estimate: -0.00052787996432397395
+
+-> still wrong, but much closer than before...
+...but 1D example still won't solve (zero pivot in LU, inexact newton fails...)
+	-if you ignore forcing term for auxiliary equations (so that all auxiliary variables are zero), using gmres gets very different parameters but residual still small (e-14) (q=(-1.26126 2.42304 0.102468 0.0701751 -0.553671)); same with default (residual e-19, but q=(-0.00810372 0.00245963 -0.00773981 0.00483283 -0.00649891))...can't seem to get correct parameters even though primary equations unchanged...
+	-upping regularization to beta = 0.001 doesn't help...
+	
+	-stick qoi forcing into diff_all? since primary and auxiliary have the same equations, just different forcing...
+		-solves, and matches matlab results (zc, auxzc are negative because state equations on other side of zero)
+		-2d psi solved in one go agrees with (q,u,z) and (p,v,y) solved separately...
+	-since psi won't solve for 1D, solve the two parts seperately and then fuse into one xda? but the order of the numbers in the xda file follow neither element id nor geographic left-to-right...what order is it?? how the hell is it read in correctly?
+			-feeding in correct answer to psiMF code (initial.h route) allows it to start with correctly small residual, but then it still fails to find a happy answer from there, even with various solver flags...
+	-reading in fused 1D psiHF, the residual is oddly large (Residual L2 norm: 0.13665257042677595) and if system.solve(), the first "nonlinear residual" is different from that if the same file is read into psiMF solver (0.756514)...even though their init_data() and element_time_derivative() are the same (copy and paste, removing bit allowing for diff-only in subdomain from superadj version) (fine in 2D case)...CHECK SUPERADJ MAYBE RESIDUAL WRONG BUT SUPERADJ RIGHT? no superadj is hilariously wrong...by 10+ orders of magnitude...it depends on the residual as rhs in adjoint solve, so yeah...
+			-reading in fused 1D psiHF into aux solver gives initial nonlinear residual of 0.756514, even though the solution was saved up to 17 sig figs...copying equations from aux-only doesn't change anything...then again, you already checked the jacobian element-by-element, and it's correct...so something wrong with the rhs or with the solver...
+				-same residual if read-in by aux solver...though aux solver can still solve...maybe the system is really sensitive and the seemingly small differences between outputting to and reading in xda vs saving to exo and then using paraview to save data makes a difference...saving aux.xda and then reading it in crashes aux solver (seems obsessively unsatisfied with tiny starting residual 10^-9), but not using initial.h route (starting residual 0.75806)...
+
+
+----
+1D debug
+
+Jacobian disagreement (see get_psi_MF/meep.txt)
+J_auxzc_fc1,2,3,4,5
+J_auxfc1,2,3,4,5_fc1,2,3,4,5
+(same if order shuffled)
+	-these are the primary equations and shouldn't be affected at all change to Rc...and they were copy and pasted over from cd_all...maybe during the solve it hits nan or something very large and that screws up the FD numerical approximation? what if you read in the matlab output as an initial guess? scalar variables don't seem to be saved into xda file...but it's read in...
+	-removing forcing for primary equations and leaving only Rc, Rzc, Rfc's still gives Jaconian disagreement...
+	
+try it on a two element mesh and print out analytic and numeric...if you make it ignore analytic check, is psi correct?
+	-will not solve if use analytic only...lu gives zero pivot (both orderings)
+
+-if you ignore forcing term for auxiliary equations (so that all auxiliary variables are zero), and then switch the order of the equations so that primary and auxiliary are grouped, it takes a lot longer to solve...and though it gets to a similar residual norm (e-19 instead of e-20), the resulting parameters are very different(q=(-0.32565 -0.128374 0.396075 0.168661 0.197997) vs (-0.00696052 0.0020067 -0.00668027 0.00395938 -0.0057315))
+	-grouped ordering, with gmres flags: q = (-0.326201 -0.12694 0.395587 0.168817 0.197956); I(psiLF): 0.15353773078867183
+	
+-what if you solved the two chunks separately? solve for state, then read in to solve for auxiliary? how to combine though?
+
+./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4
+./progname -pc_type lu
+./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal (might require recompiling petsc) (SHOULD YOU BE USING superlu_dist?
+
+LF: Computed QoI is 0.15355109395460917 (diff_all)
+HF: Computed QoI is 0.13894656673895892 (cd_all)
+matlab:
+ypLF = 0.153551212372836
+qLF =(-0.3256 -0.1284 0.3961 0.1686 0.1980)
+----
+
+LF: Computed QoI is 0.0015782611526088093
+HF: Computed QoI is 0.0013656455027004559
+
+error ought to be I_HF-I_LF -0.00021261564
+
+-does penalizing derivative of source make things nonlinear? shouldn't...RtR will just include a differencing matrix...
+-is the adjoint being resolved accurately enough? (yes, to 3 sig figs)
+-what things can we solve for two ways, to compare?
+	-adjoint-residual calculation? swap adjoint with forward, dot residual with adjoint in element_postprocess? are they properly matched-up? (matched up the same way as in 1D...)
+	-does M_HF(psiLF) give I_HF if psiLF replaced with psiHF? (yes; correct to machine precision when psiLF=psiHF)
+-how different are primal variables when solved as part of psi versus when auxiliary variables are not solved for?
+		-same up to 3-4 sig figs...I(q,u,v) and I(psi) match up to 13 sig figs...
+-elemental contributions to MHF_psiLF seem to be of an order so that elemental contributions are being properly summed...
+
+-M_HF(psiLF)-I(psiLF) contributed most of the estimate in the 1D case... 
+
+-parameters are totally different in 1D case...how to replicate in libMesh? how to designate parameters as not a field?
+-don't forget alpha vs beta/2 (nah they the same)...and diffusion coeff...
+
+-in 1D case...is enrichment necessary?
+
+current output:
+0.5*M'_HF(psiLF)(superadj): -1.9493516019282498e-05
+M_HF(psiLF): 0.0015741119531960598
+I(psiLF): 0.0015782611526087805
+QoI error estimate: -2.364271543200307e-05
+
+
+-try adj-resid dot as an intergral (step through elements in a post-process...)  -> matches
+-if that doesn't turn up anything, try things on a straight channel, in case T is messing up physics...
+	HF: 0.00091998571954313526
+	LF: 0.0012916704969018959
+	QoI error estimate: 1.6480614004099224e-05
+		-> it ain't the T-channel screwing things up...
+	

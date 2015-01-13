@@ -1,0 +1,229 @@
+#include "libmesh/getpot.h"
+
+#include "diff_convdiff_inv.h"
+
+#include "libmesh/boundary_info.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/mesh.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/zero_function.h"
+
+#include <cmath>
+
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
+// System initialization
+void Diff_ConvDiff_Sys::init_data (){
+	const unsigned int dim = this->get_mesh().mesh_dimension();
+
+	//polynomial order and finite element type for pressure variable
+	unsigned int pressure_p = 1;
+	GetPot infile("diff_convdiff_inv.in");
+	std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
+
+	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
+                         
+	c_var = this->add_variable("c", static_cast<Order>(pressure_p), fefamily); 
+	
+	//diffusion coefficient
+	k = infile("k", 1.0);
+	
+	//reaction coefficient
+	Rcoeff = infile("R", 1.0);
+
+	//indicate variables that change in time
+	this->time_evolving(c_var);
+	
+	// Useful debugging options
+	// Set verify_analytic_jacobians to 1e-6 to use
+	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+	this->print_jacobians = infile("print_jacobians", false);
+	this->print_element_jacobians = infile("print_element_jacobians", false);
+	this->print_residuals = infile("print_residuals", false);
+
+	// Set Dirichlet boundary conditions
+	//const boundary_id_type all_ids[6] = {0, 1, 2, 3, 4, 5};
+	//std::set<boundary_id_type> all_bdys(all_ids, all_ids+(dim*2)); std::cout << "\n\nCHANNEL DEBUG\n\n";
+	std::set<boundary_id_type> all_bdys;
+	
+	if(dim == 2){ 
+		if(this->get_mesh().get_boundary_info().n_boundary_ids() == 9){ //T-channel
+			all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); all_bdys.insert(4);
+			all_bdys.insert(5); all_bdys.insert(6); all_bdys.insert(7); all_bdys.insert(8);
+		}
+		else if(this->get_mesh().get_boundary_info().n_boundary_ids() == 4){ //straight channel
+			all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3);
+		}
+	}  
+
+	//std::vector<unsigned int> all_of_em(1, c_var);
+	std::vector<unsigned int> all_of_em;
+	all_of_em.push_back(c_var);
+	
+	ZeroFunction<Number> zero;
+	ConstFunction<Number> one(1);
+	
+	if(dim == 2){
+		//c=0 on boundary, cuz I feel like it...
+		this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, all_of_em, &zero));
+	}
+	  
+	// Do the parent's initialization after variables and boundary constraints are defined
+	FEMSystem::init_data();
+}
+
+// Context initialization
+void Diff_ConvDiff_Sys::init_context(DiffContext &context){
+	FEMContext &ctxt = cast_ref<FEMContext&>(context);
+  
+	//stuff for things of pressure's family
+	FEBase* c_elem_fe = NULL;
+
+  ctxt.get_element_fe(c_var, c_elem_fe);
+  c_elem_fe->get_JxW();
+  c_elem_fe->get_phi();
+  c_elem_fe->get_dphi();
+
+  FEBase* c_side_fe = NULL;
+  ctxt.get_side_fe(c_var, c_side_fe);
+
+  c_side_fe->get_JxW();
+  c_side_fe->get_phi();
+  c_side_fe->get_dphi();
+}
+
+// Element residual and jacobian calculations
+// Time dependent parts
+bool Diff_ConvDiff_Sys::element_time_derivative (bool request_jacobian, DiffContext& context){
+	const unsigned int dim = this->get_mesh().mesh_dimension();
+	
+	FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  FEBase* c_elem_fe = NULL; 
+  ctxt.get_element_fe( c_var, c_elem_fe );
+
+	// Element Jacobian * quadrature weights for interior integration
+	const std::vector<Real> &JxW = c_elem_fe->get_JxW();
+
+	const std::vector<std::vector<Real> >& phi = c_elem_fe->get_phi();
+	const std::vector<std::vector<RealGradient> >& dphi = c_elem_fe->get_dphi();
+	
+	// Physical location of the quadrature points
+	const std::vector<Point>& qpoint = c_elem_fe->get_xyz();
+
+	// The number of local degrees of freedom in each variable
+	const unsigned int n_c_dofs = ctxt.get_dof_indices( c_var ).size();
+
+	// The subvectors and submatrices we need to fill:
+	DenseSubMatrix<Number> &J_c_c = ctxt.get_elem_jacobian(c_var, c_var);
+	DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
+	
+	// Now we will build the element Jacobian and residual.
+	// Constructing the residual requires the solution and its
+	// gradient from the previous timestep.  This must be
+	// calculated at each quadrature point by summing the
+	// solution degree-of-freedom values by the appropriate
+	// weight functions.
+	unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
+
+	for (unsigned int qp=0; qp != n_qpoints; qp++)
+	  {
+	    Number 
+	      c = ctxt.interior_value(c_var, qp);
+	    Gradient 
+	      grad_c = ctxt.interior_gradient(c_var, qp);
+			
+	  	//location of quadrature point
+	  	const Real ptx = qpoint[qp](0);
+	  	const Real pty = (dim == 2) ? qpoint[qp](1) : 0.0;
+			
+			Real u, v;
+
+	 		int xind, yind;
+	 		Real xdist = 1.e10; Real ydist = 1.e10;
+	 		for(int ii=0; ii<x_pts.size(); ii++){
+	 			Real tmp = std::abs(ptx - x_pts[ii]);
+	 			if(xdist > tmp){
+	 				xdist = tmp;
+	 				xind = ii;
+	 			}
+	 			else
+	 				break;
+	 		} 
+	 		for(int jj=0; jj<y_pts[xind].size(); jj++){
+	 			Real tmp = std::abs(pty - y_pts[xind][jj]);
+	 			if(ydist > tmp){
+	 				ydist = tmp;
+	 				yind = jj;
+	 			}
+	 			else
+	 				break;
+	 		}
+	 		u = vel_field[xind][yind](0);
+	 		v = vel_field[xind][yind](1);
+   		
+			Point f = this->forcing(qpoint[qp]);
+			Number fc = f(0);
+			
+	    NumberVectorValue U(u);
+	    if(dim == 2)
+	    	U(1) = v;
+	    	
+			Real R = Rcoeff; //reaction coefficient
+	
+			// First, an i-loop over the  degrees of freedom.
+			for (unsigned int i=0; i != n_c_dofs; i++){
+
+	      Rc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
+
+				if (request_jacobian){
+					for (unsigned int j=0; j != n_c_dofs; j++){
+
+						J_c_c(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
+																+ 2*R*c*phi[j][qp]*phi[i][qp]);
+
+					} // end of the inner dof (j) loop
+			  } // end - if (compute_jacobian && context.get_elem_solution_derivative())
+
+			} // end of the outer dof (i) loop
+    } // end of the quadrature point (qp) loop
+    
+	return request_jacobian;
+}
+
+// Postprocessed output
+void Diff_ConvDiff_Sys::postprocess (){
+	
+	GetPot infile("diff_convdiff_inv.in");
+	std::string write_data_here = infile("data_file","Measurements.dat");
+	std::ofstream output(write_data_here);
+	for(int i = 0; i<datavals.size(); i++){
+		Point pt = datapts[i];
+		Number c = point_value(c_var, pt);
+		std::cout << "c(" << pt(0) << ", " << pt(1)<< ") = " << c << std::endl;
+		if(output.is_open()){
+      output << pt(0) << " " << pt(1) << " " << c << "\n";
+    }
+		
+	}
+	
+	output.close();
+
+}
+
+Point Diff_ConvDiff_Sys::forcing(const Point& pt){
+	Point f;
+	//f(0) = exp(-10*(pow(pt(0)-0.25,2)+pow(pt(1)-0.25,2)));
+	if(fabs(pt(0) - 0.25) <= 0.125 && fabs(pt(1) - 0.25) <= 0.125)
+		f(0) = 1.0;
+	else if(fabs(pt(0) - 2.5) <= 0.125 && fabs(pt(1) - 0.5) <= 0.125)
+		f(0) = 0.8;
+		
+	return f;
+}
