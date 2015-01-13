@@ -51,8 +51,10 @@ void Diff_ConvDiff_InvSys::element_postprocess (DiffContext &context)
       if((qoi_option == 1 && 
       		((dim == 2 && (fabs(x - 0.5) <= 0.125 && fabs(y - 0.5) <= 0.125)) || 
       		(dim == 1 && x >= 0.7 && x <= 0.9))) ||
-      		(qoi_option == 2 &&
-      		(dim == 2 && (fabs(x - 2.0) <= 0.125 && fabs(y - 0.5) <= 0.125)))){
+    		(qoi_option == 2 &&
+      		(dim == 2 && (fabs(x - 2.0) <= 0.125 && fabs(y - 0.5) <= 0.125))) ||
+	  		(qoi_option == 3 &&
+	  			(dim == 2 && (fabs(x - 0.75) <= 0.125 && fabs(y - 0.5) <= 0.125)))){
       	
         // Get the solution value at the quadrature point
         Number c = ctxt.interior_value(c_var, qp);

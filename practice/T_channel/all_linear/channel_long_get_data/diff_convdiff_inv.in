@@ -12,7 +12,7 @@ k = 0.1   #1.0 #0.1
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
 
 #where to write data (have locations and dummy data)
-data_file = long_channel_data.dat
+data_file = long_channel_data3.dat
 
 #find mesh
 divided_mesh = channel_long.exo

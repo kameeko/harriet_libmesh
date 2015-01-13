@@ -27,7 +27,6 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
   ctxt.get_element_fe( c_var , elem_fe );
   
   int myElemID = ctxt.get_elem().id();
-  //std::cout << myElemID << "\n"; //DEBUG
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> &JxW = elem_fe->get_JxW();
@@ -80,8 +79,6 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	    	fc = f_from_coeff(f1, f2, f3, f4, f5, ptx);
 	    	auxfc = f_from_coeff(auxf1, auxf2, auxf3, auxf4, auxf5, ptx);
 	    	
-	    	std::cout << f1 << " " << f2 << " " << f3 << " " << f4 << " " << f5 << "\n"; //DEBUG
-   			//std::cout << auxf1 << " " << auxf2 << " " << auxf3 << " " << auxf4 << " " << auxf5 << "\n"; //DEBUG
 	    }
 
 			Real u, v;
@@ -125,11 +122,14 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + zc*auxfc);
    		else if(dim == 1)
    			MHF_psiLF_elem += JxW[qp]*(beta*fc*auxfc + zc*auxfc);
+   		
    		if((qoi_option == 1 && 
 						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
 						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
 		  		(qoi_option == 2 &&
-		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
+		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+		  		(qoi_option == 3 &&
+		  			(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
         MHF_psiLF_elem += JxW[qp] * c;
 			}
 
@@ -138,7 +138,9 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
 						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
 		  		(qoi_option == 2 &&
-		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
+		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+		  		(qoi_option == 3 &&
+		  			(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
         MLF_psiLF_elem += JxW[qp] * c;
 			}
     } //end of quadrature loop

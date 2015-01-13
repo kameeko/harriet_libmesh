@@ -266,8 +266,10 @@ int main(int argc, char** argv)
 	  std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << 0.5*(system.rhs)->dot(dual_solution) << "\n";
 	  std::cout << " M_HF(psiLF): " << std::setprecision(17) << system.get_MHF_psiLF() << "\n";
   	std::cout << " M_LF(psiLF): " << std::setprecision(17) << system.get_MLF_psiLF() << "\n";
-	  std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, 0, L2) << "\n"; 
-	  std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, 0, L2) << "\n";
+	  std::cout << "\n\n Residual L2 norm: " << system.calculate_norm(*system.rhs, L2) << "\n"; 
+	  std::cout << " Residual discrete L2 norm: " << system.calculate_norm(*system.rhs, DISCRETE_L2) << "\n";
+	  std::cout << " Super-adjoint L2 norm: " << system.calculate_norm(dual_solution, L2) << "\n";
+	  std::cout << " Super-adjoint discrete L2 norm: " << system.calculate_norm(dual_solution, DISCRETE_L2) << "\n";
 	  std::cout << "\n\n QoI error estimate: " << std::setprecision(17) << QoI_error_estimate << "\n\n";
 	  
 	  //DEBUG
@@ -368,7 +370,11 @@ int main(int argc, char** argv)
 	  for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
 	    {
 	      cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
-	      		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i));
+	      		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)); //THIS IS NOT THE PROPER WAY TO ITERATE THROUGH LAST TWO...THOSE ARE BY ELEMENT NUMBER...not sure if i=elementID even when it's less than # of elements...
+	      //DEBUG
+	      //if(cell_wise_error[i] >= 1.e-6)
+	      //	std::cout << i << " " << cell_wise_error[i] << " " << -0.5*((system.rhs)->el(i) * dual_solution(i)) <<
+	      //		" " << system.get_MHF_psiLF(i)-system.get_MLF_psiLF(i) << std::endl;
 	    }
 
 	  // Plot it
