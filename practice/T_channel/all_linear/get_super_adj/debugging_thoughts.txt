@@ -49,7 +49,7 @@ try it on a two element mesh and print out analytic and numeric...if you make it
 
 ./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4
 ./progname -pc_type lu
-./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal (might require recompiling petsc) (SHOULD YOU BE USING superlu_dist?
+./progname -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal 
 
 LF: Computed QoI is 0.15355109395460917 (diff_all)
 HF: Computed QoI is 0.13894656673895892 (cd_all)

@@ -1,0 +1,26 @@
+verify_analytic_jacobians = 1.0e-6 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+print_residuals = false
+print_solutions = false 
+
+fe_family = 'LAGRANGE'
+
+#regularization parameter
+beta = 0.001   #1.0e-8 #0.001
+
+#diffusion coefficient
+k = 0.1   #1.0 #0.1
+
+#reaction coefficient
+R = -1.0
+
+#QoI option
+QoI_option = 2
+
+#where to find files
+velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
+data_file = long_channel_data3.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
+
+mesh = psiLF_mesh.xda
+psiLF_file = psiLF.xda

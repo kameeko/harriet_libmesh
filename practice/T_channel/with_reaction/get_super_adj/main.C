@@ -354,33 +354,39 @@ int main(int argc, char** argv)
 		//system.matrix->print();
 		
 	  std::cout << "\n------------ herp derp ------------" << std::endl;
+
+	  // The cell wise breakdown
+	  ErrorVector cell_wise_error;
+	  cell_wise_error.resize((system.rhs)->size());
+	  for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
+	    {
+	      if(i < system.get_mesh().n_elem())
+			    cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
+			    		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)); 
+    		else
+    			cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)));
+	      		
+	      /*csv from 'save data' from gmv output gives a few values at each node point (value 
+	      for every element that shares that node), yet paraview display only seems to show one 
+	      of them -> the value in an element is given at each of the nodes that it has, hence the 
+	      repetition; what is displayed in paraview is each element's value; even though MHF_psiLF 
+	      and MLF_psiLF are stored by element this seems to give elemental contributions that 
+	      agree with if we had taken the superadj-residual dot product by integrating over elements*/
+	    }
+	  // Plot it
+	  std::ostringstream error_gmv;
+	  error_gmv << "error.gmv";
+	  cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
 	  
-	  //formerly debug, now in place of sketchy element-wise error breakdown
+	  //alternate element-wise breakdown, outputed as values matched to element centroids; for matlab plotz
 	  primal_solution.swap(dual_solution);
 	 	system.postprocess(1);
 	 	primal_solution.swap(dual_solution);
 	 	system.postprocess(2);
 	 	std::cout << "\n\n -0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
 	 	primal_solution.swap(dual_solution);
-
-	  // The cell wise breakdown
-	  //ErrorVector cell_wise_error;
-	  //cell_wise_error.resize((system.rhs)->size());
-	  
-	  //for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
-	  //  {
-	  //    cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
-	  //    		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)); 
-	      		
-	      /*the output looks about right, but printing out each gives infinity sometimes 
-	      because we go out of bounds in accessing MHF_psiLF and MLF_psiLF; infinities 
-	      don't seem to show up in gmv, even after 'save data'; csv from 'save data' 
-	      seems to give a few values at each node point (value for every element that 
-	      shares that node), yet paraview display only seems to show one of them 
-	      (perhaps the max?)*/
-	  //  }
-
-		std::string write_error_here = infileForMesh("error_est_output_file", "error_est_breakdown.dat");
+	 	
+	 	std::string write_error_here = infileForMesh("error_est_output_file", "error_est_breakdown.dat");
     std::ofstream output(write_error_here);
 		for(unsigned int i = 0 ; i < system.get_mesh().n_elem(); i++){
 			Point elem_cent = system.get_mesh().elem(i)->centroid();
@@ -390,12 +396,6 @@ int main(int argc, char** argv)
 			}
 		}
 		output.close();
-
-	  // Plot it
-	  //std::ostringstream error_gmv;
-	  //error_gmv << "error.gmv";
-	  
-	  //cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
 	  
 	} // End if at max adaptive steps
       
