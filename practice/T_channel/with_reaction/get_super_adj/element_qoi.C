@@ -122,7 +122,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 			}
 		}
 		else if(debug_step == 1){
-	     /* sadj_c_stash[myElemID].push_back(c);
+	     	sadj_c_stash[myElemID].push_back(c);
 	      sadj_zc_stash[myElemID].push_back(zc);
 	      sadj_fc_stash[myElemID].push_back(fc);
 	      sadj_auxc_stash[myElemID].push_back(auxc);
@@ -134,12 +134,11 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	      sadj_gradfc_stash[myElemID].push_back(grad_fc);
 	      sadj_gradauxc_stash[myElemID].push_back(grad_auxc);
 	      sadj_gradauxzc_stash[myElemID].push_back(grad_auxzc);
-	      sadj_gradauxfc_stash[myElemID].push_back(grad_auxfc); */
-	      std::cout << "\nNOT UP TO DATE!!!!!!!\n";
+	      sadj_gradauxfc_stash[myElemID].push_back(grad_auxfc); 
 		}
 		else if(debug_step == 2){		
-			//DEBUG - 0.5*superadj*resid ; half of this needs forward, half of this needs adj...
-			/*
+			//-0.5*superadj*resid ; half of this needs forward, half of this needs adj...get adj from stash...
+			
    		Number 
 	      sadj_c = sadj_c_stash[myElemID][qp],
 	      sadj_zc = sadj_zc_stash[myElemID][qp],
@@ -158,14 +157,18 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    		half_sadj_resid_elem += JxW[qp]*(-k*grad_zc*sadj_grad_auxc + U*grad_zc*sadj_auxc + 2*R*zc*c*sadj_auxc);
 			half_sadj_resid_elem += JxW[qp]*(-k*grad_c*sadj_grad_auxzc - U*grad_c*sadj_auxzc + R*c*c*sadj_auxzc + fc*sadj_auxzc);
 			half_sadj_resid_elem += JxW[qp]*(beta*grad_fc*sadj_grad_auxfc + zc*sadj_auxfc);
-			half_sadj_resid_elem += JxW[qp]*(-k*grad_auxzc*sadj_grad_c + U*grad_auxzc*sadj_c 
-      						+ auxc*sadj_c + 2*R*zc*auxc*sadj_c);
-      if(fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125) //is this correct?
-   			half_sadj_resid_elem += JxW[qp]*sadj_c; //Rc(i) += JxW[qp]?
+      half_sadj_resid_elem += JxW[qp]*(-k*grad_auxzc*sadj_grad_c + U*grad_auxzc*sadj_c 
+      						+ 2*R*zc*auxc*sadj_c);
+      if((qoi_option == 1 && 
+					((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
+					(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
+				(qoi_option == 2 &&
+					(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){ 
+   			half_sadj_resid_elem += JxW[qp]*sadj_c; 
+   		}
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxc*sadj_grad_zc - U*grad_auxc*sadj_zc 
       						+ auxfc*sadj_zc + 2*R*c*auxc*sadj_zc);
-   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc); */
-   		std::cout << "\nNOT UP TO DATE!!!!!!!\n";
+   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc); 
 		}		
 		
     } //end of quadrature loop
@@ -183,12 +186,16 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 		  
     	Number auxc_point = ctxt.point_value(aux_c_var, data_point);	      
 
-		if(debug_step == 0)
-	  	MHF_psiLF_elem += (cpred - cstar)*auxc_point;
-	  else if(debug_step == 1)
-	  	sadj_auxc_point_stash[dnum] = auxc_point;
-	  else if(debug_step == 2)
-	  	half_sadj_resid_elem += (cpred - cstar)*sadj_auxc_point_stash[dnum]; //DEBUG
+			if(debug_step == 0)
+				MHF_psiLF_elem += (cpred - cstar)*auxc_point;
+			else if(debug_step == 1){
+				sadj_auxc_point_stash[dnum] = auxc_point;
+				sadj_c_point_stash[dnum] = cpred;
+			}
+			else if(debug_step == 2){
+				half_sadj_resid_elem += (cpred - cstar)*sadj_auxc_point_stash[dnum];
+				half_sadj_resid_elem += auxc_point*sadj_c_point_stash[dnum];
+			}
 
 		}
 	}
@@ -198,7 +205,7 @@ if(debug_step == 0){
   MLF_psiLF[myElemID] += MLF_psiLF_elem;
 }
 else if(debug_step == 2){
-	half_sadj_resid[myElemID] += 0.5*half_sadj_resid_elem; //DEBUG
+	half_sadj_resid[myElemID] += -0.5*half_sadj_resid_elem; //DEBUG
 }
 
 }

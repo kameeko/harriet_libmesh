@@ -68,6 +68,7 @@ public:
 		}
 		
 		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
+		sadj_c_point_stash.resize(datavals.size()); //DEBUG
 		
 		accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
 
@@ -150,7 +151,7 @@ public:
 	std::vector<std::vector<Real> > sadj_auxc_stash; std::vector<std::vector<Gradient> > sadj_gradauxc_stash;
 	std::vector<std::vector<Real> > sadj_auxzc_stash; std::vector<std::vector<Gradient> > sadj_gradauxzc_stash;
 	std::vector<std::vector<Real> > sadj_auxfc_stash; std::vector<std::vector<Gradient> > sadj_gradauxfc_stash;
-	std::vector<Real> sadj_auxc_point_stash;
+	std::vector<Real> sadj_auxc_point_stash; std::vector<Real> sadj_c_point_stash;
 	unsigned int debug_step; //if 1, fill up sadj stash; if 2, calculate half_sadj_resid
 	
 	//avoid assigning data point to two elements in on their boundary

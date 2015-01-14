@@ -94,10 +94,10 @@ int main(int argc, char** argv)
   std::cout << "Read in solution norm: "<< readin_L2 << std::endl << std::endl;
 
 	//DEBUG
-  equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
-			 EquationSystems::WRITE_ADDITIONAL_DATA);
+  //equation_systems.write("right_back_out.xda", WRITE, EquationSystems::WRITE_DATA |
+	//		 EquationSystems::WRITE_ADDITIONAL_DATA);
 #ifdef LIBMESH_HAVE_GMV
-  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
+  //GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("right_back_out.gmv"), equation_systems);
 #endif
 
   // Initialize the system
@@ -355,35 +355,47 @@ int main(int argc, char** argv)
 		
 	  std::cout << "\n------------ herp derp ------------" << std::endl;
 	  
-	  //DEBUG
-	  //primal_solution.swap(dual_solution);
-	 	//system.postprocess(1);
-	 	//primal_solution.swap(dual_solution);
-	 	//system.postprocess(2);
-	 	//std::cout << "\n\n 0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
-	 	//primal_solution.swap(dual_solution);
+	  //formerly debug, now in place of sketchy element-wise error breakdown
+	  primal_solution.swap(dual_solution);
+	 	system.postprocess(1);
+	 	primal_solution.swap(dual_solution);
+	 	system.postprocess(2);
+	 	std::cout << "\n\n -0.5*M'_HF(psiLF)(superadj): " << std::setprecision(17) << system.get_half_adj_weighted_resid() << "\n";
+	 	primal_solution.swap(dual_solution);
 
 	  // The cell wise breakdown
-	  ErrorVector cell_wise_error;
-	  cell_wise_error.resize((system.rhs)->size());
+	  //ErrorVector cell_wise_error;
+	  //cell_wise_error.resize((system.rhs)->size());
 	  
-	  for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
-	    {
-	      cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
-	      		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)); //THIS IS NOT THE PROPER WAY TO ITERATE THROUGH LAST TWO...THOSE ARE BY ELEMENT NUMBER...not sure if i=elementID even when it's less than # of elements...
-	      //DEBUG
-	      //if(cell_wise_error[i] >= 1.e-6)
-	      //	std::cout << i << " " << cell_wise_error[i] << " " << -0.5*((system.rhs)->el(i) * dual_solution(i)) <<
-	      //		" " << system.get_MHF_psiLF(i)-system.get_MLF_psiLF(i) << std::endl;
-	    }
+	  //for(unsigned int i = 0; i < (system.rhs)->size() ; i++)
+	  //  {
+	  //    cell_wise_error[i] = fabs(-0.5*((system.rhs)->el(i) * dual_solution(i)) 
+	  //    		+ system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)); 
+	      		
+	      /*the output looks about right, but printing out each gives infinity sometimes 
+	      because we go out of bounds in accessing MHF_psiLF and MLF_psiLF; infinities 
+	      don't seem to show up in gmv, even after 'save data'; csv from 'save data' 
+	      seems to give a few values at each node point (value for every element that 
+	      shares that node), yet paraview display only seems to show one of them 
+	      (perhaps the max?)*/
+	  //  }
+
+		std::string write_error_here = infileForMesh("error_est_output_file", "error_est_breakdown.dat");
+    std::ofstream output(write_error_here);
+		for(unsigned int i = 0 ; i < system.get_mesh().n_elem(); i++){
+			Point elem_cent = system.get_mesh().elem(i)->centroid();
+			if(output.is_open()){
+				output << elem_cent(0) << " " << elem_cent(1) << " " 
+					<< fabs(system.get_half_adj_weighted_resid(i) + system.get_MHF_psiLF(i) - system.get_MLF_psiLF(i)) << "\n";
+			}
+		}
+		output.close();
 
 	  // Plot it
-	  std::ostringstream error_gmv;
-	  error_gmv << "error.gmv";
+	  //std::ostringstream error_gmv;
+	  //error_gmv << "error.gmv";
 	  
-	  cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
-	  
-
+	  //cell_wise_error.plot_error(error_gmv.str(), equation_systems.get_mesh());
 	  
 	} // End if at max adaptive steps
       
