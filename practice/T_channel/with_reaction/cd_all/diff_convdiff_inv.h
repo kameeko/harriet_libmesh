@@ -114,7 +114,7 @@ public:
 	std::vector<std::vector<Real> > y_pts;
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
-	int cd_subdomain_id, cdr_subdomain_id;
+	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
 	
 	//avoid assigning data point to two elements in on their boundary
 	std::vector<int> accounted_for;

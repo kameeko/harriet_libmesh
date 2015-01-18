@@ -372,6 +372,9 @@ int main(int argc, char** argv)
 	      repetition; what is displayed in paraview is each element's value; even though MHF_psiLF 
 	      and MLF_psiLF are stored by element this seems to give elemental contributions that 
 	      agree with if we had taken the superadj-residual dot product by integrating over elements*/
+	      
+	      /*at higher mesh resolutions and lower k, weird-looking artifacts start to appear and
+	      it no longer agrees with output from manual integration of superadj-residual...*/
 	    }
 	  // Plot it
 	  std::ostringstream error_gmv;

@@ -16,7 +16,7 @@ k = 0.1   #1.0 #0.1
 R = -1.0
 
 #QoI option
-QoI_option = 2
+QoI_option = 3
 
 #where to find files
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt

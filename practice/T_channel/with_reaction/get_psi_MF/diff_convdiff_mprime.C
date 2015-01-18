@@ -51,6 +51,7 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 	Rcoeff = infile("R", 1.0);
 	
 	//subdomain ids
+	diff_subdomain_id = infile("diff_id", 2);
 	cd_subdomain_id = infile("cd_id", 1);
 	cdr_subdomain_id = infile("cdr_id", 0);
 
@@ -204,29 +205,34 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	  	const Real pty = (dim == 2) ? qpoint[qp](1) : 0.0;
 			
 			Real u, v;
-	 		int xind, yind;
-	 		Real xdist = 1.e10; Real ydist = 1.e10;
-	 		for(int ii=0; ii<x_pts.size(); ii++){
-	 			Real tmp = std::abs(ptx - x_pts[ii]);
-	 			if(xdist > tmp){
-	 				xdist = tmp;
-	 				xind = ii;
-	 			}
-	 			else
-	 				break;
-	 		} 
-	 		for(int jj=0; jj<y_pts[xind].size(); jj++){
-	 			Real tmp = std::abs(pty - y_pts[xind][jj]);
-	 			if(ydist > tmp){
-	 				ydist = tmp;
-	 				yind = jj;
-	 			}
-	 			else
-	 				break;
+			if(subdomain == cdr_subdomain_id || subdomain == cd_subdomain_id){
+		 		int xind, yind;
+		 		Real xdist = 1.e10; Real ydist = 1.e10;
+		 		for(int ii=0; ii<x_pts.size(); ii++){
+		 			Real tmp = std::abs(ptx - x_pts[ii]);
+		 			if(xdist > tmp){
+		 				xdist = tmp;
+		 				xind = ii;
+		 			}
+		 			else
+		 				break;
+		 		} 
+		 		for(int jj=0; jj<y_pts[xind].size(); jj++){
+		 			Real tmp = std::abs(pty - y_pts[xind][jj]);
+		 			if(ydist > tmp){
+		 				ydist = tmp;
+		 				yind = jj;
+		 			}
+		 			else
+		 				break;
+		 		}
+		 		u = vel_field[xind][yind](0);
+		 		v = vel_field[xind][yind](1);
+			}
+	 		else if(subdomain == diff_subdomain_id){
+	 			u = 0.0; v = 0.0;
 	 		}
-	 		u = vel_field[xind][yind](0);
-	 		v = vel_field[xind][yind](1);
-
+	 		
 	    NumberVectorValue U(u);
 	    if(dim == 2)
 	    	U(1) = v;
@@ -234,7 +240,7 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	    Real R; //reaction coefficient
 	    if(subdomain == cdr_subdomain_id)	
 				R = Rcoeff; 
-			else if(subdomain == cd_subdomain_id)
+			else if(subdomain == cd_subdomain_id || subdomain == diff_subdomain_id)
 				R = 0.0;
 	
 			// First, an i-loop over the  degrees of freedom.
@@ -248,7 +254,9 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	      if((qoi_option == 1 && 
 		    		(dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	    		(qoi_option == 2 &&
-		    		(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){			
+		    		(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+	  			(qoi_option == 3 &&
+	  				(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){			
 	      	
      			Rc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
      		}
@@ -264,7 +272,9 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 					if((qoi_option == 1 && 
 		    			(dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 		    		(qoi_option == 2 &&
-		    			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
+		    			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+						(qoi_option == 3 &&
+							(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
 							J_c_c(i,j) += 0.0; //no dependence on c here if QoI is integral of c over subdomain
 						}
 						

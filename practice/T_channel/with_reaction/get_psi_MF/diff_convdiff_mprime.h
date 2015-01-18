@@ -114,7 +114,7 @@ public:
 	std::vector<std::vector<Real> > y_pts;
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
-	int cd_subdomain_id, cdr_subdomain_id;
+	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
 
 	//DEBUG
 	std::vector<Real> MHF_psiLF;
