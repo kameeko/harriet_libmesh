@@ -170,7 +170,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 			half_sadj_resid_elem += JxW[qp]*(-k*grad_c*sadj_grad_auxzc - U*grad_c*sadj_auxzc + R*c*c*sadj_auxzc + fc*sadj_auxzc);
 			half_sadj_resid_elem += JxW[qp]*(beta*grad_fc*sadj_grad_auxfc + zc*sadj_auxfc);
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxzc*sadj_grad_c + U*grad_auxzc*sadj_c 
-      						+ 2*R*zc*auxc*sadj_c);
+      						+ 2*R*zc*auxc*sadj_c + 2*R*auxzc*c*sadj_c);
       if((qoi_option == 1 && 
 		    		(dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	    		(qoi_option == 2 &&

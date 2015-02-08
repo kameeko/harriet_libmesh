@@ -244,7 +244,8 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	      Rauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
      		Rauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]);
      		
-	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] + 2*R*zc*auxc*phi[i][qp]); 
+	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
+	      	+ 2*R*zc*auxc*phi[i][qp] + 2*R*auxzc*c*phi[i][qp]); 
 	      if((qoi_option == 1 && 
 		    		(dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	    		(qoi_option == 2 &&
@@ -265,9 +266,10 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
-        		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp]);
+        		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] + 2*R*phi[j][qp]*c*phi[i][qp]);
 						J_c_auxc(i,j) += JxW[qp]*(2*R*zc*phi[j][qp]*phi[i][qp]);
 						J_c_zc(i,j) += JxW[qp]*(2*R*phi[j][qp]*auxc*phi[i][qp]);
+						J_c_c(i,j) += JxW[qp]*(2*R*auxzc*phi[j][qp]*phi[i][qp]);
 						if((qoi_option == 4 &&
 								(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){	
 								J_c_c(i,j) += JxW[qp]*(2*phi[j][qp]*phi[i][qp]); 
