@@ -1,0 +1,9 @@
+convdiff_inv.$(obj-suffix):\
+    convdiff_inv.C\
+    convdiff_inv.h
+element_qoi.$(obj-suffix):\
+    element_qoi.C\
+    convdiff_inv.h
+main.$(obj-suffix):\
+    main.C\
+    convdiff_inv.h

@@ -1,0 +1,9 @@
+convdiff_mprime.$(obj-suffix):\
+    convdiff_mprime.C\
+    convdiff_mprime.h
+element_qoi.$(obj-suffix):\
+    element_qoi.C\
+    convdiff_mprime.h
+main.$(obj-suffix):\
+    main.C\
+    convdiff_mprime.h

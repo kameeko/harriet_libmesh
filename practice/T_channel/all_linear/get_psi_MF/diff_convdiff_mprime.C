@@ -62,6 +62,8 @@ void Diff_ConvDiff_MprimeSys::init_data (){
 		aux_fc5_var = this->add_variable("aux_fc5", static_cast<Order>(conc_p), meep);
 		aux_fc_var = c_var;
 	}
+	//derp_var = this->add_variable("herp_derp", static_cast<Order>(1),
+	//	Utility::string_to_enum<FEFamily>(std::string("SCALAR"))); //DEBUG
 
 	//regularization
 	beta = infile("beta",0.1);
@@ -221,6 +223,10 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	DenseSubVector<Number> &Rauxc = ctxt.get_elem_residual( aux_c_var );;
 	DenseSubVector<Number> &Rauxzc = ctxt.get_elem_residual( aux_zc_var );
 	DenseSubVector<Number> &Rauxfc = ctxt.get_elem_residual( aux_fc_var );
+	
+	//DEBUG
+	//DenseSubVector<Number> &Rderp = ctxt.get_elem_residual( derp_var );
+	//DenseSubMatrix<Number> &J_derp_derp = ctxt.get_elem_jacobian(derp_var, derp_var);
 	
 	//for 1D debugging
 	DenseSubVector<Number> &Rfc1 = ctxt.get_elem_residual( fc1_var );
@@ -397,6 +403,9 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
 	
 			// First, an i-loop over the  degrees of freedom.
 			for (unsigned int i=0; i != n_c_dofs; i++){
+			
+				//if(i == 0)
+				//	Rderp(i) += JxW[qp]*(ctxt.interior_value(derp_var, qp) - 123.45); //DEBUG
      		
 	      Rauxc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] + 2*R*zc*c*phi[i][qp]);
 	      Rauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
@@ -434,6 +443,8 @@ bool Diff_ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, Di
      		}
 
 				if (request_jacobian){
+					//if(i==0){J_derp_derp(0,0) += JxW[qp];} //DEBUG
+						
 					for (unsigned int j=0; j != n_c_dofs; j++){
         		J_c_auxzc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp]);
 						J_c_auxc(i,j) += JxW[qp]*(2*R*zc*phi[j][qp]*phi[i][qp]);

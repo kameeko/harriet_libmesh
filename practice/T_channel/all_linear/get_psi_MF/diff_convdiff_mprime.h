@@ -117,6 +117,7 @@ public:
   unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
   unsigned int fc1_var, fc2_var, fc3_var, fc4_var, fc5_var,
   							aux_fc1_var, aux_fc2_var, aux_fc3_var, aux_fc4_var, aux_fc5_var; //for 1D debugging
+ 	unsigned int derp_var; //DEBUG
   
   Real beta; //regularization parameter
   Real k; //diffusion coefficient

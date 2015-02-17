@@ -9,13 +9,13 @@ fe_family = 'LAGRANGE'
 k = 0.1   #1.0 #0.1
 
 #reaction coefficient
-R = -1.0
+R = -42.0
 
 #where to find files
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
 
 #where to write data (have locations and dummy data)
-data_file = long_channel_data3.dat
+data_file = long_channel_data3_r42.dat
 
 #find mesh
 divided_mesh = channel_long.exo

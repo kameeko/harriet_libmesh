@@ -80,7 +80,7 @@ int main(int argc, char** argv){
   libmesh_assert_equal_to (n_timesteps, 1);
   
  	//DEBUG
- 	//std::string find_psiLF_here = "psiHF_1D_fused.xda";
+ 	//std::string find_psiLF_here = "psiLF.xda";
   //equation_systems.read(find_psiLF_here, READ,
   //  EquationSystems::READ_HEADER |
   //  EquationSystems::READ_DATA |
