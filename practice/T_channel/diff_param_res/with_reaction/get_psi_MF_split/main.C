@@ -127,6 +127,7 @@ int main(int argc, char** argv){
     infile("relative_residual_tolerance", 0.0);
   solver_aux->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
+  //solver_aux->require_residual_reduction = false; //DEBUG
 
   // And the linear solver options
   solver_primary->max_linear_iterations =
@@ -243,7 +244,10 @@ int main(int argc, char** argv){
     if (a_step == max_adaptivesteps)
       {
         system_primary.solve();
-				std::cout << "\n\n Residual L2 norm (primary): " << system_primary.calculate_norm(*system_primary.rhs, L2) << "\n";
+				std::cout << "\n\n Residual L2 norm (primary): " 
+					<< system_primary.calculate_norm(*system_primary.rhs, L2) << std::endl;
+				std::cout << "\n\n Solution L2 norm (primary): " 
+					<< system_primary.calculate_norm(*system_primary.solution, L2) << std::endl << std::endl;
 				system_aux.solve();
 				std::cout << "\n\n Residual L2 norm (auxiliary): " << system_aux.calculate_norm(*system_aux.rhs, L2) << "\n";
 				

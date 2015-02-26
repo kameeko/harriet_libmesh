@@ -46,7 +46,7 @@ void ConvDiff_AuxSys::init_data (){
 	k = infile("k", 1.0);
 	
 	//reaction coefficient
-	R = infile("R", -1.0);
+	R = infile("R", 0.0);
 	
 	//knobs for how hard to enfore pinning to constant
 	screw_mag = infile("aux_mag_screw",1.0e6);
@@ -177,14 +177,20 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	
   const System & sys = ctxt.get_system();
   NumericVector<Number> &primary_solution = 
- 	 	*(this->get_equation_systems().get_system("ConvDiff_PrimarySys").solution);
-  	//*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+ 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+  	//*(this->get_equation_systems().get_system("ConvDiff_PrimarySys").solution);
+  std::cout << "~~~~~ " << this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
   std::vector<Number> c_at_qp (n_qpoints, 0);
   std::vector<Number> zc_at_qp (n_qpoints, 0);
   unsigned int c_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("c");
   unsigned int zc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("zc");
-  ctxt.interior_values<Number>(c_var, primary_solution, c_at_qp);
+  
+  //THIS IS GRABBING THE AUX VARIABLES, even though primary_solution is the correct solution vector?!?
+  ctxt.interior_values<Number>(c_var, primary_solution, c_at_qp); 
   ctxt.interior_values<Number>(zc_var, primary_solution, zc_at_qp);
+  
+  std::cout << "c_at_qp: " << c_at_qp << std::endl;
+
 
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
@@ -200,10 +206,15 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	      
 	    Number c = c_at_qp[qp];
 	    Number zc = zc_at_qp[qp];
+	    //Number c = 1; //DEBUG
+	    //Number zc = 1; //DEBUG
 	    
 	  	//location of quadrature point
 	  	const Real ptx = qpoint[qp](0);
 	  	const Real pty = qpoint[qp](1);
+	  	
+	  	std::cout << ptx << " " << pty << " : " << c << " " << zc << std::endl; //DEBUG
+	  	std::cout << "   " << auxc << " " << auxzc << " " << auxfc << " " << auxfpin << std::endl; //DEBUG
 			
 			Real u, v;
 	 		int xind, yind;
@@ -249,7 +260,7 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
      		if(subdomain == scalar_subdomain_id){
 	      	Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 			    						+ auxfpin*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-			    Rfc(i) += JxW[qp]*(screw_mag*(auxfpin - auxfc)*phi[i][qp] + screw_grad*grad_auxfc*dphi[i][qp]);				
+			    Rfc(i) += JxW[qp]*(screw_mag*(auxfpin - auxfc)*phi[i][qp] + screw_grad*grad_auxfc*dphi[i][qp]);						
 	      }
 	      else if(subdomain == field_subdomain_id){
 			    Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
