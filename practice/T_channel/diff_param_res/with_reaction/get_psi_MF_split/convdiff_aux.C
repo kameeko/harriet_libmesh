@@ -189,8 +189,7 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
   ctxt.interior_values<Number>(c_var, primary_solution, c_at_qp); 
   ctxt.interior_values<Number>(zc_var, primary_solution, zc_at_qp);
   
-  std::cout << "c_at_qp: " << c_at_qp << std::endl;
-
+  std::cout << "this better be the same: " << this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
 
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
