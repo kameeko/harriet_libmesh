@@ -105,7 +105,9 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 		    		(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	  			(qoi_option == 3 &&
 	  				(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-	  			(qoi_option == 5) ){		
+	  			(qoi_option == 5) ||
+	  			(qoi_option == 6 &&
+		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ){		
         MHF_psiLF_elem += JxW[qp] * c;
 			}
 
@@ -116,7 +118,9 @@ void Diff_ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	    			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	  			(qoi_option == 3 &&
 	  				(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-	  			(qoi_option == 5) ){			
+	  			(qoi_option == 5) ||
+	  			(qoi_option == 6 &&
+		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ){			
         MLF_psiLF_elem += JxW[qp] * c;
 			}
     } //end of quadrature loop

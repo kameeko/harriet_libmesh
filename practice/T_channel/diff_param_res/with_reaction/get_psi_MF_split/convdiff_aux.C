@@ -119,6 +119,12 @@ void ConvDiff_AuxSys::init_context(DiffContext &context){
   c_side_fe->get_JxW();
   c_side_fe->get_phi();
   c_side_fe->get_dphi();
+  
+  //add primary solution to the vectors that diff context should localize
+  const System & sys = ctxt.get_system();
+  NumericVector<Number> &primary_solution = 
+ 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+ 	ctxt.add_localized_vector(primary_solution, sys);
 }
 
 // Element residual and jacobian calculations
@@ -179,18 +185,21 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
   NumericVector<Number> &primary_solution = 
  	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
   	//*(this->get_equation_systems().get_system("ConvDiff_PrimarySys").solution);
-  std::cout << "~~~~~ " << this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
+  //std::cout << "\nnorm of primary_solution: " 
+  //				<< this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
+  //std::cout << "norm of auxiliary solution: " 
+  //				<< this->calculate_norm(*(this->solution), L2) << " ~~~~~~~~" << std::endl; //DEBUG
   std::vector<Number> c_at_qp (n_qpoints, 0);
   std::vector<Number> zc_at_qp (n_qpoints, 0);
   unsigned int c_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("c");
   unsigned int zc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("zc");
-  
-  //THIS IS GRABBING THE AUX VARIABLES, even though primary_solution is the correct solution vector?!?
+
   ctxt.interior_values<Number>(c_var, primary_solution, c_at_qp); 
   ctxt.interior_values<Number>(zc_var, primary_solution, zc_at_qp);
   
-  std::cout << "this better be the same: " << this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
-
+  //std::cout << "norm of primary_solution: " << this->calculate_norm(primary_solution, L2) << " ~~~~~~~~" << std::endl; //DEBUG
+	//std::cout << "norm of auxiliary solution: " 
+  //				<< this->calculate_norm(*(this->solution), L2) << " ~~~~~~~~" << std::endl; //DEBUG
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
 	    Number 
@@ -212,8 +221,8 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	  	const Real ptx = qpoint[qp](0);
 	  	const Real pty = qpoint[qp](1);
 	  	
-	  	std::cout << ptx << " " << pty << " : " << c << " " << zc << std::endl; //DEBUG
-	  	std::cout << "   " << auxc << " " << auxzc << " " << auxfc << " " << auxfpin << std::endl; //DEBUG
+	  	//std::cout << ptx << " " << pty << " : " << c << " " << zc << std::endl; //DEBUG
+	  	//std::cout << "   " << auxc << " " << auxzc << " " << auxfc << " " << auxfpin << std::endl; //DEBUG
 			
 			Real u, v;
 	 		int xind, yind;

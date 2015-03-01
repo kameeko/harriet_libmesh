@@ -7,7 +7,7 @@ print_solutions = false
 fe_family = 'LAGRANGE'
 
 #regularization parameter
-beta = 0.001   #1.0e-8 #0.001
+beta = 0.1   #1.0e-8 #0.001
 
 #diffusion coefficient
 k = 0.1   #1.0 #0.1

@@ -8,3 +8,5 @@ QoI error (estimated)
 	LF:		0.056578114332055313
 	MF01:	-0.010373007204859869
 	MF02:	0.00037441341019596409
+	
+%can't solve for psiMF for MF03...won't converge even really loose screws...
