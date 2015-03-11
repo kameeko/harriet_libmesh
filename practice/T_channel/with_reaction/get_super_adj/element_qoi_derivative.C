@@ -126,7 +126,9 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 						(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	  			(qoi_option == 5) ||
 	  			(qoi_option == 6 &&
-		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ){		
+		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+		    	(qoi_option == 7 &&
+		    		(dim == 2 && (ptx >= 0.625 && ptx <= 1.5 && fabs(pty - 0.5) <= 0.25 ))) ){		
 	      		
 					Qc(i) += JxW[qp]*phi[i][qp]; 
 				}

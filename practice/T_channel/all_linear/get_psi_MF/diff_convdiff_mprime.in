@@ -17,7 +17,7 @@ QoI_option = 3
 
 #where to find files
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
-data_file = long_channel_data3.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
+data_file = long_channel_data3_boop.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
 
 #subdomains
 diff_id = 0

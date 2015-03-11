@@ -246,7 +246,9 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 						(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	  			(qoi_option == 5)  ||
 	  			(qoi_option == 6 &&
-		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){
+		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+		    	(qoi_option == 7 &&
+		    		(dim == 2 && (ptx >= 0.625 && ptx <= 1.5 && fabs(pty - 0.5) <= 0.25 ))) ){
 	      	
      			Rc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
      		}
@@ -268,7 +270,9 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 								(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 	  					(qoi_option == 5) ||
 							(qoi_option == 6 &&
-								(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ){		
+								(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
+							(qoi_option == 7 &&
+								(dim == 2 && (ptx >= 0.625 && ptx <= 1.5 && fabs(pty - 0.5) <= 0.25 ))) ){		
 							
 							J_c_c(i,j) += 0.0; //no dependence on c here if QoI is integral of c over subdomain
 						}
