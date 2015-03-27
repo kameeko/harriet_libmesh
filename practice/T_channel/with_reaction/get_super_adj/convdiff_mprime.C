@@ -352,6 +352,9 @@ void ConvDiff_MprimeSys::postprocess (unsigned int dbg_step){
 		std::fill(MHF_psiLF.begin(), MHF_psiLF.end(), 0); //zero out
 		MLF_psiLF.resize(this->get_mesh().n_elem()); //upper-bound on size needed
 		std::fill(MLF_psiLF.begin(), MLF_psiLF.end(), 0); //zero out
+		
+		beta_bits.resize(this->get_mesh().n_elem());
+		std::fill(beta_bits.begin(), beta_bits.end(), 0);
 	
 		FEMSystem::postprocess();
 	}

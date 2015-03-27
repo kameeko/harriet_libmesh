@@ -1,13 +1,13 @@
 %to make pretty plots from error breakdown file
 close all;
 
-refLevel = 'MF08';
+refLevel = 'MF06';
 dir_root = ['',...
-  'diff_param_res/with_reaction/long_channel_stash/'...
-  'qoi6_setup02_r4p2/',refLevel,'/'];
+  'with_reaction/long_channel_stash/'...
+  '3by3_suite/qoi3_sens3/',refLevel,'/'];
 
 errFileID = ...
-  fopen([dir_root,'error_est_breakdown.dat'],'r');
+  fopen([dir_root,'error_est_breakdown_beta.dat'],'r');
 errFormatSpec = '%f %f %f';
 errSizeMat = [3 Inf];
 
@@ -30,10 +30,10 @@ title('QoI Error Estimate Contribution')
 % title('{ }')
 set(gca,'FontSize',20); 
 set(findall(gcf,'type','text'),'FontSize',20)
-caxis([0 0.001])
+caxis([0 0.00004])
 set(gcf,'PaperPositionMode','auto','Position',[66 253 1535 297])
-print(err,[dir_root, 'err_breakdown_', refLevel,'_v2'],'-depsc');
-break
+print(err,[dir_root, 'err_breakdown_', refLevel,'_beta'],'-depsc');
+
 divFileID = ...
   fopen([dir_root,'divvy.txt'],'r');
 divFormatSpec = '%d %d';
@@ -50,9 +50,14 @@ end
 LFbits = (B == 0);
 HFbits = (B == 1);
 
-divvy = figure(2); hold on;
-scatter(A(LFbits,1),A(LFbits,2),270,[227, 38, 54]/255,'s','filled');
-scatter(A(HFbits,1),A(HFbits,2),270,[91, 146, 229]/255,'s','filled');
+divvy = figure(2); 
+% hold on;
+% scatter(A(LFbits,1),A(LFbits,2),270,[227, 38, 54]/255,'s','filled');
+% scatter(A(HFbits,1),A(HFbits,2),270,[91, 146, 229]/255,'s','filled');
+map = [91, 146, 229; 227, 38, 54]/255;
+squish = reshape(B,75,15)';
+imagesc([0 5],[0 1],-squish); 
+set(gca,'YDir','normal','Ticklength',[0 0]); colormap(map);
 xlabel('{ }'); ylabel('{ }'); 
 title('{ }')
 set(gca,'FontSize',20); 

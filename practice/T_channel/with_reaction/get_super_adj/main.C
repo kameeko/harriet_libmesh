@@ -396,6 +396,16 @@ int main(int argc, char** argv)
 			}
 		}
 		output.close();
+		
+		std::string write_beta_bits_here = infileForMesh("err_est_beta_output_file", "error_est_breakdown_beta.dat");
+		std::ofstream output2(write_beta_bits_here);
+		for(unsigned int i = 0 ; i < system.get_mesh().n_elem(); i++){
+			Point elem_cent = system.get_mesh().elem(i)->centroid();
+			if(output2.is_open()){
+				output2 << elem_cent(0) << " " << elem_cent(1) << " " << fabs(system.get_beta_bits(i)) << "\n";
+			}
+		}
+		output2.close();
 	  
 	} // End if at max adaptive steps
       

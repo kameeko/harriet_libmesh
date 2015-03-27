@@ -67,8 +67,8 @@ public:
 	  	fclose(fp);
 		}
 		
-		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
-		sadj_c_point_stash.resize(datavals.size()); //DEBUG
+		sadj_auxc_point_stash.resize(datavals.size());
+		sadj_c_point_stash.resize(datavals.size());
 		
 		accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
 
@@ -87,7 +87,7 @@ public:
 
   // Postprocessed output
   //virtual void postprocess();
-  void postprocess(unsigned int dbg_step = 0); //DEBUG
+  void postprocess(unsigned int dbg_step = 0);
   
   //to calculate QoI
   virtual void element_postprocess(DiffContext &context);
@@ -118,6 +118,10 @@ public:
   double get_half_adj_weighted_resid(){
   	return std::accumulate(half_sadj_resid.begin(), half_sadj_resid.end(), 0.0);
   }
+  
+  double get_beta_bits(int elem_ind){
+  	return beta_bits[elem_ind];
+	}
 
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
@@ -139,7 +143,7 @@ public:
 	std::vector<Real> MHF_psiLF;
 	std::vector<Real> MLF_psiLF;
 	
-	//DEBUGGING
+	//DEBUGGING - not anymore...more element-wise breakdown...
 	std::vector<Real> half_sadj_resid;
 	std::vector<std::vector<Real> > sadj_c_stash; std::vector<std::vector<Gradient> > sadj_gradc_stash;
 	std::vector<std::vector<Real> > sadj_zc_stash; std::vector<std::vector<Gradient> > sadj_gradzc_stash;
@@ -150,7 +154,10 @@ public:
 	std::vector<Real> sadj_auxc_point_stash; std::vector<Real> sadj_c_point_stash;
 	unsigned int debug_step; //if 1, fill up sadj stash; if 2, calculate half_sadj_resid
 	
-	//avoid assigning data point to two elements in on their boundary
+	//for regularization study
+	std::vector<Real> beta_bits;
+	
+	//avoid assigning data point to two elements in on their boundary - IMPERFECT
 	std::vector<int> accounted_for;
 
   //options for QoI location and nature

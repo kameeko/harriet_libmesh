@@ -40,7 +40,8 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
   Number MHF_psiLF_elem = 0.;
   Number MLF_psiLF_elem = 0.;
   
-  Number half_sadj_resid_elem = 0.0; //DEBUG
+  Number half_sadj_resid_elem = 0.0; 
+  Number beta_bits_elem = 0.0;
 
   // Loop over quadrature points
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
@@ -134,6 +135,8 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	  			
         MLF_psiLF_elem += JxW[qp] * c;
 			}
+			
+			beta_bits_elem += JxW[qp]*(beta*grad_fc*grad_auxfc);
 		}
 		else if(debug_step == 1){
 	     	sadj_c_stash[myElemID].push_back(c);
@@ -190,6 +193,9 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxc*sadj_grad_zc - U*grad_auxc*sadj_zc 
       						+ auxfc*sadj_zc + 2*R*c*auxc*sadj_zc);
    		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc); 
+   		
+   		beta_bits_elem += JxW[qp]*(beta*grad_fc*sadj_grad_auxfc);
+   		beta_bits_elem += JxW[qp]*(beta*grad_auxfc*sadj_grad_fc);
 		}		
 		
     } //end of quadrature loop
@@ -224,9 +230,12 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 if(debug_step == 0){
   MHF_psiLF[myElemID] += MHF_psiLF_elem;
   MLF_psiLF[myElemID] += MLF_psiLF_elem;
+  
+  beta_bits[myElemID] += beta_bits_elem;
 }
 else if(debug_step == 2){
-	half_sadj_resid[myElemID] += -0.5*half_sadj_resid_elem; //DEBUG
+	half_sadj_resid[myElemID] += -0.5*half_sadj_resid_elem;
+	beta_bits[myElemID] += -0.5*beta_bits_elem;
 }
 
 }
