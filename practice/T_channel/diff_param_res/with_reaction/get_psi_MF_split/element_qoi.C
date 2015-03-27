@@ -92,7 +92,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 			//MHF_psiHF = I(q_LF, u_LF) + L'_HF(q_LF, u_LF, z_LF)(p_LF, v_LF, y_LF)
 			MHF_psiLF_elem += JxW[qp]*(-k*grad_zc*grad_auxc + U*grad_zc*auxc + 2*R*zc*c*auxc);
       MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
- 			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + beta*fc*auxfc + zc*auxfc);
+ 			MHF_psiLF_elem += JxW[qp]*(beta_grad*grad_fc*grad_auxfc + beta_mag*fc*auxfc + zc*auxfc);
 
    		if((qoi_option == 1 && 
 						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 

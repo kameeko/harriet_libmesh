@@ -43,7 +43,14 @@ void ConvDiff_MprimeSys::init_data (){
 	//aux_fpin_var = this->add_variable("aux_fpin", static_cast<Order>(conc_p), meep); 
 
 	//regularization
-	beta = infile("beta",0.1);
+	if(infile.have_variable("beta")){
+		beta_mag = infile("beta",0.1);
+		beta_grad = infile("beta",0.1);
+	}
+	else{
+		beta_mag = infile("beta_mag",0.1);
+		beta_grad = infile("beta_grad",0.1);
+	}
 	
 	//diffusion coefficient
 	k = infile("k", 1.0);
@@ -262,7 +269,7 @@ std::cout << "\n\n\n WHY ARE YOU HERE?!?!?\n\n" << std::endl;
 	      }
    			else if(subdomain == field_subdomain_id){
 		 			Rauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
-		 			Rauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + beta*fc*phi[i][qp] + zc*phi[i][qp]);
+		 			Rauxfc(i) += JxW[qp]*(beta_grad*grad_fc*dphi[i][qp] + beta_mag*fc*phi[i][qp] + zc*phi[i][qp]);
    			}
      		
 	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
@@ -288,7 +295,7 @@ std::cout << "\n\n\n WHY ARE YOU HERE?!?!?\n\n" << std::endl;
 	      else if(subdomain == field_subdomain_id){
 			    Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 			    						+ auxfc*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-		 			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp] + beta*auxfc*phi[i][qp]);
+		 			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta_grad*grad_auxfc*dphi[i][qp] + beta_mag*auxfc*phi[i][qp]);
    			}
 
 				if (request_jacobian){
@@ -318,7 +325,7 @@ std::cout << "\n\n\n WHY ARE YOU HERE?!?!?\n\n" << std::endl;
 							J_zc_auxfc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 						
 							J_fc_auxzc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
-					  	J_fc_auxfc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
+					  	J_fc_auxfc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
 						}
 						else if(subdomain == scalar_subdomain_id){
 							//if(j == 0)
@@ -339,7 +346,7 @@ std::cout << "\n\n\n WHY ARE YOU HERE?!?!?\n\n" << std::endl;
 							J_auxzc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 						
 							J_auxfc_zc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
-					  	J_auxfc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
+					  	J_auxfc_fc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
 						}
 						else if(subdomain == scalar_subdomain_id){
 							//if(j == 0)

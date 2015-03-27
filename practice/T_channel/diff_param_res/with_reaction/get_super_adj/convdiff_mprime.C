@@ -40,7 +40,14 @@ void ConvDiff_MprimeSys::init_data (){
 	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
 
 	//regularization
-	beta = infile("beta",0.1);
+	if(infile.have_variable("beta")){
+		beta_mag = infile("beta",0.1);
+		beta_grad = infile("beta",0.1);
+	}
+	else{
+		beta_mag = infile("beta_mag",0.1);
+		beta_grad = infile("beta_grad",0.1);
+	}
 	
 	//diffusion coefficient
 	k = infile("k", 1.0);
@@ -232,7 +239,7 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
      		
 	      Rauxc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] + 2*R*zc*c*phi[i][qp]);
 	      Rauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
-   			Rauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + beta*fc*phi[i][qp] + zc*phi[i][qp]);
+   			Rauxfc(i) += JxW[qp]*(beta_grad*grad_fc*dphi[i][qp] + beta_mag*fc*phi[i][qp] + zc*phi[i][qp]);
      		
 	      Rc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
 	      										+ 2*R*zc*auxc*phi[i][qp] + 2*R*auxzc*c*phi[i][qp]); 
@@ -251,7 +258,7 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
      		}
 	      Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 	      						+ auxfc*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-   			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp] + beta*auxfc*phi[i][qp]);
+   			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta_grad*grad_auxfc*dphi[i][qp] + beta_mag*auxfc*phi[i][qp]);
 
 
 				if (request_jacobian){
@@ -280,7 +287,7 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 						J_zc_auxfc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 	      		
 	      		J_fc_auxzc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
-			    	J_fc_auxfc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
+			    	J_fc_auxfc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
 			    	
 						J_auxc_zc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] 
 																+ 2*R*phi[j][qp]*c*phi[i][qp]);
@@ -291,7 +298,7 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
 						J_auxzc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 						
 	      		J_auxfc_zc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
-			    	J_auxfc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
+			    	J_auxfc_fc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
        			
 					} // end of the inner dof (j) loop
 			  } // end - if (compute_jacobian && context.get_elem_solution_derivative())

@@ -112,7 +112,7 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 			
 				Qauxzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
 
-				Qauxfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + beta*fc*phi[i][qp] + zc*phi[i][qp]);
+				Qauxfc(i) += JxW[qp]*(beta_grad*grad_fc*dphi[i][qp] + beta_mag*fc*phi[i][qp] + zc*phi[i][qp]);
 				 		
 				Qc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
 	      									+ 2*R*zc*auxc*phi[i][qp] + 2*R*auxzc*c*phi[i][qp]); 
@@ -133,7 +133,7 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 				Qzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 					  						+ auxfc*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);	
 					  						
-				Qfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp] + beta*auxfc*phi[i][qp]);
+				Qfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta_grad*grad_auxfc*dphi[i][qp] + beta_mag*auxfc*phi[i][qp]);
 
 			
 			} // end loop over n_c_dofs

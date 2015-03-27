@@ -96,7 +96,7 @@ public:
   unsigned int c_var, zc_var, fc_var;
   unsigned int fpin_var;
   
-  Real beta; //regularization parameter
+  Real beta_grad, beta_mag; //regularization parameter
   Real k; //diffusion coefficient
   Real R; //reaction coefficient
   

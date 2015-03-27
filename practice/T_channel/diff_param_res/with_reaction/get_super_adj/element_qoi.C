@@ -101,7 +101,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 			//MHF_psiHF = I(q_LF, u_LF) + L'_HF(q_LF, u_LF, z_LF)(p_LF, v_LF, y_LF)
 			MHF_psiLF_elem += JxW[qp]*(-k*grad_zc*grad_auxc + U*grad_zc*auxc + 2*R*zc*c*auxc);
       MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
- 			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + beta*fc*auxfc + zc*auxfc);
+ 			MHF_psiLF_elem += JxW[qp]*(beta_grad*grad_fc*grad_auxfc + beta_mag*fc*auxfc + zc*auxfc);
 
    		if((qoi_option == 1 && 
 						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
@@ -167,7 +167,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    		
    		half_sadj_resid_elem += JxW[qp]*(-k*grad_zc*sadj_grad_auxc + U*grad_zc*sadj_auxc + 2*R*zc*c*sadj_auxc);
 			half_sadj_resid_elem += JxW[qp]*(-k*grad_c*sadj_grad_auxzc - U*grad_c*sadj_auxzc + R*c*c*sadj_auxzc + fc*sadj_auxzc);
-			half_sadj_resid_elem += JxW[qp]*(beta*grad_fc*sadj_grad_auxfc + beta*fc*sadj_auxfc + zc*sadj_auxfc);
+			half_sadj_resid_elem += JxW[qp]*(beta_grad*grad_fc*sadj_grad_auxfc + beta_mag*fc*sadj_auxfc + zc*sadj_auxfc);
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxzc*sadj_grad_c + U*grad_auxzc*sadj_c 
       						+ 2*R*zc*auxc*sadj_c + 2*R*auxzc*c*sadj_c);
       if((qoi_option == 1 && 
@@ -184,7 +184,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
    		}
       half_sadj_resid_elem += JxW[qp]*(-k*grad_auxc*sadj_grad_zc - U*grad_auxc*sadj_zc 
       						+ auxfc*sadj_zc + 2*R*c*auxc*sadj_zc);
-   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta*grad_auxfc*sadj_grad_fc + beta*auxfc*sadj_fc); 
+   		half_sadj_resid_elem += JxW[qp]*(auxzc*sadj_fc + beta_grad*grad_auxfc*sadj_grad_fc + beta_mag*auxfc*sadj_fc); 
 		}		
 		
     } //end of quadrature loop

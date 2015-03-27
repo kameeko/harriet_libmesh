@@ -97,7 +97,7 @@ public:
   unsigned int aux_c_var, aux_zc_var, aux_fc_var;
   unsigned int aux_fpin_var;
   
-  Real beta; //regularization parameter
+  Real beta_grad, beta_mag; //regularization parameter
   Real k; //diffusion coefficient
   Real R; //reaction coefficient
   

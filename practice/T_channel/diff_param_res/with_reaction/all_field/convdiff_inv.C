@@ -41,7 +41,14 @@ void ConvDiff_InvSys::init_data (){
 	fpin_var = this->add_variable("fpin", static_cast<Order>(pressure_p), meep); 
 
 	//regularization
-	beta = infile("beta", 0.1);
+	if(infile.have_variable("beta")){
+		beta_mag = infile("beta",0.1);
+		beta_grad = infile("beta",0.1);
+	}
+	else{
+		beta_mag = infile("beta_mag",0.1);
+		beta_grad = infile("beta_grad",0.1);
+	}
 	
 	//diffusion coefficient
 	k = infile("k", 1.0);
@@ -215,14 +222,11 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 				
 				if(subdomain == scalar_subdomain_id){
 					Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fpin*phi[i][qp]);
-		 			//Rfc(i) += JxW[qp]*(beta*fpin*phi[i][qp] + zc*phi[i][qp]); 
-		 			//Rfc(i) += JxW[qp]*(1.e10*0.5*(fpin - fc)*(fpin - fc))*phi[i][qp];
 		 			Rfc(i) += JxW[qp]*(1.e6*(fpin - fc))*phi[i][qp];
-		 			//Rfc(i) += JxW[qp]*fabs(fpin - fc)*phi[i][qp];
 				}
 				else if(subdomain == field_subdomain_id){
 			    Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
-		 			Rfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + beta*fc*phi[i][qp] + zc*phi[i][qp]); 
+		 			Rfc(i) += JxW[qp]*(beta_grad*grad_fc*dphi[i][qp] + beta_mag*fc*phi[i][qp] + zc*phi[i][qp]); 
    			}
      		
 				if (request_jacobian){
@@ -240,22 +244,12 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 					
 		     		if(subdomain == field_subdomain_id){
 		     			J_fc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-	     				J_fc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
+	     				J_fc_fc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
 	     			}
 	     			else if(subdomain == scalar_subdomain_id){
-	     				//J_fc_fc(i,j) += -JxW[qp]*(1.e10*(fpin - fc)*phi[j][qp]*phi[i][qp]);
 	     				J_fc_fc(i,j) += -JxW[qp]*(1.e6*phi[j][qp]*phi[i][qp]);
-	     				//if(fpin >= fc)
-	     				//	J_fc_fc(i,j) += -JxW[qp]*phi[j][qp]*phi[i][qp];
-	     				//else
-	     				//	J_fc_fc(i,j) += JxW[qp]*phi[j][qp]*phi[i][qp];
 	     				if(j == 0){
-	     					//J_fc_fpin(i,j) += JxW[qp]*1.e10*(fpin - fc)*phi[i][qp];
 	     					J_fc_fpin(i,j) += JxW[qp]*1.e6*phi[i][qp];
-	     					//if(fpin >= fc)
-	     					//	J_fc_fpin(i,j) += JxW[qp]*phi[i][qp];
-	     					//else
-	     					//	J_fc_fpin(i,j) += -JxW[qp]*phi[i][qp];
 	     				}
 	     			} 
        			
@@ -265,10 +259,10 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 			} // end of the outer dof (i) loop
 			
 			if(subdomain == scalar_subdomain_id){
-				Rfpin(0) += JxW[qp]*(beta*fpin + zc);
+				Rfpin(0) += JxW[qp]*(beta_mag*fpin + zc);
 				
 				if(request_jacobian){
-					J_fpin_fpin(0,0) += JxW[qp]*beta;
+					J_fpin_fpin(0,0) += JxW[qp]*beta_mag;
 					for (unsigned int j=0; j != n_c_dofs; j++){
 						J_fpin_zc(0,j) += JxW[qp]*(phi[j][qp]);
 					}
