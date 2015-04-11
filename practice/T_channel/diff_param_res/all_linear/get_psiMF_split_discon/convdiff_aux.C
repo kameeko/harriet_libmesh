@@ -26,48 +26,32 @@ void ConvDiff_AuxSys::init_data (){
 	GetPot infile("convdiff_mprime.in");
 	std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
 
-	// LBB needs better-than-quadratic velocities for better-than-linear
-	// pressures, and libMesh needs non-Lagrange elements for
-	// better-than-quadratic velocities.
-	//libmesh_assert((conc_p == 1) || (fe_family != "LAGRANGE"));
+	//subdomain ids
+	scalar_subdomain_id = infile("scalar_id", 2);
+	field_subdomain_id = infile("field_id", 1);
+	
+	std::set<subdomain_id_type> active_subdom_field; 	active_subdom_field.insert(field_subdomain_id);
+	std::set<subdomain_id_type> active_subdom_scalar; active_subdom_scalar.insert(scalar_subdomain_id);
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
 	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
 	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
-	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);   
+	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily, &active_subdom_field);  
 	
 	FEFamily meep = Utility::string_to_enum<FEFamily>(std::string("SCALAR"));
-	aux_fpin_var = this->add_variable("aux_fpin", static_cast<Order>(conc_p), meep); 
+	aux_fconst_var = this->add_variable("aux_fconst", static_cast<Order>(conc_p), meep, &active_subdom_scalar); 
 
 	//regularization
-	if(infile.have_variable("beta")){
-		beta_mag = infile("beta",0.1);
-		beta_grad = infile("beta",0.1);
-	}
-	else{
-		beta_mag = infile("beta_mag",0.1);
-		beta_grad = infile("beta_grad",0.1);
-	}
+	beta = infile("beta",0.1);
 	
 	//diffusion coefficient
 	k = infile("k", 1.0);
-	
-	//reaction coefficient
-	R = infile("R", 0.0);
-	
-	//knobs for how hard to enfore pinning to constant
-	screw_mag = infile("aux_mag_screw",1.0e6);
-	screw_grad = infile("aux_grad_screw",1.0e0);
-	
-	//subdomain ids
-	scalar_subdomain_id = infile("scalar_id", 2);
-	field_subdomain_id = infile("field_id", 1);
 
 	//indicate variables that change in time
 	this->time_evolving(aux_c_var);
 	this->time_evolving(aux_zc_var);
 	this->time_evolving(aux_fc_var);
-	this->time_evolving(aux_fpin_var);
+	this->time_evolving(aux_fconst_var);
 	
 	// Useful debugging options
 	// Set verify_analytic_jacobians to 1e-6 to use
@@ -112,7 +96,6 @@ void ConvDiff_AuxSys::init_data (){
 void ConvDiff_AuxSys::init_context(DiffContext &context){
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
   
-	//stuff for things of pressure's family
 	FEBase* c_elem_fe = NULL;
 
   ctxt.get_element_fe(aux_c_var, c_elem_fe);
@@ -138,7 +121,6 @@ void ConvDiff_AuxSys::init_context(DiffContext &context){
 // Time dependent parts
 bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContext& context){
 	const unsigned int dim = this->get_mesh().mesh_dimension();
-	Real PI = 3.14159265359;
 
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
@@ -165,19 +147,19 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	
 	DenseSubMatrix<Number> &J_zc_auxc = ctxt.get_elem_jacobian(aux_zc_var, aux_c_var);
 	DenseSubMatrix<Number> &J_zc_auxfc = ctxt.get_elem_jacobian(aux_zc_var, aux_fc_var);
-	DenseSubMatrix<Number> &J_zc_auxfpin = ctxt.get_elem_jacobian(aux_zc_var, aux_fpin_var);
+	DenseSubMatrix<Number> &J_zc_auxfconst = ctxt.get_elem_jacobian(aux_zc_var, aux_fconst_var);
 	
 	DenseSubMatrix<Number> &J_fc_auxfc = ctxt.get_elem_jacobian(aux_fc_var, aux_fc_var);
 	DenseSubMatrix<Number> &J_fc_auxzc = ctxt.get_elem_jacobian(aux_fc_var, aux_zc_var);
-	DenseSubMatrix<Number> &J_fc_auxfpin = ctxt.get_elem_jacobian(aux_fc_var, aux_fpin_var);
+	DenseSubMatrix<Number> &J_fc_auxfconst = ctxt.get_elem_jacobian(aux_fc_var, aux_fconst_var);
 	
-	DenseSubMatrix<Number> &J_fpin_auxfpin = ctxt.get_elem_jacobian(aux_fpin_var, aux_fpin_var);
-	DenseSubMatrix<Number> &J_fpin_auxzc = ctxt.get_elem_jacobian(aux_fpin_var, aux_zc_var);
+	DenseSubMatrix<Number> &J_fconst_auxfconst = ctxt.get_elem_jacobian(aux_fconst_var, aux_fconst_var);
+	DenseSubMatrix<Number> &J_fconst_auxzc = ctxt.get_elem_jacobian(aux_fconst_var, aux_zc_var);
 
 	DenseSubVector<Number> &Rc = ctxt.get_elem_residual( aux_c_var );
 	DenseSubVector<Number> &Rzc = ctxt.get_elem_residual( aux_zc_var );
 	DenseSubVector<Number> &Rfc = ctxt.get_elem_residual( aux_fc_var );
-	DenseSubVector<Number> &Rfpin = ctxt.get_elem_residual( aux_fpin_var );
+	DenseSubVector<Number> &Rfconst = ctxt.get_elem_residual( aux_fconst_var );
 	
 	
 	// Now we will build the element Jacobian and residual.
@@ -188,7 +170,7 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	// weight functions.
 	unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
 	
-  const System & sys = ctxt.get_system();
+	const System & sys = ctxt.get_system();
   NumericVector<Number> &primary_solution = 
  	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
   std::vector<Number> c_at_qp (n_qpoints, 0);
@@ -198,14 +180,19 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 
   ctxt.interior_values<Number>(c_var, primary_solution, c_at_qp); 
   ctxt.interior_values<Number>(zc_var, primary_solution, zc_at_qp);
-  
+
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
 	    Number 
 	      auxc = ctxt.interior_value(aux_c_var, qp),
-	      auxzc = ctxt.interior_value(aux_zc_var, qp),
-	      auxfc = ctxt.interior_value(aux_fc_var, qp),
-	      auxfpin = ctxt.interior_value(aux_fpin_var, qp);
+	      auxzc = ctxt.interior_value(aux_zc_var, qp);
+			Number auxfc, auxfconst;
+			if(subdomain == field_subdomain_id){
+	      auxfc = ctxt.interior_value(aux_fc_var, qp);
+			}
+	    else if(subdomain == scalar_subdomain_id){ 
+	      auxfconst = ctxt.interior_value(aux_fconst_var, qp);
+	    }
 	    Gradient 
 	      grad_auxc = ctxt.interior_gradient(aux_c_var, qp),
 	      grad_auxzc = ctxt.interior_gradient(aux_zc_var, qp),
@@ -213,15 +200,10 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	      
 	    Number c = c_at_qp[qp];
 	    Number zc = zc_at_qp[qp];
-	    //Number c = 1; //DEBUG
-	    //Number zc = 1; //DEBUG
 	    
 	  	//location of quadrature point
 	  	const Real ptx = qpoint[qp](0);
 	  	const Real pty = qpoint[qp](1);
-	  	
-	  	//std::cout << ptx << " " << pty << " : " << c << " " << zc << std::endl; //DEBUG
-	  	//std::cout << "   " << auxc << " " << auxzc << " " << auxfc << " " << auxfpin << std::endl; //DEBUG
 			
 			Real u, v;
 	 		int xind, yind;
@@ -248,6 +230,8 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 	 		v = vel_field[xind][yind](1);
 
 	    NumberVectorValue U(u,v);
+	    	
+			Real R = 0.0; //reaction coefficient
 	
 			// First, an i-loop over the  degrees of freedom.
 			for (unsigned int i=0; i != n_c_dofs; i++){
@@ -260,22 +244,18 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 			  		(qoi_option == 2 &&
 			  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
 			  		(qoi_option == 3 &&
-			  			(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-						(qoi_option == 5) ||
-						(qoi_option == 6 &&
-				  		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ){			
+			  			(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125)))){			
 	      	
      			Rc(i) += JxW[qp]*phi[i][qp]; //Rc(i) += JxW[qp]?
      		}
      		if(subdomain == scalar_subdomain_id){
 	      	Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
-			    						+ auxfpin*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-			    Rfc(i) += JxW[qp]*(screw_mag*(auxfpin - auxfc)*phi[i][qp] + screw_grad*grad_auxfc*dphi[i][qp]);						
+			    						+ auxfconst*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);			
 	      }
 	      else if(subdomain == field_subdomain_id){
 			    Rzc(i) += JxW[qp]*(-k*grad_auxc*dphi[i][qp] - U*grad_auxc*phi[i][qp] 
 			    						+ auxfc*phi[i][qp] + 2*R*c*auxc*phi[i][qp]);
-		 			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta_grad*grad_auxfc*dphi[i][qp] + beta_mag*auxfc*phi[i][qp]);
+		 			Rfc(i) += JxW[qp]*(auxzc*phi[i][qp] + beta*grad_auxfc*dphi[i][qp] + beta*auxfc*phi[i][qp]);
    			}
 
 				if (request_jacobian){
@@ -290,15 +270,12 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 							J_zc_auxfc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 						
 							J_fc_auxzc(i,j) += JxW[qp]*(phi[j][qp])*phi[i][qp];
-					  	J_fc_auxfc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
+					  	J_fc_auxfc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp] + beta*phi[j][qp]*phi[i][qp]);
 						}
 						else if(subdomain == scalar_subdomain_id){
 							if(j == 0)
-								J_zc_auxfpin(i,j) += JxW[qp]*phi[i][qp];
+								J_zc_auxfconst(i,j) += JxW[qp]*phi[i][qp];
 								
-							J_fc_auxfc(i,j) += JxW[qp]*(-screw_mag*phi[j][qp]*phi[i][qp] + screw_grad*dphi[j][qp]*dphi[i][qp]);
-	     				if(j == 0)
-	     					J_fc_auxfpin(i,j) += JxW[qp]*screw_mag*phi[i][qp];
 		      	}
 		      	
 					} // end of the inner dof (j) loop
@@ -307,12 +284,12 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 			} // end of the outer dof (i) loop
 			
 			if(subdomain == scalar_subdomain_id){
-				Rfpin(0) += JxW[qp]*(beta_mag*auxfpin + auxzc);
+				Rfconst(0) += JxW[qp]*(beta*auxfconst + auxzc);
 				
 				if(request_jacobian){
-					J_fpin_auxfpin(0,0) += JxW[qp]*beta_mag;
+					J_fconst_auxfconst(0,0) += JxW[qp]*beta;
 					for (unsigned int j=0; j != n_c_dofs; j++){
-						J_fpin_auxzc(0,j) += JxW[qp]*(phi[j][qp]);
+						J_fconst_auxzc(0,j) += JxW[qp]*(phi[j][qp]);
 					}
 				}
 			}

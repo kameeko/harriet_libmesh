@@ -3,26 +3,22 @@
 
 using namespace libMesh;
 
-//this one is for the optimality system, not just the forward
-
-// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
-// but we must specify element residuals
-class Diff_ConvDiff_InvSys : public FEMSystem
+class ConvDiff_PrimarySys : public FEMSystem
 {
 public:
 
   // Constructor
-  Diff_ConvDiff_InvSys(EquationSystems& es,
+  ConvDiff_PrimarySys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
     
-    GetPot infile("diff_convdiff_inv.in");
+    GetPot infile("convdiff_mprime.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
 		qoi_option = infile("QoI_option",1);
-		
-		const unsigned int dim = this->get_mesh().mesh_dimension();
+    
+    const unsigned int dim = this->get_mesh().mesh_dimension();
     
     if(FILE *fp=fopen(find_velocity_here.c_str(),"r")){
     	if(dim == 2){
@@ -69,6 +65,18 @@ public:
 				}
 				fclose(fp);
 	  	}
+	  	else if(dim == 1){
+	  		Real x, value;
+				int flag = 1;
+				while(flag != -1){
+					flag = fscanf(fp,"%lf %lf",&x,&value);
+					if(flag != -1){
+						datapts.push_back(Point(x));
+						datavals.push_back(value);
+					}
+				}
+				fclose(fp);
+	  	}
 	  }
 	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
   }
@@ -84,26 +92,12 @@ public:
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext& context);
 
-  // Postprocessed output
-  virtual void postprocess ();
-
-  //to calculate QoI
-  virtual void element_postprocess(DiffContext &context);
-  
-  //return QoI
-  Number &get_QoI_value(std::string type, unsigned int QoI_index){
-      return computed_QoI[QoI_index]; //no exact QoI available
-  }
-
-  
-  
-
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var;
+  unsigned int fconst_var;
   
   Real beta; //regularization parameter
   Real k; //diffusion coefficient
-  Real Rcoeff; //reaction coefficient
   
   //data-related stuff
   std::vector<Point> datapts; 
@@ -114,16 +108,12 @@ public:
 	std::vector<std::vector<Real> > y_pts;
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
-	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
+	int scalar_subdomain_id, field_subdomain_id;
 	
 	//avoid assigning data point to two elements in on their boundary
 	std::vector<int> accounted_for;
-	
-  //to hold computed QoI
-  Number computed_QoI[1];
   
   //options for QoI location and nature
   int qoi_option;
-  
-  bool beta_cut; //for exploration of regularization's effect
+
 };

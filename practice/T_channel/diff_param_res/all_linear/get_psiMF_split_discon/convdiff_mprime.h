@@ -3,26 +3,22 @@
 
 using namespace libMesh;
 
-//this one is for the optimality system, not just the forward
-
-// FEMSystem, TimeSolver and  NewtonSolver will handle most tasks,
-// but we must specify element residuals
-class Diff_ConvDiff_InvSys : public FEMSystem
+class ConvDiff_MprimeSys : public FEMSystem
 {
 public:
 
   // Constructor
-  Diff_ConvDiff_InvSys(EquationSystems& es,
+  ConvDiff_MprimeSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
     
-    GetPot infile("diff_convdiff_inv.in");
+    GetPot infile("convdiff_mprime.in");
 		std::string find_velocity_here = infile("velocity_file","velsTtrim.txt");
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
 		qoi_option = infile("QoI_option",1);
-		
-		const unsigned int dim = this->get_mesh().mesh_dimension();
+    
+    const unsigned int dim = this->get_mesh().mesh_dimension();
     
     if(FILE *fp=fopen(find_velocity_here.c_str(),"r")){
     	if(dim == 2){
@@ -69,6 +65,18 @@ public:
 				}
 				fclose(fp);
 	  	}
+	  	else if(dim == 1){
+	  		Real x, value;
+				int flag = 1;
+				while(flag != -1){
+					flag = fscanf(fp,"%lf %lf",&x,&value);
+					if(flag != -1){
+						datapts.push_back(Point(x));
+						datavals.push_back(value);
+					}
+				}
+				fclose(fp);
+	  	}
 	  }
 	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
   }
@@ -85,25 +93,30 @@ public:
                                         DiffContext& context);
 
   // Postprocessed output
-  virtual void postprocess ();
-
-  //to calculate QoI
+  virtual void postprocess();
+  
+  //DEBUG
   virtual void element_postprocess(DiffContext &context);
-  
-  //return QoI
-  Number &get_QoI_value(std::string type, unsigned int QoI_index){
-      return computed_QoI[QoI_index]; //no exact QoI available
+  double get_MHF_psiLF(int elem_ind){
+  	return MHF_psiLF[elem_ind];
   }
-
-  
+  double get_MHF_psiLF(){
+  	return std::accumulate(MHF_psiLF.begin(),MHF_psiLF.end(),0.0);
+  }
+  double get_MLF_psiLF(int elem_ind){
+  	return MLF_psiLF[elem_ind];
+  }
+  double get_MLF_psiLF(){
+  	return std::accumulate(MLF_psiLF.begin(),MLF_psiLF.end(),0.0);
+  }
   
 
   // Indices for each variable;
-  unsigned int c_var, zc_var, fc_var;
+  unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
+  unsigned int fconst_var, aux_fconst_var;
   
   Real beta; //regularization parameter
   Real k; //diffusion coefficient
-  Real Rcoeff; //reaction coefficient
   
   //data-related stuff
   std::vector<Point> datapts; 
@@ -114,16 +127,15 @@ public:
 	std::vector<std::vector<Real> > y_pts;
 	std::vector<std::vector<NumberVectorValue> > vel_field;
 	
-	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
+	int scalar_subdomain_id, field_subdomain_id;
+
+	//DEBUG
+	std::vector<Real> MHF_psiLF;
+	std::vector<Real> MLF_psiLF;
 	
 	//avoid assigning data point to two elements in on their boundary
 	std::vector<int> accounted_for;
-	
-  //to hold computed QoI
-  Number computed_QoI[1];
   
   //options for QoI location and nature
   int qoi_option;
-  
-  bool beta_cut; //for exploration of regularization's effect
 };
