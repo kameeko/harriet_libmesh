@@ -1,0 +1,38 @@
+\chapter{Introduction}
+...
+%------------------------------------------------------------------------------%
+\section{Motivation}  %\label{sec:xx}
+%------------------------------------------------------------------------------%
+
+In studying the world, physical systems are often represented by mathematical models characterized by a set of parameters; these models are oftentimes partial differential equations (PDEs), and their parameters may be numerous, representing discretized fields. For a given forward model, often based on physical laws and relating the model parameters to predicted observations, one can infer the model parameters based on actual results of these observations \cite{Taran05, BanksKuhn89}. These parameters, especially in engineering contexts, are then used to calculate some Quantity of Interest (QoI).
+
+A given physical system can be represented with varying degrees of fidelity by different models. A high-fidelity model may, for example, take into account more physical laws or be finely discretized, and thus more accurately represent reality; a high-fidelity model is also often more difficult to solve. Since solving the inverse problems generally requires many evaluations of the forward model, it may be cheaper to use a lower-fidelity model, and since the inverse problem is often ill-posed without regularization, it may not be the case that the addition \red{something} of the high-fidelity model is even informed by the observations.
+
+%tarantola seems to frame parameters as independent of forward model; forward model just relates parameters to observables; but in scalar vs field case, parameter choice is part of forward model?
+
+%Inverse problems appear in many contexts. They are difficult to solve because of so and so. In many cases, the purpose of inferring for parameters is to use them to calculate some Quantity of Interest (QoI) that we can then use to make decisions. Goal-oriented approaches trade accuracy in the inferred parameters for accuracy in QoI...?
+
+%------------------------------------------------------------------------------%
+\section{Previous Work}  %\label{sec:xx}
+%------------------------------------------------------------------------------%
+\subsection{Goal-Oriented Approaches}
+%goal-oriented DoE from marzouk?
+\subsection{Multifidelity Modeling?}
+
+%idea of most-complex \neq best? occam's razor thing from all-hands...
+%mixing models? like the thing that inspired vikram to do this model-mixing thing? (stokes-navierstokes...refered to as "classical"...is there a paper?) 
+	%what oden,prudhomme,et al refer to as "concurrent" multiscale models; their first numerical example has a lower-fidelity/surrogate model with "homogeneous and deterministic coefficients"
+	%other papers with mixed models? "multiscale"? -> "multifidelity"? multimodel - pressure first, then rest as update (typically what this refers to, partankar algorithm); can also think of differently coupled stacks (hierarchies) as different fidelities of models (multiphysics)...
+	%poke oden branches for examples?
+
+%------------------------------------------------------------------------------%
+\section{Thesis Objectives}  %\label{sec:xx}
+%------------------------------------------------------------------------------%
+%need to set up the problem we are trying to solve...include LF-HF-MF cartoon? haven't seen other theses with images in intro...
+%define inverse problem optimization setup here
+
+%------------------------------------------------------------------------------%
+\section{Thesis Outline}  %\label{sec:xx}
+%------------------------------------------------------------------------------%
+
+

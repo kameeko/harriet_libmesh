@@ -1,0 +1,94 @@
+\chapter{Formulation}
+
+In this chapter, we...
+%------------------------------------------------------------------------------%
+\section{Derivation of Error Estimate}  \label{sec:deriv}
+%------------------------------------------------------------------------------%
+Given $n_d$ observations $d\in\R^{n_d}$, suppose we wish to infer the parameters $q\in Q$ of a PDE model $a(u,\phi;q)=f(\phi;q),\:\forall\phi\in U$, where $u\in U$ are the states and $U,Q$ are Hilbert spaces. Then this PDE-constrained inverse problem can be written as an optimization problem
+\begin{equation}
+\begin{array}{r@{}l}
+\textrm{Minimize } & \quad J(q)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q) \\ \textrm{s.t. }& \quad a(u,\phi;q)=f(\phi;q),\quad\forall\phi\in U,
+\end{array}
+\end{equation}
+for which the Langrangian is
+\begin{equation}
+\mathcal{L}(q,u,z)= J(q,u)-(a(u,z;q)-f(z;q)),
+\end{equation}
+where $z\in U$ is the adjoint. 
+
+Let $\xi=(q,u,z)$ be called the primary variables. Following the work of \cite{BecVex05}, we introduce a set of auxiliary variables $\chi=(p,v,y)\in Q\times U\times U$ corresponding to these primary variables, and define an augmented Lagrangian
+\begin{equation}
+\mathcal{M}((q,u,z),(p,v,y)) = I(q,u) + \mathcal{L}'(q,u,z)(p,v,y),
+\end{equation}
+where $I:Q\times U\to\R$ is a functional that gives our QoI. Let $\Psi = (\xi,\chi)$ denote the stationary point of $\mathcal{M}$. Note that
+\begin{equation}
+\mathcal{M}(\Psi)=I(q,u),
+\label{eq:MeqI}
+\end{equation} since taking variations of $\mathcal{M}$ with respect to the auxiliary variables recovers the optimality conditions. If we have high-fidelity (HF) and low-fidelity (LF) models for which we can infer parameters, then for each of these we can define an augemented Lagrangian ($\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively) with corresponding stationary points $\Psi_{HF}$ and $\Psi_{LF}$. 
+
+Using Equation (\ref{eq:MeqI}), we can write
+\begin{equation}
+\begin{array}{r@{}l}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})\: &= \mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.} 
+\end{array}
+\end{equation}
+Using Equation 21 from \cite{BecVex05}, we can write
+\begin{equation}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
+\label{eq:preadj}
+\end{equation}
+where $e=\Psi_{HF}-\Psi_{LF}$. We cannot solve for $\Psi_{HF}$, and we cannot replace $\Psi_{HF}-\Psi_{LF}$ with an interpolation estimate as was done for $\Psi-\Psi_h$ in \cite{BecVex05}, since we now have different models instead of different discretizations of the same model. 
+
+We take an adjoint approach to obtain the term $\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$ by viewing it as an error in a linear output. As $\Psi_{HF}$ is a stationary point, it satisfies $\mathcal{M}'_{HF}(\Psi_{HF})(\Phi)=0$. Let its variational form be
+\begin{equation}
+A_{HF}(\Psi_{HF},\Phi)=F(\Phi),\:\forall\:\Phi\in(Q\times U\times U)^2,
+\end{equation}
+and define an output 
+\begin{equation}
+\mathcal{Q}(\Psi_{HF})=\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}).
+\end{equation}
+We can then solve
+\begin{equation}
+A_{HF}(\Phi,\Lambda)=\mathcal M'_{HF}(\Psi_{LF})(\Phi),\:\forall\:\Phi\in(Q\times U\times U)^2
+\label{eq:superAdjEq}
+\end{equation}
+for the adjoint $\Lambda$, which can be used to obtain
+\begin{equation}
+\mathcal M'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})=\mathcal{M}'_{HF}(\Psi_{LF})(\Lambda).
+\label{eq:adjOutErr}
+\end{equation}
+Combining Equations (\ref{eq:preadj}) and (\ref{eq:adjOutErr}) and dropping the higher-order term $\mathcal{R}(e^3)$, we obtain an expression for the error in the QoI from inferring the parameters of a low-fidelity model instead of a high-fidelity model:
+\begin{equation}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})\approx\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF}).
+\label{eq:finErrExp}
+\end{equation}
+%there is a minus sign in the adjoint-weighted residual expression in vikram's writeup...but not in any of your stuff...looks like that depends on how you define the residual...Ax-b or b-Ax...should you define that somewhere?
+
+The equations in this section apply also when the low-fidelity model is replaced with an intermediate model. Just as \red{error estimates} can be used to guide mesh-refinement, Equation (\ref{eq:finErrExp}) can be decomposed into elemental contributions and used to guide the creation of a mixed-fidelity model, where the high-fidelity model is used in some parts of the domain, and the low-fidelity model is used in the rest. The error estimate (\ref{eq:finErrExp}) can be calculated again, using the mixed-fidelity model as the lower-fidelity model; this process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. %should you expand this into an "algorithm"-type section? section/note that forming a mixed-fidelity model is not always so straightfoward? should poke literature about how this is done if so (model interfacing that Oden,Prudhomme, etal talk about...also seemed to have a sort of interior-boundary-condition for stokes-ns mix)...also include de-refinement? (choices of how to pick where to refine? if so, would we need to reference other papers where similar choices are made?)
+
+%do we have restrictions on I? the prediction process could be a whole 'nother PDE, or something as simple as our subdomain integral...needs to be at least once differentiable? with respect to? B+V just seems to have I' with respect to state, even though I(q,u)...B+V only say that I is some functional...if I is a PDE, then is it also possible that it can be excessively complex as well?
+
+%------------------------------------------------------------------------------%
+\section{Limitations and Bounds}  %\label{sec:xx}
+%------------------------------------------------------------------------------%
+
+The error estimate (\ref{eq:finErrExp}) is exact in the case where the model PDEs and QoI functional are linear. In the presence of nonlinearities, the error estimate is approximate, due to having dropped the higher order terms $\mathcal{R}(e^3)$, and due to the need to linearize about $\Psi_{HF}$ in forming the adjoint problem (\ref{eq:superAdjEq}). It will also sometimes be the case that it is cheaper to solve the inverse problem with the high-fidelity model than to calculate the quantities needed to build up to a mixed-fidelity model for which the estimated error in the QoI is acceptably low. %bounds on accuracy of error estimate? B+V doesn't say anything about bounds on the third order term...I think FE stuff can say things about e in mesh-discretization case but not for different models...if we can't come up with bounds, can we just acknowledge that as a current weakness? did oden+prudhomme have bounds? (no) 	-> there haven't really been anything published on e for multiple-models...hence why we want as high an order method as possible...perhaps once there is a defined hierarchy (poke model hierachy?), as there is for mesh-refinement, perhaps then...otherwise models could be totally unrelated...
+
+The two models must also have a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in \cite{BecVex05} would be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The two models must also have some degree of compatibility, in that the variables of one model must have some meaning in the other. %is this something to expand on, or just give the weak form assumption and leave it at that?
+
+%in the formulation, psiLF and psiHF share the same space...which they might not necessarily be able to be made to if psiMF has discontinuities allowed but psiHF doesn't?
+
+%cost analysis?
+	%assume LF inverse problem is cheap to solve; if we solve for auxiliary naively (not B+V's) way, then so and so many linear solves...? anything we can do for superadj other than breaking into blocks?
+
+%more than two models? the error breakdown is only ever for two models at a time...if A>B>C, then first do between B and C, get a mix of B+C as your new 'LF', then do between B+C and A?
+
+%%%%
+
+%How different can the models be before the error estimate becomes unreliable? Are there any kinds of PDEs for which the error estimate is unreliable? (in forward problems, adjoint based error estimation works well for any adjoint consistent formulation; handles hyperbolic and highly nonlinear problems well (Darmofal has a paper comparing it to other methods for hyperbolic problems?); possible that this might extend to our case, though having an inverse problem might screw that up; might have to settle for running numerical experiments on simplified versions to build/decrease confidence that it would work on more complex version)
+
+%How much of an issue would adjoint inconsistency be? (Perhaps not so much in gradient calculation in solving inverse problem, since you want to find an optimum for a particular choice of model and mesh, but it gets worse when you want to do things like mesh refinement, since then adjoint-of-discrete not corresponding to discretized-adjoint breaks up your connection to the infinite dimensional system; in our case, we are comparing two models with set discretizations, and there is no continuous ideal that we need to relate to...)
+
+%transient case? theory should hold, since we can stack solutions at time-steps into one giant solution and theoretically solve everything in one go; should we discuss how that would be implemented though? states evolve forward, adjoints evolve backwards, auxiliary are linearly related to primary...do people automatically think of steady-state when they see a(*,*)=f(*) form? B+V's example is steady-state...but weak form can definitely encapsulate transient (DG_NonLinearSystems, slide 8) -> writing out steps for transient case doesn't really add anything to this theory; enough existing literature to see how to implement in transient case
+
+%in B+V, they say "The form a and the observation C are assumed to be three times continuously differentiable"...what might a not-differentiable operator look like? should we include this in assumptions about form? (their C is observation operator acting on state, not params) why three times? (for HOT remainder)
