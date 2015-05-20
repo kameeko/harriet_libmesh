@@ -110,7 +110,7 @@ public:
 
   // Indices for each variable;
   unsigned int c_var, zc_var, fc_var;
-  unsigned int fpin_var;
+  //unsigned int fpin_var;
   
   Real beta_grad, beta_mag; //regularization parameters
   Real k; //diffusion coefficient

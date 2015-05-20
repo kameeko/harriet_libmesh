@@ -123,6 +123,13 @@ int main(int argc, char** argv)
 		system.variable(system.variable_number("aux_zc")));
 	sol_transfer.transfer(system_dummy.variable(system_dummy.variable_number("aux_fc")),
 		system.variable(system.variable_number("aux_fc")));
+
+std::cout << "c: " << system.calculate_norm(*system.solution, 0, L2) << std::endl;
+std::cout << "zc: " << system.calculate_norm(*system.solution, 1, L2) << std::endl;
+std::cout << "fc: " << system.calculate_norm(*system.solution, 2, L2) << std::endl;
+std::cout << "aux_c: " << system.calculate_norm(*system.solution, 3, L2) << std::endl;
+std::cout << "aux_zc: " << system.calculate_norm(*system.solution, 4, L2) << std::endl;
+std::cout << "aux_fc: " << system.calculate_norm(*system.solution, 5, L2) << std::endl;
 	
 	//save values of scalar variables; FEMSystem::point_value doesn't work for scalars...?!
 	//Point p(0.0333333, 0.0333333);

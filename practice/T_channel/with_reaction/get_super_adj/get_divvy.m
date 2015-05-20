@@ -33,11 +33,12 @@ divvynew = bloop + divvy;
 divvynew(divvynew == 2) = 1;
 
 figure(1)
-scatter(A(:,1),A(:,2),200,divvynew,'s','filled','MarkerEdgeColor','k')
+% scatter(A(:,1),A(:,2),200,divvynew,'s','filled','MarkerEdgeColor','k')
+scatter(A(:,1),A(:,2),50,divvynew,'s','filled')
 set(gcf,'Position',[278 395 1323 183])
 
 figure(2)
-scatter(A(:,1),A(:,2),200,A(:,3),'s','filled')
+scatter(A(:,1),A(:,2),50,A(:,3),'s','filled')
 set(gcf,'Position',[278 395 1323 183])
 
 

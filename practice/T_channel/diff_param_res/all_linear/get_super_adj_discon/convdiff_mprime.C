@@ -24,20 +24,21 @@ void ConvDiff_MprimeSys::init_data (){
 	unsigned int conc_p = 1;
 	GetPot infile("convdiff_mprime.in");
 	std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
+	
+	//subdomain ids
+	scalar_subdomain_id = infile("scalar_id", 0);
+	field_subdomain_id = infile("field_id", 1);
 
-	// LBB needs better-than-quadratic velocities for better-than-linear
-	// pressures, and libMesh needs non-Lagrange elements for
-	// better-than-quadratic velocities.
-	//libmesh_assert((conc_p == 1) || (fe_family != "LAGRANGE"));
+	std::set<subdomain_id_type> active_subdom_field; 	active_subdom_field.insert(field_subdomain_id);
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
                          
 	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
 	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
-	fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
+	fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily, &active_subdom_field); 
 	aux_c_var = this->add_variable("aux_c", static_cast<Order>(conc_p), fefamily); 
 	aux_zc_var = this->add_variable("aux_zc", static_cast<Order>(conc_p), fefamily);
-	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily);  
+	aux_fc_var = this->add_variable("aux_fc", static_cast<Order>(conc_p), fefamily, &active_subdom_field);  
 
 	//regularization
 	beta = infile("beta",0.1);
@@ -52,10 +53,6 @@ void ConvDiff_MprimeSys::init_data (){
 	this->time_evolving(aux_zc_var);
 	this->time_evolving(fc_var);
 	this->time_evolving(aux_fc_var);
-
-	//subdomain ids
-	scalar_subdomain_id = infile("scalar_id", 0);
-	field_subdomain_id = infile("field_id", 1);
 	
 	// Useful debugging options
 	// Set verify_analytic_jacobians to 1e-6 to use

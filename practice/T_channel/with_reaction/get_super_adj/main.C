@@ -396,7 +396,7 @@ int main(int argc, char** argv)
 			}
 		}
 		output.close();
-		
+		/*
 		std::string write_beta_bits_here = infileForMesh("err_est_beta_output_file", "error_est_breakdown_beta.dat");
 		std::ofstream output2(write_beta_bits_here);
 		for(unsigned int i = 0 ; i < system.get_mesh().n_elem(); i++){
@@ -406,6 +406,7 @@ int main(int argc, char** argv)
 			}
 		}
 		output2.close();
+		*/
 	  
 	} // End if at max adaptive steps
       

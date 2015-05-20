@@ -37,8 +37,8 @@ void ConvDiff_InvSys::init_data (){
 	zc_var = this->add_variable("zc", static_cast<Order>(pressure_p), fefamily); 
 	fc_var = this->add_variable("fc", static_cast<Order>(pressure_p), fefamily); 
 	
-	FEFamily meep = Utility::string_to_enum<FEFamily>(std::string("SCALAR"));
-	fpin_var = this->add_variable("fpin", static_cast<Order>(pressure_p), meep); 
+	//FEFamily meep = Utility::string_to_enum<FEFamily>(std::string("SCALAR"));
+	//fpin_var = this->add_variable("fpin", static_cast<Order>(pressure_p), meep); 
 
 	//regularization
 	if(infile.have_variable("beta")){
@@ -64,7 +64,7 @@ void ConvDiff_InvSys::init_data (){
 	this->time_evolving(c_var);
 	this->time_evolving(zc_var);
 	this->time_evolving(fc_var);
-	this->time_evolving(fpin_var);
+	//this->time_evolving(fpin_var);
 	
 	// Useful debugging options
 	// Set verify_analytic_jacobians to 1e-6 to use
@@ -151,19 +151,19 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 
 	DenseSubMatrix<Number> &J_zc_c = ctxt.get_elem_jacobian(zc_var, c_var);
 	DenseSubMatrix<Number> &J_zc_fc = ctxt.get_elem_jacobian(zc_var, fc_var);
-	DenseSubMatrix<Number> &J_zc_fpin = ctxt.get_elem_jacobian(zc_var, fpin_var);
+	//DenseSubMatrix<Number> &J_zc_fpin = ctxt.get_elem_jacobian(zc_var, fpin_var);
 
 	DenseSubMatrix<Number> &J_fc_zc = ctxt.get_elem_jacobian(fc_var, zc_var);
 	DenseSubMatrix<Number> &J_fc_fc = ctxt.get_elem_jacobian(fc_var, fc_var);
-	DenseSubMatrix<Number> &J_fc_fpin = ctxt.get_elem_jacobian(fc_var, fpin_var);
+	//DenseSubMatrix<Number> &J_fc_fpin = ctxt.get_elem_jacobian(fc_var, fpin_var);
 	
-	DenseSubMatrix<Number> &J_fpin_fpin = ctxt.get_elem_jacobian(fpin_var, fpin_var);
-	DenseSubMatrix<Number> &J_fpin_zc = ctxt.get_elem_jacobian(fpin_var, zc_var);
+	//DenseSubMatrix<Number> &J_fpin_fpin = ctxt.get_elem_jacobian(fpin_var, fpin_var);
+	//DenseSubMatrix<Number> &J_fpin_zc = ctxt.get_elem_jacobian(fpin_var, zc_var);
 	
 	DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
 	DenseSubVector<Number> &Rzc = ctxt.get_elem_residual( zc_var );
 	DenseSubVector<Number> &Rfc = ctxt.get_elem_residual( fc_var );
-	DenseSubVector<Number> &Rfpin = ctxt.get_elem_residual( fpin_var );
+	//DenseSubVector<Number> &Rfpin = ctxt.get_elem_residual( fpin_var );
 	
 	// Now we will build the element Jacobian and residual.
 	// Constructing the residual requires the solution and its
@@ -178,8 +178,8 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 	    Number 
 	      c = ctxt.interior_value(c_var, qp),
 	      zc = ctxt.interior_value(zc_var, qp),
-	      fc = ctxt.interior_value(fc_var, qp),
-	      fpin = ctxt.interior_value(fpin_var, qp);
+	      fc = ctxt.interior_value(fc_var, qp);
+	      //fpin = ctxt.interior_value(fpin_var, qp);
 	    Gradient 
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
@@ -220,14 +220,14 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 				
 				Rc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] + 2*R*zc*c*phi[i][qp]);
 				
-				if(subdomain == scalar_subdomain_id){
-					Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fpin*phi[i][qp]);
-		 			Rfc(i) += JxW[qp]*(1.e6*(fpin - fc))*phi[i][qp];
-				}
-				else if(subdomain == field_subdomain_id){
+				//if(subdomain == scalar_subdomain_id){
+				//	Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fpin*phi[i][qp]);
+		 		//	Rfc(i) += JxW[qp]*(1.e6*(fpin - fc))*phi[i][qp];
+				//}
+				//else if(subdomain == field_subdomain_id){
 			    Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] + R*c*c*phi[i][qp] + fc*phi[i][qp]);
 		 			Rfc(i) += JxW[qp]*(beta_grad*grad_fc*dphi[i][qp] + beta_mag*fc*phi[i][qp] + zc*phi[i][qp]); 
-   			}
+   			//}
      		
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
@@ -237,37 +237,37 @@ bool ConvDiff_InvSys::element_time_derivative (bool request_jacobian, DiffContex
 
 						J_zc_c(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
 																+ 2*R*c*phi[j][qp]*phi[i][qp]);
-						if(subdomain == field_subdomain_id)
+						//if(subdomain == field_subdomain_id)
 							J_zc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-						else if(subdomain == scalar_subdomain_id && j == 0)
-							J_zc_fpin(i,j) += JxW[qp]*phi[i][qp];
+						//else if(subdomain == scalar_subdomain_id && j == 0)
+						//	J_zc_fpin(i,j) += JxW[qp]*phi[i][qp];
 					
-		     		if(subdomain == field_subdomain_id){
+		     		//if(subdomain == field_subdomain_id){
 		     			J_fc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 	     				J_fc_fc(i,j) += JxW[qp]*(beta_grad*dphi[j][qp]*dphi[i][qp] + beta_mag*phi[j][qp]*phi[i][qp]);
-	     			}
-	     			else if(subdomain == scalar_subdomain_id){
-	     				J_fc_fc(i,j) += -JxW[qp]*(1.e6*phi[j][qp]*phi[i][qp]);
-	     				if(j == 0){
-	     					J_fc_fpin(i,j) += JxW[qp]*1.e6*phi[i][qp];
-	     				}
-	     			} 
+	     			//}
+	     			//else if(subdomain == scalar_subdomain_id){
+	     			//	J_fc_fc(i,j) += -JxW[qp]*(1.e6*phi[j][qp]*phi[i][qp]);
+	     			//	if(j == 0){
+	     			//		J_fc_fpin(i,j) += JxW[qp]*1.e6*phi[i][qp];
+	     			//	}
+	     			//} 
        			
 					} // end of the inner dof (j) loop
 			  } // end - if (compute_jacobian && context.get_elem_solution_derivative())
 
 			} // end of the outer dof (i) loop
 			
-			if(subdomain == scalar_subdomain_id){
-				Rfpin(0) += JxW[qp]*(beta_mag*fpin + zc);
-				
-				if(request_jacobian){
-					J_fpin_fpin(0,0) += JxW[qp]*beta_mag;
-					for (unsigned int j=0; j != n_c_dofs; j++){
-						J_fpin_zc(0,j) += JxW[qp]*(phi[j][qp]);
-					}
-				}
-			}
+			//if(subdomain == scalar_subdomain_id){
+			//	Rfpin(0) += JxW[qp]*(beta_mag*fpin + zc);
+			//	
+			//	if(request_jacobian){
+			//		J_fpin_fpin(0,0) += JxW[qp]*beta_mag;
+			//		for (unsigned int j=0; j != n_c_dofs; j++){
+			//			J_fpin_zc(0,j) += JxW[qp]*(phi[j][qp]);
+			//		}
+			//	}
+			//}
     } // end of the quadrature point (qp) loop
     
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){

@@ -1,0 +1,18 @@
+pdfcrop --margins "5 2 -54 33" err_breakdown_MF01.pdf err_breakdown_MF01.pdf
+pdfcrop --margins "6 20 6 0" err_breakdown_MF01.pdf err_breakdown_MF01.pdf
+
+pdfcrop --margins "5 0 0 33" err_breakdown_MF03.pdf err_breakdown_MF03.pdf
+pdfcrop --margins "6 6 0 0" err_breakdown_MF03.pdf eep.pdf
+
+pdfcrop --margins "5 2 -54 33" err_breakdown_MF01.pdf err_breakdown_MF01.pdf
+pdfcrop --margins "5 20 5 10" err_breakdown_MF02.pdf err_breakdown_MF02.pdf
+pdfcrop --margins "5 17 5 1" err_breakdown_LF.pdf err_breakdown_LF.pdf (small)
+
+--margins "0 11 1 0" setup_3_3.pdf eep.pdf
+pdfcrop --margins "0 11 4 -26" setup_3_5.pdf meep.pdf
+
+pdfcrop --margins "2 13 6 -12" setup_7_3.pdf eep.pdf (small)
+pdfcrop --margins "2 11 6 0" setup_3_3.pdf eep.pdf (small)
+
+pdfcrop --margins "5 3 0 3" err_breakdown_MF03.pdf eep.pdf
+pdfcrop --margins "4 2 0 3" err_breakdown_MF03.pdf eep.pdf (small)

@@ -26,7 +26,7 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
   ctxt.get_element_fe( c_var , elem_fe );
   
   int myElemID = ctxt.get_elem().id();
-  int subdomain = subdoms[myElemID];
+  int subdomain = ctxt.get_elem().subdomain_id();
 
   // Element Jacobian * quadrature weights for interior integration
   const std::vector<Real> &JxW = elem_fe->get_JxW();
@@ -105,11 +105,15 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
       if(subdomain == field_subdomain_id){
 		    MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + fc*auxzc);
 	 			MHF_psiLF_elem += JxW[qp]*(beta*grad_fc*grad_auxfc + beta*fc*auxfc + zc*auxfc);
+std::cout << myElemID << "(field): " << c << " " << zc << " " << auxc << " " << auxzc << " " << fc << " " << auxfc << std::endl; //DEBUG
  			}
  			else{
  				MHF_psiLF_elem += JxW[qp]*(-k*grad_c*grad_auxzc - U*grad_c*auxzc + R*c*c*auxzc + const_vars[0]*auxzc);
 	 			MHF_psiLF_elem += JxW[qp]*(beta*const_vars[0]*const_vars[1] + zc*const_vars[1]);
+std::cout << myElemID << "(scalar): " << c << " " << zc << " " << auxc << " " << auxzc << " " << const_vars[0] << " " << const_vars[1] << std::endl; //DEBUG
  			}
+ 			
+
 
    		if((qoi_option == 1 && 
 						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
@@ -232,6 +236,8 @@ void ConvDiff_MprimeSys::element_postprocess (DiffContext &context)
 	if(debug_step == 0){
 		MHF_psiLF[myElemID] += MHF_psiLF_elem;
 		MLF_psiLF[myElemID] += MLF_psiLF_elem;
+		
+//std::cout << myElemID << ": " << MHF_psiLF_elem << std::endl; //DEBUG
 	}
 	else if(debug_step == 2){
 		half_sadj_resid[myElemID] += -0.5*half_sadj_resid_elem; //DEBUG

@@ -79,8 +79,15 @@ int main(int argc, char** argv){
     AutoPtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
   
+  std::string linearizeHere = "invHF.xda";
+  equation_systems.read(linearizeHere, READ,
+		EquationSystems::READ_HEADER |
+		EquationSystems::READ_DATA |
+		EquationSystems::READ_ADDITIONAL_DATA);
+	std::cout << "\n READING IN INITIAL GUESS" << std::endl;
+  
   // Initialize the system
-  equation_systems.init ();
+  //equation_systems.init ();
 
   // Set the time stepping options
   system.deltat = deltat; //this is ignored for SteadySolver...right?
@@ -245,6 +252,9 @@ int main(int argc, char** argv){
                                          1, /* This number indicates how many time steps
                                                are being written to the file */
                                          system.time);
+                                         
+       equation_systems.write("invHF.xda", WRITE, EquationSystems::WRITE_DATA | 
+               EquationSystems::WRITE_ADDITIONAL_DATA);
 
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API

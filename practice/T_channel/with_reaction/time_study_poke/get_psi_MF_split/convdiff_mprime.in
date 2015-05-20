@@ -13,7 +13,7 @@ beta = 0.00001   #1.0e-8 #0.001
 k = 0.1   #1.0 #0.1
 
 #reaction coefficient
-R = -42.0
+R = -442.0
 
 #QoI option
 QoI_option = 3

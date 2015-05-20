@@ -54,6 +54,8 @@ int main(int argc, char** argv){
 	mesh.read(find_mesh_here);
 	mesh2.read(find_mesh_here);
 	//mesh.read("psiHF_mesh_1Dfused.xda");
+	
+  bool doContinuation = infileForMesh("do_continuation",false);
 
   // And an object to refine it
   /*MeshRefinement mesh_refinement(mesh);
@@ -90,14 +92,17 @@ int main(int argc, char** argv){
     AutoPtr<TimeSolver>(new SteadySolver(system_mix));
   libmesh_assert_equal_to (n_timesteps, 1);
 
-  /*equation_systems.read("psiLF.xda", READ,
-			EquationSystems::READ_HEADER |
-			EquationSystems::READ_DATA |
-			EquationSystems::READ_ADDITIONAL_DATA);
-  equation_systems.print_info();*/
-  
-  // Initialize the system
-  equation_systems.init ();
+	if(doContinuation){
+		equation_systems.read("psiLF_split.xda", READ,
+				EquationSystems::READ_HEADER |
+				EquationSystems::READ_DATA |
+				EquationSystems::READ_ADDITIONAL_DATA);
+		equation_systems.print_info();
+  }
+  else{
+		// Initialize the system
+		equation_systems.init ();
+	}
 
   // Set the time stepping options
   system_primary.deltat = deltat; system_aux.deltat = deltat;//this is ignored for SteadySolver...right?
@@ -311,6 +316,8 @@ int main(int argc, char** argv){
      		mesh.write("psiLF_mesh.xda");
      		equation_systems_mix.write("psiLF.xda", WRITE, EquationSystems::WRITE_DATA | 
                EquationSystems::WRITE_ADDITIONAL_DATA);
+		    equation_systems.write("psiLF_split.xda", WRITE, EquationSystems::WRITE_DATA | 
+		     	EquationSystems::WRITE_ADDITIONAL_DATA);
       }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
   }

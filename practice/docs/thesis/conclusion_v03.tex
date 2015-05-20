@@ -1,0 +1,36 @@
+\chapter{Conclusion} \label{chap:conc}
+ 
+In this chapter we summarize the main contributions of the thesis and discuss future work. 
+ 
+%------------------------------------------------------------%
+\section{Thesis Summary} 
+%------------------------------------------------------------%
+
+The contribution of this work is an error estimator that can be used to adaptively create a mixed-fidelity model with which to solve a goal-oriented inverse problem, so as to minimize the error in the QoI calculated from the inferred parameters. We applied this method to pairs of models, one that differed in the physics included and one that differed in the space to which the parameters belonged. In both cases, we were able to obtain a value for the QoI with a small relative error without having to solve the inverse problem with the high-fidelity model. In these cases, the element-wise decomposition of the error estimate also indicated regions of the parameter field that were both informed by the observations and informative to the QoI. 
+
+The inverse problem with the high-fidelity models examined were not so expensive to solve as to warrant the adaptive formation of a mixed-fidelity model; however, based on existing work with concurrent multi-fidelity models, savings in computational cost are expected in cases where the high-fidelity model is more complex and solving the inverse problem with the high-fidelity model is less tractable. We demonstrated a case where the inverse problem with the high-fidelity model could not be solved without a more complex nonlinear solver, but where our method resulted in a mixed-fidelity model for which the inverse problem could be solved with a simple nonlinear solver, with a small relative error in the QoI.
+
+%------------------------------------------------------------%
+\section{Future Work} 
+%------------------------------------------------------------%
+
+An immediate direction for extension of this work is to the case of the statistical inverse problem. Thus far in this work, we have considered the deterministic inverse problem, as described in Section \ref{sec:setup}; we seek to infer the parameter values that optimally fit the observations and the prior beliefs embedded in the regularization. However, we can rarely, if ever, be certain that the inferred values are correct, whether this be due to epistemic uncertainty from a lack of knowledge or aleatoric uncertainty from inherent variability in the physical system, or both \cite{Ober04}. One may attempt to capture the uncertainty in the inferred parameters by representing them as random variables with a probability distribution; inferring the distribution of the parameters given some observations is the statistical inverse problem. 
+
+A popular approach to solving the statistical inverse problem is to apply a Bayesian framework. Bayes' rule is used to combine a prior distribution, which captures prior beliefs about the parameters, and a likelihood distribution, which captures the likelihood of observations given an instance of the parameter values and a model of noise in the observations, to give a posterior distribution on the parameters. Since there is generally no analytical expression for this posterior distribution, it is usually characterized by samples from the distribution. Sampling methods like the widely-used Markov chain Monte Carlo (MCMC) method require many evaluations of the forward model, and since the number of samples needed grows exponentially with the dimension of the parameter space, this problem becomes intractable for large parameter spaces. In engineering contexts, it is still usually the case, however, that we are ultimately interested in a low-dimensional QoI, and it is the uncertainty in this low-dimensional quantity that we wish to capture; this low-dimensional distribution is referred to as the predictive posterior.
+
+One way we could potentially apply this work to the statistical inverse problem is by reducing the parameter space that needs to be sampled. Such a direction is suggested by the results presented in Section \ref{sec:constvfield}, where the mixed-fidelity model had significantly fewer degrees of freedom in its parameter field than the high-fidelity model, and thus a smaller parameter space. In the case of a linear model and observation operator with a Gaussian prior and additive Gaussian noise, there are parallels between the objective function of the deterministic inverse problem with Tikhonov regularization and the mode of the posterior distribution. In \cite{Martetal12}, a method is described for creating proposal distributions, drawing from these parallels; both the linear Gaussian and nonlinear cases are addressed. Similarly, these parallels could potentially be drawn upon to extend this work to the creation of an alternative statistical inverse problem that, by utilizing a mixed-fidelity model with fewer degrees of freedom in its parameter field, requires exploration of a small parameter space with minimal compromise in the predictive posterior.
+
+Another potential approach would be to extend our method to the creation of mixed-fidelity models that are used as surrogates; these surrogate models can be evaluated in place of the high-fidelity model, thus decoupling the number of expensive forward evaluations of the high-fidelity model needed from the number of posterior parameter distribution samples that is desired \cite{Con14}. The samples obtained using such a surrogate might sacrifice accuracy in representing the posterior parameter distribution for accuracy in representing the predictive posterior distribution. 
+
+%soil chapter in Multiscale Modeling: A Bayesian Perspective - seems to do hierachical multiscale in context of mcmc
+%http://arxiv.org/pdf/1402.1694v3.pdf has pointers to where people use surrogate models to avoid evaluating forward model too often...
+
+%read http://www.stat.osu.edu/~comp_exp/jour.club/KennedyOHagan2000.pdf for the lulz?
+
+%stochastic
+%anything in chad's about curse of dimensionality?
+%wolfgang bangert -> mesh refinement and stochastic, keep coarse sometimes...see if this might be related to extension?
+	%can't seem to find anything by him related to this...at least, not suggested by title...
+%matt parno or patrick's stuff? exploring with surrogate models mostly and then upping fidelity strategically?
+
+%poke stochastic weak form? is that another way we could think about extending to stochastic case?

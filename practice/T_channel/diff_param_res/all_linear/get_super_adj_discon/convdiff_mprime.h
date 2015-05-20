@@ -67,24 +67,6 @@ public:
 	  	fclose(fp);
 		}
 		
-		//since mesh's xda file doesn't contain subdomain information, and since divvy is normally put in super-adj folder...
-		subdoms.resize(this->get_mesh().n_elem());
-		std::fill(subdoms.begin(),subdoms.end(), 0.);
-		std::string read_assign = "divvy.txt";
-		if(FILE *fp=fopen(read_assign.c_str(),"r")){
-			int flag = 1;
-			int elemNum, assign;
-			int ind = 0;
-			while(flag != -1){
-				flag = fscanf(fp, "%d %d",&elemNum,&assign);
-				if(flag != -1){
-					subdoms[ind] = assign;
-					ind += 1;
-				}
-			}
-			fclose(fp);
-		}
-		
 		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
 		sadj_c_point_stash.resize(datavals.size()); //DEBUG
 		
@@ -183,6 +165,5 @@ public:
   std::vector<Real> const_vars;
   
   //keep track of subdomains
-  std::vector<double> subdoms;
   int scalar_subdomain_id, field_subdomain_id;
 };

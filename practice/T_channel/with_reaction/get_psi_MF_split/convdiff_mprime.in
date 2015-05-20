@@ -15,12 +15,15 @@ k = 0.1   #1.0 #0.1
 #reaction coefficient
 R = -42.0
 
+#whether we want to do continuation (from psiLF_split.xda)
+do_continuation = true
+
 #QoI option
 QoI_option = 3
 
 #where to find files
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
-data_file = long_channel_data3_r42.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
+data_file = long_channel_data3_r42_blip.dat	#dummy_data.dat #data_1D.dat #Measurements_bottom6.dat
 
 #subdomains
 cd_id = 0

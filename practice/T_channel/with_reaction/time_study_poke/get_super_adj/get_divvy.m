@@ -1,6 +1,6 @@
 %easier way to do refinement...
 
-refPortion = 0.25;
+refPortion = 0.12;
 
 errFileID = ...
   fopen('error_est_breakdown.dat','r');

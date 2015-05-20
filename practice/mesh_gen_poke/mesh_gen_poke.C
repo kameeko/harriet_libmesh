@@ -50,12 +50,13 @@ int main (int argc, char** argv){
 	
 	//nice geometry (straight channel) 
 	MeshTools::Generation::build_square (mesh, 
-																					75, 15,
+																					250, 50,
                                          -0.0, 5.0,
                                          -0.0, 1.0,
                                          QUAD9);
 
 	//read in subdomain assignments
+	
 	std::vector<double> prev_assign(mesh.n_elem(), 0.);
 	std::string read_assign = "do_divvy.txt";
 	if(FILE *fp=fopen(read_assign.c_str(),"r")){
@@ -71,6 +72,7 @@ int main (int argc, char** argv){
 		}
 		fclose(fp);
 	}
+	
 
 	//to stash subdomain assignments
 	std::string stash_assign = "divvy.txt";
