@@ -1,16 +1,8 @@
-\chapter{Notation} \label{appendix}
+\clearpage
+\section*{\huge{Nomenclature}}
 
-For quick reference, Tables \ref{table:notation1} and \ref{table:notation2} summarize notation used throughout this thesis 
-(in alphabetical order).
-
-\begin{table}[!ht]
-\caption{Summary of Notation (Part 1)}
-\begin{center}
-\begin{tabular}{c|l}
-\textbf{Symbol} & \textbf{Meaning} \\
-\hline \hline
-$a$							& 	\red{how to describe? not necessarily bilinear...semilinear?} \\
-$A$							&		\red{similar to above...also how to refer to this adjoint problem?} \\
+\begin{longtable}{ p{.15\textwidth}  p{.85\textwidth} }
+$a$							& 	Two-form in model weak form\\
 $\mathcal{C}$		&		Observation operator \\
 $d$							&		Observations \\
 $e$							&		Error in stationary point of augmented Lagrangian \\
@@ -20,47 +12,38 @@ $I$							&		QoI functional \\
 $J$							&		Objective function of optimization formulation of inverse problem \\
 $k_d$						&		Diffusion coefficient \\
 $k_r$						&		Reaction coefficient \\
-$\ell$					&		Linear functional; part of weak form of forward model \\
+$\ell$					&		Functional in model weak form \\
 $\mathcal{L}$		&		Lagrangian \\
-$L$							&		Linear functional; part of weak form of \red{what?} \\
 $LF$						&		Low-fidelity \\
 $\mathcal{M}$		&		Augmented Lagrangian \\
 $MF$						&		Mixed-fidelity \\
 $n_d$						&		Number of observations \\
-\end{tabular}
-\label{table:notation1}
-\end{center}
-\end{table}
-
-\begin{table}[!ht]
-\caption{Summary of Notation (Part 2)}
-\begin{center}
-\begin{tabular}{c|l}
-\textbf{Symbol} & \textbf{Meaning} \\
-\hline \hline
-$p$							&		Auxiliary variable correspinding to parameters \\
-$\phi$					&		Test function \\
+$p$							&		Auxiliary variable corresponding to parameters \\
 $q$   					&   Unknown parameters \\
 $Q$							&		Hilbert space \\
 $\mathcal{Q}$		&		Output functional \\
 $R$							&		Regularization term \\
-$\mathcal{R}$		&		Higher-order terms \\
+$\mathcal{R}$		&		Higher-order remainder terms \\
+$\mathscr{R}$		&		Residual form for QoI error adjoint \\
 $u$   					&   State variables \\
 $U$							&		Hilbert space \\
 $v$							&		Auxiliary variable corresponding to state \\
 $\vec{V}$				&		Velocity field \\
-$y$							&	 	Auxiliary variables corresponding to adjoint \\
+$x_1,\:x_2$			&		Spatial coordinates \\
+$y$							&	 	Auxiliary variable corresponding to adjoint \\
 $z$	  					&	  Adjoint variables \\
 $\beta$					&		Regularization coefficient \\
-$\Lambda$				&		\red{Super-adjoint} \\
+$\Lambda$				&		Supplementary adjoint \\
 $\xi$						&		Primary variables \\
+$\phi$					&		Test function \\
+$\Phi$					&		Test function \\
 $\chi$					&		Auxiliary variables \\
 $\Psi$					&		Stationary point of augmented Lagrangian \\
 $\Omega$				&		Domain \\
 $\Omega_{HF}$		&		Subdomain over which high-fidelity model is solved \\
 $\Omega_I$			&		Region in domain over which QoI is calculated \\
-$\Omega_{LF}$		&		Subdomain over which low-fidelity model is solved
-\end{tabular}
-\label{table:notation2}
-\end{center}
-\end{table}
+$\Omega_{LF}$		&		Subdomain over which low-fidelity model is solved \\
+ & \\
+$a'_u(u_0)(\delta u)$	& Fr\'{e}chet derivative of form $a$ with respect to $u$, at $u_0$, in the direction $\delta u$
+\end{longtable}
+

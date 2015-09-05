@@ -1,0 +1,66 @@
+\documentclass[12pt,twoside]{mitthesis}
+%\usepackage{lgrind}
+
+\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{graphics}
+\usepackage{epsfig}
+%\usepackage[hang,raggedright]{subfigure}
+\usepackage{epsf}
+\usepackage{setspace}
+\usepackage{hangcaption}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{cancel}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{hyperref}
+
+\usepackage{algorithmicx}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{varwidth}
+\usepackage{caption}
+\usepackage[font=small]{subcaption}
+\usepackage{longtable}
+\usepackage{mathrsfs}
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+\newcommand{\red}[1]{{\color{red}{#1}}}
+
+\graphicspath{{./figures/}}
+
+\begin{document}
+\raggedbottom %avoid weird vertical justification
+
+\input{cover_ack_abstract.tex}
+\pagestyle{plain}
+\tableofcontents
+\clearpage 
+\listoffigures
+\input{nomenclature.tex}
+\input{intro_v03.tex}
+\input{formulation_v03.tex}
+\input{results_v03.tex}
+\input{conclusion_v03.tex}
+
+%theory and numerical results section...start writing up theory, nevermind flow? and outline of which numerical results? include discussion of costs? error bounds? section for limitations (what models, linearization, anything else in possible quals questions chew)? pictures of auxiliary variables? extension to more than two models?
+% -> vs measurements studies; vs qoi studies; vs reg study (?); effect of linearization?
+% -> DON'T HAVE: looking at contribution from regularization terms? indicator function QoI? *different physics, one where effects propogate more*? *transient*?
+%formulation for altobjfx was just what chad said; you just implemented it for a toy problem to see what would happen
+
+\appendix
+%\include{appendix}
+\include{biblio}
+\end{document}
