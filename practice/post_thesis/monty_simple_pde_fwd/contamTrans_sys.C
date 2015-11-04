@@ -41,12 +41,18 @@ void ContamTransSys::init_data(){
 	vx = infile("vx",2.415e-5);
 	react_rate = infile("reaction_rate",0.0);
 	porosity = infile("porosity",0.1);
-	double dlong = infile("dispersivity_longitudinal",60.0);
-	double dtransh = infile("dispersivity_transverse_horizontal",6.0);
-	double dtransv = infile("dispersivity_transverse_vertical",0.6);
-	dispersivity.push_back(dlong);
-	dispersivity.push_back(dtransh);
-	dispersivity.push_back(dtransv);
+	double dlong = infile("dispersivity_longitudinal",60.0); 
+	double dtransh = infile("dispersivity_transverse_horizontal",6.0); 
+	double dtransv;
+	if(dim == 2)
+	  dtransv = 0.0;
+	else if(dim == 3)
+	  dtransv = infile("dispersivity_transverse_vertical",0.6); 
+	
+	//compute dispersion tensor (assuming for now that velocity purely in x direction)
+	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
+	                            0.0, vx*dtransh, 0.0,
+	                            0.0, 0.0, vx*dtransv);
 	
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -117,22 +123,16 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     NumberVectorValue U(vx,0.0);
   	if(dim > 2)
   	  U(2) = 0.0;
-  	  
-  	//dispersivity tensor (assume no off-diagonal terms in tensor)
-  	NumberTensorValue dispers(dispersivity[0], 0.0, 0.0,
-  	                          0.0, dispersivity[1], 0.0);
-    if(dim > 2)
-      dispers(2,2) = dispersivity[2];
 
 		// First, an i-loop over the  degrees of freedom.
 		for (unsigned int i=0; i != n_c_dofs; i++){
 
-      R(i) += JxW[qp]*(-dispers*porosity*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] - react_rate*porosity*c*phi[i][qp] + fc*phi[i][qp]);
+      R(i) += JxW[qp]*(-dispTens*porosity*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] - react_rate*porosity*c*phi[i][qp] + fc*phi[i][qp]);
 
 			if (request_jacobian){
 				for (unsigned int j=0; j != n_c_dofs; j++){
 
-					J(i,j) += JxW[qp]*(-dispers*porosity*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
+					J(i,j) += JxW[qp]*(-dispTens*porosity*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
 															+ react_rate*phi[j][qp]*phi[i][qp]);
 
 				} // end of the inner dof (j) loop
@@ -188,31 +188,25 @@ bool ContamTransSys::side_constraint(bool request_jacobian, DiffContext & contex
   	if(dim > 2)
   	  U(2) = 0.0;
   	  
-  	//dispersivity tensor (assume no off-diagonal terms in tensor)
-  	NumberTensorValue dispers(dispersivity[0], 0.0, 0.0,
-  	                          0.0, dispersivity[1], 0.0);
-    if(dim > 2)
-      dispers(2,2) = dispersivity[2];
-  	
   	for (unsigned int i=0; i != n_c_dofs; i++){
       //bit from changing order on diffusion term
-      R(i) += JxW[qp]*((dispers*grad_c)*face_normals[qp])*phi[i][qp];
+      R(i) += JxW[qp]*((dispTens*grad_c)*face_normals[qp])*phi[i][qp];
       
       //flux boundary conditions
       if(isWest){ //west boundary
         double bsource = -5.0; //ppb (doesn't seem to be the right units for flux though?)
-        R(i) += JxW[qp]*(U*face_normals[qp]*c - (dispers*grad_c)*face_normals[qp] - bsource)*phi[i][qp];
+        R(i) += JxW[qp]*(U*face_normals[qp]*c - (dispTens*grad_c)*face_normals[qp] - bsource)*phi[i][qp];
         std::cout << qside_point[qp](0) << " " << qside_point[qp](1) << " " << qside_point[qp](2) << std::endl; //DEBUG
       }else //"mass flow out" boundary condition?
-        R(i) += JxW[qp]*(dispers*grad_c)*face_normals[qp]*phi[i][qp];
+        R(i) += JxW[qp]*(dispTens*grad_c)*face_normals[qp]*phi[i][qp];
       
       if(request_jacobian){
         for (unsigned int j=0; j != n_c_dofs; j++){
-          J(i,j) += JxW[qp]*((dispers*dphi[j][qp])*face_normals[qp])*phi[i][qp];
+          J(i,j) += JxW[qp]*((dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
           if(isWest)
-            J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp] - (dispers*dphi[j][qp])*face_normals[qp])*phi[i][qp];
+            J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp] - (dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
           else
-            J(i,j) += JxW[qp]*((dispers*dphi[j][qp])*face_normals[qp])*phi[i][qp];
+            J(i,j) += JxW[qp]*((dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
         }
       }
     }
@@ -238,7 +232,7 @@ Point ContamTransSys::forcing(const Point& pt){
   std::vector<double> ylim{538742.0, 539522.0};
   
   double zmax = 100.0;
-  double ztol = 2.0; //source should be rectangle, but we're gonna make it a really thin box...
+  double ztol = 2.0; //a really thin box...
   
 	if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && abs(pt(2)-zmax) <= ztol)
 	  f(0) = 1000; //ppb

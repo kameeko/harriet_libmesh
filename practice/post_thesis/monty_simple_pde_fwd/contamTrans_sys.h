@@ -41,5 +41,5 @@ public:
   double vx; //west-east velocity (along x-axis, for now)
   double react_rate; //reaction rate
   double porosity; //porosity
-  std::vector<double> dispersivity; //dispersivity
+  NumberTensorValue dispTens; //dispersion tensor
 };
