@@ -2,7 +2,7 @@
 transient = true
 
 # The interval between our timesteps
-deltat = 1.0
+deltat = 604800.0 #seconds per week
 
 # And the number of timesteps to take
 n_timesteps = 3
@@ -17,3 +17,8 @@ solver_quiet = false
 relative_step_tolerance = 1e-3
 
 relative_residual_tolerance = 1.e-3
+
+#discretization
+nz = 10
+ny = 10
+nz = 10

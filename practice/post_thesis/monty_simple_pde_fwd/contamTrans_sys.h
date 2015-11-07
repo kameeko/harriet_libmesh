@@ -25,7 +25,7 @@ public:
                                         DiffContext& context);
   
   //boundary residual and jacobian calculations                                      
-  virtual bool side_constraint (bool request_jacobian,
+  virtual bool side_time_derivative (bool request_jacobian,
                                         DiffContext& context);                                      
 
   // Postprocessed output

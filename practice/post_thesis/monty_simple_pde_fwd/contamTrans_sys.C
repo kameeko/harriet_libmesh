@@ -43,11 +43,7 @@ void ContamTransSys::init_data(){
 	porosity = infile("porosity",0.1);
 	double dlong = infile("dispersivity_longitudinal",60.0);
 	double dtransh = infile("dispersivity_transverse_horizontal",6.0);
-	double dtransv;
-	if(dim == 2)
-	  dtransv = 0.0;
-	else if(dim == 3)
-	  dtransv = infile("dispersivity_transverse_vertical",0.6);
+	double dtransv = infile("dispersivity_transverse_vertical",0.6);
 
 	//compute dispersion tensor (assuming for now that velocity purely in x direction)
 	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
@@ -122,9 +118,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     Number fc = f(0);
 
     //velocity vector
-    NumberVectorValue U(vx,0.0);
-    if(dim > 2)
-      U(2) = 0.0;
+    NumberVectorValue U(vx, 0.0, 0.0);
 
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_c_dofs; i++)
@@ -135,16 +129,15 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 		       - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
 		       + fc*phi[i][qp]); // Source term
 
-      if (request_jacobian)
+      if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
-	for (unsigned int j=0; j != n_c_dofs; j++)
-	{
-	  J(i,j) += JxW[qp]*(-dispTens*porosity*dphi[j][qp]*dphi[i][qp] // Dispersion
-			     - U*dphi[j][qp]*phi[i][qp] // Convection
-			     + react_rate*phi[j][qp]*phi[i][qp]); // Reaction Term
-
-	} // end of the inner dof (j) loop
-      } // end - if (compute_jacobian && context.get_elem_solution_derivative())
+	      for (unsigned int j=0; j != n_c_dofs; j++)
+	      {
+	        J(i,j) += JxW[qp]*((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
+			           - (U*dphi[j][qp])*phi[i][qp] // Convection
+			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+	      } // end of the inner dof (j) loop
+      } // end - if (request_jacobian && context.get_elem_solution_derivative())
 
     } // end of the outer dof (i) loop
   } // end of the quadrature point (qp) loop
@@ -153,7 +146,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 }
 
 //for non-Dirichlet boundary conditions and the bit from diffusion term
-bool ContamTransSys::side_constraint(bool request_jacobian, DiffContext & context)
+bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & context)
 {
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
@@ -169,7 +162,6 @@ bool ContamTransSys::side_constraint(bool request_jacobian, DiffContext & contex
 
   // Side basis functions
   const std::vector<std::vector<Real> > &phi = side_fe->get_phi();
-  const std::vector<std::vector<RealGradient> > &dphi = side_fe->get_dphi();
 
   // Side Quadrature points
   const std::vector<Point > &qside_point = side_fe->get_xyz();
@@ -182,51 +174,42 @@ bool ContamTransSys::side_constraint(bool request_jacobian, DiffContext & contex
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &J = ctxt.get_elem_jacobian(c_var, c_var);
-	DenseSubVector<Number> &R  = ctxt.get_elem_residual(c_var);
+	DenseSubVector<Number> &R = ctxt.get_elem_residual(c_var);
 
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
 
-  bool isWest = ctxt.has_side_boundary_id(4); //guessing this one is west...?
-
+  bool isWest = ctxt.has_side_boundary_id(4);
+  
+  //set (in)flux boundary condition on west side
+  //homogeneous neumann (Danckwerts) outflow boundary condition on east side
+  //no-flux (equivalently, homoegenous neumann) boundary conditions on north, south, top, bottom sides
+  //"strong" enforcement of boundary conditions
   for (unsigned int qp=0; qp != n_qpoints; qp++)
   {
     Number c = ctxt.side_value(c_var, qp);
     Gradient grad_c = ctxt.side_gradient(c_var, qp);
 
     //velocity vector
-    NumberVectorValue U(vx,0.0);
-
-    if(dim > 2)
-      U(2) = 0.0;
+    NumberVectorValue U(vx, 0.0, 0.0);
 
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
-      //bit from changing order on dispersion term
-      R(i) += JxW[qp]*((dispTens*(porosity*grad_c))*face_normals[qp])*phi[i][qp]; // Dispersion term
-
-      //flux boundary conditions
-      if(isWest)
+      if(isWest) //west boundary
       {
-	//west boundary
-        double bsource = -5.0; //ppb (doesn't seem to be the right units for flux though?)
-        R(i) += JxW[qp]*(U*face_normals[qp]*c - (dispTens*grad_c)*face_normals[qp] - bsource)*phi[i][qp];
-        std::cout << qside_point[qp](0) << " " << qside_point[qp](1) << " " << qside_point[qp](2) << std::endl; //DEBUG
+        double bsource = 5.0; //ppb (influx on west boundary)
+        R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource)*phi[i][qp]; 
+        //std::cout << qside_point[qp](0) << " " << qside_point[qp](1) << " " << qside_point[qp](2) << std::endl; //DEBUG
       }
-      else //"mass flow out" boundary condition?
-        R(i) += JxW[qp]*(dispTens*grad_c)*face_normals[qp]*phi[i][qp];
 
-      if(request_jacobian)
+      if(request_jacobian && context.get_elem_solution_derivative())
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
-	{
-          J(i,j) += JxW[qp]*((dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
+	      {
           if(isWest)
-            J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp] - (dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
-          else
-            J(i,j) += JxW[qp]*((dispTens*dphi[j][qp])*face_normals[qp])*phi[i][qp];
+            J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
         }
-      }
-    }
+      } // end - if (request_jacobian && context.get_elem_solution_derivative())
+    } //end of outer dof (i) loop
   }
 
   return request_jacobian;
@@ -237,7 +220,42 @@ void ContamTransSys::postprocess(){
   std::ostringstream file_name;
   file_name << "Measurements" << time << ".dat";
   std::ofstream output(file_name.str());
-  //write out data
+  
+  //location of (bottoms of) wells
+  std::vector<Point> wells;
+  wells.push_back(Point(497541.44, 539374.57, 8.23)); //R-1
+  wells.push_back(Point(499882.61, 539296.05, 5.57)); //R-11
+  wells.push_back(Point(500174.36, 538579.77, 36.73)); //R-13
+  wells.push_back(Point(498442.06, 538969.46, 0)); //R-15
+  wells.push_back(Point(499563.69, 538995.82, 13.15)); //R-28
+  wells.push_back(Point(497855.44, 539040.32, 4.57)); //R-33#1
+  wells.push_back(Point(497855.44, 539040.32, 39.62)); //R-33#2
+  wells.push_back(Point(500972.02, 537650.74, 26.73)); //R-34
+  wells.push_back(Point(500581.13, 539285.95, 69.01)); //R-35a
+  wells.push_back(Point(500553.15, 539289.64, 11.15)); //R-35b
+  wells.push_back(Point(501062.87, 538806.13, 4.86)); //R-36
+  wells.push_back(Point(499174, 539122.84, 3.66)); //R-42
+  wells.push_back(Point(499029.6, 539378.56, 3.32)); //R-43#1
+  wells.push_back(Point(499029.6, 539378.56, 23.2)); //R-43#2
+  wells.push_back(Point(499890.7, 538615.08, 4.94)); //R-44#1
+  wells.push_back(Point(499890.7, 538615.08, 32.46)); //R-44#2
+  wells.push_back(Point(499948.08, 538891.8, 3.59)); //R-45#1
+  wells.push_back(Point(499948.08, 538891.8, 32.51)); //R-45#2
+  wells.push_back(Point(499465.44, 538608.21, 3.05)); //R-50#1
+  wells.push_back(Point(499465.44, 538608.21, 32.92)); //R-50#2
+  wells.push_back(Point(498987.1, 538710.37, 7.62)); //R-61#1
+  wells.push_back(Point(498987.1, 538710.37, 36.58)); //R-61#2
+  wells.push_back(Point(498574.44, 539304.64, 4.57)); //R-62
+  
+  //write out data (get concentration at bottom of wells)
+  for(int i=0; i<wells.size(); i++){
+    Point pt = wells[i];
+    Number c = point_value(c_var, pt);
+    if(output.is_open()){
+      output << pt(0) << "  " << pt(1) << "  " << pt(2) << " " << c << "\n";
+    }
+  }
+  
   output.close();
 }
 
