@@ -1,0 +1,144 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{amsfonts}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{fullpage}
+\usepackage{fancyhdr}
+\usepackage{color}
+\usepackage{enumerate}
+\usepackage{hyperref}
+\usepackage{subfigure}
+\usepackage{cite}
+\usepackage{wrapfig}
+\usepackage[footnotesize,center,bf]{caption}
+\usepackage{bbm}
+\graphicspath{{./figures/}}
+
+%\pagestyle{fancy}
+%\rhead{}
+%\chead{}
+%\lhead{}
+%\lfoot{}
+\cfoot{\thepage}
+%\rfoot{}
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\dA}{{\:\textrm{d}A}}
+\newcommand{\dV}{{\:\textrm{d}V}}
+\newcommand{\dt}{{\:\textrm{d}t}}
+
+\begin{document}
+
+This is where the problem we're trying to solve will be written out, so that we're on the same page as to what we're trying to implement and to perhaps help with debugging (either code or derivations...). We take the low-fidelity (LF) model to be one of Monty's analytical model, and the high-fidelity model to be a transport PDE. We assume the source to be zero everywhere outside a box region. For the low-fidelity model, the strength of the source is assumed constant throughtout the box; for the high-fidelity model, the source is described by a field within the box. 
+
+\section{Monty's Simple Setup}
+
+We have a domain $\Omega=[497150.00, 501750.00]\times[537350.00, 540650.00]\times[0,100]$ (in meters). Let the x-axis be aligned with the East-West direction (increasing x corresponds to going east), and the y-axis be aligned with the North-South direction (increasing y corresponds to going north). At the west boundary there is a constant head of $h_w=1798.61$ m, and at the east boundary there is a constant head of $h_e=1772.05$ m. There is no flow through the north and south boundaries. There is a uniform hydraulic conductivity of $k=0.003$ m/s throughout the domain. The velocity is thus $\vec{v}=<v_x,0,0>$ throughout the domain. Using Darcy's law and ignoring the effects of gravity, and letting $l_{ew}$ be the distance between the east and west boundaries, we get
+\[
+v_x=-k\frac{h_e-h_w}{l_{ew}}=2.415\cdot10^{-5}\textrm{ m/s}.
+\]
+
+The transport equation governing the concentration state $c$ is
+\[
+\frac{\partial c}{\partial t}=\nabla\cdot(\vec{v}c-nD\nabla c)+\lambda n c - f
+\]
+There is a uniform porosity of $n=0.1$ throughout the domain. No reaction rate was provided in Monty's description although a first-order reaction is included in some of the analytical models \cite{}; for now we keep the reaction term but set $\lambda=0.0$ 1/s. The longitudinal dispersivity $\alpha_L=60.0$ m, the transverse horizontal dispersivity $\alpha_{TH}=6.0$ m, and the transverse vertical dispersivity $\alpha_{VH}=0.6$ m. The total disperion tensor $D=D^m+D^{disp}$ is the sum of the molecular diffusion tensor $D^m$ and the dispersion tensor $D_{disp}$. In very slow flows, or when the porous medium is dominated by ``dead end pores'', the effects of molecular diffusion become significant. As no diffusion parameters were provided, we assume that we are not in one of these regimes. We use the expression for the dispersion tensor $D^{disp}$ described in \cite{}:
+\[
+D^{disp}_{ij}=a_{ijmn}\frac{v_n v_m}{\|\vec{v}\|}
+\]
+where $a_{ijmn}$ is the dispersivity of the porous medium, $v_n$ and $v_m$ are velocity components, and $\|\vec{v}\|$ is the magnitude of the velocity vector. For our velocity, we have $D_{xx}=\alpha_{LH}v_x$, $D_{yy}=\alpha_{TH}v_x$, and $D_{zz}=\alpha_{TV}v_x$. 
+
+There is an influx $(\vec{v}c-nD\nabla c)\cdot\hat{n}=5\textrm{ ppb}$ at the west boundary. There is no flux through the north and south boundaries, and no flux through the top or bottom. The east boundary $\Gamma_e$ has a ``mass flow out'' boundary condition. There does not appear to be a consensus as to how to model a lack of a boundary in a transport equation; the simplest approach is the Danckwerts boundary condition $\frac{\partial c}{\partial n}=0$. 
+
+Given these boundary conditions and the alignment of the velocity, axes and boundaries, the weak form of the governing equation with test function $w$ is
+\begin{multline*}
+\int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c - nD\nabla c) - w\lambda nc + wf \dV \\
+= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_\Gamma wn(D\nabla c)\cdot\hat{n} \dA\\
+= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}-5 \dA,
+\end{multline*}
+where $\Gamma_w$ is the west boundary.
+
+\section{KKT System}
+
+Let $\Omega_f=[498716,498316]\times[538742,539522]\times[100-z,100]$ (m) denote the subregion over which the source term may be nonzero, and let $\Gamma_f$ denote its boundary.
+
+The Lagrangian is
+\begin{eqnarray*}
+\mathcal{L}(f,c,z) &=& \frac{\beta}{2}\int_{\Omega_f}\nabla f\cdot\nabla f\dV \\
+&& -\int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial c}{\partial t}-\nabla\cdot(\vec{v}c)+n\nabla\cdot (D\nabla c)-\lambda n c + f\right)\dV\dt \\
+&& +\frac{1}{2}\int_{t_0}^{t_f}\int_\Omega \mathbbm{1}_{obs}(c-c^\star)^2 \dV\dt
+\end{eqnarray*}
+where $z$ is the adjoint, $\beta$ is a regularization scaling constant, $c^\star$ is the truth state (or observations), and $\mathbbm{1}_{obs}$ is an indicator function such that $\mathbbm{1}_{obs}(\vec{x},t)=1$ if $(\vec{x},t)$ correspond to an observation point and time, and is zero otherwise.
+
+Taking variations with respect to the parameters gives
+\begin{eqnarray*}
+\frac{\delta\mathcal{L}}{\delta f} &=& \lim_{\epsilon\to0}\frac{1}{\epsilon}(\mathcal{L}(f+\epsilon\delta,c,z)-\mathcal{L}(f,c,z)) \\
+&=& \frac{\beta}{2}\int_{\Omega_f} 2\nabla\delta\cdot\nabla f \dV - \int_{t_0}^{t_f}\int_\Omega z\delta \dV\dt \\
+&=& \int_{\Omega_f}-\beta\delta\nabla^2 f \dV + \int_{\Gamma_f}\beta\delta\frac{\partial f}{\partial n} \dA-\int_{t_0}^{t_f}\int_\Omega z\delta \dV\dt
+\end{eqnarray*}
+Setting $\frac{\delta\mathcal{L}}{\delta f}=0$ for all perturbations $\delta$ gives
+\[
+z+\frac{\beta}{t_f-t_0}\nabla^2f=0\textrm{ in }\Omega_f,\quad\frac{\partial f}{\partial n}=0\textrm{ on }\Gamma_f.
+\]
+
+Taking variations with respect to the state gives
+\begin{eqnarray*}
+\frac{\delta\mathcal{L}}{\delta c} &=& \lim_{\epsilon\to0}\frac{1}{\epsilon}(\mathcal{L}(f,c+\epsilon\delta,z)-\mathcal{L}(f,c,z)) \\
+&=& \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega\mathbbm{1}_{obs}(2\delta (c-c^\star)) \dV\dt - \int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial \delta}{\partial t}-\nabla\cdot(\vec{v}\delta)+n\nabla\cdot (D\nabla \delta)-\lambda n \delta + f\right)\dV\dt
+\end{eqnarray*}
+Using
+\[
+\int_{t_0}^{t_f}\int_\Omega z\frac{\partial\delta}{\partial t} \dV\dt=\left.\left(\int_\Omega z\delta \dV\right)\right\vert^{t_f}_{t_0}-\int_{t_0}^{t_f}\int_\Omega \delta\frac{\partial z}{\partial n}\dV\dt
+\]
+\[
+\int_{t_0}^{t_f}\int_\Omega z(\nabla\cdot(\vec{v}\delta)) \dV\dt = \int_{t_0}^{t_f}\left(\int_\Gamma z\delta(\vec{v}\cdot\hat{n}) \dA -\int_\Omega \delta (\vec{v}\cdot\nabla z) \dV\right)\dt
+\]
+\[
+\int_{t_0}^{t_f}\int_\Omega zn\nabla\cdot(D\nabla\delta) \dV\dt = \int_{t_0}^{t_f}\left(\int_\Gamma zn(D\nabla\delta)\cdot\hat{n}-n\delta(D\nabla z)\cdot\hat{n}\dA + \int_\Omega n\delta\nabla\cdot(D\nabla z) \dV\right)\dt
+\]
+\[
+\left.\delta\right\vert_{t_0}=0,\quad (\vec{v}\delta-nD\nabla\delta)\cdot\hat{n}\textrm{ on }\Gamma\backslash\Gamma_e,\quad\nabla\delta\cdot\hat{n}\textrm{ on }\Gamma_e
+\]
+gives
+\begin{multline*}
+\frac{\delta\mathcal{L}}{\delta c} = \int_{t_0}^{t_f}\left(\int_\Omega \delta\mathbbm{1}_{obs}(c-c^\star)+\delta\frac{\partial z}{\partial t} - \delta\vec{v}\cdot\nabla z - \delta n \nabla\cdot(D\nabla z) + \delta\lambda nz \dV \right. \\
+ \quad \left. + \int_\Gamma \delta n(D\nabla z)\cdot\hat{n} \dA - \int_{\Gamma_e} \delta z\vec{v}\cdot\hat{n} \dA\right)\dt -\left.z\delta\right\vert_{t_f}
+\end{multline*}
+Setting $\frac{\delta\mathcal{L}}{\delta c}=0$ for all perturbations $\delta$ gives
+\begin{eqnarray*}
+& -\frac{\partial z}{\partial t} = -\vec{v}\cdot\nabla z - n\nabla\cdot(D\nabla z) + \lambda nz + \mathbbm{1}_{obs}(c-c^\star)\textrm{ in }\Omega,\\
+& \quad \left.z\right\vert_{t_f}=0,
+\quad n(D\nabla z)\cdot\hat{n}=0\textrm{ on }\Gamma\backslash\Gamma_e,
+\quad (\vec{v}z-n(D\nabla z))\cdot\hat{n} = 0\textrm{ on }\Gamma_e
+\end{eqnarray*}
+
+Taking variations with respect to the adjoint recovers the governing equation.
+
+\section{Solving for Auxiliary Variables}
+
+Since the objective function is quadratic in the state and parameters, and the governing equation is linear, the auxiliary variables are related to each other in the same way as the primary variables, with the exception of the forcing term, which depends on the QoI.
+
+\section{Solving for LF versions}
+
+In the analytical model, $f$ is a scalar. Let $d$ be the observations and $O_e$ be a matrix so that $d=O_e f^\star$, where $f^\star$ is the true parameter value. The chosen regularization results in no penalty for a constant $f$. The inferred parameter is $f=(O_e^TO_e)^{-1}O_e^Td$.
+
+Let $A(\vec{x},t)$ be a linear operator whose action depends on the location $\vec{x}$ and time $t$, and which corresponds to the analytical model so that we have $c=Af$. The Lagrangian is then
+\[
+\mathcal{L}(f,c,z) = -\int_{t_0}^{t_f}\int_\Omega z(c-Af) \dV\dt + \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega \mathbbm{1}_{obs}(c-c^\star)^2 \dV\dt
+\]
+Taking variations with respect to the state and setting it to zero for all perturbations gives
+\[
+z=\mathbbm{1}_{obs}(c-c^\star)
+\]
+
+\end{document}
