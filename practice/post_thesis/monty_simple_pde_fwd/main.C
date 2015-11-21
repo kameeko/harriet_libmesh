@@ -13,6 +13,7 @@
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
+#include "libmesh/tecplot_io.h"
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
@@ -122,21 +123,31 @@ int main(int argc, char** argv){
 #ifdef LIBMESH_HAVE_EXODUS_API
     // Write out this timestep if we're requested to
     if ((t_step+1)%write_interval == 0){
-      std::ostringstream file_name;
+      std::ostringstream ex_file_name;
+      std::ostringstream tplot_file_name;
 
       // We write the file in the ExodusII format.
-      file_name << "out_"
-                << std::setw(3)
-                << std::setfill('0')
-                << std::right
-                << t_step+1
-                << ".e";
+      ex_file_name << "out_"
+                  << std::setw(3)
+                  << std::setfill('0')
+                  << std::right
+                  << t_step+1
+                  << ".e";
+                  
+      tplot_file_name << "out_"
+                  << std::setw(3)
+                  << std::setfill('0')
+                  << std::right
+                  << t_step+1
+                  << ".plt";
 
-      ExodusII_IO(mesh).write_timestep(file_name.str(),
+      ExodusII_IO(mesh).write_timestep(ex_file_name.str(),
                                        equation_systems,
                                        1, /* This number indicates how many time steps
                                              are being written to the file */
                                        system.time);
+      
+      TecplotIO(mesh).write_equation_systems(tplot_file_name.str(), equation_systems);
     }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API     
               
