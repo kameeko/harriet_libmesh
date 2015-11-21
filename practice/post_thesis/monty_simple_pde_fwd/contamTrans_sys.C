@@ -41,6 +41,7 @@ void ContamTransSys::init_data(){
 	vx = infile("vx",2.415e-5);
 	react_rate = infile("reaction_rate",0.0);
 	porosity = infile("porosity",0.1);
+	bsource = infile("bsource", 5.0);
 	double dlong = infile("dispersivity_longitudinal",60.0);
 	double dtransh = infile("dispersivity_transverse_horizontal",6.0);
 	double dtransv = infile("dispersivity_transverse_vertical",0.6);
@@ -174,12 +175,12 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &J = ctxt.get_elem_jacobian(c_var, c_var);
-	DenseSubVector<Number> &R = ctxt.get_elem_residual(c_var);
+  DenseSubVector<Number> &R = ctxt.get_elem_residual(c_var);
 
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
 
   bool isWest = ctxt.has_side_boundary_id(4);
-  
+
   //set (in)flux boundary condition on west side
   //homogeneous neumann (Danckwerts) outflow boundary condition on east side
   //no-flux (equivalently, homoegenous neumann) boundary conditions on north, south, top, bottom sides
@@ -196,8 +197,7 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
     {
       if(isWest) //west boundary
       {
-        double bsource = 5.0; //ppb (influx on west boundary)
-        R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource)*phi[i][qp]; 
+        R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource)*phi[i][qp];
         //std::cout << qside_point[qp](0) << " " << qside_point[qp](1) << " " << qside_point[qp](2) << std::endl; //DEBUG
       }
 
@@ -207,7 +207,7 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
 	      {
           if(isWest)
             J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
-        }
+	      }
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
     } //end of outer dof (i) loop
   }
@@ -220,7 +220,7 @@ void ContamTransSys::postprocess(){
   std::ostringstream file_name;
   file_name << "Measurements" << time << ".dat";
   std::ofstream output(file_name.str());
-  
+
   //location of (bottoms of) wells
   std::vector<Point> wells;
   wells.push_back(Point(497541.44, 539374.57, 8.23)); //R-1
@@ -246,7 +246,7 @@ void ContamTransSys::postprocess(){
   wells.push_back(Point(498987.1, 538710.37, 7.62)); //R-61#1
   wells.push_back(Point(498987.1, 538710.37, 36.58)); //R-61#2
   wells.push_back(Point(498574.44, 539304.64, 4.57)); //R-62
-  
+
   //write out data (get concentration at bottom of wells)
   for(int i=0; i<wells.size(); i++){
     Point pt = wells[i];
@@ -255,24 +255,25 @@ void ContamTransSys::postprocess(){
       output << pt(0) << "  " << pt(1) << "  " << pt(2) << " " << c << "\n";
     }
   }
-  
+
   output.close();
 }
 
 //source term at point pt
-Point ContamTransSys::forcing(const Point& pt){
-	Point f;
+Point ContamTransSys::forcing(const Point& pt)
+{
+  Point f;
 
-	std::vector<double> xlim{498316.0, 498716.0};
+  std::vector<double> xlim{498316.0, 498716.0};
   std::vector<double> ylim{538742.0, 539522.0};
 
   double zmax = 100.0;
   double ztol = 2.0; //a really thin box...
 
-	if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && abs(pt(2)-zmax) <= ztol)
-	  f(0) = 1000; //ppb
-	else
-	  f(0) = 0.0;
+  //if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && abs(pt(2)-zmax) <= ztol)
+  //f(0) = 1000; //ppb
+  //else
+    f(0) = 0.0;
 
-	return f;
+  return f;
 }

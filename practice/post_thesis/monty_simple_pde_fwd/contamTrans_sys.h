@@ -23,10 +23,10 @@ public:
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext& context);
-  
-  //boundary residual and jacobian calculations                                      
+
+  //boundary residual and jacobian calculations
   virtual bool side_time_derivative (bool request_jacobian,
-                                        DiffContext& context);                                      
+                                        DiffContext& context);
 
   // Postprocessed output
   virtual void postprocess ();
@@ -37,9 +37,10 @@ public:
   // Returns the value of a forcing function at point p.  This value
   // depends on which application is being used.
   Point forcing(const Point& p);
-  
+
   double vx; //west-east velocity (along x-axis, for now)
   double react_rate; //reaction rate
   double porosity; //porosity
+  Real bsource; // ppb (influx on west boundary)
   NumberTensorValue dispTens; //dispersion tensor
 };
