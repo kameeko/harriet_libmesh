@@ -1,4 +1,4 @@
-verify_analytic_jacobians = 1.0e-6 #if too large, will print out jacobians that disagree...
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
 print_jacobians = false
 print_element_jacobians = false
 
@@ -7,10 +7,14 @@ print_element_jacobians = false
 poly_order = 1
 fe_family = 'LAGRANGE'
 
-vx = 0.001
+vx = 2.415e-5
 reaction_rate = 0.0
 porosity = 0.1
-dispersivity_longitudinal = 2.0
-dispersivity_transverse_horizontal = 8.0
-dispersivity_transverse_vertical = 1.0
-bsource = -0.0001
+dispersivity_longitudinal = 60.0
+dispersivity_transverse_horizontal = 6.0
+dispersivity_transverse_vertical = 0.6
+bsource = -5.0
+
+source_rate = 5.0;
+source_conc = 1000.0;
+source_thickness = 5.0;

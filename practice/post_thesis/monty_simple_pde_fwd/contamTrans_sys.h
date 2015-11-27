@@ -38,9 +38,17 @@ public:
   // depends on which application is being used.
   Point forcing(const Point& p);
 
-  double vx; //west-east velocity (along x-axis, for now)
-  double react_rate; //reaction rate
-  double porosity; //porosity
-  Real bsource; // ppb (influx on west boundary)
-  NumberTensorValue dispTens; //dispersion tensor
+  Real vx; //west-east velocity (along x-axis, for now); m/s
+  Real react_rate; //reaction rate; 1/s
+  Real porosity; //porosity
+  Real bsource; // ppb (concentration of influx at west boundary)
+  Real source_rate; // kg/s
+	Real source_conc; // ppb
+	Real water_density; // kg/m^3
+  NumberTensorValue dispTens; //dispersion tensor; m^2/s
+  std::vector<Real> xlim; //boundaries of interior source; m
+  std::vector<Real> ylim; //boundaries of interior source; m
+  Real source_zmax; //top of domain; m
+  Real source_dz; //interior source thickness; m
+  Real source_vol; //interior source volume; m^3
 };

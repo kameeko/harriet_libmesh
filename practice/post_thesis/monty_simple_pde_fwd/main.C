@@ -68,10 +68,10 @@ int main(int argc, char** argv){
   	
   //solve as steady or transient
   if(transient)
-    system.time_solver = AutoPtr<TimeSolver>(new EulerSolver(system));
+    system.time_solver = AutoPtr<TimeSolver>(new EulerSolver(system)); //backward Euler
   else{
     system.time_solver = AutoPtr<TimeSolver>(new SteadySolver(system));
-    libmesh_assert_equal_to (n_timesteps, 1);
+    libmesh_assert_equal_to (n_timesteps, 1); //this doesn't seem to work?
   }
   
   // Initialize the system
@@ -109,6 +109,8 @@ int main(int argc, char** argv){
   // Print information about the system to the screen.
   equation_systems.print_info();
   
+  ExodusII_IO exodusIO = ExodusII_IO(mesh); //DEBUG
+  
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step){
   
     std::cout << "\n\nSolving time step " << t_step << ", time = "
@@ -127,12 +129,12 @@ int main(int argc, char** argv){
       std::ostringstream tplot_file_name;
 
       // We write the file in the ExodusII format.
-      ex_file_name << "out_"
-                  << std::setw(3)
-                  << std::setfill('0')
-                  << std::right
-                  << t_step+1
-                  << ".e";
+      //ex_file_name << "out_"
+      //            << std::setw(3)
+      //            << std::setfill('0')
+      //            << std::right
+      //            << t_step+1
+      //            << ".e";
                   
       tplot_file_name << "out_"
                   << std::setw(3)
@@ -141,12 +143,12 @@ int main(int argc, char** argv){
                   << t_step+1
                   << ".plt";
 
-      ExodusII_IO(mesh).write_timestep(ex_file_name.str(),
-                                       equation_systems,
-                                       1, /* This number indicates how many time steps
-                                             are being written to the file */
-                                       system.time);
-      
+      //ExodusII_IO(mesh).write_timestep(ex_file_name.str(),
+      //                                 equation_systems,
+      //                                 1, /* This number indicates how many time steps
+      //                                       are being written to the file */
+      //                                 system.time);
+      exodusIO.write_timestep("output.exo", equation_systems, t_step+1, system.time); //DEBUG
       TecplotIO(mesh).write_equation_systems(tplot_file_name.str(), equation_systems);
     }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API     

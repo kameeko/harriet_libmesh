@@ -58,13 +58,13 @@ D^{disp}_{ij}=a_{ijmn}\frac{v_n v_m}{\|\vec{v}\|}
 \]
 where $a_{ijmn}$ is the dispersivity of the porous medium, $v_n$ and $v_m$ are velocity components, and $\|\vec{v}\|$ is the magnitude of the velocity vector. For our velocity, we have $D_{xx}=\alpha_{LH}v_x$, $D_{yy}=\alpha_{TH}v_x$, and $D_{zz}=\alpha_{TV}v_x$. 
 
-There is an influx $(\vec{v}c-nD\nabla c)\cdot\hat{n}=5\textrm{ ppb}$ at the west boundary. There is no flux through the north and south boundaries, and no flux through the top or bottom. The east boundary $\Gamma_e$ has a ``mass flow out'' boundary condition. There does not appear to be a consensus as to how to model a lack of a boundary in a transport equation; the simplest approach is the Danckwerts boundary condition $\frac{\partial c}{\partial n}=0$. 
+There is an influx $(\vec{v}c-nD\nabla c)\cdot\hat{n}=(5\textrm{ ppb})\vec{v}\cdot\hat{n}$ at the west boundary. There is no flux through the north and south boundaries, and no flux through the top or bottom. The east boundary $\Gamma_e$ has a ``mass flow out'' boundary condition. There does not appear to be a consensus as to how to model a lack of a boundary in a transport equation; the simplest approach is the Danckwerts boundary condition $\frac{\partial c}{\partial n}=0$. 
 
 Given these boundary conditions and the alignment of the velocity, axes and boundaries, the weak form of the governing equation with test function $w$ is
 \begin{multline*}
 \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c - nD\nabla c) - w\lambda nc + wf \dV \\
 = \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_\Gamma wn(D\nabla c)\cdot\hat{n} \dA\\
-= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}-5 \dA,
+= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}+5 \dA,
 \end{multline*}
 where $\Gamma_w$ is the west boundary.
 

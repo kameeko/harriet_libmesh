@@ -38,15 +38,24 @@ void ContamTransSys::init_data(){
 	//set Dirichlet boundary conditions (none in this case)
 
 	//set parameters
-	vx = infile("vx",2.415e-5);
-	react_rate = infile("reaction_rate",0.0);
-	porosity = infile("porosity",0.1);
-	bsource = infile("bsource", 5.0);
+	vx = infile("vx", 2.415e-5); // m/s
+	react_rate = infile("reaction_rate", 0.0); // 1/s
+	porosity = infile("porosity", 0.1); // (unitless)
+	bsource = infile("bsource", -5.0); // ppb
+	source_rate = infile("source_rate", 5.0); // kg/s
+	source_conc = infile("source_conc", 1000.0); // ppb
+	source_dz = infile("source_thickness", 1.0); // m
+	
+	xlim.push_back(498316.0); xlim.push_back(498716.0); // m
+  ylim.push_back(538742.0); ylim.push_back(539522.0); // m
+	source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0])*source_dz;
+	water_density = 1.0; // kg/m^3
+	source_zmax = 100.0; // m
+
+	//compute dispersion tensor (assuming for now that velocity purely in x direction)
 	double dlong = infile("dispersivity_longitudinal",60.0);
 	double dtransh = infile("dispersivity_transverse_horizontal",6.0);
 	double dtransv = infile("dispersivity_transverse_vertical",0.6);
-
-	//compute dispersion tensor (assuming for now that velocity purely in x direction)
 	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
 	                            0.0, vx*dtransh, 0.0,
 	                            0.0, 0.0, vx*dtransv);
@@ -197,8 +206,7 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
     {
       if(isWest) //west boundary
       {
-        R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource)*phi[i][qp];
-        //std::cout << qside_point[qp](0) << " " << qside_point[qp](1) << " " << qside_point[qp](2) << std::endl; //DEBUG
+        R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
       }
 
       if(request_jacobian && context.get_elem_solution_derivative())
@@ -264,15 +272,10 @@ Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
 
-  std::vector<double> xlim{498316.0, 498716.0};
-  std::vector<double> ylim{538742.0, 539522.0};
-
-  double zmax = 100.0;
-  double ztol = 2.0; //a really thin box...
-
-  //if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && abs(pt(2)-zmax) <= ztol)
-  //f(0) = 1000; //ppb
-  //else
+  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && pt(2) >= source_zmax-source_dz){
+    f(0) = source_rate*source_conc/(water_density*source_vol); //ppb
+    
+  }else
     f(0) = 0.0;
 
   return f;
