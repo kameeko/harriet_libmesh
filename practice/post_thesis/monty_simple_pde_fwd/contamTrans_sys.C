@@ -272,11 +272,16 @@ Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
 
-  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && pt(2) >= source_zmax-source_dz){
-    f(0) = source_rate*source_conc/(water_density*source_vol); //ppb
-    
-  }else
+  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && pt(2) >= source_zmax-source_dz)
+    f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
+  else
     f(0) = 0.0;
 
+  /*//DEBUG - see if smoother source fixes the ridges problem...
+  double xcent = 0.5*(xlim[0]+xlim[1]);
+  double ycent = 0.5*(ylim[0]+ylim[1]);
+  //f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.0001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
+  f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.00001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
+*/
   return f;
 }
