@@ -51,4 +51,6 @@ public:
   Real source_zmax; //top of domain; m
   Real source_dz; //interior source thickness; m
   Real source_vol; //interior source volume; m^3
+  
+  bool useSUPG; //whether to use SUPG...
 };

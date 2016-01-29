@@ -23,6 +23,7 @@ void ContamTransSys::init_data(){
   GetPot infile("contamTrans.in");
   unsigned int poly_order = infile("poly_order",1);
   std::string fefamily = infile("fe_family", std::string("LAGRANGE"));
+  useSUPG = infile("use_SUPG",false);
 
   c_var = this->add_variable("c", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
 
@@ -59,6 +60,15 @@ void ContamTransSys::init_data(){
 	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
 	                            0.0, vx*dtransh, 0.0,
 	                            0.0, 0.0, vx*dtransv);
+
+  //DEBUG
+  //std::set<boundary_id_type> west_bdy;
+  ////west_bdy.insert(4);
+  //west_bdy.insert(0); west_bdy.insert(1); west_bdy.insert(2); west_bdy.insert(3); west_bdy.insert(4); west_bdy.insert(5);
+  //std::vector<unsigned int> all_vars;
+	//all_vars.push_back(c_var);
+	//ConstFunction<Number> five(5.0);
+	//this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(west_bdy, all_vars, &five));
 
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -129,21 +139,36 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 
     //velocity vector
     NumberVectorValue U(vx, 0.0, 0.0);
+    
+    //SUPG
+    double tau = 0.0;
+    if(useSUPG){ //assuming isotropic dispersion for now
+      double C1 = 4.0;
+      double C2 = 2.0;
+      double k = dispTens(0,0);
+      if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
+        std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
+      Real h = ctxt.get_elem().hmax();
+      std::cout << k << " " << sqrt(U*U) << std::endl;
+      tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
+    }
 
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
       // The residual
-      R(i) += JxW[qp]*(-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
+      R(i) += JxW[qp]*(1. + tau*U*dphi[i][qp])*
+           (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
 		       - (U*grad_c)*phi[i][qp] // Convection Term
 		       - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
 		       + fc*phi[i][qp]); // Source term
-
+		       
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
 	      for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-	        J(i,j) += JxW[qp]*((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
+	        J(i,j) += JxW[qp]*(1. + tau*U*dphi[i][qp])*
+	               ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
 			           - (U*dphi[j][qp])*phi[i][qp] // Convection
 			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
 	      } // end of the inner dof (j) loop
@@ -280,8 +305,8 @@ Point ContamTransSys::forcing(const Point& pt)
   /*//DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);
   double ycent = 0.5*(ylim[0]+ylim[1]);
-  //f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.0001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
-  f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.00001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
+  f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.0001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
+  //f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.00001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
 */
   return f;
 }

@@ -1,0 +1,20 @@
+-> did previous example have ridges? also had rectangular source...if not, is it because of mesh resolution, peclet number, dirichlet BCs, or non-transience?
+
+-setting 3D to steady-state does the weird ridges-to-the-left, smear-to-the-right thing...
+
+-all-linear data-making
+  -dx = 1/40, vmax = 0.5, k = 0.1
+  -no ridges even when dx = 0.25, v = e-9, k = e-8
+
+-diri = 5 on west boundary doesn't help...steady state still has ridges...
+
+-reducing velocity doesn't help, perhaps because dispersion scales with it?
+-changing dispersivity to isotropic 600 removes oscillations from steady state with 30x30x30 discretization
+
+
+-what if you add SUPG?
+  -SUPG doesn't seem to help either...(reproduced tau from milo...)?!?
+-what if source takes up all of z?
+  -does not seem to help...
+  -with all diri?
+    -does not seem to help...
