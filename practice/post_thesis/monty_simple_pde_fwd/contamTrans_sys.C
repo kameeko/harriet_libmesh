@@ -143,34 +143,50 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     //SUPG
     double tau = 0.0;
     if(useSUPG){ //assuming isotropic dispersion for now
+      //version 1, copied from another code
       double C1 = 4.0;
       double C2 = 2.0;
       double k = dispTens(0,0);
       if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
         std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
       Real h = ctxt.get_elem().hmax();
-      std::cout << k << " " << sqrt(U*U) << std::endl;
       tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
+      
+      //version 2, from http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf
+      /*double k = dispTens(0,0);
+      if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
+        std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
+      Real h = ctxt.get_elem().hmax();
+      Real Pe = sqrt(U*U)*h/(2.*k); //element Peclet number
+      tau = (h/(2.*sqrt(U*U)))*(1./tanh(Pe) + 1./Pe);*/
     }
 
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
       // The residual
-      R(i) += JxW[qp]*(1. + tau*U*dphi[i][qp])*
+      R(i) += JxW[qp]*
            (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
 		       - (U*grad_c)*phi[i][qp] // Convection Term
 		       - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
 		       + fc*phi[i][qp]); // Source term
-		       
+		  if(useSUPG)
+		    R(i) += JxW[qp]*((tau*U*dphi[i][qp])*
+		           (- (U*grad_c) // Convection Term
+		           - (react_rate*(porosity*c)) // Reaction Term
+		           + fc)); // Source term
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
 	      for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-	        J(i,j) += JxW[qp]*(1. + tau*U*dphi[i][qp])*
+	        J(i,j) += JxW[qp]*
 	               ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
 			           - (U*dphi[j][qp])*phi[i][qp] // Convection
 			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+			    if(useSUPG)
+			      J(i,j) += JxW[qp]*((tau*U*dphi[i][qp])* 
+		                 (- (U*dphi[j][qp]) // Convection Term
+		                 - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
 	      } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
 

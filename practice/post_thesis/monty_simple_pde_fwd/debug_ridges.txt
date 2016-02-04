@@ -10,7 +10,7 @@
 
 -reducing velocity doesn't help, perhaps because dispersion scales with it?
 -changing dispersivity to isotropic 600 removes oscillations from steady state with 30x30x30 discretization
-
+  -might still have some less visible oscillations <<
 
 -what if you add SUPG?
   -SUPG doesn't seem to help either...(reproduced tau from milo...)?!?
@@ -18,3 +18,14 @@
   -does not seem to help...
   -with all diri?
     -does not seem to help...
+    
+4600 in x
+3300 in y
+100 in z
+-without SUPG, if discretized elements to be 50x50x33, need k/U = 400 to not let it dip below 5 anywhere...
+  -Pe = LU/k, so seems like we should only need k/U = 50 to get Pe = 1
+  -if keep k/U = 200, try SUPG
+    -first version (from other code) barely seems the change the field (based on most negative value)
+    -second version (from Eq 17 in http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf) makes it hilariously more oscillatory...?!?
+    
+SHOULD YOU JUST TRY THIS IN MILO?

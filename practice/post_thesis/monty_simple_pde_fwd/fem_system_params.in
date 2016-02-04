@@ -20,6 +20,6 @@ relative_residual_tolerance = 1.e-8
 absolute_residual_tolerance = 1.e-13
 
 #discretization
-nx = 80
-ny = 60
-nz = 5
+nx = 92
+ny = 66
+nz = 3
