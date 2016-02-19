@@ -1,10 +1,9 @@
 -> did previous example have ridges? also had rectangular source...if not, is it because of mesh resolution, peclet number, dirichlet BCs, or non-transience?
-
--setting 3D to steady-state does the weird ridges-to-the-left, smear-to-the-right thing...
-
--all-linear data-making
+  -all-linear data-making
   -dx = 1/40, vmax = 0.5, k = 0.1
   -no ridges even when dx = 0.25, v = e-9, k = e-8
+
+-setting 3D to steady-state does the weird ridges-to-the-left, smear-to-the-right thing...
 
 -diri = 5 on west boundary doesn't help...steady state still has ridges...
 
@@ -13,7 +12,7 @@
   -might still have some less visible oscillations <<
 
 -what if you add SUPG?
-  -SUPG doesn't seem to help either...(reproduced tau from milo...)?!?
+  -SUPG doesn't seem to help either...(reproduced tau from milo...)
 -what if source takes up all of z?
   -does not seem to help...
   -with all diri?
@@ -22,10 +21,26 @@
 4600 in x
 3300 in y
 100 in z
--without SUPG, if discretized elements to be 50x50x33, need k/U = 400 to not let it dip below 5 anywhere...
+-without SUPG, if discretized elements to be 50x50x33 (nx = 92, ny = 66, nz = 3), need k/U = 400 to not let it dip below 5 anywhere...
   -Pe = LU/k, so seems like we should only need k/U = 50 to get Pe = 1
   -if keep k/U = 200, try SUPG
     -first version (from other code) barely seems the change the field (based on most negative value)
     -second version (from Eq 17 in http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf) makes it hilariously more oscillatory...?!?
     
 SHOULD YOU JUST TRY THIS IN MILO?
+  -> same behavior in MILO, not problem with replication...
+  
+if you keep everything but the z-dimension, then at k/U = 200 you can dip below 5 but not go negative...halving mesh size makes it at all at least 5...
+    -doubling tau also works
+    -if set k/U = 60, then tau = 5*tau doesn't work, but tau = 10*tau fails to converge (nonlinear solver)
+    -does SUPG really act like artificial viscosity? the tau doesn't even touch the diffusive bit...
+    
+adding decay around edges of box (nx = 92, ny = 66, nz = 3)
+  -no decay: max: 4.65e3; min: -271
+  -decay param 1e-1: max: 6.78e3; min: -40.3 
+  -decay param 5e-2: max: 8.32e3; min: -68.6
+  -decay param 2.5e-2: max: 1.07e4; min: -2.56 
+  -decay param 1e-2: max: 1.6e4; min: 5
+  vs changing mesh size 
+    -no decay, (nx = 184, ny = 132, nz = 3): max: 4.56e3; min: -84.9
+    -no decay, (nx = 368, ny = 264, nz = 3): max: 4.48e3; min: -3.54

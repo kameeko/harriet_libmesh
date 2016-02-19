@@ -23,7 +23,6 @@ void ContamTransSys::init_data(){
   GetPot infile("contamTrans.in");
   unsigned int poly_order = infile("poly_order",1);
   std::string fefamily = infile("fe_family", std::string("LAGRANGE"));
-  useSUPG = infile("use_SUPG",false);
 
   c_var = this->add_variable("c", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
 
@@ -69,6 +68,9 @@ void ContamTransSys::init_data(){
 	//all_vars.push_back(c_var);
 	//ConstFunction<Number> five(5.0);
 	//this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(west_bdy, all_vars, &five));
+
+  useSUPG = infile("use_SUPG",false);
+  ds = infile("source_decay",100.0);
 
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -312,12 +314,31 @@ void ContamTransSys::postprocess(){
 Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
-
-  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && pt(1) >= ylim[0] && pt(1) <= ylim[1] && pt(2) >= source_zmax-source_dz)
+/*
+  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
+     pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
+     pt(2) >= source_zmax-source_dz)
+    f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
+  else if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
+          pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
+          this->get_mesh().mesh_dimension() == 2) //test if making it 2D removes oscillations
     f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
   else
     f(0) = 0.0;
-
+*/    
+  //DEBUG - try to use smoothed box source
+  double dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
+                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
+                    + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); //distance for decay
+  f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
+  //if(abs(dist) < 1.e-8){
+    //f(0) = (source_rate*source_conc/(water_density*source_vol));
+  //}//debug
+  //else{
+    //f(0)=0.0;
+  //  std::cout << f(0) << std::endl;
+  //}//debug
+  
   /*//DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);
   double ycent = 0.5*(ylim[0]+ylim[1]);

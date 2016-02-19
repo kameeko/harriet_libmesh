@@ -38,7 +38,7 @@ int main(int argc, char** argv){
   const int nx                          = infile("nx",100);
   const int ny                          = infile("ny",100);
   const int nz                          = infile("nz",100);
-  const unsigned int dim                = 3;
+  //const unsigned int dim                = 3;
   
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -49,12 +49,19 @@ int main(int argc, char** argv){
   Mesh mesh(init.comm());
   
   //create mesh
-  MeshTools::Generation::build_cube(mesh, 
-                                    nx, ny, nz, 
-                                    497150.0, 501750.0, 
-                                    537350.0, 540650.0, 
-                                    0.0, 100.0, 
-                                    HEX27);
+  unsigned int dim;
+  if(nz == 0){
+    dim = 2;
+    MeshTools::Generation::build_square(mesh, nx, ny, 497150.0, 501750.0, 537350.0, 540650.0, QUAD9); //DEBUG
+  }else{
+    dim = 3;
+    MeshTools::Generation::build_cube(mesh, 
+                                      nx, ny, nz, 
+                                      497150.0, 501750.0, 
+                                      537350.0, 540650.0, 
+                                      0.0, 100.0, 
+                                      HEX27);
+  }
   
   // Print information about the mesh to the screen.
   mesh.print_info();

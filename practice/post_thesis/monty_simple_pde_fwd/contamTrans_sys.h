@@ -53,4 +53,5 @@ public:
   Real source_vol; //interior source volume; m^3
   
   bool useSUPG; //whether to use SUPG...
+  Real ds; //decay scaling parameter for smoothing edges of box source; larger for faster decay
 };
