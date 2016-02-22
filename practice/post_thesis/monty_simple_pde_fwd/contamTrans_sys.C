@@ -60,15 +60,6 @@ void ContamTransSys::init_data(){
 	                            0.0, vx*dtransh, 0.0,
 	                            0.0, 0.0, vx*dtransv);
 
-  //DEBUG
-  //std::set<boundary_id_type> west_bdy;
-  ////west_bdy.insert(4);
-  //west_bdy.insert(0); west_bdy.insert(1); west_bdy.insert(2); west_bdy.insert(3); west_bdy.insert(4); west_bdy.insert(5);
-  //std::vector<unsigned int> all_vars;
-	//all_vars.push_back(c_var);
-	//ConstFunction<Number> five(5.0);
-	//this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(west_bdy, all_vars, &five));
-
   useSUPG = infile("use_SUPG",false);
   ds = infile("source_decay",100.0);
 
@@ -314,7 +305,7 @@ void ContamTransSys::postprocess(){
 Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
-/*
+
   if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
      pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
      pt(2) >= source_zmax-source_dz)
@@ -325,25 +316,20 @@ Point ContamTransSys::forcing(const Point& pt)
     f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
   else
     f(0) = 0.0;
-*/    
+
+/*  
   //DEBUG - try to use smoothed box source
   double dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
                     + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
                     + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); //distance for decay
   f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
-  //if(abs(dist) < 1.e-8){
-    //f(0) = (source_rate*source_conc/(water_density*source_vol));
-  //}//debug
-  //else{
-    //f(0)=0.0;
-  //  std::cout << f(0) << std::endl;
-  //}//debug
-  
-  /*//DEBUG - see if smoother source fixes the ridges problem...
+*/
+/*  
+  //DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);
   double ycent = 0.5*(ylim[0]+ylim[1]);
-  f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.0001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
-  //f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-0.00001*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)));
+  double zcent = source_zmax - 0.5*source_dz;
+  f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-ds*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)+pow(pt(2)-zcent,2.0)));
 */
   return f;
 }
