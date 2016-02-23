@@ -28,4 +28,5 @@ nz = 3
 max_r_steps = 10
 max_r_level = 5
 refine_percentage = 0.5
-coarsen_percentage = 0.0
+coarsen_percentage = 0.2
+indicator_type = kelly #kelly or patch

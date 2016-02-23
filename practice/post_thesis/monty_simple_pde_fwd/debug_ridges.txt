@@ -44,3 +44,8 @@ adding decay around edges of box (nx = 92, ny = 66, nz = 3)
   vs changing mesh size 
     -no decay, (nx = 184, ny = 132, nz = 3): max: 4.56e3; min: -84.9
     -no decay, (nx = 368, ny = 264, nz = 3): max: 4.48e3; min: -3.54
+    
+mesh adaptivity
+  -patch seems to do much worse than kelly, even though kelly designed for poisson?
+  -refinement seems to target east side of box, not the west where it dips below 5...
+  -2D: decay param 5e-2: max: ; min: --SOMETHING IS WRONG WITH 2D IT'S NOT SOLVING ANYMORE NONLINEAR SOLVER STALLS...

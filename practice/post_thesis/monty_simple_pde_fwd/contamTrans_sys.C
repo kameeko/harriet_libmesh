@@ -305,7 +305,7 @@ void ContamTransSys::postprocess(){
 Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
-
+/*
   if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
      pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
      pt(2) >= source_zmax-source_dz)
@@ -316,14 +316,19 @@ Point ContamTransSys::forcing(const Point& pt)
     f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
   else
     f(0) = 0.0;
-
-/*  
-  //DEBUG - try to use smoothed box source
-  double dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
-                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
-                    + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); //distance for decay
-  f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
 */
+
+  //DEBUG - try to use smoothed box source
+  double dist = 0.0; //distance for decay
+  if(this->get_mesh().mesh_dimension() == 3)
+    dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
+                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
+                    + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); 
+  else if(this->get_mesh().mesh_dimension() == 2)
+    dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
+                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.)); 
+  f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
+
 /*  
   //DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);

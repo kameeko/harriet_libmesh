@@ -20,4 +20,4 @@ source_conc = 1000.0;
 source_thickness = 20.0;
 
 use_SUPG = false;
-source_decay = 1.e-6;
+source_decay = 5.e-2;

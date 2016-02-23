@@ -44,6 +44,7 @@ int main(int argc, char** argv){
   const unsigned int max_r_level        = infile("max_r_level", 3);
   const Real refine_percentage          = infile("refine_percentage", 0.5);
   const Real coarsen_percentage         = infile("coarsen_percentage", 0.5);
+  const std::string indicator_type      = infile("indicator_type", "kelly");
       
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -131,7 +132,7 @@ int main(int argc, char** argv){
   
   for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
     {
-      std::cout << "Beginning Solve " << r_step+1 << std::endl;
+      std::cout << "\nBeginning Solve " << r_step+1 << std::endl;
       
       for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
         {
@@ -147,18 +148,32 @@ int main(int argc, char** argv){
    
       } //end stepping through time loop
                 
-      std::cout << "  Refining the mesh..." << std::endl;
+      std::cout << "\n  Refining the mesh..." << std::endl;
       
       // The \p ErrorVector is a particular \p StatisticsVector
       // for computing error information on a finite element mesh.
       ErrorVector error;
       
-      // The patch recovery estimator should give a
-      // good estimate of the solution interpolation
-      // error.
-      PatchRecoveryErrorEstimator error_estimator;
+      if (indicator_type == "patch")
+        {
+          // The patch recovery estimator should give a
+          // good estimate of the solution interpolation
+          // error.
+          PatchRecoveryErrorEstimator error_estimator;
 
-      error_estimator.estimate_error (system, error);
+          error_estimator.estimate_error (system, error);
+        }
+      else if (indicator_type == "kelly")
+        {
+
+          // The Kelly error estimator is based on
+          // an error bound for the Poisson problem
+          // on linear elements, but is useful for
+          // driving adaptive refinement in many problems
+          KellyErrorEstimator error_estimator;
+
+          error_estimator.estimate_error (system, error);
+        }
       
       // Write out the error distribution
       std::ostringstream ss;
@@ -196,39 +211,56 @@ int main(int argc, char** argv){
       
     } //end refinement loop
     
+  if(max_r_steps == 0)
+    {
+      for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
+        {
+      
+          std::cout << "\n\nSolving time step " << t_step << ", time = "
+                    << system.time << std::endl;
+          
+          system.solve();
+          system.postprocess();
+          
+          // Advance to the next timestep in a transient problem
+          system.time_solver->advance_timestep();
+   
+        } //end stepping through time loop
+    }
+    
 #ifdef LIBMESH_HAVE_EXODUS_API
-    for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
-      {
-        // Write out this timestep if we're requested to
-        if ((t_step+1)%write_interval == 0)
-          {
-            std::ostringstream ex_file_name;
-            std::ostringstream tplot_file_name;
+  for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
+    {
+      // Write out this timestep if we're requested to
+      if ((t_step+1)%write_interval == 0)
+        {
+          std::ostringstream ex_file_name;
+          std::ostringstream tplot_file_name;
 
-            // We write the file in the ExodusII format.
-            //ex_file_name << "out_"
-            //            << std::setw(3)
-            //            << std::setfill('0')
-            //            << std::right
-            //            << t_step+1
-            //            << ".e";
-                        
-            tplot_file_name << "out_"
-                        << std::setw(3)
-                        << std::setfill('0')
-                        << std::right
-                        << t_step+1
-                        << ".plt";
+          // We write the file in the ExodusII format.
+          //ex_file_name << "out_"
+          //            << std::setw(3)
+          //            << std::setfill('0')
+          //            << std::right
+          //            << t_step+1
+          //            << ".e";
+                      
+          tplot_file_name << "out_"
+                      << std::setw(3)
+                      << std::setfill('0')
+                      << std::right
+                      << t_step+1
+                      << ".plt";
 
-            //ExodusII_IO(mesh).write_timestep(ex_file_name.str(),
-            //                                 equation_systems,
-            //                                 1, /* This number indicates how many time steps
-            //                                       are being written to the file */
-            //                                 system.time);
-            exodusIO.write_timestep("output.exo", equation_systems, t_step+1, system.time); //outputs all timesteps in one file
-            TecplotIO(mesh).write_equation_systems(tplot_file_name.str(), equation_systems);
-          }
-      }
+          //ExodusII_IO(mesh).write_timestep(ex_file_name.str(),
+          //                                 equation_systems,
+          //                                 1, /* This number indicates how many time steps
+          //                                       are being written to the file */
+          //                                 system.time);
+          exodusIO.write_timestep("output.exo", equation_systems, t_step+1, system.time); //outputs all timesteps in one file
+          TecplotIO(mesh).write_equation_systems(tplot_file_name.str(), equation_systems);
+        }
+    }
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API     
 
   // All done.
