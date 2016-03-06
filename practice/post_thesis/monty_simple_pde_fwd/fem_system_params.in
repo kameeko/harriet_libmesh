@@ -25,8 +25,8 @@ ny = 66
 nz = 3
 
 #refinement
-max_r_steps = 10
-max_r_level = 5
-refine_percentage = 0.5
-coarsen_percentage = 0.2
+max_r_steps = 0
+max_r_level = 7
+refine_percentage = 0.1
+coarsen_percentage = 0.0
 indicator_type = kelly #kelly or patch

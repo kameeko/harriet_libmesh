@@ -143,6 +143,10 @@ int main(int argc, char** argv){
           system.solve();
           system.postprocess();
           
+          //print out solution minimum to debug oscillations
+          NumericVector<Number> &primal_solution = *system.solution;
+          std::cout << "Solution min: " << primal_solution.min() << std::endl;
+          
           // Advance to the next timestep in a transient problem
           system.time_solver->advance_timestep();
    
@@ -211,22 +215,25 @@ int main(int argc, char** argv){
       
     } //end refinement loop
     
-  if(max_r_steps == 0)
+  //use that final refinement
+  for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
     {
-      for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
-        {
+  
+      std::cout << "\n\nSolving time step " << t_step << ", time = "
+                << system.time << std::endl;
       
-          std::cout << "\n\nSolving time step " << t_step << ", time = "
-                    << system.time << std::endl;
-          
-          system.solve();
-          system.postprocess();
-          
-          // Advance to the next timestep in a transient problem
-          system.time_solver->advance_timestep();
-   
-        } //end stepping through time loop
-    }
+      system.solve();
+      system.postprocess();
+      
+      //print out solution minimum to debug oscillations
+      NumericVector<Number> &primal_solution = *system.solution;
+      std::cout << "Solution min: " << primal_solution.min() << std::endl;
+      
+      // Advance to the next timestep in a transient problem
+      system.time_solver->advance_timestep();
+
+    } //end stepping through time loop
+    
     
 #ifdef LIBMESH_HAVE_EXODUS_API
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)

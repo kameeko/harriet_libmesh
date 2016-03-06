@@ -48,4 +48,41 @@ adding decay around edges of box (nx = 92, ny = 66, nz = 3)
 mesh adaptivity
   -patch seems to do much worse than kelly, even though kelly designed for poisson?
   -refinement seems to target east side of box, not the west where it dips below 5...
-  -2D: decay param 5e-2: max: ; min: --SOMETHING IS WRONG WITH 2D IT'S NOT SOLVING ANYMORE NONLINEAR SOLVER STALLS...
+  -2/23 - attempted to play around in 2D, but nonlinear solver stalling...issue seems to go back to commit on 2/19 (commit before that has only 3D)...not sure what went wrong but somewhere between those two commits the 2D was solving...
+    -may not be new issue; previous debugging did k/U=200 in 2D, and only k/U=60 with SUPG versions
+    -> needed to specify west boundary (different side id)
+  -decay param 5e-2: max: 8.32e3; min: -68.6 (25000 DOFs)
+    -refinement: 5-5-0.7-0.2, kelly -> min: -1.75 (97000 DOFs)
+    -refinement: 5-5-0.8-0.2, kelly -> min: 0.209 (196000 DOFs)
+  -decay param 2.5e-2: max: 1.07e4; min: -2.56 
+    -refinement: 5-5-0.7-0.2, kelly -> min: 4.55 (69000 DOFs)
+    -refinement: 10-7-0.1-0, kelly -> min: -2.57 (29000 DOFs)
+    -refinement: 30-7-0.1-0, kelly -> min:  4.5 (64000 DOFs)
+    -refinement: 30-7-0.1-0, patch -> min: -2.49 (25500 DOFs)
+  -decay param 1.5e-2: min: 4.99
+    -refinement: 5-5-0.7-0.2, kelly -> min: 5 (44000 DOFs)
+  -seems like, for a fixed decay param, similar final DOFs gives similar oscillation-ridding...?
+  -2D: decay param 2.5e-2: min: -2.96 (6200 DOFs)
+    -refinement: 30-7-0.1-0, kelly -> min: 3.82 (9700 DOFs)
+    -refinement: 30-7-0.1-0, patch -> min: -2.95 (6700 DOFs)
+  -2D: decay param 5e-2, SUPG: min: -4.95 (6200 DOFs)
+    -refinement: 30-7-0.1-0, kelly, SUPG -> min: 4.06 (10700 DOFs)
+    
+-you forgot to include porosity when calculating Peclet number
+  -when Peclet number actually about 1 (set porosity to 1 so that U/D = 1/60 and L = 50 actually gives Pe < 1), then no stabilization needed even with hard box...
+    -has ridge/buildup at downwind side, but not as prominent
+  -if kept porosity = 1, so that U/D = 1/60 and L = 50 gives Pe ~ 10, then SUPG doesn't quite solve it (even when porosity included in SUPG's k, for both versions)
+  
+run 2D toy, with numbers scaled? or even same numbers?
+  -is there a bug in the scale of the numbers? or the use of a diff tensor? no...
+  -in current setup, build-up ridge at east of source remains even when refined further...
+    -2D toy: U = 0.5, k = 0.1, domain = [0,5]x[0,1], homo diri all around
+    -ridge remains even when velocity increased (but U/D held constant), though height of ridge decreases...
+    -ridge seems less prominent when source intensity reduced...
+      -> downwind ridges also appear in toy when k = 0.01 so LU/k = 5
+      -> ridge remains when k/U = 100 so LU/k = 0.5 as in toy problem (+ Diri BCs); does go round by the time k/U = 1000
+  --> POKE STABILIZATION IN BECKER + BRAACK PAPER
+    -still not working...did you do it wrong? 
+    -no stabilization, hard box, k/U = 60, h = 50 -> starts dipping below 5 at porosity = 0.5
+      -becker/braack option only works up to porosity = 0.45
+      -milo option works until porosity = 0.25, but fails spectacularly for porosity = 0.2 (shoots to min = -300)

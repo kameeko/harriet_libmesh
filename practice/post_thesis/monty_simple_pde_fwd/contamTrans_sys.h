@@ -54,4 +54,8 @@ public:
   
   bool useSUPG; //whether to use SUPG...
   Real ds; //decay scaling parameter for smoothing edges of box source; larger for faster decay
+  int stab_opt; //stabilization options
+  
+  bool diri_dbg; //whether to use Dirichlet boundary conditions (for debugging)
+  bool smooth_box; //whether to use box-source with smoothed edges (exponential decay)
 };

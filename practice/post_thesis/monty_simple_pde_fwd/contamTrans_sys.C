@@ -48,7 +48,10 @@ void ContamTransSys::init_data(){
 	
 	xlim.push_back(498316.0); xlim.push_back(498716.0); // m
   ylim.push_back(538742.0); ylim.push_back(539522.0); // m
-	source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0])*source_dz;
+  if(this->get_mesh().mesh_dimension() == 3)
+	  source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0])*source_dz;
+	else if(this->get_mesh().mesh_dimension() == 2)
+	  source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0]);
 	water_density = 1.0; // kg/m^3
 	source_zmax = 100.0; // m
 
@@ -60,8 +63,23 @@ void ContamTransSys::init_data(){
 	                            0.0, vx*dtransh, 0.0,
 	                            0.0, 0.0, vx*dtransv);
 
-  useSUPG = infile("use_SUPG",false);
+  useSUPG = infile("use_stabilization",false);
+  smooth_box = infile("use_smoothed_box",false);
   ds = infile("source_decay",100.0);
+  stab_opt = infile("stabilization_option",1);
+  
+  diri_dbg = infile("use_Diri_BCs",false);
+  if(diri_dbg){
+    std::set<boundary_id_type> all_bdys;
+    all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3);
+    if(this->get_mesh().mesh_dimension() == 3){
+      all_bdys.insert(4); all_bdys.insert(5);
+    }
+    std::vector<unsigned int> all_of_em;
+	  all_of_em.push_back(c_var);
+	  ConstFunction<Number> five(5.0);
+	  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, all_of_em, &five));
+  }
 
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -136,22 +154,36 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     //SUPG
     double tau = 0.0;
     if(useSUPG){ //assuming isotropic dispersion for now
-      //version 1, copied from another code
-      double C1 = 4.0;
-      double C2 = 2.0;
-      double k = dispTens(0,0);
-      if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
-        std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
-      Real h = ctxt.get_elem().hmax();
-      tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
-      
-      //version 2, from http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf
-      /*double k = dispTens(0,0);
-      if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
-        std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
-      Real h = ctxt.get_elem().hmax();
-      Real Pe = sqrt(U*U)*h/(2.*k); //element Peclet number
-      tau = (h/(2.*sqrt(U*U)))*(1./tanh(Pe) + 1./Pe);*/
+      if(stab_opt == 1){
+        //version 1, copied from MILO code
+        double C1 = 4.0;
+        double C2 = 2.0;
+        double k = dispTens(0,0)*porosity;
+        if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
+          std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
+        Real h = ctxt.get_elem().hmax();
+        tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
+      }else if(stab_opt == 2){
+        //version 2, from http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf
+        double k = dispTens(0,0)*porosity;
+        if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
+          std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
+        Real h = ctxt.get_elem().hmax();
+        Real Pe = sqrt(U*U)*h/(2.*k); //element Peclet number
+        tau = (h/(2.*sqrt(U*U)))*(1./tanh(Pe) + 1./Pe);
+      }else if(stab_opt == 3){
+        //version 3, from Becker + Braack (2002), assuming linear basis functions for now
+        double C = 12.0; //assuming linear basis functions
+        double delta0 = 0.4; //suggested 0.2 <= delta_0 <= 0.5 for linear basis functions
+        Real hK = ctxt.get_elem().hmax();
+        Real betaK = std::max(std::max(std::abs(U(0)),std::abs(U(1))),std::abs(U(2)));
+        double k = dispTens(0,0)*porosity;
+        if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
+          std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
+        tau = delta0*hK*hK/(C*k + betaK*hK);
+      }else{
+        std::cout << "Invalid stabilization option. No stabilization used." << std::endl;
+      }
     }
 
     // First, an i-loop over the  degrees of freedom.
@@ -222,7 +254,11 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
 
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
 
-  bool isWest = ctxt.has_side_boundary_id(4);
+  bool isWest = false;
+  if (dim == 3)
+    isWest = ctxt.has_side_boundary_id(4);
+  else if (dim == 2)
+    isWest = ctxt.has_side_boundary_id(3);
 
   //set (in)flux boundary condition on west side
   //homogeneous neumann (Danckwerts) outflow boundary condition on east side
@@ -305,30 +341,29 @@ void ContamTransSys::postprocess(){
 Point ContamTransSys::forcing(const Point& pt)
 {
   Point f;
-/*
-  if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
-     pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
-     pt(2) >= source_zmax-source_dz)
-    f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
-  else if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
-          pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
-          this->get_mesh().mesh_dimension() == 2) //test if making it 2D removes oscillations
-    f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
-  else
-    f(0) = 0.0;
-*/
 
-  //DEBUG - try to use smoothed box source
-  double dist = 0.0; //distance for decay
-  if(this->get_mesh().mesh_dimension() == 3)
-    dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
-                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
-                    + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); 
-  else if(this->get_mesh().mesh_dimension() == 2)
-    dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
-                    + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.)); 
-  f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
-
+  if(!smooth_box){
+    if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
+       pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
+       pt(2) >= source_zmax-source_dz)
+      f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
+    else if(pt(0) >= xlim[0] && pt(0) <= xlim[1] && 
+            pt(1) >= ylim[0] && pt(1) <= ylim[1] && 
+            this->get_mesh().mesh_dimension() == 2) //test if making it 2D removes oscillations
+      f(0) = source_rate*source_conc/(water_density*source_vol); // ppb/s
+    else
+      f(0) = 0.0;
+  }else{ //smoothed box source
+    double dist = 0.0; //distance for decay
+    if(this->get_mesh().mesh_dimension() == 3)
+      dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
+                      + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.) 
+                      + pow(std::max(std::max(pt(2)-source_zmax,0.),std::max(source_zmax-source_dz-pt(2),0.)),2.)); 
+    else if(this->get_mesh().mesh_dimension() == 2)
+      dist = sqrt(pow(std::max(std::max(pt(0)-xlim[1],0.),std::max(xlim[0]-pt(0),0.)),2.) 
+                      + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.)); 
+    f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
+  }
 /*  
   //DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);
