@@ -86,3 +86,7 @@ run 2D toy, with numbers scaled? or even same numbers?
     -no stabilization, hard box, k/U = 60, h = 50 -> starts dipping below 5 at porosity = 0.5
       -becker/braack option only works up to porosity = 0.45
       -milo option works until porosity = 0.25, but fails spectacularly for porosity = 0.2 (shoots to min = -300)
+        -3D, porosity = 0.2, milo supg, mesh adaptivity -> smoshes out oscillations ~27000 DOFs; min went from -90 in one iteration to 5 in another, with only ~100 DOFs difference between them...
+
+-can we change the setup? so we don't need all this stabilization/refinement? what do we ultimately want from the example?
+  -porosity = 0.2 is not unnatural...

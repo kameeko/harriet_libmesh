@@ -50,7 +50,7 @@ v_x=-k\frac{h_e-h_w}{l_{ew}}=2.415\cdot10^{-5}\textrm{ m/s}.
 
 The transport equation governing the concentration state $c$ is
 \[
-\frac{\partial c}{\partial t}=\nabla\cdot(\vec{v}c-nD\nabla c)+\lambda n c - f
+\frac{\partial (nc)}{\partial t}=\nabla\cdot(\vec{v}c-nD\nabla c)+\lambda n c - f
 \]
 There is a uniform porosity of $n=0.1$ throughout the domain. No reaction rate was provided in Monty's description although a first-order reaction is included in some of the analytical models \cite{}; for now we keep the reaction term but set $\lambda=0.0$ 1/s. The longitudinal dispersivity $\alpha_L=60.0$ m, the transverse horizontal dispersivity $\alpha_{TH}=6.0$ m, and the transverse vertical dispersivity $\alpha_{VH}=0.6$ m. The total disperion tensor $D=D^m+D^{disp}$ is the sum of the molecular diffusion tensor $D^m$ and the dispersion tensor $D_{disp}$. In very slow flows, or when the porous medium is dominated by ``dead end pores'', the effects of molecular diffusion become significant. As no diffusion parameters were provided, we assume that we are not in one of these regimes. We use the expression for the dispersion tensor $D^{disp}$ described in \cite{}:
 \[
@@ -62,9 +62,9 @@ There is an influx $(\vec{v}c-nD\nabla c)\cdot\hat{n}=(5\textrm{ ppb})\vec{v}\cd
 
 Given these boundary conditions and the alignment of the velocity, axes and boundaries, the weak form of the governing equation with test function $w$ is
 \begin{multline*}
-\int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c - nD\nabla c) - w\lambda nc + wf \dV \\
-= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_\Gamma wn(D\nabla c)\cdot\hat{n} \dA\\
-= \int_\Omega w\frac{\partial c}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}+5 \dA,
+\int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c - nD\nabla c) - w\lambda nc + wf \dV \\
+= \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_\Gamma wn(D\nabla c)\cdot\hat{n} \dA\\
+= \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}+5 \dA,
 \end{multline*}
 where $\Gamma_w$ is the west boundary.
 
@@ -75,7 +75,7 @@ Let $\Omega_f=[498716,498316]\times[538742,539522]\times[100-z,100]$ (m) denote 
 The Lagrangian is
 \begin{eqnarray*}
 \mathcal{L}(f,c,z) &=& \frac{\beta}{2}\int_{\Omega_f}\nabla f\cdot\nabla f\dV \\
-&& -\int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial c}{\partial t}-\nabla\cdot(\vec{v}c)+n\nabla\cdot (D\nabla c)-\lambda n c + f\right)\dV\dt \\
+&& -\int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial (nc)}{\partial t}-\nabla\cdot(\vec{v}c)+n\nabla\cdot (D\nabla c)-\lambda n c + f\right)\dV\dt \\
 && +\frac{1}{2}\int_{t_0}^{t_f}\int_\Omega \mathbbm{1}_{obs}(c-c^\star)^2 \dV\dt
 \end{eqnarray*}
 where $z$ is the adjoint, $\beta$ is a regularization scaling constant, $c^\star$ is the truth state (or observations), and $\mathbbm{1}_{obs}$ is an indicator function such that $\mathbbm{1}_{obs}(\vec{x},t)=1$ if $(\vec{x},t)$ correspond to an observation point and time, and is zero otherwise.
@@ -94,7 +94,7 @@ z+\frac{\beta}{t_f-t_0}\nabla^2f=0\textrm{ in }\Omega_f,\quad\frac{\partial f}{\
 Taking variations with respect to the state gives
 \begin{eqnarray*}
 \frac{\delta\mathcal{L}}{\delta c} &=& \lim_{\epsilon\to0}\frac{1}{\epsilon}(\mathcal{L}(f,c+\epsilon\delta,z)-\mathcal{L}(f,c,z)) \\
-&=& \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega\mathbbm{1}_{obs}(2\delta (c-c^\star)) \dV\dt - \int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial \delta}{\partial t}-\nabla\cdot(\vec{v}\delta)+n\nabla\cdot (D\nabla \delta)-\lambda n \delta + f\right)\dV\dt
+&=& \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega\mathbbm{1}_{obs}(2\delta (c-c^\star)) \dV\dt - \int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial (n\delta)}{\partial t}-\nabla\cdot(\vec{v}\delta)+n\nabla\cdot (D\nabla \delta)-\lambda n \delta + f\right)\dV\dt
 \end{eqnarray*}
 Using
 \[
@@ -111,12 +111,12 @@ Using
 \]
 gives
 \begin{multline*}
-\frac{\delta\mathcal{L}}{\delta c} = \int_{t_0}^{t_f}\left(\int_\Omega \delta\mathbbm{1}_{obs}(c-c^\star)+\delta\frac{\partial z}{\partial t} - \delta\vec{v}\cdot\nabla z - \delta n \nabla\cdot(D\nabla z) + \delta\lambda nz \dV \right. \\
+\frac{\delta\mathcal{L}}{\delta c} = \int_{t_0}^{t_f}\left(\int_\Omega \delta\mathbbm{1}_{obs}(c-c^\star)+n\delta\frac{\partial z}{\partial t} - \delta\vec{v}\cdot\nabla z - \delta n \nabla\cdot(D\nabla z) + \delta\lambda nz \dV \right. \\
  \quad \left. + \int_\Gamma \delta n(D\nabla z)\cdot\hat{n} \dA - \int_{\Gamma_e} \delta z\vec{v}\cdot\hat{n} \dA\right)\dt -\left.z\delta\right\vert_{t_f}
 \end{multline*}
 Setting $\frac{\delta\mathcal{L}}{\delta c}=0$ for all perturbations $\delta$ gives
 \begin{eqnarray*}
-& -\frac{\partial z}{\partial t} = -\vec{v}\cdot\nabla z - n\nabla\cdot(D\nabla z) + \lambda nz + \mathbbm{1}_{obs}(c-c^\star)\textrm{ in }\Omega,\\
+& -\frac{\partial (nz)}{\partial t} = -\vec{v}\cdot\nabla z - n\nabla\cdot(D\nabla z) + \lambda nz + \mathbbm{1}_{obs}(c-c^\star)\textrm{ in }\Omega,\\
 & \quad \left.z\right\vert_{t_f}=0,
 \quad n(D\nabla z)\cdot\hat{n}=0\textrm{ on }\Gamma\backslash\Gamma_e,
 \quad (\vec{v}z-n(D\nabla z))\cdot\hat{n} = 0\textrm{ on }\Gamma_e
