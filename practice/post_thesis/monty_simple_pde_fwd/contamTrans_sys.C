@@ -12,6 +12,7 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/elem.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
@@ -162,21 +163,21 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
         Real h = ctxt.get_elem().hmax();
-        tau = 1./((C1*k)/(h*h) + (C2*(sqrt(U*U)/porosity)/h));
+        tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
       }else if(stab_opt == 2){
         //version 2, from http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf
         double k = dispTens(0,0);
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
         Real h = ctxt.get_elem().hmax();
-        Real Pe = (sqrt(U*U)/porosity)*h/(2.*k); //element Peclet number
-        tau = (h/(2.*(sqrt(U*U)/porosity)))*(1./tanh(Pe) + 1./Pe);
+        Real Pe = sqrt(U*U)*h/(2.*k); //element Peclet number
+        tau = (h/(2.*sqrt(U*U)))*(1./tanh(Pe) + 1./Pe);
       }else if(stab_opt == 3){
         //version 3, from Becker + Braack (2002), assuming linear basis functions for now
         double C = 12.0; //assuming linear basis functions
         double delta0 = 0.4; //suggested 0.2 <= delta_0 <= 0.5 for linear basis functions
         Real hK = ctxt.get_elem().hmax();
-        Real betaK = std::max(std::max(std::abs(U(0)),std::abs(U(1))),std::abs(U(2)))/porosity;
+        Real betaK = std::max(std::max(std::abs(U(0)),std::abs(U(1))),std::abs(U(2)));
         double k = dispTens(0,0);
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
@@ -187,8 +188,8 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
         Real h_e = ctxt.get_elem().hmax();
         //double Pe_e = 0.5*h_e*(pow((sqrt(U*U),3.)/(U*(dispTens*U))); //as in paper
         //tau = 0.5*(h_e/sqrt(U*U))*std::min(Pe_e/3.,1.); //as in paper
-        double Pe_e = 0.5*h_e*(pow((sqrt(U*U)/porosity),3.)/((U/porosity)*(dispTens*(U/porosity)))); //adapted to our equation?
-        tau = 0.5*(h_e/(sqrt(U*U)/porosity))*std::min(Pe_e/3.,1.); //adapted to our equation?
+        double Pe_e = 0.5*h_e*(pow(sqrt(U*U),3.)/(U*(dispTens*U))); //adapted to our equation?
+        tau = 0.5*(h_e/sqrt(U*U))*std::min(Pe_e/3.,1.); //adapted to our equation?
       }else{
         std::cout << "Invalid stabilization option. No stabilization used." << std::endl;
       }
@@ -198,13 +199,13 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
       // The residual
-      R(i) += JxW[qp]*(1./porosity)*
+      R(i) += JxW[qp]*
            (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
 		       - (U*grad_c)*phi[i][qp] // Convection Term
 		       - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
 		       + fc*phi[i][qp]); // Source term
 		  if(useSUPG)
-		    R(i) += JxW[qp]*((tau*U*dphi[i][qp])*(1./porosity)*
+		    R(i) += JxW[qp]*((tau*U*dphi[i][qp])*
 		           (- (U*grad_c) // Convection Term
 		           - (react_rate*(porosity*c)) // Reaction Term
 		           + fc)); // Source term
@@ -212,12 +213,12 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
       {
 	      for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-	        J(i,j) += JxW[qp]*(1./porosity)*
+	        J(i,j) += JxW[qp]
 	               ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
 			           - (U*dphi[j][qp])*phi[i][qp] // Convection
 			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
 			    if(useSUPG)
-			      J(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*(1./porosity)*
+			      J(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
 		                 (- (U*dphi[j][qp]) // Convection Term
 		                 - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
 	      } // end of the inner dof (j) loop

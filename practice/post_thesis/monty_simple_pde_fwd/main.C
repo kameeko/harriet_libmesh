@@ -80,8 +80,10 @@ int main(int argc, char** argv){
   	equation_systems.add_system<ContamTransSys>("ContamTrans");
   	
   //solve as steady or transient
-  if(transient)
+  if(transient){
     system.time_solver = AutoPtr<TimeSolver>(new EulerSolver(system)); //backward Euler
+    std::cout << "\n\nAaahhh time derivative term doesn't yet include porosity!\n" << std::endl;
+  }
   else{
     system.time_solver = AutoPtr<TimeSolver>(new SteadySolver(system));
     libmesh_assert_equal_to (n_timesteps, 1); //this doesn't seem to work?
