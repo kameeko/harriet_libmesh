@@ -83,12 +83,48 @@ run 2D toy, with numbers scaled? or even same numbers?
       -> ridge remains when k/U = 100 so LU/k = 0.5 as in toy problem (+ Diri BCs); does go round by the time k/U = 1000
   --> POKE STABILIZATION IN BECKER + BRAACK PAPER
     -still not working...did you do it wrong? 
-    -no stabilization, hard box, k/U = 60, h = 50 -> starts dipping below 5 at porosity = 0.5
+    -2D no stabilization, hard box, k/U = 60, h = 50 -> starts dipping below 5 at porosity = 0.5
       -becker/braack option only works up to porosity = 0.45
       -milo option works until porosity = 0.25, but fails spectacularly for porosity = 0.2 (shoots to min = -300)
         -in 3D, no stab works up to porosity = 0.6; milo stab works up to 0.5
-        -3D, porosity = 0.2, milo supg, mesh adaptivity -> smoshes out oscillations ~27000 DOFs; min went from -90 in one iteration to 5 in another, with only ~100 DOFs difference between them...
-          -this no longer works if you move the porosity out of the time-derivative term...
+        -3D, porosity = 0.2, milo supg, mesh adaptivity -> smoshes out oscillations ~27000 DOFs; min went from -50 in one iteration to 5 in another, with only ~100 DOFs difference between them...
+          -this no longer works if you move the porosity out of the time-derivative term...gets to about -4 after 30 iterations...
+        -3D, porosity = 0.2, option 4 supg (as in paper), mesh adaptivity 
+          -> -86 to -3 in 30 iterations, to 0.97 in 50 iterations (30500 DOFs), to 0.97 in 100 iterations (max lvl 10, 35000 DOFs) 
+        -3D, porosity = 0.25, option 4 supg (as in paper), mesh adaptivity 
+          -> -54 to 1.0 in 100 iterations (max lvl 10, 35000 DOFs)
+        -3D, porosity = 0.3, option 4 supg (as in paper), mesh adaptivity 
+          -> -30 to 2.8 in 100 iterations (max lvl 10, 34800 DOFs)
+          -> -30 to 4.9 in 150 iterations (max lvl 10, 348000 DOFs)
+        -3D, porosity = 0.2, option 4 supg (porosity in k), mesh adaptivity -> -126 to -113 in 30 iterations...O.o
+          -doesn't even get to 27000 DOFs... <<??
+        -3D, porosity = 0.2, option 4 supg (which version), anisotropic, mesh adaptivity ->
+      -flag by elem fraction instead of error fraction
+        -> number of DOFs increases a lot faster than when error fraction used; if refine_fraction = 0.1, hits 38000 DOFs in one iteration
+        -3D, porosity = 0.2, milo supg, mesh adaptivity -> -104 to 5 in 2 iterations (61000 DOFs)
+          -if let refine_fraciton = 0.01, then hits 5 after 4 iterations (28700 DOFs)
+        -3D, porosity = 0.2, option 4 supg (as in paper), mesh adaptivity, refine_fraciton = 0.01
+          - -86 to 3 in 20 iterations (81000 DOFs)
+        -3D, porosity = 0.2, option 4 supg (porosity in k), mesh adaptivity, refine_fraction = 0.01
+          - -126 to 5 in 4 iterations (29000 DOFs)
+        -3D, porosity = 0.2, option 4 supg (porosity in k), anisotropic, mesh adaptivity, refine_fraction = 0.01
+          - -990
 
 -can we change the setup? so we don't need all this stabilization/refinement? what do we ultimately want from the example?
   -porosity = 0.2 is not unnatural...
+  
+-> if LF is merely isotropic, where would we expect to see cost savings from?
+  -isotropic should be easier for linear solver to handle...also require less adaptivity?
+  -do mesh adaptivity as you go, instead of as pre-processed?
+  
+  -> check that we're refining by elem fraction not error fraction
+  -> convert to 0-1 scale? maybe we're nitpicking tiny details...relative to the max, the oscillation is tiny...
+  -> is there a choice of isotropic diff that would mitigate the discontinuous-diff maybe-refined-is-worse problem? and also make sense physically?
+    -> if we address the interface issue, that would make this 'stronger'...gather what we know about this issue and see if this is something we can address? ask karen about choosing isotropic?
+    -> just do the thing without considering this and see if you can get savings?
+      -> reusing precond to make adjoint solve cheaper? are we solving auxiliary as cheaply as possible? poke becker+vexler? use precond from forward in auxiliary?
+    
+    
+can you find a way to do web of ideas to organize research thoughts? in terms of concepts...
+  -grouped by question they aim to answer? or linked by such?
+  -poke google? what are those diagrams called? bubble diagrams?

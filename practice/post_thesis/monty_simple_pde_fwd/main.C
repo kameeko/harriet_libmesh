@@ -45,6 +45,8 @@ int main(int argc, char** argv){
   const Real refine_percentage          = infile("refine_percentage", 0.5);
   const Real coarsen_percentage         = infile("coarsen_percentage", 0.5);
   const std::string indicator_type      = infile("indicator_type", "kelly");
+  const bool write_error                = infile("write_error",false);
+  const bool flag_by_elem_frac          = infile("flag_by_elem_frac",true);
       
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -132,6 +134,7 @@ int main(int argc, char** argv){
   
   ExodusII_IO exodusIO = ExodusII_IO(mesh); //for writing multiple timesteps to one file
   
+  Real sol_min = 100.0; //end adaptivity early if oscillations seem squashed
   for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
     {
       std::cout << "\nBeginning Solve " << r_step+1 << std::endl;
@@ -147,74 +150,78 @@ int main(int argc, char** argv){
           
           //print out solution minimum to debug oscillations
           NumericVector<Number> &primal_solution = *system.solution;
-          std::cout << "Solution min: " << primal_solution.min() << std::endl;
+          sol_min = primal_solution.min();
+          std::cout << "Solution min: " << sol_min << std::endl;
           
           // Advance to the next timestep in a transient problem
           system.time_solver->advance_timestep();
    
       } //end stepping through time loop
-                
-      std::cout << "\n  Refining the mesh..." << std::endl;
       
-      // The \p ErrorVector is a particular \p StatisticsVector
-      // for computing error information on a finite element mesh.
-      ErrorVector error;
-      
-      if (indicator_type == "patch")
-        {
-          // The patch recovery estimator should give a
-          // good estimate of the solution interpolation
-          // error.
-          PatchRecoveryErrorEstimator error_estimator;
+      if(sol_min-5.0 < -1.e-2){          
+        std::cout << "\n  Refining the mesh..." << std::endl;
+        
+        // The \p ErrorVector is a particular \p StatisticsVector
+        // for computing error information on a finite element mesh.
+        ErrorVector error;
+        
+        if (indicator_type == "patch")
+          {
+            // The patch recovery estimator should give a
+            // good estimate of the solution interpolation
+            // error.
+            PatchRecoveryErrorEstimator error_estimator;
 
-          error_estimator.estimate_error (system, error);
-        }
-      else if (indicator_type == "kelly")
-        {
+            error_estimator.estimate_error (system, error);
+          }
+        else if (indicator_type == "kelly")
+          {
 
-          // The Kelly error estimator is based on
-          // an error bound for the Poisson problem
-          // on linear elements, but is useful for
-          // driving adaptive refinement in many problems
-          KellyErrorEstimator error_estimator;
+            // The Kelly error estimator is based on
+            // an error bound for the Poisson problem
+            // on linear elements, but is useful for
+            // driving adaptive refinement in many problems
+            KellyErrorEstimator error_estimator;
 
-          error_estimator.estimate_error (system, error);
-        }
-      
-      // Write out the error distribution
-      std::ostringstream ss;
-      ss << r_step;
+            error_estimator.estimate_error (system, error);
+          }
+        
+        // Write out the error distribution
+        if(write_error){
+          std::ostringstream ss;
+          ss << r_step;
 #ifdef LIBMESH_HAVE_EXODUS_API
-      std::string error_output = "error_"+ss.str()+".e";
+          std::string error_output = "error_"+ss.str()+".e";
 #else
-      std::string error_output = "error_"+ss.str()+".gmv";
+          std::string error_output = "error_"+ss.str()+".gmv";
 #endif
-      error.plot_error( error_output, mesh );
-      
-      // This takes the error in \p error and decides which elements
-      // will be coarsened or refined.  Any element within 20% of the
-      // maximum error on any element will be refined, and any
-      // element within 10% of the minimum error on any element might
-      // be coarsened. Note that the elements flagged for refinement
-      // will be refined, but those flagged for coarsening _might_ be
-      // coarsened.
-      mesh_refinement.flag_elements_by_error_fraction (error);
-      
-      // This call actually refines and coarsens the flagged
-      // elements.
-      mesh_refinement.refine_and_coarsen_elements();
-      
-      // This call reinitializes the \p EquationSystems object for
-      // the newly refined mesh.  One of the steps in the
-      // reinitialization is projecting the \p solution,
-      // \p old_solution, etc... vectors from the old mesh to
-      // the current one.
-      equation_systems.reinit ();
-      
-      std::cout << "System has: " << equation_systems.n_active_dofs()
-                << " degrees of freedom."
-                << std::endl;
-      
+          error.plot_error( error_output, mesh );
+        }
+        
+        // This takes the error in \p error and decides which elements
+        // will be coarsened or refined. 
+        if(flag_by_elem_frac)
+          mesh_refinement.flag_elements_by_elem_fraction(error);
+        else
+          mesh_refinement.flag_elements_by_error_fraction (error);
+        
+        // This call actually refines and coarsens the flagged
+        // elements.
+        mesh_refinement.refine_and_coarsen_elements();
+        
+        // This call reinitializes the \p EquationSystems object for
+        // the newly refined mesh.  One of the steps in the
+        // reinitialization is projecting the \p solution,
+        // \p old_solution, etc... vectors from the old mesh to
+        // the current one.
+        equation_systems.reinit ();
+        
+        std::cout << "System has: " << equation_systems.n_active_dofs()
+                  << " degrees of freedom."
+                  << std::endl;
+      }else{
+        break;
+      }
     } //end refinement loop
     
   //use that final refinement

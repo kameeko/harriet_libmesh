@@ -159,14 +159,14 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
         //version 1, copied from MILO code
         double C1 = 4.0;
         double C2 = 2.0;
-        double k = dispTens(0,0);
+        double k = dispTens(0,0)*porosity;
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
         Real h = ctxt.get_elem().hmax();
         tau = 1./((C1*k)/(h*h) + (C2*sqrt(U*U)/h));
       }else if(stab_opt == 2){
         //version 2, from http://ta.twi.tudelft.nl/TWA_Reports/06/06-03.pdf
-        double k = dispTens(0,0);
+        double k = dispTens(0,0)*porosity;
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
         Real h = ctxt.get_elem().hmax();
@@ -178,7 +178,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
         double delta0 = 0.4; //suggested 0.2 <= delta_0 <= 0.5 for linear basis functions
         Real hK = ctxt.get_elem().hmax();
         Real betaK = std::max(std::max(std::abs(U(0)),std::abs(U(1))),std::abs(U(2)));
-        double k = dispTens(0,0);
+        double k = dispTens(0,0)*porosity;
         if(dispTens(0,0) != dispTens(1,1) || dispTens(1,1) != dispTens(2,2))
           std::cout << "SUPG currently assumed isotropic dispersion..." << std::endl;
         tau = delta0*hK*hK/(C*k + betaK*hK);
@@ -186,9 +186,9 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
         //version 4, from http://www.scielo.br/pdf/jbsmse/v32n3/v32n3a13.pdf
         //porosity in this paper is only attached to time derivative...not quite the same as in Ewing+Weeks...
         Real h_e = ctxt.get_elem().hmax();
-        //double Pe_e = 0.5*h_e*(pow((sqrt(U*U),3.)/(U*(dispTens*U))); //as in paper
+        //double Pe_e = 0.5*h_e*(pow(sqrt(U*U),3.)/(U*(dispTens*U))); //as in paper
         //tau = 0.5*(h_e/sqrt(U*U))*std::min(Pe_e/3.,1.); //as in paper
-        double Pe_e = 0.5*h_e*(pow(sqrt(U*U),3.)/(U*(dispTens*U))); //adapted to our equation?
+        double Pe_e = 0.5*h_e*(pow(sqrt(U*U),3.)/(U*(porosity*dispTens*U))); //adapted to our equation?
         tau = 0.5*(h_e/sqrt(U*U))*std::min(Pe_e/3.,1.); //adapted to our equation?
       }else{
         std::cout << "Invalid stabilization option. No stabilization used." << std::endl;
@@ -213,7 +213,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
       {
 	      for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-	        J(i,j) += JxW[qp]
+	        J(i,j) += JxW[qp]*
 	               ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
 			           - (U*dphi[j][qp])*phi[i][qp] // Convection
 			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
