@@ -25,9 +25,9 @@ ny = 66
 nz = 3
 
 #refinement
-max_r_steps = 20
+max_r_steps = 3
 max_r_level = 10
-refine_percentage = 0.01
+refine_percentage = 0.1 #if too low then might have islands of very-refined, which causes issues...
 coarsen_percentage = 0.0
 indicator_type = kelly #kelly or patch
 write_error = false

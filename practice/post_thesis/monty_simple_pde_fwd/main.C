@@ -171,7 +171,7 @@ int main(int argc, char** argv){
             // good estimate of the solution interpolation
             // error.
             PatchRecoveryErrorEstimator error_estimator;
-
+            error_estimator.set_patch_reuse(false); //anisotropy trips up reuse
             error_estimator.estimate_error (system, error);
           }
         else if (indicator_type == "kelly")
