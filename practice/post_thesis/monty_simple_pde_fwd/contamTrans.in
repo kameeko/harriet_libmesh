@@ -15,9 +15,9 @@ dispersivity_transverse_horizontal = 6.0
 dispersivity_transverse_vertical = 0.6
 bsource = -5.0
 
-source_rate = 5.0;
+source_rate = 50.0;
 source_conc = 1000.0;
-source_thickness = 20.0;
+source_thickness = 0.0; #set to zero to have source as boundary influx
 
 use_stabilization = true;
 use_smoothed_box = false;

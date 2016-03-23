@@ -112,9 +112,15 @@ run 2D toy, with numbers scaled? or even same numbers?
           - -990 to -76 in 50 iterations (709000 DOFs)
           - -990 to -600 in 20 iterations (patch, 78000 DOFs)
         -3D, porosity = 0.2, option 4 supg (porosity in k), anisotropic, mesh adaptivity, refine_fraction = 0.1
-          - -990 to
-        -3D, porosity = 0.2, option 4 supg (porosity in k), anisotropic (60-6-6), mesh adaptivity, refine_fraction = 0.01
+          - -990 to -8 in 9 iterations (1640000 DOFs HOLY COW THAT'S A LOT OF DOFs)
+        -3D, porosity = 0.2, option 4 supg (porosity in k), anisotropic (60-6-6), mesh adaptivity, refine_fraction = 0.1
+          - -400 to 3 in 7 iterations (925000 DOFs)
         -> that 0.6 is really bad for oscillations...is there a better way to do source on boundary?
+          -> isn't a boundary source the same as an influx?
+            -isotropic(60) with porosity = 0.2 doesn't even adaptivity with supg option 4...
+            -not so happy with anisotropy though...
+            -> use for data-production, but not for inverse problem? can't quite have variables live in different places...
+          -> or better yet, a dirichlet = 1000 ppb patch?
         -> nicer but still physically reasonable anisotropy?
           - http://info.ngwa.org/gwol/pdf/862540306.PDF -> seems that the dispersivity values used in numerical simulations are much larger than measured (like in dispersivity_in_aquifers), but when used seem to give behavior that matches field data
             -measured values seem to differ by an order of magnitude between long-transhor-transvert
@@ -125,6 +131,7 @@ run 2D toy, with numbers scaled? or even same numbers?
 -> if LF is merely isotropic, where would we expect to see cost savings from?
   -isotropic should be easier for linear solver to handle...also require less adaptivity?
   -do mesh adaptivity as you go, instead of as pre-processed?
+    -> if you're inferring for source and adaptivity depends on where source is...??? find a more benign combo of regular mesh, porosity, and dispersivity? that doesn't need adaptivity? at least to write first round of streamlined code?
   
   -> check that we're refining by elem fraction not error fraction
   -> convert to 0-1 scale? maybe we're nitpicking tiny details...relative to the max, the oscillation is tiny...

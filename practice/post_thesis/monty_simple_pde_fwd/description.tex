@@ -64,7 +64,7 @@ Given these boundary conditions and the alignment of the velocity, axes and boun
 \begin{multline*}
 \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c - nD\nabla c) - w\lambda nc + wf \dV \\
 = \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_\Gamma wn(D\nabla c)\cdot\hat{n} \dA\\
-= \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} c\vec{v}\cdot\hat{n}+5 \dA,
+= \int_\Omega w\frac{\partial (nc)}{\partial t} - w\nabla\cdot(\vec{v}c) - \nabla w\cdot (nD\nabla c) - w\lambda nc + wf \dV + \int_{\Gamma_w} w(c\vec{v}\cdot\hat{n}+5) \dA,
 \end{multline*}
 where $\Gamma_w$ is the west boundary.
 

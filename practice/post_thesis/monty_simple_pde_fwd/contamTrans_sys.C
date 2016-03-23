@@ -49,9 +49,9 @@ void ContamTransSys::init_data(){
 	
 	xlim.push_back(498316.0); xlim.push_back(498716.0); // m
   ylim.push_back(538742.0); ylim.push_back(539522.0); // m
-  if(this->get_mesh().mesh_dimension() == 3)
+  if(this->get_mesh().mesh_dimension() == 3 && source_dz > 0.0)
 	  source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0])*source_dz;
-	else if(this->get_mesh().mesh_dimension() == 2)
+	else if(this->get_mesh().mesh_dimension() == 2 || source_dz == 0.0)
 	  source_vol = (xlim[1] - xlim[0])*(ylim[1] - ylim[0]);
 	water_density = 1.0; // kg/m^3
 	source_zmax = 100.0; // m
@@ -264,10 +264,13 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
 
   bool isWest = false;
-  if (dim == 3)
+  bool isUp = false;
+  if (dim == 3){
     isWest = ctxt.has_side_boundary_id(4);
-  else if (dim == 2)
+    isUp = ctxt.has_side_boundary_id(5);
+  }else if (dim == 2){
     isWest = ctxt.has_side_boundary_id(3);
+  }
 
   //set (in)flux boundary condition on west side
   //homogeneous neumann (Danckwerts) outflow boundary condition on east side
@@ -287,12 +290,23 @@ bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & c
       {
         R(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
       }
-
+      
+      if(isUp 
+        && qside_point[qp](0) >= xlim[0] && qside_point[qp](0) <= xlim[1] 
+        && qside_point[qp](1) >= ylim[0] && qside_point[qp](1) <= ylim[1]) //upper boundary
+      {
+        R(i) += JxW[qp]*(U*face_normals[qp]*c + source_rate*source_conc/(source_vol*water_density)*vx)*phi[i][qp];
+      }
+      
       if(request_jacobian && context.get_elem_solution_derivative())
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
           if(isWest)
+            J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
+          if(isUp 
+              && qside_point[qp](0) >= xlim[0] && qside_point[qp](0) <= xlim[1] 
+              && qside_point[qp](1) >= ylim[0] && qside_point[qp](1) <= ylim[1])
             J(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
 	      }
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
@@ -373,6 +387,7 @@ Point ContamTransSys::forcing(const Point& pt)
                       + pow(std::max(std::max(pt(1)-ylim[1],0.),std::max(ylim[0]-pt(1),0.)),2.)); 
     f(0) = (source_rate*source_conc/(water_density*source_vol))*exp(-ds*dist); // ppb/s
   }
+
 /*  
   //DEBUG - see if smoother source fixes the ridges problem...
   double xcent = 0.5*(xlim[0]+xlim[1]);
@@ -380,5 +395,6 @@ Point ContamTransSys::forcing(const Point& pt)
   double zcent = source_zmax - 0.5*source_dz;
   f(0) = source_rate*source_conc/(water_density*source_vol)*exp(-ds*(pow(pt(0)-xcent,2.0)+pow(pt(1)-ycent,2.0)+pow(pt(2)-zcent,2.0)));
 */
+
   return f;
 }
