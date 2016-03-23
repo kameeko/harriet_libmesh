@@ -9,10 +9,10 @@ fe_family = 'LAGRANGE'
 
 vx = 2.415e-5
 reaction_rate = 0.0
-porosity = 0.2 #0.1
-dispersivity_longitudinal = 60.0
-dispersivity_transverse_horizontal = 6.0
-dispersivity_transverse_vertical = 0.6
+porosity = 0.3 #0.1
+dispersivity_longitudinal = 100.0
+dispersivity_transverse_horizontal = 40.0
+dispersivity_transverse_vertical = 4.0
 bsource = -5.0
 
 source_rate = 50.0;
