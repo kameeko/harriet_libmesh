@@ -42,8 +42,8 @@ int main(int argc, char** argv){
   //const unsigned int dim                = 3;
   const unsigned int max_r_steps        = infile("max_r_steps", 3);
   const unsigned int max_r_level        = infile("max_r_level", 3);
-  const Real refine_percentage          = infile("refine_percentage", 0.5);
-  const Real coarsen_percentage         = infile("coarsen_percentage", 0.5);
+  const Real refine_percentage          = infile("refine_percentage", 0.1);
+  const Real coarsen_percentage         = infile("coarsen_percentage", 0.0);
   const std::string indicator_type      = infile("indicator_type", "kelly");
   const bool write_error                = infile("write_error",false);
   const bool flag_by_elem_frac          = infile("flag_by_elem_frac",true);
@@ -123,7 +123,7 @@ int main(int argc, char** argv){
   solver->initial_linear_tolerance =
     infile("initial_linear_tolerance", 1.e-3);
     
-  // Mesh Refinement object
+  // Mesh Refinement object - to test effect of constant refined mesh (not refined at every timestep)
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.refine_fraction() = refine_percentage;
   mesh_refinement.coarsen_fraction() = coarsen_percentage;

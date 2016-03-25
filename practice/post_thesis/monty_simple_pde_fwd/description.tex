@@ -94,7 +94,7 @@ z+\frac{\beta}{t_f-t_0}\nabla^2f=0\textrm{ in }\Omega_f,\quad\frac{\partial f}{\
 Taking variations with respect to the state gives
 \begin{eqnarray*}
 \frac{\delta\mathcal{L}}{\delta c} &=& \lim_{\epsilon\to0}\frac{1}{\epsilon}(\mathcal{L}(f,c+\epsilon\delta,z)-\mathcal{L}(f,c,z)) \\
-&=& \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega\mathbbm{1}_{obs}(2\delta (c-c^\star)) \dV\dt - \int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial (n\delta)}{\partial t}-\nabla\cdot(\vec{v}\delta)+n\nabla\cdot (D\nabla \delta)-\lambda n \delta + f\right)\dV\dt
+&=& \frac{1}{2}\int_{t_0}^{t_f}\int_\Omega\mathbbm{1}_{obs}(2\delta (c-c^\star)) \dV\dt - \int_{t_0}^{t_f}\int_\Omega z\left(\frac{\partial (n\delta)}{\partial t}-\nabla\cdot(\vec{v}\delta)+n\nabla\cdot (D\nabla \delta)-\lambda n \delta \right)\dV\dt
 \end{eqnarray*}
 Using
 \[
@@ -112,14 +112,14 @@ Using
 gives
 \begin{multline*}
 \frac{\delta\mathcal{L}}{\delta c} = \int_{t_0}^{t_f}\left(\int_\Omega \delta\mathbbm{1}_{obs}(c-c^\star)+n\delta\frac{\partial z}{\partial t} - \delta\vec{v}\cdot\nabla z - \delta n \nabla\cdot(D\nabla z) + \delta\lambda nz \dV \right. \\
- \quad \left. + \int_\Gamma \delta n(D\nabla z)\cdot\hat{n} \dA - \int_{\Gamma_e} \delta z\vec{v}\cdot\hat{n} \dA\right)\dt -\left.z\delta\right\vert_{t_f}
+ \quad \left. + \int_\Gamma \delta n(D\nabla z)\cdot\hat{n} \dA + \int_{\Gamma_e} \delta z\vec{v}\cdot\hat{n} \dA\right)\dt -\left.z\delta\right\vert_{t_f}
 \end{multline*}
 Setting $\frac{\delta\mathcal{L}}{\delta c}=0$ for all perturbations $\delta$ gives
 \begin{eqnarray*}
 & -\frac{\partial (nz)}{\partial t} = -\vec{v}\cdot\nabla z - n\nabla\cdot(D\nabla z) + \lambda nz + \mathbbm{1}_{obs}(c-c^\star)\textrm{ in }\Omega,\\
 & \quad \left.z\right\vert_{t_f}=0,
 \quad n(D\nabla z)\cdot\hat{n}=0\textrm{ on }\Gamma\backslash\Gamma_e,
-\quad (\vec{v}z-n(D\nabla z))\cdot\hat{n} = 0\textrm{ on }\Gamma_e
+\quad (\vec{v}z+n(D\nabla z))\cdot\hat{n} = 0\textrm{ on }\Gamma_e
 \end{eqnarray*}
 
 Taking variations with respect to the adjoint recovers the governing equation.

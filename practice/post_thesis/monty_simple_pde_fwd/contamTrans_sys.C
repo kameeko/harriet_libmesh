@@ -99,6 +99,7 @@ void ContamTransSys::init_context(DiffContext & context){
 	c_elem_fe->get_JxW();
 	c_elem_fe->get_phi();
 	c_elem_fe->get_dphi();
+	c_elem_fe->get_d2phi();
 	c_elem_fe->get_xyz();
 
 	c_side_fe->get_JxW();
@@ -122,6 +123,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 
   const std::vector<std::vector<Real> >& phi = c_elem_fe->get_phi();
   const std::vector<std::vector<RealGradient> >& dphi = c_elem_fe->get_dphi();
+  const std::vector<std::vector<RealTensor> >& d2phi = c_elem_fe->get_d2phi();
 
   // Physical location of the quadrature points
   const std::vector<Point>& qpoint = c_elem_fe->get_xyz();
@@ -145,6 +147,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
   {
     Number c = ctxt.interior_value(c_var, qp);
     Gradient grad_c = ctxt.interior_gradient(c_var, qp);
+    NumberTensorValue hess_c = ctxt.interior_hessian(c_var, qp); //for SUPG
 
     Point f = this->forcing(qpoint[qp]);
     Number fc = f(0);
@@ -206,7 +209,8 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 		       + fc*phi[i][qp]); // Source term
 		  if(useSUPG)
 		    R(i) += JxW[qp]*((tau*U*dphi[i][qp])*
-		           (- (U*grad_c) // Convection Term
+		           (porosity*dispTens.contract(hess_c) //Dispersion term
+		           - (U*grad_c) // Convection Term
 		           - (react_rate*(porosity*c)) // Reaction Term
 		           + fc)); // Source term
       if (request_jacobian && ctxt.get_elem_solution_derivative())
@@ -219,7 +223,8 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 			           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
 			    if(useSUPG)
 			      J(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
-		                 (- (U*dphi[j][qp]) // Convection Term
+		                 (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
+		                 - (U*dphi[j][qp]) // Convection Term
 		                 - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
 	      } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())

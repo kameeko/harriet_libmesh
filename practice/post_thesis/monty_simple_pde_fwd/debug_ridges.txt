@@ -119,7 +119,7 @@ run 2D toy, with numbers scaled? or even same numbers?
           -> isn't a boundary source the same as an influx?
             -isotropic(60) with porosity = 0.2 doesn't even adaptivity with supg option 4...
             -not so happy with anisotropy though...
-            -> use for data-production, but not for inverse problem? can't quite have variables live in different places...
+            -> use for data-production, but not for inverse problem? can't quite have variables live in different places...handy for avoiding inverse crime though, since we have no noise...
           -> or better yet, a dirichlet = 1000 ppb patch?
         -> nicer but still physically reasonable anisotropy?
           - http://info.ngwa.org/gwol/pdf/862540306.PDF -> seems that the dispersivity values used in numerical simulations are much larger than measured (like in dispersivity_in_aquifers), but when used seem to give behavior that matches field data
@@ -131,8 +131,10 @@ run 2D toy, with numbers scaled? or even same numbers?
 -> if LF is merely isotropic, where would we expect to see cost savings from?
   -isotropic should be easier for linear solver to handle...also require less adaptivity?
   -do mesh adaptivity as you go, instead of as pre-processed?
+**********
     -> if you're inferring for source and adaptivity depends on where source is...??? find a more benign combo of regular mesh, porosity, and dispersivity? that doesn't need adaptivity? at least to write first round of streamlined code?
-  
+        -(100-40-4) works, with porosity = 0.3 and 92x66x20 mesh ...
+**********  
   -> check that we're refining by elem fraction not error fraction
   -> convert to 0-1 scale? maybe we're nitpicking tiny details...relative to the max, the oscillation is tiny...
   -> is there a choice of isotropic diff that would mitigate the discontinuous-diff maybe-refined-is-worse problem? and also make sense physically?
