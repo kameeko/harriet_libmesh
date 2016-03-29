@@ -26,6 +26,9 @@
 #include "contamTrans_inv.h"
 #include "initial.h"
 
+//for debugging
+#include "libmesh/sparse_matrix.h"
+
 int main(int argc, char** argv){
 
 	//initialize libMesh
@@ -47,6 +50,8 @@ int main(int argc, char** argv){
   const std::string indicator_type      = infile("indicator_type", "kelly");
   const bool write_error                = infile("write_error",false);
   const bool flag_by_elem_frac          = infile("flag_by_elem_frac",true);
+  
+  const bool printJ                     = infile("print_jac",false); //DEBUG
       
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -226,6 +231,15 @@ int main(int argc, char** argv){
       
       system.solve();
       system.postprocess();
+      
+      //DEBUG
+      if(printJ){
+        std::ostringstream Jfile_name;
+        Jfile_name << "J.dat";
+        std::ofstream outputJ(Jfile_name.str());
+        system.matrix->print(outputJ);
+        outputJ.close();
+      }
       
       Number QoI_computed = system.get_QoI_value("computed", 0);
       std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;

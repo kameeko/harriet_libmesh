@@ -29,8 +29,8 @@ void ContamTransSysInv::init_data(){
   unsigned int poly_order = infile("poly_order",1);
   std::string fefamily = infile("fe_family", std::string("LAGRANGE"));
   c_var = this->add_variable("c", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
-  f_var = this->add_variable("f", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
   z_var = this->add_variable("z", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
+  f_var = this->add_variable("f", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
 
   //indicate variables that change in time
   this->time_evolving(c_var);
@@ -43,7 +43,18 @@ void ContamTransSysInv::init_data(){
 	this->print_jacobians = infile("print_jacobians", false);
 	this->print_element_jacobians = infile("print_element_jacobians", false);
 
-	//set Dirichlet boundary conditions (none in this case)
+	//set Dirichlet boundary conditions
+	std::set<boundary_id_type> all_bdys;
+	all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); 
+	if(dim == 3){
+	  all_bdys.insert(4); all_bdys.insert(5);
+  }
+	std::vector<unsigned int> just_f;
+	just_f.push_back(f_var);
+	just_f.push_back(c_var); //DEBUG
+	just_f.push_back(z_var); //DEBUG
+	ZeroFunction<Number> zero;
+	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
 
 	//set parameters
 	vx = infile("vx", 2.415e-5); // m/s
@@ -339,7 +350,6 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
 	DenseSubVector<Number> &Rz = ctxt.get_elem_residual( z_var );
 	//Rf gets no contribution from sides
 
-
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
 
   bool isWest = false;
@@ -379,7 +389,7 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
           if(isWest)
             J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
           if(isEast)
-            J_c_z(i,i) += JxW[qp]*(-U*face_normals[qp]*phi[j][qp])*phi[i][qp];
+            J_c_z(i,j) += JxW[qp]*(-U*face_normals[qp]*phi[j][qp])*phi[i][qp];
 	      }
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
     } //end of outer dof (i) loop

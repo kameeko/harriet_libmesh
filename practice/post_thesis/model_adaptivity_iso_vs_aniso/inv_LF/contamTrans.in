@@ -15,6 +15,9 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 40.0
 bsource = -5.0
 
-use_stabilization = true;
+use_stabilization = false;
 stabilization_option = 4;
 
+data_file = Measurements0.dat
+
+beta = 1.e-5
