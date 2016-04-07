@@ -102,5 +102,7 @@ public:
   
   //options for QoI location and nature
   int qoi_option;
+  
+  bool nondim; //whether to nondimensionalize equations
 
 };

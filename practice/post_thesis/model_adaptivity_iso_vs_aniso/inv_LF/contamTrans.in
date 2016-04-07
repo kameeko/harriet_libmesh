@@ -7,17 +7,19 @@ print_element_jacobians = false
 poly_order = 1
 fe_family = 'LAGRANGE'
 
-vx = 2.415e-5
+vx = 0.5 #762.11604 m/yr or 2.415e-5 m/s
 reaction_rate = 0.0
-porosity = 0.3 #0.1
-dispersivity_longitudinal = 40.0
-dispersivity_transverse_horizontal = 40.0
-dispersivity_transverse_vertical = 40.0
+porosity = 1.0 #0.3 #0.1
+dispersivity_longitudinal = 0.2
+dispersivity_transverse_horizontal = 0.2
+dispersivity_transverse_vertical = 0.2
 bsource = -5.0
 
 use_stabilization = false;
 stabilization_option = 4;
 
-data_file = Measurements0.dat
+data_file = long_channel_data3_3d.dat #Measurements0.dat;
 
-beta = 1.e-5
+beta = 1.e-3;
+
+nondimensionalize = true;

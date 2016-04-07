@@ -51,8 +51,8 @@ void ContamTransSysInv::init_data(){
   }
 	std::vector<unsigned int> just_f;
 	just_f.push_back(f_var);
-	just_f.push_back(c_var); //DEBUG
-	just_f.push_back(z_var); //DEBUG
+	//just_f.push_back(c_var); //DEBUG
+	//just_f.push_back(z_var); //DEBUG
 	ZeroFunction<Number> zero;
 	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
 
@@ -69,6 +69,20 @@ void ContamTransSysInv::init_data(){
 	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
 	                            0.0, vx*dtransh, 0.0,
 	                            0.0, 0.0, vx*dtransv);
+	                            
+  nondim = infile("nondimensionalize",false);
+  if(nondim){
+    NumberTensorValue invDisp = dispTens.inverse();
+    NumberVectorValue U(vx, 0.0, 0.0);
+    NumberVectorValue Uscaled = (1./porosity)*invDisp*U;
+    vx = Uscaled(0);
+    dispTens(0,0) = 1.0;
+    dispTens(1,1) = 1.0;
+    dispTens(2,2) = 1.0;
+    porosity = 1.0;
+    if(react_rate != 0.0)
+      std::cout << "AAAHHHH need to figure out how to non-dimensionalize reaction..." << std::endl;
+  }
 
   useSUPG = infile("use_stabilization",false);
   stab_opt = infile("stabilization_option",1);
@@ -299,11 +313,13 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
       }
       
       for (unsigned int i=0; i != n_c_dofs; i++){
-	  		Rc(i) += -(cpred - cstar)*point_phi[i];
+	  		//Rc(i) += -(cpred - cstar)*point_phi[i]; //to match nandbg...also sign on beta*grad_f was wrong...need to fix description...
+	  		Rc(i) += (cpred - cstar)*point_phi[i];
   
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++)
-						J_c_c(i,j) += -point_phi[j]*point_phi[i] ;
+					  J_c_c(i,j) += point_phi[j]*point_phi[i] ;
+						//J_c_c(i,j) += -point_phi[j]*point_phi[i] ;
 			  }
   
 			}

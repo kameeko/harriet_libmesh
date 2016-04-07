@@ -22,8 +22,61 @@ nan residual?? after the linear solve...c doesn't seem to have moved from initia
           -interior terms look the same as in old cd_all inverse system...
           -matlab says rank is 417/432; if velocity increased to 2.415 (remove e-5 factor), then matlab thinks it's full rank...scaling problem? even with inceased velocity, still get nan...
           -do not get nan if superlu used with regular velocity, but then qoi becomes negative...same for original non-Diri BCs...
+            -superlu is not the way to go...on 92x66x5 mesh, even bassi chokes...doesn't finish after 30 minutes...
+          -if using inputs for HF for long_channel_stash/qoi2_setup02/HF, recover recorded QoI using superlu, but also get nan residual using default solver; Jacobian on coarser mesh is full rank
+          
+    system    mesh    variation                             gmres           gmres w/shift           superlu       rank(J)       cond(J)
+    nandbg    25x5                                    fails, resid e7                               resid e-17    468/468 **      e3
+    nandbg    15x3                                    resid e-14                                    resid e-17    192/192 **      e3
+    invLF     5x5x3   f homo diri, no supg            fails, resid nan                              resid e-10    422/432 (same with fixed beta/gradf signs)
+    invLF     5x5x3   f homo diri, vel*e5, no supg    fails, resid nan                              resid e-9     429/432
+    invLF     5x5x3   f homo diri, vel*e6, no supg    fails, resid nan                              inex newt fails, resid e-8)         
+    invLF     46x33x3  f homo diri, vel*e6, no supg                         inex newt fails, (resid e-1) resid e-9
+    invLF     46x33x3  f homo diri, vel*e6, no supg, disp 400               inex newt fails, (resid e-2) resid e-8
+    invLF     46x33x3  f homo diri, vel*e6, no supg, disp 4000              inex newt fails
+    invLF     5x5x3   all homo diri, no supg          fails, resid nan                              resid e-7     417/432
+    invLF     5x5x3   all homo diri, vel*e5, no supg  fails, resid nan                              resid e-7     432/432 **      e11
+    invLF     5x5x3   all homo diri, vel*e6, no supg                        resid e-1 (9 order reduction)         432/432 **      e9
+    invLF     5x5x3   all homo diri, vel*e6, #4 supg                        resid e-2 (10 order reduction)        432/432 **      e9
+    invLF     46x33x3  all homo diri, vel*e6, no supg                       resid e-4 (11 order reduction)        
+    invLF     5x5x3   all homo diri, vel*e5, no supg, disp 400              resid e-2 (10 order reduction)        432/432 **      e9
+    invLF     5x5x3   all homo diri, vel*e5, #4 supg, disp 400              resid e-1 (9 order reduction)         432/432 **      e9
+    invLF     5x5x3   all homo diri, vel/decade, no supg, disp 400          resid e-2 (9 order reduction)         432/432 **      e12
+    invLF     5x5x3   all homo diri, option 4 supg    fails, resid nan                              resid e-7     417/432  
+    invLF     5x5x3   f homo diri, option 4 supg      fails, resid nan                              resid e-9     422/432 
+    nandbg    5x5x3   all homo diri, no supg          fails, resid nan                              resid e-7     417/432
+    fwd       5x5x3   iso 40                          resid e-7                                     resid e-10    144/144 **      e2  
+    nandbg    25x5x5  gave data z-coord, else same    fails, resid nan      resid e-9               resid e-16    TOO LARGE TO READ INTO MATLAB
+    nandbg    15x3x3  gave data z-coord, else same    fails, resid nan      resid e-11              resid e-15    768/768 **      e3
+    nandbg    15x3x3  gave data z-coord, just f diri                        resid e-12                            768/768 **      e6
+    nandbg    15x3x3  gave data z-coord, just f diri, const v=0.5           resid e-11                           
+    
+    -nondimensionalize, compare current nandebug (put old nandbg params into invLF code?)?
+      --wouldn't change the peclet number...is that what's really at the heart of f-homo-diri cases skimming singularity?
+      -first implement last nandbg in inv_LF
+        -sign on beta*grad_c and cpred-cstar were inconsistent...if match nandbg, then recover same qoi..if flip signs, then newton solve fails...
+      -how to nondimensionalize with tensor diff? do you also scale domain?
+        -without scaling domain, dividing by tensor*disp -> current nondimensionalization messes up 15x3x3 nandbg qoi...(should be 1.05191)
+    -or maybe you really do need to go parallel?
+    
+    -> add pc_factor_shift_type nonzero:
+    ./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels -pc_factor_shift_type nonzero
+      -> singularity of J perhaps related to velocity term being too small relative to element size? maybe forward and adjoint, which only differ by sign of velocity, look too similar? no, one acts on adjoint and one acts on state...different columns...
+        -> only velocity and reaction use time...
+      -> on bassi
+          92x66x3
+            iso, all homo diri - almost 3 hours of "alive time", but only 6 minutes of "active time"...
+            iso, f homo diri - 8.3 hours of "active time", but about 12.2 hours of "alive time"...
+            iso, no diri
+            aniso, f homo diri
+            aniso, no diri
+          184x132x4
+            iso, f homo diri
+            iso, no diri
+            aniso, f homo diri
+            aniso, no diri
         
-bart says he has an example that would be applicable to master's and easy to apply in milo?
+bart told karen he has an example that would be applicable to master's and easy to apply in milo?
 --> focus on getting the two papers written and submitted this semester before opening more cans...will help you narrow down your ideas and see what work can/should still be done...and to understand what it means to have something finished...you should be expecting to get 2-3 papers from thesis...
 
 karen will be at mit 4/6-7
