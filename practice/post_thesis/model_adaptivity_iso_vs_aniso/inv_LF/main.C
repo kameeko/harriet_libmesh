@@ -28,6 +28,7 @@
 
 //for debugging
 #include "libmesh/sparse_matrix.h"
+#include "libmesh/gmv_io.h"
 
 int main(int argc, char** argv){
 
@@ -68,18 +69,18 @@ int main(int argc, char** argv){
     MeshTools::Generation::build_square(mesh, nx, ny, 497150.0, 501750.0, 537350.0, 540650.0, QUAD9);
   }else{
     dim = 3;
-    //MeshTools::Generation::build_cube(mesh, 
-    //                                  nx, ny, nz, 
-    //                                  497150.0, 501750.0, 
-    //                                  537350.0, 540650.0, 
-    //                                  0.0, 100.0, 
-    //                                  HEX27);
-    MeshTools::Generation::build_cube (mesh, 
-																					15, 3, 3,
-                                         -0.0, 5.0,
-                                        -0.0, 1.0,
-                                         -0.0, 1.0,
-                                        HEX27); //DEBUG
+    MeshTools::Generation::build_cube(mesh, 
+                                      nx, ny, nz, 
+                                      497150.0, 501750.0, 
+                                      537350.0, 540650.0, 
+                                      0.0, 100.0, 
+                                      HEX27);
+    //MeshTools::Generation::build_cube (mesh, 
+		//																			15, 3, 3,
+    //                                     -0.0, 5.0,
+    //                                    -0.0, 1.0,
+    //                                     -0.0, 1.0,
+    //                                    HEX27); //DEBUG
   }
   
   // Print information about the mesh to the screen.
@@ -141,6 +142,10 @@ int main(int argc, char** argv){
   mesh_refinement.refine_fraction() = refine_percentage;
   mesh_refinement.coarsen_fraction() = coarsen_percentage;
   mesh_refinement.max_h_level() = max_r_level;
+  
+#ifdef LIBMESH_HAVE_GMV
+  GMVIO(equation_systems.get_mesh()).write_equation_systems(std::string("invLF.gmv"), equation_systems); //DEBUG
+#endif
 
   // Print information about the system to the screen.
   equation_systems.print_info();

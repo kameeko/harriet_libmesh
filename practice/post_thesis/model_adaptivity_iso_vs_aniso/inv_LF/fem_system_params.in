@@ -22,7 +22,7 @@ absolute_residual_tolerance = 1.e-13
 #discretization
 nx = 5 #92
 ny = 5 #66
-nz = 3
+nz = 4
 
 #refinement
 max_r_steps = 0

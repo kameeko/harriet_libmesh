@@ -51,10 +51,18 @@ void ContamTransSysInv::init_data(){
   }
 	std::vector<unsigned int> just_f;
 	just_f.push_back(f_var);
-	//just_f.push_back(c_var); //DEBUG
-	//just_f.push_back(z_var); //DEBUG
+	just_f.push_back(c_var); //DEBUG
+	just_f.push_back(z_var); //DEBUG
 	ZeroFunction<Number> zero;
 	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
+  
+	//DEBUG: influx side as Diri instead of flux BC
+	ConstFunction<Number>five(5.0);
+	std::vector<unsigned int> just_c; just_c.push_back(c_var);
+	std::vector<unsigned int> just_z; just_z.push_back(z_var);
+	std::set<boundary_id_type> westside; westside.insert(4); 
+	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &five));
+	this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
 
 	//set parameters
 	vx = infile("vx", 2.415e-5); // m/s
@@ -71,7 +79,7 @@ void ContamTransSysInv::init_data(){
 	                            0.0, 0.0, vx*dtransv);
 	                            
   nondim = infile("nondimensionalize",false);
-  if(nondim){
+  if(nondim){ //not yet debugged!
     NumberTensorValue invDisp = dispTens.inverse();
     NumberVectorValue U(vx, 0.0, 0.0);
     NumberVectorValue Uscaled = (1./porosity)*invDisp*U;
@@ -393,8 +401,8 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
 
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
-      if(isWest) //west boundary
-        Rz(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
+      //if(isWest) //west boundary
+      //  Rz(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
       if(isEast)
         Rc(i) += JxW[qp]*(-U*face_normals[qp]*z)*phi[i][qp];
       
@@ -402,8 +410,8 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-          if(isWest)
-            J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
+          //if(isWest)
+          //  J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
           if(isEast)
             J_c_z(i,j) += JxW[qp]*(-U*face_normals[qp]*phi[j][qp])*phi[i][qp];
 	      }
