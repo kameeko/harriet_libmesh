@@ -6,7 +6,7 @@ LIBMESH_DIR = ~/software/libmesh-0.9.5_build_petsc
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
 
-target			:= ./diff_convdiff_mprime-$(METHOD)
+target			:= ./convdiff_mprime_getadj-$(METHOD)
 
 # include my common application options
 include Make_template
