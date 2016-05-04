@@ -15,9 +15,6 @@ k = 0.1   #1.0 #0.1
 #reaction coefficient
 R = -42.0
 
-#whether we want to do continuation (from psiLF_split.xda)
-do_continuation = true
-
 #QoI option
 QoI_option = 3
 

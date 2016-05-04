@@ -1,7 +1,7 @@
 # $Id: Makefile,v 1.8 2008-10-16 18:04:01 roystgnr Exp $
 
 # The location of the mesh library
-LIBMESH_DIR = ~/software/libmesh_build6_superlu
+LIBMESH_DIR = ~/software/libmesh-0.9.5_build_petsc
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
