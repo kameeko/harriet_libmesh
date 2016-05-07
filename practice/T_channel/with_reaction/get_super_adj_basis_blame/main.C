@@ -22,6 +22,7 @@
 #include "libmesh/sparse_matrix.h" //DEBUG
 
 #include "libmesh/dof_map.h" //alternate error breakdown
+#include "libmesh/direct_solution_transfer.h"
 
 // The main program
 int main(int argc, char** argv)
@@ -48,9 +49,11 @@ int main(int argc, char** argv)
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
   Mesh mesh(init.comm());
+  Mesh mesh2(init.comm()); 
   GetPot infileForMesh("convdiff_mprime.in");
   std::string find_mesh_here = infileForMesh("mesh","psiLF_mesh.xda");
   mesh.read(find_mesh_here);
+  mesh2.read(find_mesh_here); 
 	
   std::cout << "Read in mesh from: " << find_mesh_here << "\n\n";
 
@@ -70,14 +73,19 @@ int main(int argc, char** argv)
 
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
+  EquationSystems equation_systems2(mesh2);
  
   // Name system
   ConvDiff_MprimeSys & system = 
     equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
+  ConvDiff_MprimeSys & system2 = 
+    equation_systems2.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys");
       
   // Steady-state problem	
   system.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system));
+  system2.time_solver =
+    AutoPtr<TimeSolver>(new SteadySolver(system2));
 
   // Sanity check that we are indeed solving a steady problem
   libmesh_assert_equal_to (n_timesteps, 1);
@@ -402,15 +410,30 @@ int main(int argc, char** argv)
 		output.close();
 		
 		//error-breakdown, with contributions assigned to basis functions instead of elements
+		equation_systems2.init();
+		DirectSolutionTransfer sol_transfer(init.comm());
+		sol_transfer.transfer(system.variable(system.variable_number("aux_c")),
+			system2.variable(system2.variable_number("aux_c")));
+		sol_transfer.transfer(system.variable(system.variable_number("aux_zc")),
+			system2.variable(system2.variable_number("aux_zc")));
+		sol_transfer.transfer(system.variable(system.variable_number("aux_fc")),
+			system2.variable(system2.variable_number("aux_fc")));
 		std::string write_error_basis_blame = infileForMesh("error_est_output_file_basis_blame", "error_est_breakdown_basis_blame.dat");
 		AutoPtr<NumericVector<Number> > adjresid_basis_blame = system.solution->clone();
 		adjresid_basis_blame->zero();
 		adjresid_basis_blame->pointwise_mult(*system.rhs,dual_solution); 
-	  std::cout << "\n 0.5*M'_HF(psiLF)(superadj): " << 0.5*adjresid_basis_blame->sum() << std::endl; //check
+	  std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << -0.5*adjresid_basis_blame->sum() << std::endl; //check
+	  AutoPtr<NumericVector<Number> > LprimeHF_psiLF_basis_blame = system.solution->clone();
+	  LprimeHF_psiLF_basis_blame->zero();
+	  LprimeHF_psiLF_basis_blame->pointwise_mult(*system.rhs,*system2.solution);
+	  std::cout << " L'_HF(psiLF): " << LprimeHF_psiLF_basis_blame->sum() << " vs " 
+	    << system.get_MHF_psiLF()-system.get_MLF_psiLF() << std::endl; //check
+	  std::cout << " QoI error estimate: " << std::setprecision(17) 
+	    << -0.5*adjresid_basis_blame->sum()+LprimeHF_psiLF_basis_blame->sum() << std::endl; //check
 	  std::ofstream output2(write_error_basis_blame);
     for(unsigned int i = 0 ; i < adjresid_basis_blame->size(); i++){
 	    if(output2.is_open())
-	      output2 << (*adjresid_basis_blame)(i) << "\n";
+	      output2 << -0.5*(*adjresid_basis_blame)(i) + (*LprimeHF_psiLF_basis_blame)(i) << "\n";
 	  }
 	  output2.close();
 	  //DOF maps and such to help visualize
