@@ -46,7 +46,7 @@ The rest of the paper is organized as follows, Section~\ref{} presents the mathe
   \item alternate/additional example: use setup from B+V? navier-stokes and another model? 
     \bit
     \item potential flow? model flow as sum of elementary flows; but then parameters would be magnitudes of elementary flows, which has no spatial location...is that a problem for the algorithm or just for interpreting error breakdown?
-    \item there would still be the question of how to interface the models...
+    \item there would still be the question of how to interface the models...(in stokes vs navier-stokes foward paper, they just required continuity of state variables (velocity field and presssure))
     %do scalar + field for infer BCs on BV NS thing? try for different QoIs? (can we have a variable live on a boundary while the rest are inside? vikram will poke roy about implementing)
     %stokes is good in slow flows...not in boundary layer cuz gradient is high...
     %what situation would it make sense to use the LF model in some place?

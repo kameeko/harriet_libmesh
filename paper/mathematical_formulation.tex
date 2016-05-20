@@ -178,6 +178,8 @@ I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF}
 
 The error estimate (\ref{eq:finErrExp}) is general and the lower-fidelity model can also be a mixed-fidelity model that combines the high- and low-fidelity model. Given a low-fidelity model and a high-fidelity model, an intermediate, mixed-fidelity (MF) model can be formed by using the high-fidelity model in some parts of the domain, and the low-fidelity model in the rest of the domain. Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, the error estimate (\ref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. 
 
+\red{We should include something about how to map error to elements to refine...}
+
 %------------------------------------------------------------%
 \subsection{Approximations in Practice}
 %------------------------------------------------------------%
