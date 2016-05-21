@@ -1,4 +1,4 @@
-\section{Numerical Experiments}
+\section{Numerical Experiments}\label{sect:numexp}
 \red{Don't forget to trim figures and convert them to pdfs!}
 
 \subsection{Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
@@ -102,19 +102,3 @@ It can be seen that in this case, while the error estimates are not exact due to
 \end{figure}
 
 \subsection{Constant vs Field Parameters}
-
-\subsection{Cost Comparison}
-
-\subsubsection{Simple Cost Analysis}
-
-Consider a situation like that described in Section \ref{sec:cdvcdr}, where the state, adjoint, and parameter variables each have $N$ degrees of freedom. Suppose the low-fidelity model is linear, so that the cost of solving the inverse problem with the low-fidelity model (or with a mixed-fidelity model that is low-fidelity in most of the domain), is on the order of $(3N)^g$, where $g$ depends on the linear solver used. The cost for computing the auxiliary variables is also on the order of $(3N)^g$, and the cost for computing the supplementary adjoint is on the order of $(6N)^g$. Thus for $T$ iterations of the adaptive algorithm (where $T=1$ if one only calculates the error estimate relative to the low-fidelity model), the cost of using the adaptive algorithm is $T(2+2^g)(3N)^g$.
-
-Suppose the inverse problem with the high-fidelity model is sufficiently nonlinear that a good initial guess is needed for convergence; one way to approach this is to use arclength continuation, a standard procedure in commercial nonlinear finite element programs.\footnote{According to Wikipedia...should see if we can confirm this elsewhere...} Letting $L_i$ represent the number of non-linear iterations required at each continuation step, the cost of solving the inverse problem with the high-fidelity model is $\sum_i L_i (3N)^g$. Assuming that the costs of both the high-fidelity inverse problem and adaptive algorithm are dominated by the cost of the linear solves, it is less costly to use Algorithm \ref{alg:refSeries} when $T<(2+2^g)^{-1}\sum_i L_i$. The bound on $T$ is strictest when $g=3$, as in the case where Gaussian elimination is used, giving $T<\frac{1}{10}\sum_i L_i$.
-
-\subsubsection{Cost Comparison Example}
-
-Here we consider the same problem as in Section \ref{sec:cdvcdr}, but with a reaction term $k_r=-616$ in the high-fidelity model. This reaction term is large enough that if the Newton solver will not converge with a zero initial guess. We first solve the inverse problem with the low-fidelity model ($k_r=0$), and then use the natural continuation approach, using the solution at one value of $k_r$ as the initial guess for the next.\footnote{NOT arclength continuation, which is more difficult to implement, though libMesh appears to have a class for such continuation, which we can use if this seems like a viable direction...}, We increase the reaction term in increments of $\Delta k_r=100$, and halve the increment each time the step is too large (Newton solver does not converge at the next $k_r$ value). From $k_r=0$ to $k_r=-616$, this results in 9 continuation steps being taken, with $\sum_i L_i=30$ linear solves of $N\times N$ systems required.
-
-Since the low-fidelity model is linear in this case, solving for the primary and auxiliary variables takes one linear solve of an $N\times N$ system each. The error estimate is then used to choose $10\%$ of the domain in which to use the high-fidelity model. For this amount of refinement, the estimated relative error is $<1\%$; estimating the error requires five $N\times N$ linear solves for the primary variables and one linear $N\times N$ solve for the auxiliary variables. If adaption stops at this point, then the adaptive algorithm will have required $8+2(2^g)$ solves of $N\times N$ systems. For $g=3$ (Gaussian elimination), this amounts to 24 solves; with iterative methods where $g<3$, this number is smaller.
-
-%does B+V's method for 'cheaply' getting auxiliary variables not really work when parameters are a field and not handful of scalars? does it even matter, since bulk of costs seem to be going to super-adjoint?
