@@ -1,0 +1,98 @@
+\section{Inference Algorithm and Complexity Analysis}\label{sect:alg}
+%
+Based on the above discussion and the theoretical developments in the last section, we present below a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
+%
+\subsection{Goal Oriented Inference Algorithm}
+%
+Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, the error estimate (\ref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. \red{We should include something about how to map error to elements to refine.} We present below an algorithm that accomplishes the above goals.
+%
+\alglanguage{pseudocode}
+\begin{algorithm}[h!]
+\small
+\caption{An algorithm to adaptively build a mixed-fidelity model for low error in the QoI.}
+\label{alg:refSeries}
+\begin{algorithmic}[1]
+\State{Define maximum acceptable absolute relative QoI error \texttt{errTol}}
+\State{Define maximum number of adaptive iterations \texttt{maxIter}}
+\Procedure{$\texttt{BuildMF}$}{HF model, LF model, \texttt{errTol}, \texttt{maxIter}}
+	\State{Let the model MF$_0$ be the LF model applied everywhere in the domain.}
+	\State{$i\gets0$}
+	\State{Solve for stationary point $\Psi_{MF_0}$ of augmented Lagrangian $\mathcal{M}_{MF_0}$}
+	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for 
+	
+	supplementary adjoint $\Lambda_0$ (see Equation (\ref{eq:superAdjEq}))}
+	\State{Compute QoI error estimate
+		
+	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
+	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
+	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/I(q_{MF_i},u_{MF_i})|>$ \texttt{errTol}}
+		\State{\begin{varwidth}[t]{\linewidth}Localize $e_{I,i}$ and use this element-wise decomposition to guide formation \par\hskip\algorithmicindent of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+		\State{$i\gets i+1$}
+		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
+		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for 
+		
+		$\quad\quad$supplementary adjoint $\Lambda_i$ (see Equation (\ref{eq:superAdjEq}))}
+		\State{Compute QoI error estimate
+		
+		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$}
+		\State{Calculate QoI $I(q_{MF_i},u_{MF_i})$}
+	\EndWhile \\
+\Return{model MF$_i$ and QoI estimate $I(q_{MF_i},u_{MF_i})$}
+\EndProcedure
+\Statex
+\end{algorithmic}
+\end{algorithm}
+%
+
+Note that the QoI error adjoint problem (\ref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
+
+Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
+% 
+\subsection{Complexity Analysis}
+%
+We now derive the computational complexity of using algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an 'all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
+
+If one utilizes algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
+%
+\begin{align}
+\label{eq:cost_adapt}
+C_{MF} &= \sum_{i=1}^{T}L_{i}(3N)^{\gamma} + 1(3N)^{\gamma} + 2^{\gamma}(3N)^{\gamma} \nonumber \\
+&= \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) (3N)^{\gamma}
+\end{align}
+% 
+where $L_i$ is the number of nonlinear solver steps needed to solve the KKT system for the low or mixed fidelity model. The corresponding cost for a nonadaptive algorithm, for a nonlinear inference problem, solved using a continuation scheme is,
+%
+\begin{equation}
+\label{eq:cost_nadapt}
+C_{HF} = \sum_{i=1}^{C}K_{i}(3N)^{\gamma}
+\end{equation}
+% 
+where $K_i$ is the number of nonlinear solver steps needed to solve the KKT system for the high fidelity model, and $C$ is the number of continuation steps.
+
+Comparing Eq.~\eqref{eq:cost_adapt} and~\eqref{eq:cost_nadapt}, we have,
+%
+\begin{equation}
+\label{eq:cost_compare_0}
+C_{MF} < C_{HF} \implies \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) < \sum_{i=1}^{C}K_{i}
+\end{equation}
+%
+If the low and multi-fidelity models are linear or nonlinear in a very small region $L_i \approx 1$, and we have the following condition,
+%
+\begin{equation}
+\label{eq:cost_compare_1}
+T < \frac{\sum_{i=1}^{C}K_{i}}{2 + 2^{\gamma}}
+\end{equation}
+% 
+The bound on $T$ is strictest when $\gamma = 3$, when Gaussian elimination is used, giving $T < \frac{\sum_{i=1}^{C}K_{i}}{10}$.
+%
+\subsubsection{Illustrative Example}
+%
+We consider the convection-diffusion-reaction term described in Section \ref{sec:cdvcdr}, with a reaction term $k_r=-616$ in the high-fidelity model. This reaction term is large enough that the Newton solver will not converge with a zero initial guess. We first solve the inverse problem with the low-fidelity model ($k_r=0$), and then use a simple continuation approach, using the solution at one value of $k_r$ as the initial guess for the next.\footnote{not arclength continuation, which is more difficult to implement, though libMesh appears to have a class for such continuation, which we can use if this seems like a viable direction} We increase the reaction term in increments of $\Delta k_r=100$, and halve the increment each time the step is too large (Newton solver does not converge at the next $k_r$ value). From $k_r=0$ to $k_r=-616$, this results in 9 continuation steps being taken, with $\sum_{i=1}^{C} K_i=30$. With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
+
+In other words, for a highly nonlinear problem, using algorithm~\ref{alg:refSeries}, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, while avoiding any need for continuation to handle nonlinearities. 
+
+%does B+V's method for 'cheaply' getting auxiliary variables not really work when parameters are a field and not handful of scalars? does it even matter, since bulk of costs seem to be going to super-adjoint?
+
+%% Although Equation (\ref{eq:finErrExp}) is exact, the error estimate that can be calculated in practice will not generally be exact. Let us refer to a goal-oriented inverse problem as linear when the state $u$ and parameters $q$ are linearly related, the observation operator $C$ is linear in $u$, the regularization term $R$ is at most quadratic in the parameters, and the QoI functional $I$ is linear in $u$ and $q$. The remainder term $\mathcal{R}(e^3)$ is included in Equation (\ref{eq:finErrExp}) but would not, in practice, be calculated; in the case of a linear goal-oriented inverse problem, the remainder term disappears, but it is nonzero in general. 
+
+%% In motivating our approach, it is assumed that one can most accurately calculate the QoI from the parameter values inferred using the highest-fidelity forward model available, but that solving the inverse problem with this model is prohibitively expensive. It is also assumed that solving the inverse problem with a mixed-fidelity model, where this highest-fidelity model is only used in a portion of the domain, will be cheaper. There is a cost incurred by using our approach to design such a mixed-fidelity model, however, and it will sometimes be the case that the cost of obtaining this mixed-fidelity model exceeds that of just solving the inverse problem with the highest-fidelity model directly. Naively, if the auxiliary variables $\chi$ have $n$ degrees of freedom, they can be found by solving an $n\times n$ linear system, while the supplementary adjoint $\Lambda$ can be found by solving a $2n\times2n$ linear system. The cost of solving for the auxiliary variables can be reduced by using a technique described in \cite{BecVex05}, and the cost of solving for the supplementary adjoint $\Lambda$ can be reduced by reusing preconditioners. In general there are no guarantees that obtaining a mixed-fidelity model that meets the desired QoI error criterion will be less costly than just solving the inverse problem with the high-fidelity model. However, our approach targets problems for which solving the inverse problem with the high-fidelity model is prohibitively expensive, in which case it is expected that the cost of obtaining a satisfactory mixed-fidelity model will be comparatively low. Even in the case where a mixed-fidelity model for which the QoI error is adequately small cannot be found before another limit (for example, a maximum number of adaptive iterations) is reached, one still has an estimate for the error in the QoI without solving the prohibitively expensive inverse problem.
