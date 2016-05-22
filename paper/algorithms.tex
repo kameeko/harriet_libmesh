@@ -1,6 +1,6 @@
 \section{Inference Algorithm and Complexity Analysis}\label{sect:alg}
 %
-Based on the above discussion and the theoretical developments in the last section, we present below a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
+Based on the theoretical developments in the last section, we present below a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
 %
 \subsection{Goal Oriented Inference Algorithm}
 %
@@ -48,9 +48,9 @@ Note that the QoI error adjoint problem (\ref{eq:superAdjEq}) involves lineariza
 
 Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
 % 
-\subsection{Complexity Analysis}
+\subsection{Complexity Analysis}\label{sect:alg_complexity}
 %
-We now derive the computational complexity of using algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an 'all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
+We now derive the computational complexity of using algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
 
 If one utilizes algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
 %
@@ -60,36 +60,31 @@ C_{MF} &= \sum_{i=1}^{T}L_{i}(3N)^{\gamma} + 1(3N)^{\gamma} + 2^{\gamma}(3N)^{\g
 &= \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) (3N)^{\gamma}
 \end{align}
 % 
-where $L_i$ is the number of nonlinear solver steps needed to solve the KKT system for the low or mixed fidelity model. The corresponding cost for a nonadaptive algorithm, for a nonlinear inference problem, solved using a continuation scheme is,
+where $L_i$ is the number of nonlinear solver steps needed to solve the KKT system for the low or mixed fidelity model at each adaptive step. The corresponding cost for solving the high fidelity inference problem, with a nonadaptive algorithm, based on a continuation scheme is,
 %
 \begin{equation}
 \label{eq:cost_nadapt}
 C_{HF} = \sum_{i=1}^{C}K_{i}(3N)^{\gamma}
 \end{equation}
 % 
-where $K_i$ is the number of nonlinear solver steps needed to solve the KKT system for the high fidelity model, and $C$ is the number of continuation steps.
+where $K_i$ is the number of nonlinear solver steps needed to solve the KKT system for the high fidelity model at each continuation step, and $C$ is the number of continuation steps.
 
 Comparing Eq.~\eqref{eq:cost_adapt} and~\eqref{eq:cost_nadapt}, we have,
 %
 \begin{equation}
 \label{eq:cost_compare_0}
-C_{MF} < C_{HF} \implies \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) < \sum_{i=1}^{C}K_{i}
+C_{MF} < C_{HF} \implies \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) < \sum\limits_{i=1}^{C}K_{i}
 \end{equation}
 %
 If the low and multi-fidelity models are linear or nonlinear in a very small region $L_i \approx 1$, and we have the following condition,
 %
 \begin{equation}
 \label{eq:cost_compare_1}
-T < \frac{\sum_{i=1}^{C}K_{i}}{2 + 2^{\gamma}}
+T < \frac{\sum\limits_{i=1}^{C}K_{i}}{2 + 2^{\gamma}}
 \end{equation}
 % 
-The bound on $T$ is strictest when $\gamma = 3$, when Gaussian elimination is used, giving $T < \frac{\sum_{i=1}^{C}K_{i}}{10}$.
+The bound on $T$ will be strictest if Gaussian elimination is used, with $\gamma = 3$, giving $T < \frac{\sum\limits_{i=1}^{C}K_{i}}{10}$.
 %
-\subsubsection{Illustrative Example}
-%
-We consider the convection-diffusion-reaction term described in Section \ref{sec:cdvcdr}, with a reaction term $k_r=-616$ in the high-fidelity model. This reaction term is large enough that the Newton solver will not converge with a zero initial guess. We first solve the inverse problem with the low-fidelity model ($k_r=0$), and then use a simple continuation approach, using the solution at one value of $k_r$ as the initial guess for the next.\footnote{not arclength continuation, which is more difficult to implement, though libMesh appears to have a class for such continuation, which we can use if this seems like a viable direction} We increase the reaction term in increments of $\Delta k_r=100$, and halve the increment each time the step is too large (Newton solver does not converge at the next $k_r$ value). From $k_r=0$ to $k_r=-616$, this results in 9 continuation steps being taken, with $\sum_{i=1}^{C} K_i=30$. With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
-
-In other words, for a highly nonlinear problem, using algorithm~\ref{alg:refSeries}, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, while avoiding any need for continuation to handle nonlinearities. 
 
 %does B+V's method for 'cheaply' getting auxiliary variables not really work when parameters are a field and not handful of scalars? does it even matter, since bulk of costs seem to be going to super-adjoint?
 

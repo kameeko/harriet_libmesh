@@ -46,7 +46,7 @@ In the case of a goal-oriented inverse problem, the ultimate purpose of inferrin
 \subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse \\Problem}  \label{sec:deriv}
 %------------------------------------------------------------------------------%
 %
-For a given hierarchy of models, consider the QoI calculated from inferring the parameters with the highest-fidelity model; we take this QoI to be the value with which we compare other QoI estimates. In this section we derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model, as compared to that which would have resulted from solving the inverse problem with the highest-fidelity model. The main result is,
+For a given hierarchy of models, consider the QoI calculated from inferring the parameters with the highest-fidelity model; we take this QoI to be the value with which we compare other QoI estimates. In this section we derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model. The main result is,
 %
 \begin{theorem}
 \label{thm:error_estimate}
@@ -82,6 +82,7 @@ for the supplementary adjoint $\Lambda$. Then, the error in the Quantity of Inte
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3).
 \end{multline}
 %
+where $\mathcal{R}$ is a remainder term that is third-order in the error $e=\Psi_{HF}-\Psi_{LF}$.
 \end{theorem}
 %
 \begin{proof}
@@ -107,7 +108,7 @@ Applying Proposition 3 from~\cite{BecVex05} for the difference $\mathcal{M}_{HF}
 \label{eq:beckvex}
 \mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
 \end{equation}
-where $\mathcal{R}$ is a remainder term that is third-order in the error $e=\Psi_{HF}-\Psi_{LF}$. Combining Equations (\ref{eq:repIwithM}) and (\ref{eq:beckvex}) we obtain
+Combining Equations (\ref{eq:repIwithM}) and (\ref{eq:beckvex}) we obtain
 \begin{multline}
 \label{eq:preadj}
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}(e^3)\textrm{.}
