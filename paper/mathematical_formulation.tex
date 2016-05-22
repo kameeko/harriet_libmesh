@@ -6,42 +6,39 @@ We first introduce the goal oriented inverse problem formally, providing definit
 \subsection{Problem Setup}  \label{sec:setup}
 %------------------------------------------------------------------------------%
 %
-We seek to infer an unknown parameter $q \in Q$, where $Q$ is a Hilbert space. Consider a state variable $u \in U$, which satisfies a bilinear form $a:U \times U \to \Reals$, such that,
+Let $Q$, $U$ be Hilbert spaces. We seek to infer an unknown parameter $q \in Q$. The parameter is constrained by a state equation, with a state variable $u \in U$, which satisfies a bilinear form $a:U \times U \to \Reals$, such that,
 %
 \begin{equation}
 \label{eq:weakForm}
-a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
+a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U.
 \end{equation}
 %
-where the form $a$ and functional $\ell$ are linear with respect to the arguments in the second pair of parentheses. Further, we define an observation operator $C:U\to\Reals^{n_d}$ that maps the state to $n_d$ predicted observations. The actual observations (data) are denoted by $d\in\R^{n_d}$. 
+The bilinear form $a$ and functional $\ell$ are linear with respect to the arguments in the second pair of parentheses. Further, we define an observation operator $C:U\to\Reals^{n_d}$ that maps the state to $n_d$ predicted observations. The actual observations (data) are denoted by $d\in\R^{n_d}$.
 
 The unknown parameter $q$ can then be inferred by minimizing the difference between the predicted and actual observations, leading to an inverse problem. Such inverse problems are typically ill-posed, since the observations are sparse, and insufficiently informative to uniquely determine the parameters. To make the inverse problem well-posed, a regularization, denoted by $R(q)$, is used to inject prior information or beliefs about the parameters into the formulation. The regularized inverse problem can thus be written as a constrained optimization problem,
 %
 \begin{subequations}
 \label{eq:invOpt}
 \begin{align}
-\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q) \label{eq:invOpt_obj} \\
-\textrm{s.t. }& \quad a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U \label{eq:invOpt_cons}
+\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q), \label{eq:invOpt_obj} \\
+\textrm{s.t. }& \quad a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U. \label{eq:invOpt_cons}
 \end{align}
 \end{subequations}
 %
-where we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the constraints given by Equation (\ref{eq:weakForm}). 
+Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the constraints given by Equation (\ref{eq:weakForm}).
 
-The constraints given by Eq.~\eqref{eq:weakForm} are typically models of physical processes or systems. However, a given physical system need not have a unique model that can describe it; there may be various models of different fidelities. This naturally introduces a hierarchy of models, introducing a tradeoff between fidelity and computational expense. Consider two models with which we infer parameters: the high-fidelity (HF) model and a low fidelity (LF) model. We then have a specific form of Equation (\ref{eq:weakForm}) for the high-fidelity model:
-\begin{equation}
-a_{HF}(u_{HF},q_{HF})(\phi_{HF})=\ell_{HF}(q_{HF})(\phi_{HF}),\quad\forall\phi_{HF}\in U_{HF},
-\end{equation}
-where $u_{HF}\in U_{HF}$ and $q_{HF}\in Q_{HF}$. Similarly, the inverse problem in Equation (\ref{eq:invOpt}) has the specific form
+The constraints given by Eq.~\eqref{eq:weakForm} are typically models of physical processes or systems. However, a given physical system need not have a unique model that can describe it; there may be various models of different fidelities. This naturally introduces a hierarchy of models and, a tradeoff between fidelity and computational expense. Consider two models with which we infer parameters: a high-fidelity (HF) model and a low fidelity (LF) model. We then have a specific form of the inverse problem in Equation (\ref{eq:invOpt}) with this model,
 \begin{equation}
 \begin{array}{r@{}c}
 \min\limits_{q_{HF},u_{HF}} & \quad J_{HF}(q_{HF},u_{HF})=\frac{1}{2}\|d-C_{HF}(u_{HF})\|_2^2 + R_{HF}(q_{HF}) \\ \textrm{s.t. }& \quad a_{HF}(u_{HF},q_{HF})(\phi_{HF})=\ell_{HF}(q_{HF})(\phi_{HF}),\quad\forall\phi_{HF}\in U_{HF},
 \end{array}
 \end{equation}
-for which we have the Lagrangian
-\begin{equation}
-\mathcal{L}_{HF}(q_{HF},u_{HF},z_{HF})= J_{HF}(q_{HF},u_{HF})-(a_{HF}(u_{HF},q_{HF})(z_{HF})-\ell_{HF}(q_{HF})(z_{HF})).
-\end{equation}
-The lower fidelity model can be similarly defined and identified by the subscript $LF$.
+for which we have the Lagrangian,
+\begin{multline}
+\mathcal{L}_{HF}(q_{HF},u_{HF},z_{HF}) = \\
+J_{HF}(q_{HF},u_{HF})-(a_{HF}(u_{HF},q_{HF})(z_{HF})-\ell_{HF}(q_{HF})(z_{HF})).
+\end{multline}
+The inverse problem formulation and Lagrangian with the lower fidelity model can be similarly defined, and be identified with subscript $LF$.
 
 In the case of a goal-oriented inverse problem, the ultimate purpose of inferring the unknown parameters is to calculate some Quantity of Interest (QoI). Assuming a single scalar QoI, we denote this QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. Since our ultimate goal is to compute this QoI, the particular tradeoff we consider is the fidelity and resultant computational expense of the model we use, versus the error in the QoI. We thus seek to introduce the QoI functional $I$ into the inverse problem formulation, by introducing auxilary variables and additional adjoint equations. Then we use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those which occur due to the use of constraints other than those given by Eq.~\eqref{eq:invOpt_cons}.
 %
@@ -94,7 +91,7 @@ Observe that,
 \begin{equation}
 \label{eq:MeqI}
 \mathcal{M}(\Psi)=I(q,u),
-\end{equation} 
+\end{equation}
 %
 since taking variations of $\mathcal{M}$ with respect to the auxiliary variables gives that $\xi_\Psi$ is a stationary point of $\mathcal{L}$.
 
@@ -105,7 +102,7 @@ Extending the property in Equation (\ref{eq:MeqI}) to the augmented Lagrangians 
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.}
 \end{multline}
 %
-Applying Proposition 3 from~\cite{BecVex05} for the difference $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$,  
+Applying Proposition 3 from~\cite{BecVex05} for the difference $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$,
 \begin{equation}
 \label{eq:beckvex}
 \mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
