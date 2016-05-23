@@ -82,3 +82,23 @@ bart told karen he has an example that would be applicable to master's and easy 
 karen will be at mit 4/6-7
 
 date for forming committee is a guideline...
+
+----------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+
+DO NOT EVER USE HARD RESET EVER AGAIN IT DOESN'T JUST APPLY TO SUBDIRECTORIES IT APPLIES TO THE WHOLE REPO
+
+----------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------
+
+bart didn't seem to have any actual model pairs in mind, just ideas for applications...batteries? also using summer cd(r)...
+
+-if we want to compare linear solves, then need to make sure that linear solves are being solved precisely (especially with iterative solvers!)
+-sometimes a newton solve with not converge if linear solves done precisely, but sometimes the looseness of inexact solve can save it (ex: continuation on HF cdr, 600->700 doesn't work if superlu used...)
+
+-write up new error breakdown
+-streamline psi-to-superadj
+  -how long does it take to set up meshes/system objects? if significant, is there a way to just reassign subdomain IDs? have all the divvy text available and read them in? (re-run from start-to-finish each time new divvy available)
+  -reassign subdomain ID without changing current solution? keep that as initial guess?
+  -seems like it might be lot less work to read in xda files like in superadj than to read in exo like in psi_MF...psi_MF had a lot of time spent in inverse_map() under FE...
+  -solution transfer hopefully doesn't take up too much? (try timing it)

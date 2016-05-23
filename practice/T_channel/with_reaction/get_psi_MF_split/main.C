@@ -139,6 +139,10 @@ int main(int argc, char** argv){
     infile("max_linear_iterations", 50000);
   solver_primary->initial_linear_tolerance =
     infile("initial_linear_tolerance", 1.e-3);
+  solver_primary->max_linear_iterations = infile("max_linear_iterations",10000);
+  solver_primary->initial_linear_tolerance = infile("initial_linear_tolerance",1.e-13);
+  solver_primary->minimum_linear_tolerance = infile("minimum_linear_tolerance",1.e-13);
+  solver_primary->linear_tolerance_multiplier = infile("linear_tolerance_multiplier",1.e-3);
  	solver_aux->max_linear_iterations =
     infile("max_linear_iterations", 50000);
   solver_aux->initial_linear_tolerance =
@@ -146,7 +150,6 @@ int main(int argc, char** argv){
 
   // Print information about the system to the screen.
   equation_systems.print_info();
-
 
   // Now we begin the timestep loop to compute the time-accurate
   // solution of the equations...not that this is transient, but eh, why not...
