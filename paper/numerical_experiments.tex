@@ -1,11 +1,22 @@
 \section{Numerical Experiments}\label{sect:numexp}
 %
-We now use algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi model setting. We consider two kinds of multi-fidelity models, in a total of three experiments. In the first experiment, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. In the second experiment, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.
+We now use Algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi model setting. We consider two kinds of multi-fidelity models, in a total of three experiments. In the first experiment, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. In the second experiment, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.
 
 In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
 \red{Don't forget to trim figures and convert them to pdfs!}
 %
+\subsection{Error Estimate Localization}
+%
+Algorithm~\ref{alg:refSeries} does not specify any particular method for localizing the error estimate. A naive approach would be to calculate the contribution to the estimated error by a particular element $\kappa$ by simply considering all area integrals in the error estimate expression, limited to that element. While perhaps simple to compute, this method results in non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret.
 
+We instead use the alternative method described in \cite{vanOpstaletal15} to decompose the equivalent error estimate expression
+%
+\begin{multline}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi)+\mathcal{R}(e^3). \nonumber
+\end{multline}
+%
+into error contributions from locally supported basis functions, and refine the model in those elements in the support of those basis functions with the largest error contributions. Using this method, elements in which the high-fidelity model is already being used are not seen as continuing to contribute to the error in the QoI, with the possible exception of elements near the interfaces between the low-fidelity and high-fidelity regions. \red{Express this mathematically?}
+%
 \subsection{Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
 %
 In this section, we demonstrate the method derived in Section \ref{sec:deriv} for two models which differ in the physics included. We first describe the problem setup, and then present results from applying our approach.
@@ -83,7 +94,7 @@ For the numerical simulations, we use the finite element method (FEM), employing
 \subsubsection{Results} \label{sec:cdvcdrBaseRef} 
 %------------------------------------------------------------%
 %
-We now present the results for solving the inference problem using algorithm~\ref{alg:refSeries}. Once the QoI error estimate is calculated using Equation (\ref{eq:finErrExp}), the error estimate is then localized to each element to give an element-wise decomposition of the error. Based on this element-wise decomposition, we increase the proportion of the domain in which the high-fidelity model is used until the estimated absolute relative error in the QoI, is less than $1\%$. 
+We now present the results for solving the inference problem using Algorithm~\ref{alg:refSeries}. Once the QoI error estimate is calculated using Equation (\ref{eq:finErrExp}), the error estimate is then localized to each element to give an element-wise decomposition of the error. Based on this element-wise decomposition, we increase the proportion of the domain in which the high-fidelity model is used until the estimated absolute relative error in the QoI, is less than $1\%$. 
 
 Figure~\ref{fig:baseRef} shows the element-wise decomposition of the error estimate, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated.
 %
@@ -123,7 +134,7 @@ Note that since linear nodal basis elements are used, elements in regions where 
 We see that model refinement is concentrated in the QoI region, and the data point closest to the QoI. In the first elemental decomposition of the error (Figure~\ref{fig:baseRef0}), the region where the elemental error is maximum is data point one. Since the constraining model is an elliptic PDE, with a weak convection, information flow is localized, and is weakly convected from left to right. Therefore, for the calculation of the QoI, it is most important to refine the region near data point one, and the QoI region. 
 We also observe that the region near the data points downstream from the QoI are not refined as much as the region immediately adjacent to the QoI. This indicates that the information from these two data points is not significant for the estimation of the QoI. \red{We should say a bit more about the refinement region here, and implications for experimental design ?}. 
 
-Figure~\ref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by algorithm~\ref{alg:refSeries}. It can be seen that the error estimates are close to the true error, and the error estimator has an effectivity index close to one. We also see that the QoI error of only $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain.
+Figure~\ref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by Algorithm~\ref{alg:refSeries}. It can be seen that the error estimates are close to the true error, and the error estimator has an effectivity index close to one. We also see that the QoI error of only $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain.
 %
 \begin{figure}[h]
 \centering
@@ -146,8 +157,8 @@ We consider the convection-diffusion-reaction term described in Section \ref{sec
 %
 \subsubsection{Computational Complexity}
 %
-We compare the complexity of algorithm~\ref{alg:refSeries} and the continuation method for the high fidelity problem, in the context of the analysis developed in section~\ref{sect:alg_complexity}. For the high fidelity problem, with  with 9 continuation steps, we have $\sum\limits_{i=1}^{C} K_i=30$. 
+We compare the complexity of Algorithm~\ref{alg:refSeries} and the continuation method for the high fidelity problem, in the context of the analysis developed in section~\ref{sect:alg_complexity}. For the high fidelity problem, with  with 9 continuation steps, we have $\sum\limits_{i=1}^{C} K_i=30$. 
  
-With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
+With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using Algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
 
-In other words, on using algorithm~\ref{alg:refSeries} for a highly nonlinear problem, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, with a $20\%$ reduction in computational cost, while avoiding any need for continuation to handle nonlinearities. 
+In other words, on using Algorithm~\ref{alg:refSeries} for a highly nonlinear problem, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, with a $20\%$ reduction in computational cost, while avoiding any need for continuation to handle nonlinearities. 

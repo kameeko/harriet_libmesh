@@ -50,9 +50,9 @@ Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lowe
 % 
 \subsection{Complexity Analysis}\label{sect:alg_complexity}
 %
-We now derive the computational complexity of using algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
+We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
 
-If one utilizes algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
+If one utilizes Algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
 %
 \begin{align}
 \label{eq:cost_adapt}
