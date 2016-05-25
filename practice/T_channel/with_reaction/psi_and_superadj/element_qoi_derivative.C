@@ -131,7 +131,8 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 					
 				//go between physical and reference element
 				Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
-			
+			  numInvCalls += 1; //DEBUG
+			  
 				std::vector<Real> point_phi(n_c_dofs);
 				for (unsigned int i=0; i != n_c_dofs; i++)
 					{

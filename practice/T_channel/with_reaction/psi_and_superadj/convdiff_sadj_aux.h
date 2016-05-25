@@ -3,12 +3,12 @@
 
 using namespace libMesh;
 
-class ConvDiff_AuxSys : public FEMSystem
+class ConvDiff_AuxSadjSys : public FEMSystem
 {
 public:
 
   // Constructor
-  ConvDiff_AuxSys(EquationSystems& es,
+  ConvDiff_AuxSadjSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
@@ -28,6 +28,16 @@ public:
 				}
 			}
 			fclose(fp);
+	  }
+	  if(FILE *fp=fopen("c_points.dat","r")){
+	    int flag = 1;
+	    Real meep;
+	    while(flag != -1){
+	      flag = fscanf(fp,"%lf",&meep);
+	      if(flag != -1)
+	        primal_c_vals.push_back(meep);
+	    }
+	    fclose(fp);
 	  }
 	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
   }
@@ -66,6 +76,6 @@ public:
   int numInvCalls; //DEBUG
   int getInvCalls(){ return numInvCalls; } //DEBUG
   
-  virtual void postprocess();
+  std::vector<Real> primal_c_vals;
   
 };

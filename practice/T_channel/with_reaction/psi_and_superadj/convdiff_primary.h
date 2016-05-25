@@ -67,4 +67,9 @@ public:
   Real qoi;
   double getQoI(){ return qoi; }
   
+  int numInvCalls; //DEBUG
+  int getInvCalls(){ return numInvCalls; } //DEBUG
+  
+  virtual void postprocess();
+  
 };

@@ -69,4 +69,7 @@ public:
   
   //options for QoI location and nature
   int qoi_option;
+  
+  int numInvCalls; //DEBUG
+  int getInvCalls(){ return numInvCalls; } //DEBUG
 };
