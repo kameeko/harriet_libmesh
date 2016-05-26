@@ -39,12 +39,13 @@ int main(int argc, char** argv)
   LibMeshInit init(argc, argv);
 	
   // Parameters
-  GetPot infile("fem_system_params.in");
-  const bool transient                  = infile("transient", false);
-  unsigned int n_timesteps              = infile("n_timesteps", 1);
-  GetPot infileForMesh("convdiff_mprime.in");
-  std::string find_mesh_here            = infileForMesh("divided_mesh","mesh.exo");
-  bool doContinuation                   = infileForMesh("do_continuation",false);
+  GetPot solverInfile("fem_system_params.in");
+  const bool transient                  = solverInfile("transient", false);
+  unsigned int n_timesteps              = solverInfile("n_timesteps", 1);
+  GetPot infile("convdiff_mprime.in");
+  std::string find_mesh_here            = infile("divided_mesh","mesh.exo");
+  bool doContinuation                   = infile("do_continuation",false);
+  bool splitSuperAdj                    = infile("split_super_adjoint",true); //solve as single adjoint or two forwards
 
   Mesh mesh(init.comm());
   Mesh mesh2(init.comm()); 
@@ -65,9 +66,9 @@ int main(int argc, char** argv)
   ConvDiff_MprimeSys & system_mix = 
 		equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for superadj
   ConvDiff_PrimarySadjSys & system_sadj_primary = 
-    equation_systems.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj TEST
+    equation_systems.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
   ConvDiff_AuxSadjSys & system_sadj_aux = 
-    equation_systems.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj TEST  
+    equation_systems.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
 		
 	//steady-state problem	
  	system_primary.time_solver =
@@ -89,90 +90,88 @@ int main(int argc, char** argv)
 	//nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
   system_sadj_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_primary); 
-  solver_sadj_primary->quiet = infile("solver_quiet", true);
+  solver_sadj_primary->quiet = solverInfile("solver_quiet", true);
   solver_sadj_primary->verbose = !solver_sadj_primary->quiet;
   solver_sadj_primary->max_nonlinear_iterations =
-    infile("max_nonlinear_iterations", 15);
+    solverInfile("max_nonlinear_iterations", 15);
   solver_sadj_primary->relative_step_tolerance =
-    infile("relative_step_tolerance", 1.e-3);
+    solverInfile("relative_step_tolerance", 1.e-3);
   solver_sadj_primary->relative_residual_tolerance =
-    infile("relative_residual_tolerance", 0.0);
+    solverInfile("relative_residual_tolerance", 0.0);
   solver_sadj_primary->absolute_residual_tolerance =
-    infile("absolute_residual_tolerance", 0.0);
+    solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_sadj_aux = new NewtonSolver(system_sadj_aux); 
   system_sadj_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_aux); 
-  solver_sadj_aux->quiet = infile("solver_quiet", true);
+  solver_sadj_aux->quiet = solverInfile("solver_quiet", true);
   solver_sadj_aux->verbose = !solver_sadj_aux->quiet;
   solver_sadj_aux->max_nonlinear_iterations =
-    infile("max_nonlinear_iterations", 15);
+    solverInfile("max_nonlinear_iterations", 15);
   solver_sadj_aux->relative_step_tolerance =
-    infile("relative_step_tolerance", 1.e-3);
+    solverInfile("relative_step_tolerance", 1.e-3);
   solver_sadj_aux->relative_residual_tolerance =
-    infile("relative_residual_tolerance", 0.0);
+    solverInfile("relative_residual_tolerance", 0.0);
   solver_sadj_aux->absolute_residual_tolerance =
-    infile("absolute_residual_tolerance", 0.0);
+    solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_primary = new NewtonSolver(system_primary); 
   system_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_primary); 
-  solver_primary->quiet = infile("solver_quiet", true);
+  solver_primary->quiet = solverInfile("solver_quiet", true);
   solver_primary->verbose = !solver_primary->quiet;
   solver_primary->max_nonlinear_iterations =
-    infile("max_nonlinear_iterations", 15);
+    solverInfile("max_nonlinear_iterations", 15);
   solver_primary->relative_step_tolerance =
-    infile("relative_step_tolerance", 1.e-3);
+    solverInfile("relative_step_tolerance", 1.e-3);
   solver_primary->relative_residual_tolerance =
-    infile("relative_residual_tolerance", 0.0);
+    solverInfile("relative_residual_tolerance", 0.0);
   solver_primary->absolute_residual_tolerance =
-    infile("absolute_residual_tolerance", 0.0);
+    solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_aux = new NewtonSolver(system_aux); 
   system_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_aux); 
-  solver_aux->quiet = infile("solver_quiet", true);
+  solver_aux->quiet = solverInfile("solver_quiet", true);
   solver_aux->verbose = !solver_aux->quiet;
   solver_aux->max_nonlinear_iterations =
-    infile("max_nonlinear_iterations", 15);
+    solverInfile("max_nonlinear_iterations", 15);
   solver_aux->relative_step_tolerance =
-    infile("relative_step_tolerance", 1.e-3);
+    solverInfile("relative_step_tolerance", 1.e-3);
   solver_aux->relative_residual_tolerance =
-    infile("relative_residual_tolerance", 0.0);
+    solverInfile("relative_residual_tolerance", 0.0);
   solver_aux->absolute_residual_tolerance =
-    infile("absolute_residual_tolerance", 0.0);
+    solverInfile("absolute_residual_tolerance", 0.0);
     
   //linear solver options
-  solver_primary->max_linear_iterations       = infile("max_linear_iterations", 50000);
-  solver_primary->max_linear_iterations       = infile("max_linear_iterations",10000);
-  solver_primary->initial_linear_tolerance    = infile("initial_linear_tolerance",1.e-13);
-  solver_primary->minimum_linear_tolerance    = infile("minimum_linear_tolerance",1.e-13);
-  solver_primary->linear_tolerance_multiplier = infile("linear_tolerance_multiplier",1.e-3);
- 	solver_aux->max_linear_iterations           = infile("max_linear_iterations", 50000);
-  solver_aux->max_linear_iterations           = infile("max_linear_iterations",10000);
-  solver_aux->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);
-  solver_aux->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);
-  solver_aux->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
-  solver_sadj_primary->max_linear_iterations       = infile("max_linear_iterations", 50000);
-  solver_sadj_primary->max_linear_iterations       = infile("max_linear_iterations",10000);
-  solver_sadj_primary->initial_linear_tolerance    = infile("initial_linear_tolerance",1.e-13);
-  solver_sadj_primary->minimum_linear_tolerance    = infile("minimum_linear_tolerance",1.e-13);
-  solver_sadj_primary->linear_tolerance_multiplier = infile("linear_tolerance_multiplier",1.e-3);
- 	solver_sadj_aux->max_linear_iterations           = infile("max_linear_iterations", 50000);
-  solver_sadj_aux->max_linear_iterations           = infile("max_linear_iterations",10000);
-  solver_sadj_aux->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);
-  solver_sadj_aux->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);
-  solver_sadj_aux->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
+  solver_primary->max_linear_iterations       = solverInfile("max_linear_iterations", 50000);
+  solver_primary->max_linear_iterations       = solverInfile("max_linear_iterations",10000);
+  solver_primary->initial_linear_tolerance    = solverInfile("initial_linear_tolerance",1.e-13);
+  solver_primary->minimum_linear_tolerance    = solverInfile("minimum_linear_tolerance",1.e-13);
+  solver_primary->linear_tolerance_multiplier = solverInfile("linear_tolerance_multiplier",1.e-3);
+ 	solver_aux->max_linear_iterations           = solverInfile("max_linear_iterations", 50000);
+  solver_aux->max_linear_iterations           = solverInfile("max_linear_iterations",10000);
+  solver_aux->initial_linear_tolerance        = solverInfile("initial_linear_tolerance",1.e-13);
+  solver_aux->minimum_linear_tolerance        = solverInfile("minimum_linear_tolerance",1.e-13);
+  solver_aux->linear_tolerance_multiplier     = solverInfile("linear_tolerance_multiplier",1.e-3);
+  solver_sadj_primary->max_linear_iterations       = solverInfile("max_linear_iterations", 50000);
+  solver_sadj_primary->max_linear_iterations       = solverInfile("max_linear_iterations",10000);
+  solver_sadj_primary->initial_linear_tolerance    = solverInfile("initial_linear_tolerance",1.e-13);
+  solver_sadj_primary->minimum_linear_tolerance    = solverInfile("minimum_linear_tolerance",1.e-13);
+  solver_sadj_primary->linear_tolerance_multiplier = solverInfile("linear_tolerance_multiplier",1.e-3);
+ 	solver_sadj_aux->max_linear_iterations           = solverInfile("max_linear_iterations", 50000);
+  solver_sadj_aux->max_linear_iterations           = solverInfile("max_linear_iterations",10000);
+  solver_sadj_aux->initial_linear_tolerance        = solverInfile("initial_linear_tolerance",1.e-13);
+  solver_sadj_aux->minimum_linear_tolerance        = solverInfile("minimum_linear_tolerance",1.e-13);
+  solver_sadj_aux->linear_tolerance_multiplier     = solverInfile("linear_tolerance_multiplier",1.e-3);
   
-  equation_systems.print_info(); //DEBUG
+  //equation_systems.print_info(); //DEBUG
   
 //ITERATE THROUGH REFINEMENTS  
   
   system_primary.solve();
-  std::cout << "\n inverse_map() calls in primary solve: " << system_primary.getInvCalls() << std::endl;
   std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
   system_aux.solve();
-  std::cout << "\n inverse_map() calls in auxiliary solve: " << system_aux.getInvCalls() << std::endl;
   std::cout << "\n End auxiliary solve..." << std::endl;
   
   system_primary.postprocess();
   system_aux.postprocess();
   
-std::clock_t start = std::clock(); //DEBUG
+//std::clock_t start = std::clock(); //DEBUG
 	DirectSolutionTransfer sol_transfer(init.comm()); 
 	sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
 		system_mix.variable(system_mix.variable_number("aux_c")));
@@ -187,7 +186,7 @@ std::clock_t start = std::clock(); //DEBUG
 		system_mix.variable(system_mix.variable_number("zc")));
 	sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
 		system_mix.variable(system_mix.variable_number("fc")));
-	
+/*	
 double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC; //DEBUG
 std::cout<<"\n Solution transfer time: "<< duration <<'\n';	 //DEBUG
 std::cout << "c: " << system_mix.calculate_norm(*system_mix.solution, 0, L2) << " " 
@@ -202,73 +201,71 @@ std::cout << "aux_zc: " << system_mix.calculate_norm(*system_mix.solution, 4, L2
 									<< system_aux.calculate_norm(*system_aux.solution, 1, L2) << std::endl; //DEBUG
 std::cout << "aux_fc: " << system_mix.calculate_norm(*system_mix.solution, 5, L2) << " " 
 									<< system_aux.calculate_norm(*system_aux.solution, 2, L2) << std::endl; //DEBUG
-/*
-  system_mix.assemble_qoi_sides = true; //QoI doesn't involve sides
-  
-  std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
-  std::pair<unsigned int, Real> adjsolve = system_mix.adjoint_solve();
-  std::cout << "number of iterations to solve adjoint: " << adjsolve.first << std::endl;
-  std::cout << "final residual of adjoint solve: " << adjsolve.second << std::endl;
-	std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
-	
-	NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
-  //NumericVector<Number> &primal_solution = *system_mix.solution;
-  
-  system_mix.assemble(); //calculate residual to correspond to solution
-  
-  std::cout << "\n inverse_map() calls in super-adj solve: " << system_mix.getInvCalls() << std::endl; //DEBUG
-  std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_solution, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 0, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 1, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 2, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 3, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 4, L2) << std::endl; //DEBUG
-  std::cout << system_mix.calculate_norm(dual_solution, 5, L2) << std::endl; //DEBUG
 */
-
-  system_mix.assemble(); //calculate residual to correspond to solution
-  system_sadj_primary.solve();
-  system_sadj_aux.solve();
-  const std::string & adjoint_solution0_name = "adjoint_solution0";
-  system_mix.add_vector(adjoint_solution0_name, false, GHOSTED);
-  system_mix.set_vector_as_adjoint(adjoint_solution0_name,0);
-  NumericVector<Number> &eep = system_mix.add_adjoint_rhs(0);
-  system_mix.set_adjoint_already_solved(true);
-  NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
-  NumericVector<Number> &primal_solution = *system_mix.solution;
-  dual_solution.swap(primal_solution);
-  sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_c")),
-		system_mix.variable(system_mix.variable_number("aux_c")));
-	sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
-		system_mix.variable(system_mix.variable_number("aux_zc")));
-	sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
-		system_mix.variable(system_mix.variable_number("aux_fc")));
-	sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
-		system_mix.variable(system_mix.variable_number("c")));
-	sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
-		system_mix.variable(system_mix.variable_number("zc")));
-	sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
-		system_mix.variable(system_mix.variable_number("fc")));
-	std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_solution, L2) << std::endl;
-	dual_solution.swap(primal_solution);
-	std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_solution, L2) << std::endl;
-	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl;
-	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl;
-	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl;
-	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl;
-	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl;
-	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl;
+  if(!splitSuperAdj){
+    system_mix.assemble_qoi_sides = true; //QoI doesn't involve sides
+    
+    std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve start ~*~*~*~*~*~*~*~*~\n" << std::endl;
+    std::pair<unsigned int, Real> adjsolve = system_mix.adjoint_solve();
+    std::cout << "number of iterations to solve adjoint: " << adjsolve.first << std::endl;
+    std::cout << "final residual of adjoint solve: " << adjsolve.second << std::endl;
+	  std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
+	
+	  NumericVector<Number> &dual_sol = system_mix.get_adjoint_solution(0); //DEBUG
+    
+    system_mix.assemble(); //calculate residual to correspond to solution
+    
+    std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_sol, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 0, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 1, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 2, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 3, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 4, L2) << std::endl; //DEBUG
+    std::cout << system_mix.calculate_norm(dual_sol, 5, L2) << std::endl; //DEBUG
+  }else{
+    system_mix.assemble(); //calculate residual to correspond to solution
+    system_sadj_primary.solve();
+    system_sadj_aux.solve();
+    const std::string & adjoint_solution0_name = "adjoint_solution0";
+    system_mix.add_vector(adjoint_solution0_name, false, GHOSTED);
+    system_mix.set_vector_as_adjoint(adjoint_solution0_name,0);
+    NumericVector<Number> &eep = system_mix.add_adjoint_rhs(0);
+    system_mix.set_adjoint_already_solved(true);
+    NumericVector<Number> &dual_sol = system_mix.get_adjoint_solution(0);
+    NumericVector<Number> &primal_sol = *system_mix.solution;
+    dual_sol.swap(primal_sol);
+    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_c")),
+		  system_mix.variable(system_mix.variable_number("aux_c")));
+	  sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
+		  system_mix.variable(system_mix.variable_number("aux_zc")));
+	  sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
+		  system_mix.variable(system_mix.variable_number("aux_fc")));
+	  sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
+		  system_mix.variable(system_mix.variable_number("c")));
+	  sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
+		  system_mix.variable(system_mix.variable_number("zc")));
+	  sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
+		  system_mix.variable(system_mix.variable_number("fc")));
+	  std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+	  dual_sol.swap(primal_sol);
+	  std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl; //DEBUG
+	  std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl; //DEBUG
+	}
+	NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
 
   //adjoint-weighted residual
-  AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->clone();
-	adjresid->zero();
+  AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
 	adjresid->pointwise_mult(*system_mix.rhs,dual_solution); 
 	adjresid->scale(-0.5);
 	std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << adjresid->sum() << std::endl; //DEBUG
   
   //LprimeHF(psiLF)
-  AutoPtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->clone();
-  LprimeHF_psiLF->zero();
+  AutoPtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
   LprimeHF_psiLF->pointwise_mult(*system_mix.rhs,*just_aux);
   std::cout << " L'_HF(psiLF): " << LprimeHF_psiLF->sum() << std::endl; //DEBUG
   
@@ -279,7 +276,7 @@ std::cout << "aux_fc: " << system_mix.calculate_norm(*system_mix.solution, 5, L2
   
   //output if last iteration
   std::string write_error_basis_blame = 
-    infileForMesh("error_est_output_file_basis_blame", "error_est_breakdown_basis_blame.dat");
+    infile("error_est_output_file_basis_blame", "error_est_breakdown_basis_blame.dat");
   std::ofstream output2(write_error_basis_blame);
   for(unsigned int i = 0 ; i < adjresid->size(); i++){
     if(output2.is_open())
@@ -322,6 +319,4 @@ std::cout << "aux_fc: " << system_mix.calculate_norm(*system_mix.solution, 5, L2
 
   return 0; //done
 
-//TRY SOLVING SUPERADJ AS SPLIT FORWARD AFTER FIRST ROUND OF INTEGRATION? if so use different (not-newton) solver that knows it should be linear?
-  //put in same eq sys as primary and aux so you can grab values to linearize about?
 } //end main

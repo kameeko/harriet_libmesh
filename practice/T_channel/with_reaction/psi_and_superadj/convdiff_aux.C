@@ -76,8 +76,7 @@ void ConvDiff_AuxSys::init_data (){
 
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
-	
-	numInvCalls = 0; //DEBUG
+
 }
 
 // Context initialization
@@ -241,11 +240,8 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
     
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
 	  	Point data_point = datapts[dnum];
-	  	if(ctxt.get_elem().contains_point(data_point) && (accounted_for[dnum]>=ctxt.get_elem().id()) ){
-	  	
-	  		//help avoid double-counting if data from edge of elements, but may mess with jacobian check
-	  		accounted_for[dnum] = ctxt.get_elem().id(); 
-	  		
+	  	if(dataelems[dnum] == ctxt.get_elem().id()){
+
 	  		Number auxc_pointy = ctxt.point_value(aux_c_var, data_point);
 	  		
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
@@ -253,7 +249,6 @@ bool ConvDiff_AuxSys::element_time_derivative (bool request_jacobian, DiffContex
 		    
 		    //go between physical and reference element
 		    Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
-		    numInvCalls += 1; //DEBUG
 		    
         std::vector<Real> point_phi(n_c_dofs);
       	for (unsigned int i=0; i != n_c_dofs; i++){

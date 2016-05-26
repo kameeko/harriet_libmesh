@@ -1,5 +1,6 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/getpot.h"
+#include "libmesh/point_locator_tree.h"
 
 using namespace libMesh;
 
@@ -19,6 +20,7 @@ public:
 		std::string find_data_here = infile("data_file","Measurements_top6.dat");
 		qoi_option = infile("QoI_option",1);
     
+    //read in data
 		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
 			Real x, y, value;
 			int flag = 1;
@@ -31,7 +33,14 @@ public:
 			}
 			fclose(fp);
 	  }
-	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
+	  
+	  //find elements in which data points reside
+	  PointLocatorTree point_locator(this->get_mesh());
+	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+	  	Point data_point = datapts[dnum];
+	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+	  	dataelems.push_back(this_elem->id());
+	  }
   }
 
   // System initialization
@@ -61,6 +70,7 @@ public:
   //data-related stuff
   std::vector<Point> datapts; 
   std::vector<Real> datavals;
+  std::vector<dof_id_type> dataelems;
 	
 	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
 	
@@ -69,7 +79,5 @@ public:
   
   //options for QoI location and nature
   int qoi_option;
-  
-  int numInvCalls; //DEBUG
-  int getInvCalls(){ return numInvCalls; } //DEBUG
+
 };
