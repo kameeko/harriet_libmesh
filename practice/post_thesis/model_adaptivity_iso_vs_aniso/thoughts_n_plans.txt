@@ -97,6 +97,7 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
 -sometimes a newton solve with not converge if linear solves done precisely, but sometimes the looseness of inexact solve can save it (ex: continuation on HF cdr, 600->700 doesn't work if superlu used...)
 
 -write up new error breakdown
+  -RUN NEW ERROR BREAKDOWN WITH SCALAR VS FIELD
 -ask if continuationsystem can be used for the desired purpose
 -streamline psi-to-superadj
   -how long does it take to set up meshes/system objects? if significant, is there a way to just reassign subdomain IDs? have all the divvy text available and read them in? (re-run from start-to-finish each time new divvy available)
@@ -107,11 +108,18 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
       -order of mag difference doesn't appear in psiLF iteration with R=-42...both spend considerable time there...
       -number of calls reduced to about 1/3 if only 1 of 3 datapoints kept, and yet if explicit calls counted, they only amount to hundreds, not millions...majority of explict call count also disappears if no numerical vs analytical jacobian comparison...
   -solution transfer hopefully doesn't take up too much? (nope it doesn't)
-  -be consistent with solver tolerances
-  -you can have velocity be analytic instead of read in
   -is it fair to not count refinement in timing? just cuz you're doing it in matlab...which is probably not the most efficient way either...
     -if we have a problem where the two methods are sufficiently different, it shouldn't matter...
   -can we make a basis function a vector of original basis functions? would that help with grouping basis functions by node?
+    -what if you just trust that every group of 6 belongs to the same node?
   
-  -LF iteration, superlu: split = 25+72=97 (10+51=61 in linear solve), joined = 90 (63 in linear solve)
+  -LF iteration, superlu: 
+    split codes = 25+72=97 (10+51=61 in linear solve)
+    joined code = 90 (63 in linear solve)
+    joined code, split super-adj = 50 (20 in linear solve)
 
+  -FOR FINAL COMPARISON:
+    -turn off numerical jacobian check
+    -turn off norm checks
+    -use analytic velocity for both
+    -be consistent with solver tolerances

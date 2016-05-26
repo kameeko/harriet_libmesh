@@ -98,6 +98,12 @@ void ConvDiff_PrimarySadjSys::init_context(DiffContext &context){
   c_side_fe->get_JxW();
   c_side_fe->get_phi();
   c_side_fe->get_dphi();
+  
+  //add other solutions to the vectors that diff context should localize
+  const System & sys = ctxt.get_system();
+  NumericVector<Number> &primary_solution = 
+ 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+ 	ctxt.add_localized_vector(primary_solution, sys);
 }
 
 // Element residual and jacobian calculations
@@ -147,31 +153,24 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	const System & sys = ctxt.get_system();
   NumericVector<Number> &primary_solution = 
  	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
- 	NumericVector<Number> &aux_solution = 
- 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_AuxSys").solution;
   std::vector<Number> c_at_qp (n_qpoints, 0);
   std::vector<Number> zc_at_qp (n_qpoints, 0);
-  std::vector<Number> aux_c_at_qp (n_qpoints, 0);
-  std::vector<Number> aux_zc_at_qp (n_qpoints, 0);
-  std::vector<Number> aux_fc_at_qp (n_qpoints, 0);
-  std::vector<Gradient> grad_aux_c_at_qp (n_qpoints, 0);
-  std::vector<Gradient> grad_aux_zc_at_qp (n_qpoints, 0);
-  std::vector<Gradient> grad_aux_fc_at_qp (n_qpoints, 0);
+  std::vector<Number> fc_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_c_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_zc_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_fc_at_qp (n_qpoints, 0);
   unsigned int primal_c_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("c");
   unsigned int primal_zc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("zc");
-  unsigned int primal_auxc_var = sys.get_equation_systems().get_system("ConvDiff_AuxSys").variable_number("aux_c");
-  unsigned int primal_auxzc_var = sys.get_equation_systems().get_system("ConvDiff_AuxSys").variable_number("aux_zc");
-  unsigned int primal_auxfc_var = sys.get_equation_systems().get_system("ConvDiff_AuxSys").variable_number("aux_fc");
+  unsigned int primal_fc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("fc");
 
   ctxt.interior_values<Number>(primal_c_var, primary_solution, c_at_qp); 
   ctxt.interior_values<Number>(primal_zc_var, primary_solution, zc_at_qp);
-  ctxt.interior_values<Number>(primal_auxc_var, aux_solution, aux_c_at_qp); 
-  ctxt.interior_values<Number>(primal_auxzc_var, aux_solution, aux_zc_at_qp);
-  ctxt.interior_values<Number>(primal_auxfc_var, aux_solution, aux_fc_at_qp);
-  ctxt.interior_gradients<Gradient>(primal_auxc_var, aux_solution, grad_aux_c_at_qp); 
-  ctxt.interior_gradients<Gradient>(primal_auxzc_var, aux_solution, grad_aux_zc_at_qp);
-  ctxt.interior_gradients<Gradient>(primal_auxfc_var, aux_solution, grad_aux_fc_at_qp);
+  ctxt.interior_values<Number>(primal_fc_var, primary_solution, fc_at_qp);
+  ctxt.interior_gradients<Gradient>(primal_c_var, primary_solution, grad_c_at_qp); 
+  ctxt.interior_gradients<Gradient>(primal_zc_var, primary_solution, grad_zc_at_qp);
+  ctxt.interior_gradients<Gradient>(primal_fc_var, primary_solution, grad_fc_at_qp);
 
+  
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
 	    Number 
@@ -182,15 +181,13 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
 	      grad_fc = ctxt.interior_gradient(fc_var, qp);
-	      
-      Number primal_c = c_at_qp[qp];
+	    
+	    Number primal_c = c_at_qp[qp];
 	    Number primal_zc = zc_at_qp[qp];
-	    Number primal_auxc = aux_c_at_qp[qp];
-	    Number primal_auxzc = aux_zc_at_qp[qp];
-	    Number primal_auxfc = aux_fc_at_qp[qp];
-	    Gradient primal_grad_auxc = grad_aux_c_at_qp[qp];
-	    Gradient primal_grad_auxzc = grad_aux_zc_at_qp[qp];
-	    Gradient primal_grad_auxfc = grad_aux_fc_at_qp[qp];
+	    Number primal_fc = fc_at_qp[qp];
+	    Gradient primal_grad_c = grad_c_at_qp[qp];
+	    Gradient primal_grad_zc = grad_zc_at_qp[qp];
+	    Gradient primal_grad_fc = grad_fc_at_qp[qp];
 
 	  	//location of quadrature point
 	  	const Real ptx = qpoint[qp](0);
@@ -217,25 +214,9 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	 			Rfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]); 
 	 			
 	 			//rhs of adjoint
-	 			Rc(i) -= JxW[qp]*(-k*primal_grad_auxzc*dphi[i][qp] + U*primal_grad_auxzc*phi[i][qp] 
-	      	+ 2*R*primal_zc*primal_auxc*phi[i][qp] + 2*R*primal_auxzc*primal_c*phi[i][qp]);
-				if((qoi_option == 1 && 
-						(dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-					(qoi_option == 2 &&
-						(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-					(qoi_option == 3 &&
-						(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-	  			(qoi_option == 5) ||
-	  			(qoi_option == 6 &&
-		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-		    	(qoi_option == 7 &&
-		    		(dim == 2 && (ptx >= 0.625 && ptx <= 1.5 && fabs(pty - 0.5) <= 0.25 ))) ){		
-	      		
-					Rc(i) -= JxW[qp]*phi[i][qp]; 
-				}
-				Rzc(i) -= JxW[qp]*(-k*primal_grad_auxc*dphi[i][qp] - U*primal_grad_auxc*phi[i][qp] 
-					  						+ primal_auxfc*phi[i][qp] + 2*R*primal_c*primal_auxc*phi[i][qp]);	
-				Rfc(i) -= JxW[qp]*(primal_auxzc*phi[i][qp] + beta*primal_grad_auxfc*dphi[i][qp]);
+        Rc(i) -= JxW[qp]*(-k*primal_grad_zc*dphi[i][qp] + U*primal_grad_zc*phi[i][qp] + 2*R*primal_zc*primal_c*phi[i][qp]);
+				Rzc(i) -= JxW[qp]*(-k*primal_grad_c*dphi[i][qp] - U*primal_grad_c*phi[i][qp] + R*primal_c*primal_c*phi[i][qp] + primal_fc*phi[i][qp]);
+				Rfc(i) -= JxW[qp]*(beta*primal_grad_fc*dphi[i][qp] + primal_zc*phi[i][qp]);
      		
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
@@ -265,7 +246,8 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	  		accounted_for[dnum] = ctxt.get_elem().id(); 
 	  		
 	  		Number cpred = ctxt.point_value(c_var, data_point);
-        Number primal_auxc_pointy = primal_auxc_vals[dnum];
+        Number cstar = datavals[dnum];
+	  		Number primal_cpred = primal_c_vals[dnum];
         
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
 		    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
@@ -284,7 +266,7 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
   	  		Rc(i) += cpred*point_phi[i];
   	  		
   	  		//rhs of adjoint
-  	  		Rc(i) -= primal_auxc_pointy*point_phi[i];
+  	  		Rc(i) -= (primal_cpred - cstar)*point_phi[i];
 	  
 					if (request_jacobian){
 						for (unsigned int j=0; j != n_c_dofs; j++)

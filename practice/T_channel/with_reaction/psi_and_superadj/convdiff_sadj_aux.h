@@ -29,13 +29,13 @@ public:
 			}
 			fclose(fp);
 	  }
-	  if(FILE *fp=fopen("c_points.dat","r")){
+	  if(FILE *fp=fopen("auxc_points.dat","r")){
 	    int flag = 1;
 	    Real meep;
 	    while(flag != -1){
 	      flag = fscanf(fp,"%lf",&meep);
 	      if(flag != -1)
-	        primal_c_vals.push_back(meep);
+	        primal_auxc_vals.push_back(meep);
 	    }
 	    fclose(fp);
 	  }
@@ -76,6 +76,6 @@ public:
   int numInvCalls; //DEBUG
   int getInvCalls(){ return numInvCalls; } //DEBUG
   
-  std::vector<Real> primal_c_vals;
+  std::vector<Real> primal_auxc_vals;
   
 };

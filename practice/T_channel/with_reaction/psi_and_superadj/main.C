@@ -216,13 +216,24 @@ std::cout << "aux_fc: " << system_mix.calculate_norm(*system_mix.solution, 5, L2
   
   system_mix.assemble(); //calculate residual to correspond to solution
   
-  std::cout << "\n inverse_map() calls in super-adj solve: " << system_mix.getInvCalls() << std::endl;
-  std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_solution, L2) << std::endl;
+  std::cout << "\n inverse_map() calls in super-adj solve: " << system_mix.getInvCalls() << std::endl; //DEBUG
+  std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_solution, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 0, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 1, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 2, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 3, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 4, L2) << std::endl; //DEBUG
+  std::cout << system_mix.calculate_norm(dual_solution, 5, L2) << std::endl; //DEBUG
 */
 
   system_mix.assemble(); //calculate residual to correspond to solution
   system_sadj_primary.solve();
   system_sadj_aux.solve();
+  const std::string & adjoint_solution0_name = "adjoint_solution0";
+  system_mix.add_vector(adjoint_solution0_name, false, GHOSTED);
+  system_mix.set_vector_as_adjoint(adjoint_solution0_name,0);
+  NumericVector<Number> &eep = system_mix.add_adjoint_rhs(0);
+  system_mix.set_adjoint_already_solved(true);
   NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
   NumericVector<Number> &primal_solution = *system_mix.solution;
   dual_solution.swap(primal_solution);
@@ -238,9 +249,15 @@ std::cout << "aux_fc: " << system_mix.calculate_norm(*system_mix.solution, 5, L2
 		system_mix.variable(system_mix.variable_number("zc")));
 	sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
 		system_mix.variable(system_mix.variable_number("fc")));
-	std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_solution, L2) << std::endl;
+	std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_solution, L2) << std::endl;
 	dual_solution.swap(primal_solution);
-	std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_solution, L2) << std::endl;
+	std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_solution, L2) << std::endl;
+	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl;
+	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl;
+	std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl;
+	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl;
+	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl;
+	std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl;
 
   //adjoint-weighted residual
   AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->clone();
