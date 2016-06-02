@@ -139,13 +139,19 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     -alternatives to even having concentrations to powers? (vikram will look at this)
   -> field vs scalar E? hopefully field E makes things nonlinear enough to require many more nonlinear steps...
     -does it even make sense to make E a field?
+    -what happened to previous attempts to limit scalar and field param variables to different subdomains?
+      -see practice/T_channel/diff_param_res/all_linear/get_psi_MF_discon/debug_notes.txt:
   -> HF: couple non-newtonian flow? depends on temp...what sorts of reactants would this make sense for?
-  -> HF: couple to compressible navier stokes? (density depends on temperature)
-  *> Galagali, Nikhil: thesis on different combustion models...
+  -> HF: couple to compressible navier stokes? (density depends on temperature; varying density would also affect reaction expression)
+  -> Galagali, Nikhil: thesis on different combustion models...
     -seems to be about inferring (stochastically) for intermediate reaction mechanisms (infer for pathway) and their reaction rates
-  *> Rebecca Morrison: might have some knowledge of chemical model hierarchies
+  -> Rebecca Morrison: might have some knowledge of chemical model hierarchies
     -> nikhil and rebecca are both youseff's...maybe ask him?
-  *> just make the LF a ROM? gah how to those work?
+  -> just make the LF a ROM? gah how to those work?
+    -need HF fwd runs in order to build basis...that would probably have to be included in the cost of even creating LF model...
+    -projection-based: let the solution only exist in subspace of R^n, defined by a not-full-rank basis; would affect state and adjoint, but not params...ROMs for inverse problems?
+    -each component of the reduced basis is likely to have nonzero components inside and/or outside the LF regions...do we just ignore those bits that are outside the LF regions?
+    -doesn't seem easily implementable in libmesh...though it does have a 'Reduced Basis' section in examples...(POKE ME)
   -can we/would it make sense to infer temp from measurements of temp?
   -HF has additional reactions that also affect temperature? (instead of adding intermediate reactants, just have other species with their own reactions that also contribute to temp...)
     -ex: 2H_2 + O_2 -> 2H_2O, C + O_2 -> CO_2; C is a contaminant? (also N2+O2=2NO, 2NO+O2=2NO2)
@@ -154,7 +160,8 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     -impure mixture doesn't even need to be air...make up some contaminant...
       -NOx has complicated mechanism, and doesn't seem to have a simple version with O_2 instead of O
   -if you knew the field for H_2 and O_2 and T, could you write equation for H_2O as convdiff with reaction term as source? infer for parameter describing inlet H_2 and O_2 (and inlet T?) and also parameterizing fields (say, you guess it'll look somewhat half-eliptic?), which thus parameterizes forcing?; measurements of H_2O or T?
-    
+    -if parameters can be used to create analytical expressions for H_2, O_2, T fields, couldn't you make this a ROM? basis depending on analytical expression, not derived from original FE basis functions?
+    -parameters that affect diri BCs...how to derive adjoint, and is that something you could implement?
     
     
   -what happens to the qoi if you remove data points altogether? (in chad's thing, there seemed to be the possibility of certain data points being ignored/not of much weight) how does the error breakdown change? what if you change the data values?
