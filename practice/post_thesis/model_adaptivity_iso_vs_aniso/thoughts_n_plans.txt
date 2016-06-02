@@ -150,8 +150,9 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
   -> just make the LF a ROM? gah how to those work?
     -need HF fwd runs in order to build basis...that would probably have to be included in the cost of even creating LF model...
     -projection-based: let the solution only exist in subspace of R^n, defined by a not-full-rank basis; would affect state and adjoint, but not params...ROMs for inverse problems?
-    -each component of the reduced basis is likely to have nonzero components inside and/or outside the LF regions...do we just ignore those bits that are outside the LF regions?
-    -doesn't seem easily implementable in libmesh...though it does have a 'Reduced Basis' section in examples...(POKE ME)
+    -each component of the reduced basis is likely to have nonzero components inside and/or outside the LF regions...do we just ignore those bits that are outside the LF regions? pretend they were just given?
+    -doesn't seem easily implementable in libmesh...though it does have a 'Reduced Basis' section in examples...
+    -can theoretically still use a ROM, but will probably need specialized method to build the basis...
   -can we/would it make sense to infer temp from measurements of temp?
   -HF has additional reactions that also affect temperature? (instead of adding intermediate reactants, just have other species with their own reactions that also contribute to temp...)
     -ex: 2H_2 + O_2 -> 2H_2O, C + O_2 -> CO_2; C is a contaminant? (also N2+O2=2NO, 2NO+O2=2NO2)
@@ -166,3 +167,7 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     
   -what happens to the qoi if you remove data points altogether? (in chad's thing, there seemed to be the possibility of certain data points being ignored/not of much weight) how does the error breakdown change? what if you change the data values?
     -can we use this to say something about experimental design?
+    -adjoints are about sensitivity to perturbations...sadj_auxc seems to indicate most sensitivty to data mismatch near middle sensor...?
+      -sensitivity of what? error in qoi?
+        -kinda seems to fit that interpretation...if you could only have one sensor in one of the three positions, then having middle gives lowest relative difference in QoI...if you had a right sensor and could only add middle or left sensor, then most reduction in relative difference in QoI if add middle...same if you had left sensor at first...relative difference increases from just-right to left+right, so is this even a good measure?
+
