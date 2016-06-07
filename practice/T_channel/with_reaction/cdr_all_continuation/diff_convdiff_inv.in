@@ -1,0 +1,25 @@
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+print_residuals = false
+
+fe_family = 'LAGRANGE'
+
+#regularization parameter
+beta = 0.00001   #1.0e-8 #0.001
+
+#diffusion coefficient
+k = 0.1   #1.0 #0.1
+
+#reaction coefficient
+R = -200.0
+
+#QoI option
+QoI_option = 3
+
+#where to find files
+data_file = long_channel_data3_r42_blip.dat
+
+divided_mesh = channel_long_coarse.exo 
+
+do_continuation = true

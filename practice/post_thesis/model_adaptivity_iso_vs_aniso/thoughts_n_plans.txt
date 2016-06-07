@@ -113,8 +113,6 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     -if we have a problem where the two methods are sufficiently different, it shouldn't matter...
   -can we make a basis function a vector of original basis functions? would that help with grouping basis functions by node?
     *****what if you just trust that every group of 6 belongs to the same node?*****
-    
-    -check if randomly refining somewhere on the right gives the same 'interface error' 
   
   -LF iteration, superlu: 
     split codes = 25+72=97 (10+51=61 in linear solve)
@@ -160,10 +158,27 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     -pure-oxygen vs "air"? combust methane in oxygen vs in air?
     -impure mixture doesn't even need to be air...make up some contaminant...
       -NOx has complicated mechanism, and doesn't seem to have a simple version with O_2 instead of O
+      -kinda weird, though, to know the params for your contaminants but not your main reaction...
   -if you knew the field for H_2 and O_2 and T, could you write equation for H_2O as convdiff with reaction term as source? infer for parameter describing inlet H_2 and O_2 (and inlet T?) and also parameterizing fields (say, you guess it'll look somewhat half-eliptic?), which thus parameterizes forcing?; measurements of H_2O or T?
     -if parameters can be used to create analytical expressions for H_2, O_2, T fields, couldn't you make this a ROM? basis depending on analytical expression, not derived from original FE basis functions?
     -parameters that affect diri BCs...how to derive adjoint, and is that something you could implement?
+    -what if you do H_2 and O_2 fields without reaction, and read them in to create forcing function? based on assumption that H_2 and O_2 concentrations large enough so as to be mostly unaffected by reaction? 
+      -if there is a shat ton more of one reactant than another, then the amount of product is limited by the availability of the scarcer species...can't quite divorce the product from the concentration of *both* reactants though...
     
+-stokes vs navierstokes
+  -parameters in b+v are actually not in diri bcs...would appear in weak form...
+  -does it really not make sense to try to mesh stokes and navierstokes in one domain? at least, not have large parts of domain with the very different reynolds numbers...
+-different physics + different mesh resolutions? HF: more nonlinear and higher resolution?
+  -vikram poking whether libmesh can do this...-> yes
+  
+-does having localized reaction (as if other reactant(s) were available at only certain location, and which concentration was very large/kept constant; or as if catalyst sufficiently reduced activation energy only in some region) make the problem more nonlinear?
+  -cdr solve, r = 400, centered at (2.5,0.5)
+    -everywhere: 5 NL iters
+    -r exponetially decaying, decay param 1:  5 NL iters
+    -r exponetially decaying, decay param 10: 4 NL iters
+    -r exponetially decaying, decay param 20: 4 NL iters
+    -r exponetially decaying, decay param 20: 3 NL iters
+  -it shouldn't...otherwise MF with cd+cdr would be worse...
     
   -what happens to the qoi if you remove data points altogether? (in chad's thing, there seemed to be the possibility of certain data points being ignored/not of much weight) how does the error breakdown change? what if you change the data values?
     -can we use this to say something about experimental design?
