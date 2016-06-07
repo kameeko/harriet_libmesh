@@ -86,6 +86,9 @@ int main (int argc, char** argv){
     //Point cshift1(c(0)-0.63, c(1)-0.5);
 
     elem->subdomain_id() = prev_assign[elem->id()];
+    //TEST/DEBUG
+    //if(fabs(c(0)-3.0) < 0.35 && fabs(c(1)-0.5) < 0.35)
+    //  elem->subdomain_id() = 1;
     		
     if(output.is_open()){
     	output << elem->id() << " " << elem->subdomain_id() << "\n";

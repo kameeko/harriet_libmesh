@@ -73,9 +73,6 @@ public:
   std::vector<dof_id_type> dataelems;
 	
 	int diff_subdomain_id, cd_subdomain_id, cdr_subdomain_id;
-	
-	//avoid assigning data point to two elements in on their boundary
-	std::vector<int> accounted_for;
   
   //options for QoI location and nature
   int qoi_option;

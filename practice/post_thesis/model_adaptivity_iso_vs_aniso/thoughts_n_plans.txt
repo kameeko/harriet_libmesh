@@ -99,6 +99,7 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
 -write up new error breakdown
   -RUN NEW ERROR BREAKDOWN WITH SCALAR VS FIELD
 -ask if continuationsystem can be used for the desired purpose
+  -yes, but arclength continuation is overkill...natural continuation is more common...calculating optimal parameter stepsizes would require tangent information of some sort, and at that point you might as well use arclength...which is meant for robustness, not necessarily for efficieny...
 -streamline psi-to-superadj
   -how long does it take to set up meshes/system objects? if significant, is there a way to just reassign subdomain IDs? have all the divvy text available and read them in? (re-run from start-to-finish each time new divvy available)
   -reassign subdomain ID without changing current solution? keep that as initial guess?
@@ -185,4 +186,9 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
     -adjoints are about sensitivity to perturbations...sadj_auxc seems to indicate most sensitivty to data mismatch near middle sensor...?
       -sensitivity of what? error in qoi?
         -kinda seems to fit that interpretation...if you could only have one sensor in one of the three positions, then having middle gives lowest relative difference in QoI...if you had a right sensor and could only add middle or left sensor, then most reduction in relative difference in QoI if add middle...same if you had left sensor at first...relative difference increases from just-right to left+right, so is this even a good measure?
+        
+        
+poke dissolution/precipitation forward problem, see if it does have an interesting steady state?
+  -if not, then try iso conv-diff vs aniso conv-diff-react
+  -should probably also intergrate divvy...
 

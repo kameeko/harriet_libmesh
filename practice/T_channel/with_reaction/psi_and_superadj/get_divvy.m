@@ -2,7 +2,7 @@
 
 close all;
 
-refPortion = 0.2; %total, not in addition to previous
+refPortion = 0.1; %total, not in addition to previous
     %portion of basis functions; portion of elements will be slightly off
 fntsize = 16;
 
@@ -34,6 +34,7 @@ end
 
 %combine error
 basis_errs = abs(sum(err_dof(dof_groups),2));
+% basis_errs = sum(err_dof(dof_groups),2);
 
 %find current refinement level
 divFileID = fopen(divvy_prev,'r');
