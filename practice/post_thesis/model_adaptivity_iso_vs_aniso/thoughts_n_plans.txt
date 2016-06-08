@@ -195,3 +195,6 @@ poke dissolution/precipitation forward problem, see if it does have an interesti
 is continuation not 'state of the art' enough because we would not normally even solve the whole KKT system, and instead go for optimization program? harder to compare the two then...although even for optimization a good initial guess is sometimes needed...
 
 for 442, taking two refinements of 0.05 increments each in integrated code doesn't end up with <1% error...
+
+natural continuation vs integrated adaptivity:
+  -r = -442: cont steps (400, 442) < cont steps (0,100,200,300,400,442) < adaptive

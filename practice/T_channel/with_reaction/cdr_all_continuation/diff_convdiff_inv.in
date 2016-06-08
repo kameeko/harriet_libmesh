@@ -1,4 +1,4 @@
-verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+verify_analytic_jacobians = 1e-5 #if too large, will print out jacobians that disagree...
 print_jacobians = false
 print_element_jacobians = false
 print_residuals = false
@@ -12,7 +12,7 @@ beta = 0.00001   #1.0e-8 #0.001
 k = 0.1   #1.0 #0.1
 
 #reaction coefficient
-R = -200.0
+R = -442.0
 
 #QoI option
 QoI_option = 3
@@ -20,6 +20,7 @@ QoI_option = 3
 #where to find files
 data_file = long_channel_data3_r42_blip.dat
 
-divided_mesh = channel_long_coarse.exo 
+divided_mesh = channel_long.exo 
 
 do_continuation = true
+do_arclength_continuation = false

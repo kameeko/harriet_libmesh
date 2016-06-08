@@ -148,22 +148,18 @@ int main(int argc, char** argv)
     solverInfile("absolute_residual_tolerance", 0.0);
     
   //linear solver options
-  solver_primary->max_linear_iterations       = solverInfile("max_linear_iterations", 50000);
   solver_primary->max_linear_iterations       = solverInfile("max_linear_iterations",10000);
   solver_primary->initial_linear_tolerance    = solverInfile("initial_linear_tolerance",1.e-13);
   solver_primary->minimum_linear_tolerance    = solverInfile("minimum_linear_tolerance",1.e-13);
   solver_primary->linear_tolerance_multiplier = solverInfile("linear_tolerance_multiplier",1.e-3);
- 	solver_aux->max_linear_iterations           = solverInfile("max_linear_iterations", 50000);
   solver_aux->max_linear_iterations           = solverInfile("max_linear_iterations",10000);
   solver_aux->initial_linear_tolerance        = solverInfile("initial_linear_tolerance",1.e-13);
   solver_aux->minimum_linear_tolerance        = solverInfile("minimum_linear_tolerance",1.e-13);
   solver_aux->linear_tolerance_multiplier     = solverInfile("linear_tolerance_multiplier",1.e-3);
-  solver_sadj_primary->max_linear_iterations       = solverInfile("max_linear_iterations", 50000);
   solver_sadj_primary->max_linear_iterations       = solverInfile("max_linear_iterations",10000);
   solver_sadj_primary->initial_linear_tolerance    = solverInfile("initial_linear_tolerance",1.e-13);
   solver_sadj_primary->minimum_linear_tolerance    = solverInfile("minimum_linear_tolerance",1.e-13);
   solver_sadj_primary->linear_tolerance_multiplier = solverInfile("linear_tolerance_multiplier",1.e-3);
- 	solver_sadj_aux->max_linear_iterations           = solverInfile("max_linear_iterations", 50000);
   solver_sadj_aux->max_linear_iterations           = solverInfile("max_linear_iterations",10000);
   solver_sadj_aux->initial_linear_tolerance        = solverInfile("initial_linear_tolerance",1.e-13);
   solver_sadj_aux->minimum_linear_tolerance        = solverInfile("minimum_linear_tolerance",1.e-13);

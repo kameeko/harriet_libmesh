@@ -35,6 +35,7 @@ int main(int argc, char** argv){
   GetPot infileForMesh("diff_convdiff_inv.in");
   std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
   bool doContinuation                  = infileForMesh("do_continuation",false);
+  bool doArcLengthContinuation         = infileForMesh("do_arclength_continuation",false);
   
   Mesh mesh(init.comm());
 	mesh.read(find_mesh_here);
@@ -73,8 +74,7 @@ int main(int argc, char** argv){
     infile("absolute_residual_tolerance", 0.0);
 
   // And the linear solver options
-  solver->max_linear_iterations           = infile("max_linear_iterations", 50000);
-  solver->max_linear_iterations           = infile("max_linear_iterations",10000);
+  solver->max_linear_iterations           = infile("max_linear_iterations", 10000);
   solver->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);
   solver->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);
   solver->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
@@ -87,10 +87,10 @@ int main(int argc, char** argv){
   if(!doContinuation || target_R < 100.){
     system.set_R(target_R);
     system.solve();
-    system.postprocess();
-    Number QoI_computed = system.get_QoI_value("computed", 0);
-    std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;
-  }else{
+  }else if(doArcLengthContinuation){
+  
+    std::cout << "\n\nAAAAAAAAAAAAAHHHHHHHHH this arc-length continuation doesn't work yet...\n\n" << std::endl;
+    
     system.quiet = infile("solver_quiet", true);
     system.set_max_arclength_stepsize(infile("max_ds",1.e2));
       
@@ -118,11 +118,33 @@ int main(int argc, char** argv){
       std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
       iter += 1;
     }
-    
-    system.postprocess();
-    Number QoI_computed = system.get_QoI_value("computed", 0);
-    std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;
-  }
+  }else{ //natural continuation
+    std::vector<double> Rsteps;
+    if(FILE *fp=fopen("continuation_steps.txt","r")){
+			Real value;
+			int flag = 1;
+			while(flag != -1){
+				flag = fscanf(fp,"%lf",&value);
+				if(flag != -1){
+					Rsteps.push_back(value);
+				}
+			}
+			fclose(fp);
+	  }else{
+	    std::cout << "\n\n Need to define continuation steps in continuation_steps.txt\n\n" << std::endl;
+	  }
+	  
+	  for(int i = 0; i < Rsteps.size(); i++){
+	    double R = Rsteps[i];
+	    system.set_R(fabs(R));
+	    std::cout << "\n\nStarting iteration with R = " << R << "\n\n" << std::endl;
+	    system.solve();
+	  }
+  } //end continuation type switch
+  
+  system.postprocess();
+  Number QoI_computed = system.get_QoI_value("computed", 0);
+  std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;
 
   // All done.
   return 0;

@@ -53,6 +53,9 @@ int main(int argc, char** argv){
   std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
 	mesh.read(find_mesh_here);
 	mesh2.read(find_mesh_here);
+	//std::string find_mesh_here = infileForMesh("mesh","psiLF_mesh.xda");
+  //mesh.read(find_mesh_here);
+  //mesh2.read(find_mesh_here); 
 	//mesh.read("psiHF_mesh_1Dfused.xda");
 	
   bool doContinuation = infileForMesh("do_continuation",false);
@@ -137,8 +140,6 @@ int main(int argc, char** argv){
   // And the linear solver options
   solver_primary->max_linear_iterations =
     infile("max_linear_iterations", 50000);
-  solver_primary->initial_linear_tolerance =
-    infile("initial_linear_tolerance", 1.e-3);
   solver_primary->max_linear_iterations = infile("max_linear_iterations",10000);
   solver_primary->initial_linear_tolerance = infile("initial_linear_tolerance",1.e-13);
   solver_primary->minimum_linear_tolerance = infile("minimum_linear_tolerance",1.e-13);
@@ -260,6 +261,7 @@ int main(int argc, char** argv){
 				std::cout << "\n\n Residual L2 norm (auxiliary): " << system_aux.calculate_norm(*system_aux.rhs, L2) << "\n";
 				
 				equation_systems_mix.init();
+		std::clock_t start = std::clock();
   			DirectSolutionTransfer sol_transfer(init.comm()); 
   			sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
   				system_mix.variable(system_mix.variable_number("c")));
@@ -273,6 +275,8 @@ int main(int argc, char** argv){
   				system_mix.variable(system_mix.variable_number("aux_zc")));
 				sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
   				system_mix.variable(system_mix.variable_number("aux_fc")));
+		double duration = ( std::clock() - start ) / (double) CLOCKS_PER_SEC;
+    std::cout<<"\n Solution transfer time: "<< duration <<'\n';	
   			std::cout << "c: " << system_mix.calculate_norm(*system_mix.solution, 0, L2) << " " 
   												<< system_primary.calculate_norm(*system_primary.solution, 0, L2) << std::endl;
 				std::cout << "zc: " << system_mix.calculate_norm(*system_mix.solution, 1, L2) << " " 
