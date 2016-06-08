@@ -50,9 +50,10 @@ int main(int argc, char** argv)
   bool splitSuperAdj                    = infile("split_super_adjoint",true); //solve as single adjoint or two forwards
   int maxIter                           = infile("max_model_refinements",0);  //maximum number of model refinements
   double refStep                        = infile("refinement_step",0.1); //additional proportion of domain refined per step
+    //this refers to additional basis functions...number of elements will be more...
   double qoiErrorTol                    = infile("relative_error_tolerance",0.01); //stopping criterion
   bool doDivvyMatlab                    = infile("do_divvy_in_Matlab",false); //output files to determine next refinement in Matlab
-  
+
   if(refStep*maxIter > 1)
     maxIter = round(ceil(1./refStep));
 
@@ -95,7 +96,7 @@ int main(int argc, char** argv)
   // Initialize the system
 	equation_systems.init ();
 	equation_systems_mix.init();
-	
+
 	//nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
   system_sadj_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_primary); 
@@ -201,7 +202,7 @@ int main(int argc, char** argv)
 	  for(unsigned int j = 0; j < di.size(); j++)
 	    node_to_elem[round(floor(di[j]/6.))].insert(i);
   }
-  
+
   int refIter = 0;
   double relError = 2.*qoiErrorTol;
   while(refIter <= maxIter && relError > qoiErrorTol){
@@ -211,8 +212,10 @@ int main(int argc, char** argv)
       system_sadj_primary.solution->zero();
       system_sadj_aux.solution->zero();
     }
+    system_mix.solution->zero();
   
     system_primary.solve();
+    system_primary.clearQoI();
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
     system_aux.solve();
     std::cout << "\n End auxiliary solve..." << std::endl;
@@ -220,8 +223,7 @@ int main(int argc, char** argv)
     system_primary.postprocess();
     system_aux.postprocess();
 
-    equation_systems_mix.init();
-
+    equation_systems_mix.reinit();
     //combine primary and auxiliary variables into psi
 	  DirectSolutionTransfer sol_transfer(init.comm()); 
 	  sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
@@ -251,13 +253,13 @@ int main(int argc, char** argv)
       
       system_mix.assemble(); //calculate residual to correspond to solution
       
-      std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_sol, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 0, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 1, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 2, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 3, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 4, L2) << std::endl; //DEBUG
-      std::cout << system_mix.calculate_norm(dual_sol, 5, L2) << std::endl; //DEBUG
+      //std::cout << "\n sadj norm: " << system_mix.calculate_norm(dual_sol, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 0, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 1, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 2, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 3, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 4, L2) << std::endl; //DEBUG
+      //std::cout << system_mix.calculate_norm(dual_sol, 5, L2) << std::endl; //DEBUG
     }else{ //solve super-adjoint as
       system_mix.assemble(); //calculate residual to correspond to solution
       system_sadj_primary.solve();
@@ -282,15 +284,15 @@ int main(int argc, char** argv)
 		    system_mix.variable(system_mix.variable_number("zc")));
 	    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
 		    system_mix.variable(system_mix.variable_number("fc")));
-	    std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+	    //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
 	    dual_sol.swap(primal_sol);
-	    std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl; //DEBUG
-	    std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl; //DEBUG
+	    //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl; //DEBUG
+	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl; //DEBUG
 	  }
 	  NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
 /*	
@@ -319,7 +321,7 @@ int main(int argc, char** argv)
 	      << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
 	      
 	  relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
-	  std::cout << "Estimated relative qoi error: " << relError << std::endl;
+	  std::cout << "Estimated relative qoi error: " << relError << std::endl << std::endl;
     
     //output at each iteration
     std::stringstream ss;
@@ -349,7 +351,8 @@ int main(int argc, char** argv)
 	    }
 	
 	    //find nodes contributing the most
-	    double refPcnt = std::min((refIter+1)*refStep,1.);
+	    //double refPcnt = std::min((refIter+1)*refStep,1.);
+	    double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
 	    int cutoffLoc = round(node_errs.size()*refPcnt);
 	    std::sort(node_errs.begin(), node_errs.end()); 
 	    std::reverse(node_errs.begin(), node_errs.end()); 
@@ -383,8 +386,22 @@ int main(int argc, char** argv)
     refIter += 1;
   }
   
+  std::string stash_assign = "divvy_final.txt";
+  std::ofstream output_dbg(stash_assign.c_str());
+  MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+  const MeshBase::element_iterator elem_end = mesh.elements_end();
+  double numMarked = 0.;
+  for (; elem_it != elem_end; ++elem_it){
+    Elem* elem = *elem_it;
+    numMarked += elem->subdomain_id();
+    if(output_dbg.is_open()){
+    	output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
+    }
+  }
+  output_dbg.close();
+  
   std::cout << "\nRefinement concluded..." << std::endl;
-  std::cout << "Final refinement fraction: " << (refIter-1)*refStep << std::endl;
+  std::cout << "Final refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl;
   std::cout << "Final estimated relative error: " << relError << std::endl;
   
   return 0; //done

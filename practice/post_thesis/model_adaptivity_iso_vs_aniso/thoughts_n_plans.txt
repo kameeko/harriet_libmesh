@@ -60,7 +60,7 @@ nan residual?? after the linear solve...c doesn't seem to have moved from initia
     -or maybe you really do need to go parallel?
     
     -> add pc_factor_shift_type nonzero:
-    ./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels -pc_factor_shift_type nonzero
+    ./progname -ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4 -pc_factor_shift_type nonzero
       -> singularity of J perhaps related to velocity term being too small relative to element size? maybe forward and adjoint, which only differ by sign of velocity, look too similar? no, one acts on adjoint and one acts on state...different columns...
         -> only velocity and reaction use time...
       -> on bassi
@@ -189,6 +189,9 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
         
         
 poke dissolution/precipitation forward problem, see if it does have an interesting steady state?
-  -if not, then try iso conv-diff vs aniso conv-diff-react
-  -should probably also intergrate divvy...
+  -if not, then try iso conv-diff vs aniso conv-diff-react? or inferring for k with regular cd vs cdr?
+  -try inexact-linear-solve continuation on original problem, vs newly integrated? does newly integrated benefit from loose linear solve?
 
+is continuation not 'state of the art' enough because we would not normally even solve the whole KKT system, and instead go for optimization program? harder to compare the two then...although even for optimization a good initial guess is sometimes needed...
+
+for 442, taking two refinements of 0.05 increments each in integrated code doesn't end up with <1% error...

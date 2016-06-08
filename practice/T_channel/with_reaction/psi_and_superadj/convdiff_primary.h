@@ -76,6 +76,7 @@ public:
   int qoi_option;
   Real qoi;
   double getQoI(){ return qoi; }
+  void clearQoI(){ qoi = 0.; }
   
   int numInvCalls; //DEBUG
   int getInvCalls(){ return numInvCalls; } //DEBUG
