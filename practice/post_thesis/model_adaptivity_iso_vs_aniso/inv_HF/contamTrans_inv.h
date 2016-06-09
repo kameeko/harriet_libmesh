@@ -1,6 +1,7 @@
 // DiffSystem framework files
 #include "libmesh/fem_system.h"
 #include "libmesh/getpot.h"
+#include "libmesh/point_locator_tree.h"
 
 using namespace libMesh;
 
@@ -45,7 +46,13 @@ public:
 				fclose(fp);
 	  	}
 	  }
-	  accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
+	  //find elements in which data points reside
+	  PointLocatorTree point_locator(this->get_mesh());
+	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+	  	Point data_point = datapts[dnum];
+	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+	  	dataelems.push_back(this_elem->id());
+	  }
   }
 
   // System initialization
@@ -93,9 +100,7 @@ public:
   //data-related stuff
   std::vector<Point> datapts; 
   std::vector<Real> datavals;
-  
-	//avoid assigning data point to two elements in on their boundary
-	std::vector<int> accounted_for;
+  std::vector<dof_id_type> dataelems;
 	
   //to hold computed QoI
   Number computed_QoI[1];

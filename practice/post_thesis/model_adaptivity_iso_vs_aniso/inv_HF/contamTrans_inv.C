@@ -24,8 +24,8 @@ void ContamTransSysInv::init_data(){
   GetPot infile("contamTrans.in");
   
   //regularization
-	beta = infile("beta", 0.1);
-	
+  beta = infile("beta", 0.1);
+  
   unsigned int poly_order = infile("poly_order",1);
   std::string fefamily = infile("fe_family", std::string("LAGRANGE"));
   c_var = this->add_variable("c", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
@@ -38,32 +38,32 @@ void ContamTransSysInv::init_data(){
   this->time_evolving(z_var);
 
   // Useful debugging options'
-	// Set verify_analytic_jacobians to positive to use
-	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
-	this->print_jacobians = infile("print_jacobians", false);
-	this->print_element_jacobians = infile("print_element_jacobians", false);
+  // Set verify_analytic_jacobians to positive to use
+  this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+  this->print_jacobians = infile("print_jacobians", false);
+  this->print_element_jacobians = infile("print_element_jacobians", false);
 
-	//set Dirichlet boundary conditions (none in this case)
+  //set Dirichlet boundary conditions (none in this case)
 
-	//set parameters
-	vx = infile("vx", 2.415e-5); // m/s
-	react_rate = infile("reaction_rate", 0.0); // 1/s
-	porosity = infile("porosity", 0.1); // (unitless)
-	bsource = infile("bsource", -5.0); // ppb
+  //set parameters
+  vx = infile("vx", 2.415e-5); // m/s
+  react_rate = infile("reaction_rate", 0.0); // 1/s
+  porosity = infile("porosity", 0.1); // (unitless)
+  bsource = infile("bsource", -5.0); // ppb
 
-	//compute dispersion tensor (assuming for now that velocity purely in x direction)
-	double dlong = infile("dispersivity_longitudinal",60.0);
-	double dtransh = infile("dispersivity_transverse_horizontal",6.0);
-	double dtransv = infile("dispersivity_transverse_vertical",0.6);
-	dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
-	                            0.0, vx*dtransh, 0.0,
-	                            0.0, 0.0, vx*dtransv);
+  //compute dispersion tensor (assuming for now that velocity purely in x direction)
+  double dlong = infile("dispersivity_longitudinal",60.0);
+  double dtransh = infile("dispersivity_transverse_horizontal",6.0);
+  double dtransv = infile("dispersivity_transverse_vertical",0.6);
+  dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
+                              0.0, vx*dtransh, 0.0,
+                              0.0, 0.0, vx*dtransv);
 
   useSUPG = infile("use_stabilization",false);
   stab_opt = infile("stabilization_option",1);
 
-	// Do the parent's initialization after variables and boundary constraints are defined
-	FEMSystem::init_data();
+  // Do the parent's initialization after variables and boundary constraints are defined
+  FEMSystem::init_data();
 }
 
 //context initialization
@@ -74,18 +74,18 @@ void ContamTransSysInv::init_context(DiffContext & context){
   FEBase* c_side_fe;
 
   ctxt.get_element_fe(c_var, c_elem_fe);
-	ctxt.get_side_fe(c_var, c_side_fe );
+  ctxt.get_side_fe(c_var, c_side_fe );
 
-	c_elem_fe->get_JxW();
-	c_elem_fe->get_phi();
-	c_elem_fe->get_dphi();
-	c_elem_fe->get_d2phi();
-	c_elem_fe->get_xyz();
+  c_elem_fe->get_JxW();
+  c_elem_fe->get_phi();
+  c_elem_fe->get_dphi();
+  c_elem_fe->get_d2phi();
+  c_elem_fe->get_xyz();
 
-	c_side_fe->get_JxW();
-	c_side_fe->get_phi();
-	c_side_fe->get_dphi();
-	c_side_fe->get_xyz();
+  c_side_fe->get_JxW();
+  c_side_fe->get_phi();
+  c_side_fe->get_dphi();
+  c_side_fe->get_xyz();
 }
 
 //element residual and jacobian calculations
@@ -112,18 +112,18 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
   const unsigned int n_c_dofs = ctxt.get_dof_indices( c_var ).size();
 
   // The subvectors and submatrices we need to fill:
-	DenseSubMatrix<Number> &J_c_z = ctxt.get_elem_jacobian(c_var, z_var);
-	DenseSubMatrix<Number> &J_c_c = ctxt.get_elem_jacobian(c_var, c_var);
+  DenseSubMatrix<Number> &J_c_z = ctxt.get_elem_jacobian(c_var, z_var);
+  DenseSubMatrix<Number> &J_c_c = ctxt.get_elem_jacobian(c_var, c_var);
 
-	DenseSubMatrix<Number> &J_z_c = ctxt.get_elem_jacobian(z_var, c_var);
-	DenseSubMatrix<Number> &J_z_f = ctxt.get_elem_jacobian(z_var, f_var);
+  DenseSubMatrix<Number> &J_z_c = ctxt.get_elem_jacobian(z_var, c_var);
+  DenseSubMatrix<Number> &J_z_f = ctxt.get_elem_jacobian(z_var, f_var);
 
-	DenseSubMatrix<Number> &J_f_z = ctxt.get_elem_jacobian(f_var, z_var);
-	DenseSubMatrix<Number> &J_f_f = ctxt.get_elem_jacobian(f_var, f_var);
-	
-	DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
-	DenseSubVector<Number> &Rz = ctxt.get_elem_residual( z_var );
-	DenseSubVector<Number> &Rf = ctxt.get_elem_residual( f_var );
+  DenseSubMatrix<Number> &J_f_z = ctxt.get_elem_jacobian(f_var, z_var);
+  DenseSubMatrix<Number> &J_f_f = ctxt.get_elem_jacobian(f_var, f_var);
+  
+  DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
+  DenseSubVector<Number> &Rz = ctxt.get_elem_residual( z_var );
+  DenseSubVector<Number> &Rf = ctxt.get_elem_residual( f_var );
 
   // Now we will build the element Jacobian and residual.
   // Constructing the residual requires the solution and its
@@ -197,106 +197,103 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
       //dL/dz = 0
       Rz(i) += JxW[qp]*
                  (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
-		             - (U*grad_c)*phi[i][qp] // Convection Term
-		             - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
-		             + f*phi[i][qp]); // Source term
-		       
-		  //dL/dc = 0
-		  Rc(i) += JxW[qp]*
-		            (-(dispTens*(porosity*grad_z))*dphi[i][qp] // Dispersion Term
-		             + (U*grad_z)*phi[i][qp] // Convection Term
-		             - (react_rate*(porosity*z))*phi[i][qp]); // Reaction Term
-		  
-		  //dL/df = 0
-		  Rf(i) += JxW[qp]*(beta*grad_f*dphi[i][qp] + z*phi[i][qp]); 
-		       
-		  if(useSUPG){
-		    //dL/dz = 0
-		    Rz(i) += JxW[qp]*((tau*U*dphi[i][qp])*
-		               (porosity*dispTens.contract(hess_c) //Dispersion term
-		               - (U*grad_c) // Convection Term
-		               - (react_rate*(porosity*c)) // Reaction Term
-		               + f)); // Source term
-		    
-		    //dL/dc = 0
-		    Rc(i) += JxW[qp]*((tau*U*grad_z)*
-		               (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
-		               - (U*dphi[i][qp]) // Convection Term
-		               - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
-		    
-		    //dL/df = 0
-		    Rf(i) += JxW[qp]*(tau*U*grad_z)*phi[i][qp];
+                 - (U*grad_c)*phi[i][qp] // Convection Term
+                 - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
+                 + f*phi[i][qp]); // Source term
+           
+      //dL/dc = 0
+      Rc(i) += JxW[qp]*
+                (-(dispTens*(porosity*grad_z))*dphi[i][qp] // Dispersion Term
+                 + (U*grad_z)*phi[i][qp] // Convection Term
+                 - (react_rate*(porosity*z))*phi[i][qp]); // Reaction Term
+      
+      //dL/df = 0
+      Rf(i) += JxW[qp]*(beta*grad_f*dphi[i][qp] + z*phi[i][qp]); 
+           
+      if(useSUPG){
+        //dL/dz = 0
+        Rz(i) += JxW[qp]*((tau*U*dphi[i][qp])*
+                   (porosity*dispTens.contract(hess_c) //Dispersion term
+                   - (U*grad_c) // Convection Term
+                   - (react_rate*(porosity*c)) // Reaction Term
+                   + f)); // Source term
+        
+        //dL/dc = 0
+        Rc(i) += JxW[qp]*((tau*U*grad_z)*
+                   (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                   - (U*dphi[i][qp]) // Convection Term
+                   - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
+        
+        //dL/df = 0
+        Rf(i) += JxW[qp]*(tau*U*grad_z)*phi[i][qp];
       }
       
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
-	      for (unsigned int j=0; j != n_c_dofs; j++)
-	      {
-	        J_z_c(i,j) += JxW[qp]*
-	                       ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
-			                   - (U*dphi[j][qp])*phi[i][qp] // Convection
-			                   - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
-			    J_z_f(i,j) += JxW[qp]*phi[j][qp]*phi[i][qp];
-			    
-			    J_c_z(i,j) += JxW[qp]*
-			                    (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
-		                       + (U*dphi[j][qp])*phi[i][qp] // Convection Term
-		                       - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
-			    
-			    J_f_z(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]); 
-			    J_f_f(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]); 
-			    if(useSUPG){
-			      J_z_c(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
-		                 (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
-		                 - (U*dphi[j][qp]) // Convection Term
-		                 - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
-		        J_z_f(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*phi[j][qp]);
-		        
-			      J_c_z(i,j) += JxW[qp]*((tau*U*dphi[j][qp])*
-		                       (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
-		                       - (U*dphi[i][qp]) // Convection Term
-		                       - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
-			      
-			      J_f_z(i,j) += JxW[qp]*(tau*U*dphi[j][qp])*phi[i][qp];
+        for (unsigned int j=0; j != n_c_dofs; j++)
+        {
+          J_z_c(i,j) += JxW[qp]*
+                         ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
+                         - (U*dphi[j][qp])*phi[i][qp] // Convection
+                         - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          J_z_f(i,j) += JxW[qp]*phi[j][qp]*phi[i][qp];
+          
+          J_c_z(i,j) += JxW[qp]*
+                          (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
+                           + (U*dphi[j][qp])*phi[i][qp] // Convection Term
+                           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          
+          J_f_z(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]); 
+          J_f_f(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]); 
+          if(useSUPG){
+            J_z_c(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
+                     (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
+                     - (U*dphi[j][qp]) // Convection Term
+                     - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
+            J_z_f(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*phi[j][qp]);
+            
+            J_c_z(i,j) += JxW[qp]*((tau*U*dphi[j][qp])*
+                           (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                           - (U*dphi[i][qp]) // Convection Term
+                           - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
+            
+            J_f_z(i,j) += JxW[qp]*(tau*U*dphi[j][qp])*phi[i][qp];
           }
-	      } // end of the inner dof (j) loop
+        } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
 
     } // end of the outer dof (i) loop
   } // end of the quadrature point (qp) loop
 
   for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
-  	Point data_point = datapts[dnum];
-  	if(ctxt.get_elem().contains_point(data_point) && (accounted_for[dnum]>=ctxt.get_elem().id()) ){
-  	
-  		//help avoid double-counting if data from edge of elements, but may mess with jacobian check
-  		accounted_for[dnum] = ctxt.get_elem().id(); 
-  		
-  		Number cpred = ctxt.point_value(c_var, data_point);
-  		Number cstar = datavals[dnum];
+    Point data_point = datapts[dnum];
+    if(dataelems[dnum] == ctxt.get_elem().id()){
 
-  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
-	    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
-	    
-	    //go between physical and reference element
-	    Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point); 	
-	    
+      Number cpred = ctxt.point_value(c_var, data_point);
+      Number cstar = datavals[dnum];
+
+      unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
+      FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
+      
+      //go between physical and reference element
+      Point c_master = FEInterface::inverse_map(dim, fe_type, &ctxt.get_elem(), data_point);   
+      
       std::vector<Real> point_phi(n_c_dofs);
-    	for (unsigned int i=0; i != n_c_dofs; i++){
-    		//get value of basis function at mapped point in reference (master) element
+      for (unsigned int i=0; i != n_c_dofs; i++){
+        //get value of basis function at mapped point in reference (master) element
         point_phi[i] = FEInterface::shape(dim, fe_type, &ctxt.get_elem(), i, c_master); 
       }
       
       for (unsigned int i=0; i != n_c_dofs; i++){
-	  		Rc(i) += -(cpred - cstar)*point_phi[i];
+        Rc(i) += -(cpred - cstar)*point_phi[i];
   
-				if (request_jacobian){
-					for (unsigned int j=0; j != n_c_dofs; j++)
-						J_c_c(i,j) += -point_phi[j]*point_phi[i] ;
-			  }
+        if (request_jacobian){
+          for (unsigned int j=0; j != n_c_dofs; j++)
+            J_c_c(i,j) += -point_phi[j]*point_phi[i] ;
+        }
   
-			}
-  	}
+      }
+    }
   }
 
   return request_jacobian;
@@ -333,11 +330,11 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
   // The subvectors and submatrices we need to fill:
   DenseSubMatrix<Number> &J_c_z = ctxt.get_elem_jacobian(c_var, z_var);
 
-	DenseSubMatrix<Number> &J_z_c = ctxt.get_elem_jacobian(z_var, c_var);
-	
-	DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
-	DenseSubVector<Number> &Rz = ctxt.get_elem_residual( z_var );
-	//Rf gets no contribution from sides
+  DenseSubMatrix<Number> &J_z_c = ctxt.get_elem_jacobian(z_var, c_var);
+  
+  DenseSubVector<Number> &Rc = ctxt.get_elem_residual( c_var );
+  DenseSubVector<Number> &Rz = ctxt.get_elem_residual( z_var );
+  //Rf gets no contribution from sides
 
 
   unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
@@ -375,12 +372,12 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
       if(request_jacobian && context.get_elem_solution_derivative())
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
-	      {
+        {
           if(isWest)
             J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
           if(isEast)
             J_c_z(i,i) += JxW[qp]*(-U*face_normals[qp]*phi[j][qp])*phi[i][qp];
-	      }
+        }
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
     } //end of outer dof (i) loop
   }
@@ -391,7 +388,7 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
 //generate data
 void ContamTransSysInv::postprocess(){
 
-	//reset computed QoIs
+  //reset computed QoIs
   computed_QoI[0] = 0.0;
 
   FEMSystem::postprocess();
