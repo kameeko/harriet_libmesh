@@ -205,3 +205,7 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
     -> 1 adaptive step, 0.11 final refinement fraction, 0.0115 estimated relative error, 0.004 actual relative error
     -> this looks possibly promising...**do 3D version with iso conv-diff vs aniso conv-diff-react?** (same mesh first?)
       -ONLY RUN 3D ON BASSI
+
+3D iso conv-diff vs aniso conv-diff-react
+  -halve each dimension and origin-align? can do parallel for inv and fwd, but will make adaptivity more difficult (deal with elements across processors)
+  -LF inv in serial with strict linear tol and 92x66x20 mesh takes 3+ hours (get stuck at e-10 residual for some reason...solves on 5x5x5, weird glitch in ssh?)

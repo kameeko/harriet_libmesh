@@ -67,6 +67,7 @@ void ContamTransSysInv::init_data(){
   //set parameters
   vx = infile("vx", 2.415e-5); // m/s
   react_rate = infile("reaction_rate", 0.0); // 1/s
+  reaction_order = infile("reaction_order",2);
   porosity = infile("porosity", 0.1); // (unitless)
   bsource = infile("bsource", -5.0); // ppb
 
@@ -228,34 +229,60 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
       //dL/dz = 0
-      Rz(i) += JxW[qp]*
-                 (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
-                 - (U*grad_c)*phi[i][qp] // Convection Term
-                 - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
-                 + f*phi[i][qp]); // Source term
+      if(reaction_order == 1)
+        Rz(i) += JxW[qp]*
+                   (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
+                   - (U*grad_c)*phi[i][qp] // Convection Term
+                   - (react_rate*(porosity*c))*phi[i][qp] // Reaction Term
+                   + f*phi[i][qp]); // Source term
+      else if(reaction_order == 2)
+        Rz(i) += JxW[qp]*
+                   (-(dispTens*(porosity*grad_c))*dphi[i][qp] // Dispersion Term
+                   - (U*grad_c)*phi[i][qp] // Convection Term
+                   - (react_rate*(porosity*c*c))*phi[i][qp] // Reaction Term
+                   + f*phi[i][qp]); // Source term
            
       //dL/dc = 0
-      Rc(i) += JxW[qp]*
+      if(reaction_order == 1)
+        Rc(i) += JxW[qp]*
+                  (-(dispTens*(porosity*grad_z))*dphi[i][qp] // Dispersion Term
+                   + (U*grad_z)*phi[i][qp] // Convection Term
+                   - (react_rate*(porosity*z))*phi[i][qp]); // Reaction Term
+      else if(reaction_order == 2)
+        Rc(i) += JxW[qp]*
                 (-(dispTens*(porosity*grad_z))*dphi[i][qp] // Dispersion Term
                  + (U*grad_z)*phi[i][qp] // Convection Term
-                 - (react_rate*(porosity*z))*phi[i][qp]); // Reaction Term
+                 - (2.*react_rate*(porosity*z*c))*phi[i][qp]); // Reaction Term
       
       //dL/df = 0
       Rf(i) += JxW[qp]*(beta*grad_f*dphi[i][qp] + z*phi[i][qp]); 
            
       if(useSUPG){
         //dL/dz = 0
-        Rz(i) += JxW[qp]*((tau*U*dphi[i][qp])*
-                   (porosity*dispTens.contract(hess_c) //Dispersion term
-                   - (U*grad_c) // Convection Term
-                   - (react_rate*(porosity*c)) // Reaction Term
-                   + f)); // Source term
+        if(reaction_order == 1)
+          Rz(i) += JxW[qp]*((tau*U*dphi[i][qp])*
+                     (porosity*dispTens.contract(hess_c) //Dispersion term
+                     - (U*grad_c) // Convection Term
+                     - (react_rate*(porosity*c)) // Reaction Term
+                     + f)); // Source term
+        else if(reaction_order == 2) 
+          Rz(i) += JxW[qp]*((tau*U*dphi[i][qp])*
+                     (porosity*dispTens.contract(hess_c) //Dispersion term
+                     - (U*grad_c) // Convection Term
+                     - (react_rate*(porosity*c*c)) // Reaction Term
+                     + f)); // Source term
         
         //dL/dc = 0
-        Rc(i) += JxW[qp]*((tau*U*grad_z)*
-                   (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
-                   - (U*dphi[i][qp]) // Convection Term
-                   - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
+        if(reaction_order == 1)
+          Rc(i) += JxW[qp]*((tau*U*grad_z)*
+                     (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                     - (U*dphi[i][qp]) // Convection Term
+                     - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
+        else if(reaction_order == 2) 
+          Rc(i) += JxW[qp]*((tau*U*grad_z)*
+                     (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                     - (U*dphi[i][qp]) // Convection Term
+                     - (2.*react_rate*(porosity*c*phi[i][qp])))); // Reaction Term
         
         //dL/df = 0
         Rf(i) += JxW[qp]*(tau*U*grad_z)*phi[i][qp];
@@ -265,31 +292,57 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
         {
-          J_z_c(i,j) += JxW[qp]*
-                         ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
-                         - (U*dphi[j][qp])*phi[i][qp] // Convection
-                         - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          if(reaction_order == 1)
+            J_z_c(i,j) += JxW[qp]*
+                           ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
+                           - (U*dphi[j][qp])*phi[i][qp] // Convection
+                           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          else if(reaction_order == 2)
+            J_z_c(i,j) += JxW[qp]*
+                           ((-dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion
+                           - (U*dphi[j][qp])*phi[i][qp] // Convection
+                           - (2.*react_rate*(porosity*c*phi[j][qp]))*phi[i][qp]); // Reaction Term
           J_z_f(i,j) += JxW[qp]*phi[j][qp]*phi[i][qp];
           
-          J_c_z(i,j) += JxW[qp]*
-                          (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
-                           + (U*dphi[j][qp])*phi[i][qp] // Convection Term
-                           - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          if(reaction_order == 1)
+            J_c_z(i,j) += JxW[qp]*
+                            (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
+                             + (U*dphi[j][qp])*phi[i][qp] // Convection Term
+                             - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
+          else if(reaction_order == 2)
+            J_c_z(i,j) += JxW[qp]*
+                            (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
+                             + (U*dphi[j][qp])*phi[i][qp] // Convection Term
+                             - (2.*react_rate*(porosity*c*phi[j][qp]))*phi[i][qp]); // Reaction Term
           
           J_f_z(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]); 
           J_f_f(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]); 
           if(useSUPG){
-            J_z_c(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
-                     (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
-                     - (U*dphi[j][qp]) // Convection Term
-                     - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
+            if(reaction_order == 1)
+              J_z_c(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
+                       (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
+                       - (U*dphi[j][qp]) // Convection Term
+                       - (react_rate*(porosity*phi[j][qp])))); // Reaction Term
+            else if(reaction_order == 2)
+              J_z_c(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*
+                       (porosity*dispTens.contract(d2phi[j][qp]) //Dispersion term
+                       - (U*dphi[j][qp]) // Convection Term
+                       - (2.*react_rate*(c*porosity*phi[j][qp])))); // Reaction Term 
+            
             J_z_f(i,j) += JxW[qp]*((tau*U*dphi[i][qp])*phi[j][qp]);
             
-            J_c_z(i,j) += JxW[qp]*((tau*U*dphi[j][qp])*
-                           (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
-                           - (U*dphi[i][qp]) // Convection Term
-                           - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
-            
+            if(reaction_order == 1)
+              J_c_z(i,j) += JxW[qp]*((tau*U*dphi[j][qp])*
+                             (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                             - (U*dphi[i][qp]) // Convection Term
+                             - (react_rate*(porosity*phi[i][qp])))); // Reaction Term
+            else if(reaction_order == 2){
+              J_c_z(i,j) += JxW[qp]*((tau*U*dphi[j][qp])*
+                             (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
+                             - (U*dphi[i][qp]) // Convection Term
+                             - (2.*react_rate*(porosity*c*phi[i][qp])))); // Reaction Term
+              J_c_c(i,j) += JxW[qp]*(2.*react_rate*z*phi[j][qp]*phi[i][qp]);
+            }            
             J_f_z(i,j) += JxW[qp]*(tau*U*dphi[j][qp])*phi[i][qp];
           }
         } // end of the inner dof (j) loop
