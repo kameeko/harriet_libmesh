@@ -28,11 +28,11 @@
 
 int main(int argc, char** argv){
 
-	//initialize libMesh
-	LibMeshInit init(argc, argv);
-	
-	//parameters
-	GetPot infile("fem_system_params.in");
+  //initialize libMesh
+  LibMeshInit init(argc, argv);
+  
+  //parameters
+  GetPot infile("fem_system_params.in");
   const bool transient                  = infile("transient", true);
   const Real deltat                     = infile("deltat", 0.005);
   unsigned int n_timesteps              = infile("n_timesteps", 20);
@@ -79,8 +79,8 @@ int main(int argc, char** argv){
   
   //name system
   ContamTransSysInv & system = 
-  	equation_systems.add_system<ContamTransSysInv>("ContamTransInv");
-  	
+    equation_systems.add_system<ContamTransSysInv>("ContamTransInv");
+    
   //solve as steady or transient
   if(transient){
     //system.time_solver = AutoPtr<TimeSolver>(new EulerSolver(system)); //backward Euler
@@ -106,8 +106,8 @@ int main(int argc, char** argv){
   system.deltat = deltat;
   
   //...and the nonlinear solver options...
-  NewtonSolver *solver = new NewtonSolver(system);
-  system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver);
+  NewtonSolver *solver = new NewtonSolver(system); 
+  system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver); 
   solver->quiet = infile("solver_quiet", true);
   solver->verbose = !solver->quiet;
   solver->max_nonlinear_iterations =
@@ -118,12 +118,12 @@ int main(int argc, char** argv){
     infile("relative_residual_tolerance", 0.0);
   solver->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
-    
-  //...and the linear solver options
-  solver->max_linear_iterations =
-    infile("max_linear_iterations", 50000);
-  solver->initial_linear_tolerance =
-    infile("initial_linear_tolerance", 1.e-3);
+
+  // And the linear solver options
+  solver->max_linear_iterations           = infile("max_linear_iterations", 10000);
+  solver->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);
+  solver->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);
+  solver->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
     
   // Mesh Refinement object - to test effect of constant refined mesh (not refined at every timestep)
   MeshRefinement mesh_refinement(mesh);

@@ -1,6 +1,7 @@
 // DiffSystem framework files
 #include "libmesh/fem_system.h"
 #include "libmesh/getpot.h"
+#include "libmesh/elem.h"
 #include "libmesh/point_locator_tree.h"
 
 using namespace libMesh;

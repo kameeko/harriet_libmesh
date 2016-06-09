@@ -189,12 +189,19 @@ bart didn't seem to have any actual model pairs in mind, just ideas for applicat
         
         
 poke dissolution/precipitation forward problem, see if it does have an interesting steady state?
-  -if not, then try iso conv-diff vs aniso conv-diff-react? or inferring for k with regular cd vs cdr?
+  -if not, then try **iso conv-diff vs aniso conv-diff-react**? or **inferring for k with regular cd vs cdr**?
   -try inexact-linear-solve continuation on original problem, vs newly integrated? does newly integrated benefit from loose linear solve?
 
 is continuation not 'state of the art' enough because we would not normally even solve the whole KKT system, and instead go for optimization program? harder to compare the two then...although even for optimization a good initial guess is sometimes needed...
 
 for 442, taking two refinements of 0.05 increments each in integrated code doesn't end up with <1% error...
 
-natural continuation vs integrated adaptivity:
-  -r = -442: cont steps (400, 442) < cont steps (0,100,200,300,400,442) < adaptive
+natural continuation vs integrated adaptivity: (strict linear solve, gmres)
+  r = -442: cont steps (0,100,200,300,400,442) < adaptive (1 step, 0.11 final fraction) < cont steps (400, 442)
+    -> 25 (15 linear ) vs 35 (23 linear) vs 40 (28 linear)
+    -> 1 adaptive step, 0.11 final refinement fraction, 0.0144 estimated relative error, 0.0035 actual relative error
+  r = -1000: adaptive < cont steps (0:100:1000) < cont steps (400:100:1000)
+    -> 43 (30 linear) vs 56 (35 linear) vs 67 (45 linear)
+    -> 1 adaptive step, 0.11 final refinement fraction, 0.0115 estimated relative error, 0.004 actual relative error
+    -> this looks possibly promising...**do 3D version with iso conv-diff vs aniso conv-diff-react?** (same mesh first?)
+      -ONLY RUN 3D ON BASSI
