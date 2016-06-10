@@ -25,6 +25,7 @@
 
 //local includes
 #include "contamTrans_inv.h"
+#include "initial.h"
 
 int main(int argc, char** argv){
 
@@ -79,6 +80,12 @@ int main(int argc, char** argv){
   
   // Initialize the system
   equation_systems.init ();
+  
+  //initial conditions
+  read_initial_parameters();
+  system.project_solution(initial_value, initial_grad,
+                          equation_systems.parameters);
+  finish_initialization();
 
   // And the nonlinear solver options
   NewtonSolver *solver = new NewtonSolver(system); 
