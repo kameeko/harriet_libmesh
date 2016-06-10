@@ -1,4 +1,4 @@
-//inference with steady coupled stokes-convection-diffusion
+//foward run for simple contaminant transport model
 
 // C++ includes
 #include <iomanip>
@@ -11,17 +11,20 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/mesh_refinement.h"
+#include "libmesh/patch_recovery_error_estimator.h"
 #include "libmesh/uniform_refinement_estimator.h"
 #include "libmesh/getpot.h"
-#include "libmesh/enum_xdr_mode.h" //DEBUG
-#include "libmesh/gmv_io.h" //DEBUG
+#include "libmesh/tecplot_io.h"
 
 // The systems and solvers we may use
 #include "libmesh/diff_solver.h"
 #include "libmesh/steady_solver.h"
 #include "libmesh/newton_solver.h"
-#include "diff_convdiff_inv.h"
+#include "libmesh/euler_solver.h"
 #include "libmesh/continuation_system.h"
+
+//local includes
+#include "contamTrans_inv.h"
 
 int main(int argc, char** argv){
 
@@ -31,14 +34,32 @@ int main(int argc, char** argv){
 	//parameters
 	GetPot infile("fem_system_params.in");
   unsigned int n_timesteps             = infile("n_timesteps", 1);
-  Real init_dR                         = infile("init_dR",100.);
-  GetPot infileForMesh("diff_convdiff_inv.in");
-  std::string find_mesh_here = infileForMesh("divided_mesh","meep.exo");
+  //Real init_dR                         = infile("init_dR",1.e-3);
+  const int nx                          = infile("nx",100);
+  const int ny                          = infile("ny",100);
+  const int nz                          = infile("nz",100);
+  GetPot infileForMesh("contamTrans.in");
   bool doContinuation                  = infileForMesh("do_continuation",false);
   bool doArcLengthContinuation         = infileForMesh("do_arclength_continuation",false);
   
+  // Create a mesh, with dimension to be overridden later, distributed
+  // across the default MPI communicator.
   Mesh mesh(init.comm());
-	mesh.read(find_mesh_here);
+  
+  //create mesh
+  unsigned int dim;
+  if(nz == 0){ //to check if oscillations happen in 2D as well...
+    dim = 2;
+    MeshTools::Generation::build_square(mesh, nx, ny, 0., 2300., 0., 1650., QUAD9);
+  }else{
+    dim = 3;
+    MeshTools::Generation::build_cube(mesh, 
+                                      nx, ny, nz, 
+                                      0., 2300., 
+                                      0., 1650., 
+                                      0., 100., 
+                                      HEX27);
+  }
 
   // Print information about the mesh to the screen.
   mesh.print_info(); //DEBUG
@@ -47,10 +68,10 @@ int main(int argc, char** argv){
   EquationSystems equation_systems (mesh);
   
   //name system
-  Diff_ConvDiff_InvSys & system = 
-  	equation_systems.add_system<Diff_ConvDiff_InvSys>("Diff_ConvDiff_InvSys");
-  system.min_continuation_parameter = 0.;
-  system.max_continuation_parameter = std::fabs(infileForMesh("R",1.0));
+  ContamTransSysInv & system = 
+    equation_systems.add_system<ContamTransSysInv>("ContamTransInv");
+  //system.min_continuation_parameter = 0.;
+  //system.max_continuation_parameter = std::fabs(infileForMesh("reaction_rate",1.e-3));
   
   //steady-state problem	
  	system.time_solver = AutoPtr<TimeSolver>(new SteadySolver(system));
@@ -82,15 +103,15 @@ int main(int argc, char** argv){
   // Print information about the system to the screen.
   equation_systems.print_info(); //DEBUG
   
-  Real target_R = std::fabs(infileForMesh("R",1.0));
+  Real target_R = infileForMesh("reaction_rate",1.e-3);
   
-  if(!doContinuation || target_R < 100.){
+  if(!doContinuation){
     system.set_R(target_R);
     system.solve();
   }else if(doArcLengthContinuation){
   
     std::cout << "\n\nAAAAAAAAAAAAAHHHHHHHHH this arc-length continuation doesn't work yet...\n\n" << std::endl;
-    
+    /*
     system.quiet = infile("solver_quiet", true);
     system.set_max_arclength_stepsize(infile("max_ds",1.e2));
       
@@ -118,6 +139,7 @@ int main(int argc, char** argv){
       std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
       iter += 1;
     }
+    */
   }else{ //natural continuation
     std::vector<double> Rsteps;
     if(FILE *fp=fopen("continuation_steps.txt","r")){
@@ -136,7 +158,7 @@ int main(int argc, char** argv){
 	  
 	  for(int i = 0; i < Rsteps.size(); i++){
 	    double R = Rsteps[i];
-	    system.set_R(fabs(R));
+	    system.set_R(R);
 	    std::cout << "\n\nStarting iteration with R = " << R << "\n\n" << std::endl;
 	    system.solve();
 	  }

@@ -209,3 +209,10 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
 3D iso conv-diff vs aniso conv-diff-react
   -halve each dimension and origin-align? can do parallel for inv and fwd, but will make adaptivity more difficult (deal with elements across processors)
   -LF inv in serial with strict linear tol and 92x66x20 mesh takes 3+ hours (get stuck at e-10 residual for some reason...solves on 5x5x5, weird glitch in ssh?)
+  -quartered domain, 46x33x20
+    -iso 100: 155 (141 in linear)
+    -iso 40: 160 (147 in linear)
+    -aniso 100-40-4: 220 (200 in linear)
+    -aniso 100-40-4, r = +1e-3: 466 (433 in linear)
+    -aniso 100-40-4, r = +2e-3: freaking forever
+  -with quadratic reaction, seem to need really small reaction term to converge (e-3) on 5x5x5; probably due to change in units of c (different magnitudes...)
