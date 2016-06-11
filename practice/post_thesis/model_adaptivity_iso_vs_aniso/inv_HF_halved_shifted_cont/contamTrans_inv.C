@@ -180,7 +180,8 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
     NumberTensorValue hess_c = ctxt.interior_hessian(c_var, qp); //for SUPG
 
     //velocity vector
-    NumberVectorValue U(vx, 0.0, 0.0);
+    //NumberVectorValue U(vx, 0.0, 0.0);
+    NumberVectorValue U(porosity*vx, 0., 0.); //DEBUG
     
     //SUPG
     double tau = 0.0;
@@ -447,7 +448,8 @@ bool ContamTransSysInv::side_time_derivative(bool request_jacobian, DiffContext 
            z = ctxt.side_value(z_var, qp);
 
     //velocity vector
-    NumberVectorValue U(vx, 0.0, 0.0);
+    //NumberVectorValue U(vx, 0.0, 0.0);
+    NumberVectorValue U(porosity*vx, 0., 0.); //DEBUG
 
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
