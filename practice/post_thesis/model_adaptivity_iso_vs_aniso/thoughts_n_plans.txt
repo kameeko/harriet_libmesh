@@ -197,6 +197,7 @@ is continuation not 'state of the art' enough because we would not normally even
 for 442, taking two refinements of 0.05 increments each in integrated code doesn't end up with <1% error...
 
 natural continuation vs integrated adaptivity: (strict linear solve, gmres)
+  r = 0 inv: 4.5 (3 in linear)
   r = -442: cont steps (0,100,200,300,400,442) < adaptive (1 step, 0.11 final fraction) < cont steps (400, 442)
     -> 25 (15 linear ) vs 35 (23 linear) vs 40 (28 linear)
     -> 1 adaptive step, 0.11 final refinement fraction, 0.0144 estimated relative error, 0.0035 actual relative error
@@ -209,10 +210,19 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
 3D iso conv-diff vs aniso conv-diff-react
   -halve each dimension and origin-align? can do parallel for inv and fwd, but will make adaptivity more difficult (deal with elements across processors)
   -LF inv in serial with strict linear tol and 92x66x20 mesh takes 3+ hours (get stuck at e-10 residual for some reason...solves on 5x5x5, weird glitch in ssh?)
-  -quartered domain, 46x33x20
+  -inv, quartered domain, 46x33x20, n=0.3
     -iso 100: 155 (141 in linear)
     -iso 40: 160 (147 in linear)
     -aniso 100-40-4: 220 (200 in linear)
     -aniso 100-40-4, r = +1e-3: 466 (433 in linear)
     -aniso 100-40-4, r = +2e-3: freaking forever
+    -aniso 100-40-4, r = (0,e-3,1.5e-3,2e-3): 3392 (3140 in linear)
+    -aniso 100-40-4, r = (0,e-3,1.5e-3,2e-3), v = nv: 21798 (20336 in linear; seems to have hit max NL iter?)
+  -inv, quartered domain, 25x45x30, no stabilization (n in vel), n=0.3
+    -iso 100: 160 (150 in linear)
+    -iso 40: 158 (150 in linear)
+    -aniso 100-40-4, r = (0,e-3,1.5e-3,2e-3), v = nv: 1117 (1043 in linear)
+    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, v = nv: 2480 (2300 in linear)
   -with quadratic reaction, seem to need really small reaction term to converge (e-3) on 5x5x5; probably due to change in units of c (different magnitudes...)
+  
+  -make sure to output divvy at each step for adaptive case...
