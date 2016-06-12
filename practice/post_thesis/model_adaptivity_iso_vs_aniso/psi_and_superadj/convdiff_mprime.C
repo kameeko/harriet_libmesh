@@ -22,7 +22,7 @@ void ConvDiff_MprimeSys::init_data (){
 
 	//polynomial order and finite element type
 	unsigned int conc_p = 1;
-	GetPot infile("convdiff_mprime.in");
+	GetPot infile("contamTrans.in");
 	std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
@@ -46,6 +46,9 @@ void ConvDiff_MprimeSys::init_data (){
   dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
                               0.0, vx*dtransh, 0.0,
                               0.0, 0.0, vx*dtransv);  
+
+  //regularization
+  beta = infile("beta", 0.1);
 
 	//indicate variables that change in time
 	this->time_evolving(c_var);
@@ -75,14 +78,14 @@ void ConvDiff_MprimeSys::init_data (){
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
   
   //influx side as Diri instead of flux BC
-  ConstFunction<Number> westIn(bsource);
+  ConstFunction<Number> westIn(-bsource);
   std::vector<unsigned int> nonzero_west; nonzero_west.push_back(c_var);
   std::vector<unsigned int> zero_west; zero_west.push_back(zc_var); zero_west.push_back(aux_c_var); zero_west.push_back(aux_zc_var);
   std::set<boundary_id_type> westside; 
   if(dim == 2)
-    westside.insert(4); 
-  else if(dim == 3)
     westside.insert(3); 
+  else if(dim == 3)
+    westside.insert(4); 
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, nonzero_west, &westIn));
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, zero_west, &zero));
  

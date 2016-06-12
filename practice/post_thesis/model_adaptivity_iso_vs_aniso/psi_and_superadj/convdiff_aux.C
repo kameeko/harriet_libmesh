@@ -23,7 +23,7 @@ void ConvDiff_AuxSys::init_data (){
 
 	//polynomial order and finite element type
 	unsigned int conc_p = 1;
-	GetPot infile("convdiff_mprime.in");
+	GetPot infile("contamTrans.in");
 	std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
 
 	// LBB needs better-than-quadratic velocities for better-than-linear
@@ -67,6 +67,9 @@ void ConvDiff_AuxSys::init_data (){
                               0.0, vx*dtransh, 0.0,
                               0.0, 0.0, vx*dtransv);  
 
+  //regularization
+  beta = infile("beta", 0.1);
+
 	//set Dirichlet boundary conditions
   std::set<boundary_id_type> all_bdys;
   all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); 
@@ -83,9 +86,9 @@ void ConvDiff_AuxSys::init_data (){
   std::vector<unsigned int> just_z; just_z.push_back(aux_zc_var);
   std::set<boundary_id_type> westside;
   if(dim == 2)
-    westside.insert(4); 
-  else if(dim == 3)
     westside.insert(3); 
+  else if(dim == 3)
+    westside.insert(4); 
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &zero));
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
 

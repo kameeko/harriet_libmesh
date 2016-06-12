@@ -222,7 +222,12 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
     -iso 100: 160 (150 in linear)
     -iso 40: 158 (150 in linear)
     -aniso 100-40-4, r = (0,e-3,1.5e-3,2e-3), v = nv: 1117 (1043 in linear)
-    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, v = nv: 2480 (2300 in linear)
+    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, v = nv: 2480 (2300 in linear); qoi: 547209.61
+  -inv, quartered domain, 25x45x30, no stabilization (n in vel), n=0.1
+    -iso 100: 159 (151 in linear); qoi = 1068855.6709150125
+    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3: 
   -with quadratic reaction, seem to need really small reaction term to converge (e-3) on 5x5x5; probably due to change in units of c (different magnitudes...)
   
+  THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
+
   -make sure to output divvy at each step for adaptive case...

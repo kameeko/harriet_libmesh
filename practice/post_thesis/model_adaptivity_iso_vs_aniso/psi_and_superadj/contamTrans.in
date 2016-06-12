@@ -8,7 +8,7 @@ poly_order = 1
 fe_family = 'LAGRANGE'
 
 vx = 2.0866 #762.11604 m/yr or 2.0866 m/day or 2.415e-5 m/s
-reaction_rate = 4.2e-3
+reaction_rate = 4.2e-4
 reaction_order = 2 #adaptivity code assumes order 2
 porosity = 0.1 #0.1
 dispersivity_longitudinal = 100.0
@@ -16,12 +16,10 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
 bsource = -5.0
 
-stabilization_option = 4;
-
 data_file = Measurements_shifted.dat
 beta = 1.e-3
 
-max_model_refinements = 1
+max_model_refinements = 2
 refinement_step = 0.1
 relative_error_tolerance = 0.05
 do_divvy_in_Matlab = false

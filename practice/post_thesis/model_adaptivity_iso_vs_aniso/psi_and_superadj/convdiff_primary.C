@@ -65,6 +65,9 @@ void ConvDiff_PrimarySys::init_data (){
   dispTens = NumberTensorValue(vx*dlong, 0.0, 0.0,
                               0.0, vx*dtransh, 0.0,
                               0.0, 0.0, vx*dtransv);  
+  
+  //regularization
+  beta = infile("beta", 0.1);
 
 	//set Dirichlet boundary conditions
   std::set<boundary_id_type> all_bdys;
@@ -78,14 +81,14 @@ void ConvDiff_PrimarySys::init_data (){
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
   
   //influx side as Diri instead of flux BC
-  ConstFunction<Number> westIn(bsource);
+  ConstFunction<Number> westIn(-bsource);
   std::vector<unsigned int> just_c; just_c.push_back(c_var);
   std::vector<unsigned int> just_z; just_z.push_back(zc_var);
   std::set<boundary_id_type> westside; 
   if(dim == 2)
-    westside.insert(4); 
-  else if(dim == 3)
     westside.insert(3); 
+  else if(dim == 3)
+    westside.insert(4); 
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &westIn));
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
 
@@ -185,7 +188,7 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 		                                   0., dispTens(0,0), 0.,
 		                                   0., 0., dispTens(0,0));
 		  }
-	    	
+    	
 			// First, an i-loop over the  degrees of freedom.
 			for (unsigned int i=0; i != n_c_dofs; i++){
 				

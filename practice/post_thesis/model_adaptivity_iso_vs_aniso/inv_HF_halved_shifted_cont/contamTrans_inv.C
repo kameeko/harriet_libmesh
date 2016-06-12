@@ -182,7 +182,7 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
     //velocity vector
     //NumberVectorValue U(vx, 0.0, 0.0);
     NumberVectorValue U(porosity*vx, 0., 0.); //DEBUG
-    
+  
     //SUPG
     double tau = 0.0;
     if(useSUPG){ //assuming isotropic dispersion for now
@@ -225,7 +225,7 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
         std::cout << "Invalid stabilization option. No stabilization used." << std::endl;
       }
     }
-
+    
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
@@ -310,12 +310,13 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
                             (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
                              + (U*dphi[j][qp])*phi[i][qp] // Convection Term
                              - (react_rate*(porosity*phi[j][qp]))*phi[i][qp]); // Reaction Term
-          else if(reaction_order == 2)
+          else if(reaction_order == 2){
             J_c_z(i,j) += JxW[qp]*
                             (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
                              + (U*dphi[j][qp])*phi[i][qp] // Convection Term
                              - (2.*react_rate*(porosity*c*phi[j][qp]))*phi[i][qp]); // Reaction Term
-          
+            J_c_c(i,j) += JxW[qp]*(-2.*react_rate*z*phi[j][qp]*phi[i][qp]);
+          }
           J_f_z(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]); 
           J_f_f(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]); 
           if(useSUPG){
@@ -342,7 +343,6 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
                              (porosity*dispTens.contract(d2phi[i][qp]) //Dispersion term
                              - (U*dphi[i][qp]) // Convection Term
                              - (2.*react_rate*(porosity*c*phi[i][qp])))); // Reaction Term
-              J_c_c(i,j) += JxW[qp]*(2.*react_rate*z*phi[j][qp]*phi[i][qp]);
             }            
             J_f_z(i,j) += JxW[qp]*(tau*U*dphi[j][qp])*phi[i][qp];
           }

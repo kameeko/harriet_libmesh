@@ -22,12 +22,12 @@ public:
     
     //read in data
 		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
-			Real x, y, value;
+			Real x, y, z, value;
 			int flag = 1;
 			while(flag != -1){
-				flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
+				flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
 				if(flag != -1){
-					datapts.push_back(Point(x,y));
+					datapts.push_back(Point(x,y,z));
 					datavals.push_back(value);
 				}
 			}

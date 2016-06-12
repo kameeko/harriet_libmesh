@@ -48,7 +48,7 @@ int main(int argc, char** argv)
   const int nx                          = solverInfile("nx",100);
   const int ny                          = solverInfile("ny",100);
   const int nz                          = solverInfile("nz",100);
-  GetPot infile("convdiff_mprime.in");
+  GetPot infile("contamTrans.in");
   //std::string find_mesh_here            = infile("initial_mesh","mesh.exo");
   bool doContinuation                   = infile("do_continuation",false);
   bool splitSuperAdj                    = infile("split_super_adjoint",true); //solve as single adjoint or two forwards
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
       system_sadj_aux.solution->zero();
     }
     system_mix.solution->zero();
-  
+    
     system_primary.solve();
     system_primary.clearQoI();
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
@@ -375,7 +375,7 @@ int main(int argc, char** argv)
 	    
 	    //find elements in support of worst offenders
 	    std::vector<dof_id_type> markMe;
-	    markMe.reserve(cutoffLoc*4);
+	    markMe.reserve(cutoffLoc*8);
 	    for(int i = 0; i < cutoffLoc; i++){
 	      markMe.insert(markMe.end(), node_to_elem[node_errs[i].second].begin(), node_to_elem[node_errs[i].second].end());
 	    }
@@ -398,6 +398,14 @@ int main(int argc, char** argv)
         }
       }
       output_dbg.close();*/
+      
+#ifdef LIBMESH_HAVE_EXODUS_API
+    std::stringstream ss2;
+    ss2 << refIter + 1;
+    std::string str = ss2.str();
+    std::string write_divvy = "divvy" + str + ".exo";
+    ExodusII_IO (mesh).write_equation_systems(write_divvy,equation_systems); //DEBUG
+#endif // #ifdef LIBMESH_HAVE_EXODUS_API
     }
     refIter += 1;
   }

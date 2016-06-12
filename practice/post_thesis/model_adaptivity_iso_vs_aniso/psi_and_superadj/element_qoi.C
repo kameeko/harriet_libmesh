@@ -46,22 +46,15 @@ void ConvDiff_PrimarySys::element_postprocess (DiffContext &context)
       // Get co-ordinate locations of the current quadrature point
       const Real ptx = xyz[qp](0);
       const Real pty = xyz[qp](1);
+      const Real ptz = xyz[qp](2);
       
       Number c = ctxt.interior_value(c_var, qp);
 
 			//I(q_LF, u_LF)
       if((qoi_option == 1 && 
-						((dim == 2 && (fabs(ptx - 0.5) <= 0.125 && fabs(pty - 0.5) <= 0.125)) || 
-						(dim == 1 && ptx >= 0.7 && ptx <= 0.9))) ||
-		  		(qoi_option == 2 &&
-		  			(dim == 2 && (fabs(ptx - 2.0) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-		  		(qoi_option == 3 &&
-		  			(dim == 2 && (fabs(ptx - 0.75) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-	  			(qoi_option == 5) ||
-	  			(qoi_option == 6 &&
-		    		(dim == 2 && (fabs(ptx - 2.5) <= 0.125 && fabs(pty - 0.5) <= 0.125))) ||
-		    	(qoi_option == 7 &&
-		    		(dim == 2 && (ptx >= 0.625 && ptx <= 1.5 && fabs(pty - 0.5) <= 0.25 ))) ){	
+    			(dim == 3 && (fabs(ptx - 1150.) <= 50. && fabs(pty - 825.) <= 50. && ptz >= 80.))) ||
+    		(qoi_option == 1 && 
+    			(dim == 2 && (fabs(ptx - 1150.) <= 50. && fabs(pty - 825.) <= 50.))) 	){			
         elem_qoi += JxW[qp] * c;
 			}
     } //end of quadrature loop
