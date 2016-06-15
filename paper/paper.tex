@@ -1,11 +1,12 @@
-\documentclass[12pt]{article}
-%\usepackage{lgrind}
+\documentclass[review]{siamart0516}
+%%\usepackage{lgrind}
 
 \usepackage[square,comma,numbers,sort&compress]{natbib}
-\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym}
+%\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
+\usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
 \usepackage{graphics}
 \usepackage{epsfig}
-%\usepackage[hang,raggedright]{subfigure}
+%%\usepackage[hang,raggedright]{subfigure}
 \usepackage{epsf}
 \usepackage{setspace}
 \usepackage{hangcaption}
@@ -17,8 +18,8 @@
 \usepackage{color}
 \usepackage{hyperref}
 
-\usepackage{algorithmicx}
-\usepackage[ruled]{algorithm}
+%\usepackage{algorithmicx}
+%\usepackage[ruled]{algorithm}
 \usepackage{algpseudocode}
 \usepackage{varwidth}
 \usepackage{caption}
@@ -41,7 +42,7 @@
 \newcommand{\red}[1]{{\color{red}{#1}}}
 \newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
 
-\newtheorem{theorem}{Theorem}
+%\newtheorem{theorem}{Theorem} %conflicts with sisc
 
 \graphicspath{{./figures/}}
 
@@ -50,9 +51,11 @@
 
 \title{Model Adaptivity for Goal Oriented Inference using Adjoints}
 
-\author{}
-\date{}
+\author{Author here.}
+%\date{}
 \maketitle
+
+Meep meep.
 
 \begin{abstract}
 \input{abstract.tex}
@@ -64,8 +67,8 @@
 \input{numerical_experiments.tex}
 \input{conclusions.tex}
 
-\appendix
-%\include{appendix}
+%\appendix
+%%\include{appendix}
 \bibliography{masterBib}
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
 \end{document}

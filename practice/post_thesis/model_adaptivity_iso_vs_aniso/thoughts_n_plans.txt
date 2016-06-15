@@ -194,8 +194,6 @@ poke dissolution/precipitation forward problem, see if it does have an interesti
 
 is continuation not 'state of the art' enough because we would not normally even solve the whole KKT system, and instead go for optimization program? harder to compare the two then...although even for optimization a good initial guess is sometimes needed...
 
-for 442, taking two refinements of 0.05 increments each in integrated code doesn't end up with <1% error...
-
 natural continuation vs integrated adaptivity: (strict linear solve, gmres)
   r = 0 inv: 4.5 (3 in linear)
   r = -442: cont steps (0,100,200,300,400,442) < adaptive (1 step, 0.11 final fraction) < cont steps (400, 442)
@@ -225,9 +223,47 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
     -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, v = nv: 2480 (2300 in linear); qoi: 547209.61
   -inv, quartered domain, 25x45x30, no stabilization (n in vel), n=0.1
     -iso 100: 159 (151 in linear); qoi = 1068855.6709150125
-    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3: 
-  -with quadratic reaction, seem to need really small reaction term to converge (e-3) on 5x5x5; probably due to change in units of c (different magnitudes...)
+    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3: 2470 (2300 in linear); qoi = 547417.81514302175
+    -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, jac-fix: 
+      12135 (11724 in linear); qoi = 547420.85898380179
+      (wow we must've gotten really lucky before with the wrong jacobian...)
+    -aniso 100-40-4, r = (0,1,1.25,1.5,1.75,2,2.25,2.5,2.75,3,3.25,3.5,3.75,4,4.2)e-3
+      22040 (21290 in linear); qoi = 547422.15360160533
+    -aniso 100-40-4, r = (0,1,2,3,4.2)e-3, jac-fix: 
+      7432 (7170 in linear); qoi = 547421.62359722063
+    -aniso 100-40-4, r = (0,2,4.2)e-3, jac-fix: 
+      6587 (6446 in linear); qoi = 547421.59753930464
+    -aniso 100-40-4, r = (0,4.2)e-3, jac-fix:  
+      6210 (6130 in linear); qoi = 547419.95996741741
+    -adaptive:
+      MF01: qoi = 577581.79809296422; estimated rel error = 0.038311485179517969; actual relative error = 0.0522
+        Final refinement fraction: 0.16651851851851851; if stop here, 1113 (1035 in linear)
+      MF02: qoi = 548904.34911934205; estimated rel error = 0.002185847354112873; actual relative error = 0.002718
+        Final refinement fraction: 0.29025185185185187; if stop here, 1795 (1672 in linear)
+      MF03: qoi = 547773.23232645926; estimated rel error = 0.00032135133846412049; actual relative error = 0.000644
+        Final refinement fraction: 0.42269629629629629; if stop here, 2222 (2050 in linear)
   
   THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
 
   -make sure to output divvy at each step for adaptive case...
+  
+-from last time...
+  -integrated adaptivity steps into one time-able code
+  -model from benjamin - haven't come up with reasonable LF or HF model to go with it
+  -continuation
+    -natural continuation - more steps sometimes faster; can try a bunch of step sizes and pick best? or look for heuristics?
+    -arclength continuation - seems to be commonly used in NL FEM solvers, but 'overkill' if no bifurcation; more about robustness than efficiency
+  -3D porous media, combinantion of monty and nicer (but still in range of what's seen in porous media) alphas
+  
+-meaning of r? is there a non-dimensional version of r? either have units or non-dimensionalize? damenkoler number?
+  -can you justify r?
+-try a few more continuity sequences
+-table of times and errors? (MF01, MF02, MF03)
+-reactive turbulent combustion - turbulence is hard, as is the shat tons of intermediate reactions...
+  -refinement of graphs? poke manishika about graph theory?
+  
+  http://chemwiki.ucdavis.edu/Core/Physical_Chemistry/Kinetics/Methods_of_Determining_Reaction_Order#Second-Order_Reactions
+  
+  hmm...do you know anyone who might be able to help with the Damkohler number question? the expression on wikipedia is the most general I can find, but I don't know what the diffusive/convective 'mass transport rate' is in our equation...the reaction rate is change in concentration per time, so it has units [M/L^3/T] (Mass-Length-Time), but I'm not sure what in the convection-diffusion aspects of our equation has those units...the more specific reactions on the wiki page, as well as the other expressions I've found, seem to be derived for particular reactors and reaction orders (most assume first-order reactions, or particular idealized reactors)...
+  
+mind maps?
