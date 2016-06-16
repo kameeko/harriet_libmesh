@@ -1,0 +1,33 @@
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+print_residuals = false
+print_solutions = false
+
+fe_family = 'LAGRANGE'
+
+#regularization parameter
+beta = 0.00001   #1.0e-8 #0.001
+
+#diffusion coefficient
+k = 0.1   #1.0 #0.1
+
+#reaction coefficient
+R = -42.0
+
+#QoI option
+QoI_option = 5
+
+#where to find files
+data_file = long_channel_data3_r42_blip.dat
+
+#subdomains
+cd_id = 0
+cdr_id = 1
+initial_mesh = channel_long.exo #plain_T_ref2.exo #coarse_channel.exo #unit_interval_coarse.exo #unit_interval.exo #plain_T.exo
+
+max_model_refinements = 5
+refinement_step = 0.05
+relative_error_tolerance = 0.001
+do_divvy_in_Matlab = false
+do_continuation = true

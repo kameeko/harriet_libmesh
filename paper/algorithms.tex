@@ -26,7 +26,7 @@ Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, t
 	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
 	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
 	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/I(q_{MF_i},u_{MF_i})|>$ \texttt{errTol}}
-		\State{\begin{varwidth}[t]{\linewidth}Localize $e_{I,i}$ and use this element-wise decomposition to guide formation \par\hskip\algorithmicindent of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ and use this decomposition to guide formation of new \par\hskip\algorithmicindent mixed-fidelity model MF$_{i+1}$\end{varwidth}}
 		\State{$i\gets i+1$}
 		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
 		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for 

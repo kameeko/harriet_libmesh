@@ -1,0 +1,460 @@
+kameeko@kameeko-ThinkPad-T430:psi_and_superadj$ ./diff_convdiff_mprime-opt -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4 -pc_factor_shift_type nonzero
+*** Warning, AutoPtr is deprecated and will be removed in a future library version! ./include/libmesh/auto_ptr.h, line 271, compiled Jan 26 2016 at 09:05:16 ***
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=3
+  n_nodes()=50601
+    n_local_nodes()=50601
+  n_elem()=12500
+    n_local_elem()=12500
+    n_active_elem()=12500
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+Assembling the System
+Nonlinear Residual: 0.0386491
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 54, residual 1.18448e-12
+Trying full Newton step
+  Current Residual: 4.28043e-06
+  Nonlinear step: |du|/|u| = 1, |du| = 5.73127
+Assembling the System
+Nonlinear Residual: 4.28043e-06
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 57, residual 1.84056e-18
+Trying full Newton step
+  Current Residual: 4.91757e-12
+  Nonlinear solver converged, step 1, residual 4.91757e-12
+  Nonlinear solver relative residual 1.27236e-10 > 1e-10
+  Nonlinear solver relative step size 7.49735e-06 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.0441833
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 543, residual 1.17585e-09
+Trying full Newton step
+  Current Residual: 8.40535e-08
+  Nonlinear step: |du|/|u| = 1, |du| = 381349
+Assembling the System
+Nonlinear Residual: 8.40535e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 57, residual 1.90371e-20
+Trying full Newton step
+  Current Residual: 3.65222e-12
+  Nonlinear solver converged, step 1, residual 3.65222e-12
+  Nonlinear solver converged, step 1, residual reduction 8.26607e-11 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 2.52084e-12 < 1e-10
+
+ End auxiliary solve...
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/mesh_refinement.C, line 886, compiled Jan 26 2016 at 09:04:53 ***
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/mesh_refinement.C, line 1235, compiled Jan 26 2016 at 09:04:53 ***
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/solution_transfer/direct_solution_transfer.C, line 38, compiled Jan 26 2016 at 09:06:42 ***
+Assembling the System
+Nonlinear Residual: 0.00300391
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 2.01779e-13
+Trying full Newton step
+  Current Residual: 7.03792e-13
+  Nonlinear solver converged, step 0, residual 7.03792e-13
+  Nonlinear solver relative residual 2.34292e-10 > 1e-10
+  Nonlinear solver relative step size inf > 1e-10
+Assembling the System
+Nonlinear Residual: 52.3785
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 1.04732e-09
+Trying full Newton step
+  Current Residual: 5.48239e-07
+  Nonlinear step: |du|/|u| = 1, |du| = 112312
+Assembling the System
+Nonlinear Residual: 5.48239e-07
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 47, residual 2.15385e-19
+Trying full Newton step
+  Current Residual: 1.46289e-12
+  Nonlinear solver converged, step 1, residual 1.46289e-12
+  Nonlinear solver converged, step 1, residual reduction 2.79292e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 3.08687e-11 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 0.0145423
+ L'_HF(psiLF): -0.0257691
+QoI: 0.065658837892086
+QoI Error estimate: -0.011226754798158217
+Estimated relative qoi error: 0.17098619406895416
+
+Assembling the System
+Nonlinear Residual: 0.0025719436769836819
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 2.2062784521259248e-13
+Trying full Newton step
+  Current Residual: 0.00014878172858084673
+  Nonlinear step: |du|/|u| = 0.35577594974257165, |du| = 2.8818175268012851
+Assembling the System
+Nonlinear Residual: 0.00014878172858084673
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 55, residual 1.7007970855539828e-15
+Trying full Newton step
+  Current Residual: 1.3519559946106866e-06
+  Nonlinear step: |du|/|u| = 0.0088686300927926509, |du| = 0.072025759300142017
+Assembling the System
+Nonlinear Residual: 1.3519559946106866e-06
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 55, residual 1.8192973127489719e-17
+Trying full Newton step
+  Current Residual: 1.2295498458938297e-10
+  Nonlinear step: |du|/|u| = 7.7201980095039071e-05, |du| = 0.00062698911891784725
+Assembling the System
+Nonlinear Residual: 1.2295498458938297e-10
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 55, residual 1.7543492088241374e-21
+Trying full Newton step
+  Current Residual: 4.3112184572268383e-17
+  Nonlinear solver converged, step 3, residual 4.3112184572268383e-17
+  Nonlinear solver converged, step 3, residual reduction 1.1154762756679705e-15 < 1e-10
+  Nonlinear solver relative step size 7.1070378584821342e-09 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 27.152247410735832
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 56, residual 7.3182937318383775e-10
+Trying full Newton step
+  Current Residual: 4.7090940542719189e-06
+  Nonlinear step: |du|/|u| = 0.068432489100945376, |du| = 25956.189387262188
+Assembling the System
+Nonlinear Residual: 4.7090940542719189e-06
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 54, residual 1.3391114471403841e-18
+Trying full Newton step
+  Current Residual: 3.6881672560946862e-12
+  Nonlinear solver converged, step 1, residual 3.6881672560946862e-12
+  Nonlinear solver converged, step 1, residual reduction 1.3583285391825088e-13 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 8.2693437178606971e-11 < 1e-10
+
+ End auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.002322172093921669
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 2.6211626371899766e-13
+Trying full Newton step
+  Current Residual: 2.8346187362603514e-13
+  Nonlinear solver converged, step 0, residual 2.8346187362603514e-13
+  Nonlinear solver converged, step 0, residual reduction 9.4364300521168284e-11 < 1e-10
+  Nonlinear solver relative step size 0.74978458110086876 > 1e-10
+Assembling the System
+Nonlinear Residual: 23.03253215533973
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 50, residual 2.5850747072466824e-10
+Trying full Newton step
+  Current Residual: 9.7110036924564764e-09
+  Nonlinear step: |du|/|u| = 0.19278578682064901, |du| = 20857.053381859161
+Assembling the System
+Nonlinear Residual: 9.7110036924564764e-09
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 2.5114590462901975e-21
+Trying full Newton step
+  Current Residual: 1.4390930610091229e-12
+  Nonlinear solver converged, step 1, residual 1.4390930610091229e-12
+  Nonlinear solver converged, step 1, residual reduction 2.7474899175286894e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 5.0363359257880596e-13 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 0.0014751579293921862
+ L'_HF(psiLF): -0.0060085155943916729
+QoI: 0.059809124539110393
+QoI Error estimate: -0.0045333576649994869
+Estimated relative qoi error: 0.075797091161818181
+
+Assembling the System
+Nonlinear Residual: 0.00088548189201478119
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 3.6412324890704354e-14
+Trying full Newton step
+  Current Residual: 1.6462606796626556e-05
+  Nonlinear step: |du|/|u| = 0.063701772229069892, |du| = 0.54047739008454121
+Assembling the System
+Nonlinear Residual: 1.6462606796626556e-05
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 53, residual 3.8987381713531987e-16
+Trying full Newton step
+  Current Residual: 1.1670542201485604e-08
+  Nonlinear step: |du|/|u| = 0.0012436782225702064, |du| = 0.010557487853514952
+Assembling the System
+Nonlinear Residual: 1.1670542201485604e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 54, residual 2.8560597535646454e-19
+Trying full Newton step
+  Current Residual: 7.6839203664190018e-15
+  Nonlinear solver converged, step 2, residual 7.6839203664190018e-15
+  Nonlinear solver converged, step 2, residual reduction 1.9881226056857536e-13 < 1e-10
+  Nonlinear solver relative step size 1.0247145025310933e-06 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 7.2134897678144423
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 54, residual 1.3056237268679947e-10
+Trying full Newton step
+  Current Residual: 1.4461560807364332e-05
+  Nonlinear step: |du|/|u| = 0.025735274680932504, |du| = 9741.4715186144131
+Assembling the System
+Nonlinear Residual: 1.4461560807364332e-05
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 53, residual 4.2656821353680875e-18
+Trying full Newton step
+  Current Residual: 3.7716413126303519e-12
+  Nonlinear solver converged, step 1, residual 3.7716413126303519e-12
+  Nonlinear solver converged, step 1, residual reduction 1.3890715032078957e-13 < 1e-10
+  Nonlinear solver relative step size 2.6232999291556027e-10 > 1e-10
+
+ End auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.00086820888177392133
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 2.7755728404676679e-14
+Trying full Newton step
+  Current Residual: 4.7775489865419683e-14
+  Nonlinear solver converged, step 0, residual 4.7775489865419683e-14
+  Nonlinear solver converged, step 0, residual reduction 1.5904434079745738e-11 < 1e-10
+  Nonlinear solver relative step size 0.13910703583083581 > 1e-10
+Assembling the System
+Nonlinear Residual: 7.046149543541512
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 1.6380553161312502e-10
+Trying full Newton step
+  Current Residual: 1.9450335919081811e-08
+  Nonlinear step: |du|/|u| = 0.09345074378900313, |du| = 9783.516512024662
+Assembling the System
+Nonlinear Residual: 1.9450335919081811e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 6.3020936822622733e-21
+Trying full Newton step
+  Current Residual: 1.410602098112964e-12
+  Nonlinear solver converged, step 1, residual 1.410602098112964e-12
+  Nonlinear solver converged, step 1, residual reduction 2.6930954968906038e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 9.6497805315788546e-13 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 0.00049141569896553642
+ L'_HF(psiLF): -0.0026612156326895091
+QoI: 0.057439454422398228
+QoI Error estimate: -0.0021697999337239727
+Estimated relative qoi error: 0.037775427283269429
+
+Assembling the System
+Nonlinear Residual: 0.00035647237430513863
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 1.2191659461451273e-14
+Trying full Newton step
+  Current Residual: 7.2872607345530428e-07
+  Nonlinear step: |du|/|u| = 0.032354772907100558, |du| = 0.28244973973076348
+Assembling the System
+Nonlinear Residual: 7.2872607345530428e-07
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 2.7601076699304327e-17
+Trying full Newton step
+  Current Residual: 7.5207224114112103e-11
+  Nonlinear step: |du|/|u| = 8.0583796776875202e-05, |du| = 0.00070351063759020531
+Assembling the System
+Nonlinear Residual: 7.5207224114112103e-11
+Linear solve starting, tolerance 7.520722411411211e-14
+Linear solve finished, step 53, residual 1.1261166944619105e-21
+Trying full Newton step
+  Current Residual: 4.1099147203163441e-17
+  Nonlinear solver converged, step 2, residual 4.1099147203163441e-17
+  Nonlinear solver converged, step 2, residual reduction 1.0633913384385538e-15 < 1e-10
+  Nonlinear solver relative step size 7.7356175688210293e-09 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 17.407004735876651
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 52, residual 3.3841316340495885e-10
+Trying full Newton step
+  Current Residual: 1.8253208333786379e-05
+  Nonlinear step: |du|/|u| = 0.096178250338359181, |du| = 34355.20893099549
+Assembling the System
+Nonlinear Residual: 1.8253208333786379e-05
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 52, residual 5.0409577857838021e-18
+Trying full Newton step
+  Current Residual: 3.3378613143532e-12
+  Nonlinear solver converged, step 1, residual 3.3378613143532e-12
+  Nonlinear solver converged, step 1, residual reduction 1.2293130892116982e-13 < 1e-10
+  Nonlinear solver relative step size 2.5840876221200617e-10 > 1e-10
+
+ End auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.00035904795019349824
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 8.8621917614109892e-15
+Trying full Newton step
+  Current Residual: 3.2310424083802886e-14
+  Nonlinear solver converged, step 0, residual 3.2310424083802886e-14
+  Nonlinear solver converged, step 0, residual reduction 1.0756122258024656e-11 < 1e-10
+  Nonlinear solver relative step size 0.073513339383190157 > 1e-10
+Assembling the System
+Nonlinear Residual: 16.915196874493862
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 3.9502310952071382e-10
+Trying full Newton step
+  Current Residual: 1.2583551050993845e-08
+  Nonlinear step: |du|/|u| = 0.38449633173758152, |du| = 30782.51000354877
+Assembling the System
+Nonlinear Residual: 1.2583551050993845e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 4.4253514454354487e-21
+Trying full Newton step
+  Current Residual: 1.0390068975433748e-12
+  Nonlinear solver converged, step 1, residual 1.0390068975433748e-12
+  Nonlinear solver converged, step 1, residual reduction 1.9836527967423015e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 7.0130454090305956e-13 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 0.00016991346355234543
+ L'_HF(psiLF): -0.0015706464912685222
+QoI: 0.056683323858451838
+QoI Error estimate: -0.0014007330277161767
+Estimated relative qoi error: 0.02471155416386752
+
+Assembling the System
+Nonlinear Residual: 0.00019360016442769706
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 2.8015785988999756e-15
+Trying full Newton step
+  Current Residual: 1.8057461925878009e-07
+  Nonlinear step: |du|/|u| = 0.015447828038189445, |du| = 0.13608905658994983
+Assembling the System
+Nonlinear Residual: 1.8057461925878009e-07
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 7.5684703848364852e-18
+Trying full Newton step
+  Current Residual: 2.8327817585393269e-12
+  Nonlinear solver converged, step 1, residual 2.8327817585393269e-12
+  Nonlinear solver converged, step 1, residual reduction 7.329484407125585e-11 < 1e-10
+  Nonlinear solver relative step size 4.2870030908607828e-05 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 15.105878992290124
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 52, residual 3.0312893603816629e-10
+Trying full Newton step
+  Current Residual: 2.9811694240949084e-05
+  Nonlinear step: |du|/|u| = 0.073642459628037046, |du| = 24878.768547647909
+Assembling the System
+Nonlinear Residual: 2.9811694240949084e-05
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 50, residual 1.4476205127244896e-17
+Trying full Newton step
+  Current Residual: 3.2030710082407083e-12
+  Nonlinear solver converged, step 1, residual 3.2030710082407083e-12
+  Nonlinear solver converged, step 1, residual reduction 1.1796706769010338e-13 < 1e-10
+  Nonlinear solver relative step size 4.4805375343625563e-10 > 1e-10
+
+ End auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.00019415555589656497
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 4.2867041387599439e-15
+Trying full Newton step
+  Current Residual: 2.6514656522655119e-14
+  Nonlinear solver converged, step 0, residual 2.6514656522655119e-14
+  Nonlinear solver converged, step 0, residual reduction 8.8267144512713671e-12 < 1e-10
+  Nonlinear solver relative step size 0.035337703854637213 > 1e-10
+Assembling the System
+Nonlinear Residual: 15.006905459927776
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 2.1165956081672161e-10
+Trying full Newton step
+  Current Residual: 2.7580252551951349e-08
+  Nonlinear step: |du|/|u| = 0.39556131144286327, |du| = 23365.248998563697
+Assembling the System
+Nonlinear Residual: 2.7580252551951349e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 7.3886824533737795e-21
+Trying full Newton step
+  Current Residual: 7.844724401941129e-13
+  Nonlinear solver converged, step 1, residual 7.844724401941129e-13
+  Nonlinear solver converged, step 1, residual reduction 1.4977003075124893e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 1.3088239753834022e-12 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 8.8723835179987855e-05
+ L'_HF(psiLF): -0.0010201586009305299
+QoI: 0.056215359818848738
+QoI Error estimate: -0.00093143476575054205
+Estimated relative qoi error: 0.016569043918815876
+
+Assembling the System
+Nonlinear Residual: 0.00012809235214276051
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 50, residual 2.5527765432849571e-15
+Trying full Newton step
+  Current Residual: 1.1831498533951901e-07
+  Nonlinear step: |du|/|u| = 0.0080848076322473025, |du| = 0.071618407409938828
+Assembling the System
+Nonlinear Residual: 1.1831498533951901e-07
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 50, residual 3.671057808461091e-18
+Trying full Newton step
+  Current Residual: 2.0485257628402656e-12
+  Nonlinear solver converged, step 1, residual 2.0485257628402656e-12
+  Nonlinear solver converged, step 1, residual reduction 5.3003157024262957e-11 < 1e-10
+  Nonlinear solver relative step size 1.5904582521041703e-05 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 12.510743412598757
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 52, residual 1.7377122768506509e-10
+Trying full Newton step
+  Current Residual: 2.2035969551652076e-05
+  Nonlinear step: |du|/|u| = 0.055509228749406753, |du| = 17896.508528997434
+Assembling the System
+Nonlinear Residual: 2.2035969551652076e-05
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 51, residual 1.3034045173526645e-17
+Trying full Newton step
+  Current Residual: 3.8085062299192331e-12
+  Nonlinear solver converged, step 1, residual 3.8085062299192331e-12
+  Nonlinear solver converged, step 1, residual reduction 1.402648617739603e-13 < 1e-10
+  Nonlinear solver relative step size 9.0460375911508431e-10 > 1e-10
+
+ End auxiliary solve...
+Assembling the System
+Nonlinear Residual: 0.00012863149860068085
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 1.6643988751740318e-15
+Trying full Newton step
+  Current Residual: 4.2901876282879906e-14
+  Nonlinear solver converged, step 0, residual 4.2901876282879906e-14
+  Nonlinear solver converged, step 0, residual reduction 1.4282010821041251e-11 < 1e-10
+  Nonlinear solver relative step size 0.018640278473324019 > 1e-10
+Assembling the System
+Nonlinear Residual: 12.53496861178508
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 49, residual 2.020521163240724e-10
+Trying full Newton step
+  Current Residual: 4.8092994095522953e-08
+  Nonlinear step: |du|/|u| = 0.40785900599180491, |du| = 17442.384771293913
+Assembling the System
+Nonlinear Residual: 4.8092994095522953e-08
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 48, residual 1.7290094145266784e-20
+Trying full Newton step
+  Current Residual: 5.7171581957147549e-13
+  Nonlinear solver converged, step 1, residual 5.7171581957147549e-13
+  Nonlinear solver converged, step 1, residual reduction 1.0915092932647547e-14 < 1e-10
+  Nonlinear solver converged, step 1, relative step size 3.9782144720453913e-12 < 1e-10
+
+ -0.5*M'_HF(psiLF)(superadj): 2.6089392265392844e-05
+ L'_HF(psiLF): -0.00053405254312025236
+QoI: 0.055792539212593403
+QoI Error estimate: -0.00050796315085485948
+Estimated relative qoi error: 0.0091044995984015525
+
+
+Refinement concluded...
+Final refinement fraction: 0.33576
+Final estimated relative error: 0.0091044995984015525
+
