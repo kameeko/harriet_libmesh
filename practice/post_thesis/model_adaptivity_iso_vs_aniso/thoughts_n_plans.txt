@@ -199,8 +199,8 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
   r = -442: cont steps (0,100,200,300,400,442) < adaptive (1 step, 0.11 final fraction) < cont steps (400, 442)
     -> 25 (15 linear ) vs 35 (23 linear) vs 40 (28 linear)
     -> 1 adaptive step, 0.11 final refinement fraction, 0.0144 estimated relative error, 0.0035 actual relative error
-  r = -1000: adaptive < cont steps (0:100:1000) < cont steps (400:100:1000)
-    -> 43 (30 linear) vs 56 (35 linear) vs 67 (45 linear)
+  r = -1000: adaptive < cont steps (0:100:1000) < cont steps (400:100:1000) < cont steps (0,400:100:1000)
+    -> 43 (30 linear) vs 56 (35 linear) vs 67 (45 linear) vs 96 (72 linear)
     -> 1 adaptive step, 0.11 final refinement fraction, 0.0115 estimated relative error, 0.004 actual relative error
     -> this looks possibly promising...**do 3D version with iso conv-diff vs aniso conv-diff-react?** (same mesh first?)
       -ONLY RUN 3D ON BASSI
@@ -263,6 +263,9 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
   -refinement of graphs? poke manishika about graph theory?
   
   http://chemwiki.ucdavis.edu/Core/Physical_Chemistry/Kinetics/Methods_of_Determining_Reaction_Order#Second-Order_Reactions
+  p.683 of 'remediation of hazardous waste contaminated soils' by donald l. wise (scan of chapter requested from iliad)
+  'Evaluation of the kinetic oxidation of aqueous volatile organic compounds by permanganate' 
+    -total second order (two reactants); rate constants in desired range...
   
   hmm...do you know anyone who might be able to help with the Damkohler number question? the expression on wikipedia is the most general I can find, but I don't know what the diffusive/convective 'mass transport rate' is in our equation...the reaction rate is change in concentration per time, so it has units [M/L^3/T] (Mass-Length-Time), but I'm not sure what in the convection-diffusion aspects of our equation has those units...the more specific reactions on the wiki page, as well as the other expressions I've found, seem to be derived for particular reactors and reaction orders (most assume first-order reactions, or particular idealized reactors)...
   

@@ -4,7 +4,7 @@ Based on the theoretical developments in the last section, we present below a go
 %
 \subsection{Goal Oriented Inference Algorithm}
 %
-Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, the error estimate (\ref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. \red{We should include something about how to map error to elements to refine.} We present below an algorithm that accomplishes the above goals.
+Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, the error estimate (\ref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\ref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem (\ref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]
@@ -44,13 +44,11 @@ Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, t
 \end{algorithm}
 %
 
-Note that the QoI error adjoint problem (\ref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
-
 Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
 % 
 \subsection{Complexity Analysis}\label{sect:alg_complexity}
 %
-We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. 
+We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. \red{Solving the supplementary adjoint can be split into two $N\times N$ systems...}
 
 If one utilizes Algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
 %

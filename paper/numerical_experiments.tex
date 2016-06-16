@@ -1,31 +1,43 @@
 \section{Numerical Experiments}\label{sect:numexp}
 %
-We now use Algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi model setting. We consider two kinds of multi-fidelity models, in a total of three experiments. In the first experiment, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. In the second experiment, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.
+We now use Algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi-model setting. We consider two kinds of multi-fidelity models, in a total of three experiments. In the first experiment, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We examine how the element-wise distribution of the error estimate is affected by changes in sensor placement and in the QoI region. In the second experiment, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. \red{The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.}
 
-In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
-\red{Don't forget to trim figures and convert them to pdfs!}
+%In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
+
 %
 \subsection{Error Estimate Localization}
 %
-Algorithm~\ref{alg:refSeries} does not specify any particular method for localizing the error estimate. A naive approach would be to calculate the contribution to the estimated error by a particular element $\kappa$ by simply considering all area integrals in the error estimate expression, limited to that element. While perhaps simple to compute, this method results in non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret.
+Algorithm~\ref{alg:refSeries} does not require a particular method for localizing the error estimate. A na\"{i}ve approach would be to calculate the error contribution by a particular element $\kappa$ by simply considering all area integrals in the error estimate expression, limited to that element. While perhaps simple to compute, this method results in non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret.
 
-We instead use the alternative method described in \cite{vanOpstaletal15} to decompose the equivalent error estimate expression
+We instead use the alternative method described in \cite{vanOpstaletal15}. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subset Q$ and $U_{LF}=U$. We note that the error estimate in Equation \ref{eq:finErrExp} can be equivalently written as
 %
-\begin{multline}
-I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi)+\mathcal{R}(e^3). \nonumber
-\end{multline}
+\begin{equation}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi)+\mathcal{R}(e^3). \nonumber
+\end{equation}
 %
-into error contributions from locally supported basis functions, and refine the model in those elements in the support of those basis functions with the largest error contributions. Using this method, elements in which the high-fidelity model is already being used are not seen as continuing to contribute to the error in the QoI, with the possible exception of elements near the interfaces between the low-fidelity and high-fidelity regions. \red{Express this mathematically? Also note that plots show absolute values, so valleys between lobes are actually transition between positive and negative...}
+We consider a finite-dimensional \red{conforming} subspace $(Q^h\times U^h\times U^h)^3 \subset (Q\times U\times U)^3$ which contains the approximations $(\Lambda^h,\chi_\Psi^h)$. Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally supported functions such that span $\Phi^h=(Q^h\times U^h\times U^h)^3$; we can then write $(\Lambda^h,\chi_\Psi^h)=(\sum_{i\in I}\varphi_i\lambda_i,\sum_{i\in I}\upvarphi_i x_i)$. The error estimate
+%
+\begin{equation}
+\epsilon = -\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi) \leq \sum_{i\in I} \varepsilon_i,
+\end{equation}
+%
+where
+%
+\begin{equation}
+\varepsilon_i = \left| -\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\lambda_i\varphi_i)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(x_i\upvarphi_i) \right|
+\end{equation}
+%
+can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$. The basis functions with the largest error contributions are flagged, and the elements in their support are refined. Using this method, elements in which the high-fidelity model is already being used are not seen as continuing to contribute to the error in the QoI, with the possible exception of elements near the interfaces between the low-fidelity and high-fidelity regions. 
 %
 \subsection{Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
 %
-In this section, we demonstrate the method derived in Section \ref{sec:deriv} for two models which differ in the physics included. We first describe the problem setup, and then present results from applying our approach.
+In this section, we consider a pair of models which differ in the physics included. In Section \ref{sec:cdvcdrSetup} we describe a baseline setup for a simple problem in 2D. Section \ref{sec:cdvcdrBaseRef} describes the results of applying Algorithm~\ref{alg:refSeries} to the baseline problem, and Section \ref{sec:qoivdata} describes the results of changing the placement of observations or the QoI region from the baseline.
 %
 %------------------------------------------------------------%
 \subsubsection{Problem Setup} \label{sec:cdvcdrSetup}
 %------------------------------------------------------------%
 %
-We consider a rectangular domain $\Omega$, defined as $\Omega(x_1,x_2)=[0,5]\times[0,1]$, where $x_1$ and $x_2$ are the spatial coordinates. The high-fidelity model is a single-species convection-diffusion-reaction equation with a nonlinear reaction term, described by,
+We consider a rectangular domain $\Omega(x_1,x_2)=[0,5]\times[0,1]$, where $x_1$ and $x_2$ are the spatial coordinates. The high-fidelity model is a single-species convection-diffusion-reaction equation with a nonlinear reaction term, described by,
 %
 \begin{subequations}
 \label{eq:cdvcdrHF}
@@ -35,7 +47,7 @@ u = 0 \quad &\text{on } \partial \Omega \label{eq:cdvcdrHF_bdry}
 \end{align} 
 \end{subequations}
 %
-where the state $u$ is the species concentration and, $f(q)$ is a forcing field described by the parameters. The velocity field is $\vec{V}(x_1,x_2) = (2x_2(1-x_2),0)$, while the diffusion coefficient $k_d = 0.1$ and, the reaction coefficient $k_r = -42.0$. The low-fidelity model,
+where the state $u$ is the species concentration and $f(q)$ is a forcing field described by the parameters. We have a divergence-free parabolic-profile velocity field $\vec{V}(x_1,x_2) = (2x_2(1-x_2),0)$; the diffusion and reaction coefficients are $k_d = 0.1$ and $k_r = -42.0$, respectively. The low-fidelity model,
 %
 \begin{equation}
 k_d\nabla^2 u - \vec{V}\cdot\nabla u = f(q)
@@ -65,8 +77,7 @@ I(q,u)=\int_{(x_1,x_2)\in \Omega_I} u \:\textrm{d}A,
 %
 over a region $\Omega_I=[0.625,0.875]\times[0.375,0.625]$. 
 
-The unknown parameters we wish to infer correspond to the forcing field, so that $f(q)=q$. The `true' forcing field is given by,
-a piecewise constant source term $f_{true}$,
+The unknown parameters we wish to infer correspond to the forcing field, so that $f(q)=q$. For the low-fidelity model, the inverse problem is linear (the inferred parameters are linear in the observations). Observations consisting of the state at three points in the domain are artificially generated by running the high-fidelity model on a finer mesh with the true forcing field
 %
 \begin{equation}
 f_{true}(x_1,x_2)=
@@ -77,9 +88,7 @@ f_{true}(x_1,x_2)=
 \end{cases}
 \end{equation}
 %
-Observations $d=(u(0.35,0.35),u(1.56,0.61),u(3.1,0.5))$ from three points in the domain are artificially generated by running the high-fidelity model on a finer mesh with true forcing field. 
-
-The locations of the observations and the region $\Omega_I$ over which the QoI is calculated are shown in Figure~\ref{fig:baseSetup}. Since the inverse problem is ill-posed, we use Tikhonov regularization~\cite{EngHanNeu00}; the regularization term is $\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}A$, where $\beta=10^{-5}$ is a regularization coefficient.
+The locations of the observations and the region $\Omega_I$ over which the QoI is calculated are shown in Figure~\ref{fig:baseSetup}. Since the inverse problem is ill-posed, we use Tikhonov regularization~\cite{EngHanNeu00}; the regularization term is $\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}A$, where $\beta=10^{-5}$ is the regularization coefficient. 
 %
 \begin{figure}[h]
 \centering
@@ -88,22 +97,23 @@ The locations of the observations and the region $\Omega_I$ over which the QoI i
 \label{fig:baseSetup}
 \end{figure}
 %
-For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations. The library offers both easy calculation of adjoint systems, error estimates and subdomain restricted variables. The domain is discretized by a regular mesh of quadrilaterals, with 50 and 250 elements along the short and long boundaries, respectively, for a total of 12,500 elements, resulting in a total of 76,806 degrees of freedom. No stabilization was required for these calculations, since the cell P\'{e}clet number never exceeded 0.1.
+
+For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations. \red{The library offers easy calculation of adjoint systems, error estimates and subdomain restricted variables.}\footnote{But we don't use Libmesh's error estimates or restrict variables to subdomains...} The domain is discretized by a regular mesh of quadrilaterals, with 50 and 250 elements along the short and long boundaries, respectively, for a total of 12,500 elements, resulting in a total of 38,403 degrees of freedom. The diffusion coefficient is chosen so that the cell P\'{e}clet number never exceeds 0.1, and thus no stabilization is required.
 %
 %------------------------------------------------------------%
-\subsubsection{Results} \label{sec:cdvcdrBaseRef} 
+\subsubsection{Adaptive Model Refinement Results} \label{sec:cdvcdrBaseRef} 
 %------------------------------------------------------------%
 %
 We now present the results for solving the inference problem using Algorithm~\ref{alg:refSeries}. Once the QoI error estimate is calculated using Equation (\ref{eq:finErrExp}), the error estimate is then localized to each element to give an element-wise decomposition of the error. Based on this element-wise decomposition, we increase the proportion of the domain in which the high-fidelity model is used until the estimated absolute relative error in the QoI, is less than $1\%$. 
 
-Figure~\ref{fig:baseRef} shows the element-wise decomposition of the error estimate, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated.
+Figure~\ref{fig:baseRef} shows the element-wise decomposition of the error estimate \red{no longer constant-per-element, what exactly does this plot show?}, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. \red{note that plots show absolute values, so valleys between lobes are actually transition between positive and negative...also note which decomp method used if comparing...}
 %
 \begin{figure}[h!]
 \centering
   \begin{subfigure}[b]{\textwidth}
   \centering    
     \includegraphics[width=0.48\textwidth]{baseSeries/cd_cdr_LF_divvy.pdf}
-    \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_LF.png}
+    \includegraphics[width=0.51\textwidth]{baseSeries/err_breakdown_LF.png}
     \vspace{-0.5\baselineskip}
     \caption{MF$_0$ ($0\%$ HF)}
     \label{fig:baseRef0}
@@ -111,16 +121,16 @@ Figure~\ref{fig:baseRef} shows the element-wise decomposition of the error estim
   \end{subfigure}
 	\begin{subfigure}[b]{\textwidth}
   \centering
-    \includegraphics[width=0.48\textwidth]{baseSeries/cd_cdr_MF01_divvy.png}
-    \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF01.png}
+    \includegraphics[width=0.48\textwidth]{baseSeries/cd_cdr_MF01_divvy.pdf}
+    \includegraphics[width=0.51\textwidth]{baseSeries/err_breakdown_MF01.png}
     \vspace{-0.5\baselineskip}
     \caption{MF$_1$ ($5\%$ HF)}
     \vspace{0.8\baselineskip}
   \end{subfigure}
   \begin{subfigure}[b]{\textwidth}
   \centering
-    \includegraphics[width=0.48\textwidth]{baseSeries/cd_cdr_MF02_divvy.png}
-    \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF02.png}
+    \includegraphics[width=0.48\textwidth]{baseSeries/cd_cdr_MF02_divvy.pdf}
+    \includegraphics[width=0.51\textwidth]{baseSeries/err_breakdown_MF02.png}
     \vspace{-0.5\baselineskip}
     \caption{MF$_2$ ($10\%$ HF)}
     \vspace{0.8\baselineskip}
@@ -134,7 +144,7 @@ Note that since linear nodal basis elements are used, elements in regions where 
 We see that model refinement is concentrated in the QoI region, and the data point closest to the QoI. In the first elemental decomposition of the error (Figure~\ref{fig:baseRef0}), the region where the elemental error is maximum is data point one. Since the constraining model is an elliptic PDE, with a weak convection, information flow is localized, and is weakly convected from left to right. Therefore, for the calculation of the QoI, it is most important to refine the region near data point one, and the QoI region. 
 We also observe that the region near the data points downstream from the QoI are not refined as much as the region immediately adjacent to the QoI. This indicates that the information from these two data points is not significant for the estimation of the QoI. \red{We should say a bit more about the refinement region here, and implications for experimental design ?}. 
 
-Figure~\ref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by Algorithm~\ref{alg:refSeries}. It can be seen that the error estimates are close to the true error, and the error estimator has an effectivity index close to one. We also see that the QoI error of only $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain.
+Figure~\ref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by Algorithm~\ref{alg:refSeries}. \red{It can be seen that the error estimates are close to the true error, and the error estimator has an effectivity index close to one.} We also see that the QoI error of only $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain.
 %
 \begin{figure}[h]
 \centering
@@ -142,6 +152,15 @@ Figure~\ref{fig:baseErr} shows the true and estimated absolute relative errors i
 \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used.}
 \label{fig:baseErr}
 \end{figure}
+%
+
+\red{Does it make sense to compare the breakdowns and error vs refinement of the different error localization schemes? Or is one so obviously better than the other that we don't need to show it?}
+
+%------------------------------------------------------------%
+\subsubsection{Interaction of Observations and QoI} \label{sec:qoivdata}
+%------------------------------------------------------------%
+%
+lalala
 %
 \subsection{Constant vs Field Parameters}
 %

@@ -43,7 +43,7 @@ The inverse problem formulation and Lagrangian with the lower fidelity model can
 In the case of a goal-oriented inverse problem, the ultimate purpose of inferring the unknown parameters is to calculate some Quantity of Interest (QoI). Assuming a single scalar QoI, we denote this QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. Since our ultimate goal is to compute this QoI, the particular tradeoff we consider is the fidelity and resultant computational expense of the model we use, versus the error in the QoI. We thus seek to introduce the QoI functional $I$ into the inverse problem formulation, by introducing auxilary variables and additional adjoint equations. Then we use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those which occur due to the use of constraints other than those given by Eq.~\eqref{eq:invOpt_cons}.
 %
 %------------------------------------------------------------------------------%
-\subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse \\Problem}  \label{sec:deriv}
+\subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
 %------------------------------------------------------------------------------%
 %
 For a given hierarchy of models, consider the QoI calculated from inferring the parameters with the highest-fidelity model; we take this QoI to be the value with which we compare other QoI estimates. In this section we derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model. The main result is,
