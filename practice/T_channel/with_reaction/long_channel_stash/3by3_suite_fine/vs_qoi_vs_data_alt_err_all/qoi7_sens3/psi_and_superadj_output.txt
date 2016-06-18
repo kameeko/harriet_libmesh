@@ -327,4 +327,4 @@ Estimated relative qoi error: 8.9555016023530863e-06
 
 Refinement concluded...
 Final refinement fraction: 0.1724
-Final estimated relative error: 8.95
+Final estimated relative error: 8.9555016023530863e-06

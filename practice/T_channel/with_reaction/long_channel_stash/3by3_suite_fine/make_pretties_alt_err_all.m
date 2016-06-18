@@ -1,7 +1,5 @@
 %plot error distribution and domain division for alternate error breakdown
 
-%save inverse map to mat file? toggle option for coarser or finer version
-
 close all;
 set(0,'defaultTextInterpreter','latex');
 set(0,'defaultAxesTickLabelInterpreter','latex');
