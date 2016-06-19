@@ -2,6 +2,7 @@
 #include "libmesh/getpot.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/point_locator_tree.h"
 
 #include <numeric>
 
@@ -70,8 +71,13 @@ public:
 		sadj_auxc_point_stash.resize(datavals.size()); //DEBUG
 		sadj_c_point_stash.resize(datavals.size()); //DEBUG
 		
-		accounted_for.assign(datavals.size(), this->get_mesh().n_elem()+100);
-
+		//find elements in which data points reside
+	  PointLocatorTree point_locator(this->get_mesh());
+	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+	  	Point data_point = datapts[dnum];
+	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+	  	dataelems.push_back(this_elem->id());
+	  }
   }
 
   // System initialization
@@ -129,6 +135,7 @@ public:
   //data-related stuff
   std::vector<Point> datapts; 
   std::vector<Real> datavals;
+  std::vector<dof_id_type> dataelems;
   
   //velocity field
 	std::vector<Real> x_pts;
@@ -149,9 +156,6 @@ public:
 	std::vector<std::vector<Real> > sadj_auxfc_stash; std::vector<std::vector<Gradient> > sadj_gradauxfc_stash;
 	std::vector<Real> sadj_auxc_point_stash; std::vector<Real> sadj_c_point_stash;
 	unsigned int debug_step; //if 1, fill up sadj stash; if 2, calculate half_sadj_resid
-	
-	//avoid assigning data point to two elements in on their boundary
-	std::vector<int> accounted_for;
 
   //options for QoI location and nature
   int qoi_option;

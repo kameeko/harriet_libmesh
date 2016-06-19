@@ -308,10 +308,7 @@ bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffCon
     
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
 	  	Point data_point = datapts[dnum];
-	  	if(ctxt.get_elem().contains_point(data_point) && (accounted_for[dnum]>=ctxt.get_elem().id()) ){
-	  	
-	  		//help avoid double-counting if data from edge of elements, but may mess with jacobian check
-	  		accounted_for[dnum] = ctxt.get_elem().id(); 
+	  	if(dataelems[dnum] == ctxt.get_elem().id()){
 	  		
 	  		Number cpred = ctxt.point_value(c_var, data_point);
 	  		Number cstar = datavals[dnum];

@@ -2,7 +2,7 @@
 
 close all;
 
-refPortion = 0.57; %total, not in addition to previous
+refPortion = 0.65; %total, not in addition to previous
     %portion of basis functions; portion of elements will be slightly off
 fntsize = 16;
 
@@ -130,9 +130,9 @@ set(gcf,'PaperPositionMode','auto','Position',[66 253 1535 297])
 print(h,'err_breakdown','-dpng','-r300')
 
 %plot new domain division
-figure;
-% squish = reshape(divvynew(:,2),250,50)';
-squish = reshape(divvynew(:,2),75,15)';
+h = figure;
+squish = reshape(divvynew(:,2),250,50)';
+% squish = reshape(divvynew(:,2),75,15)';
 map = [91, 146, 229; 227, 38, 54]/255;
 imagesc([0 5],[0 1],-squish); 
 set(gca,'YDir','normal','Ticklength',[0 0]); colormap(map);
@@ -145,6 +145,7 @@ hold on;
 % contour(reshape(elem_cent(:,1),250,50),...
 %     reshape(elem_cent(:,2),250,50),...
 %     reshape(divvy,250,50),[0 1],'k','LineWidth',1)
-contour(reshape(elem_cent(:,1),75,15),...
-    reshape(elem_cent(:,2),75,15),...
-    reshape(divvy,75,15),[0 1],'k','LineWidth',1)
+% contour(reshape(elem_cent(:,1),75,15),...
+%     reshape(elem_cent(:,2),75,15),...
+%     reshape(divvy,75,15),[0 1],'k','LineWidth',1)
+print(h,'divvy','-dpng','-r300')

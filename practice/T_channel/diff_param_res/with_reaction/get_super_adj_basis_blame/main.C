@@ -419,12 +419,10 @@ int main(int argc, char** argv)
 		sol_transfer.transfer(system.variable(system.variable_number("aux_fc")),
 			system2.variable(system2.variable_number("aux_fc")));
 		std::string write_error_basis_blame = infileForMesh("error_est_output_file_basis_blame", "error_est_breakdown_basis_blame.dat");
-		AutoPtr<NumericVector<Number> > adjresid_basis_blame = system.solution->clone();
-		adjresid_basis_blame->zero();
+		AutoPtr<NumericVector<Number> > adjresid_basis_blame = system.solution->zero_clone();
 		adjresid_basis_blame->pointwise_mult(*system.rhs,dual_solution); 
 	  std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << -0.5*adjresid_basis_blame->sum() << std::endl; //check
-	  AutoPtr<NumericVector<Number> > LprimeHF_psiLF_basis_blame = system.solution->clone();
-	  LprimeHF_psiLF_basis_blame->zero();
+	  AutoPtr<NumericVector<Number> > LprimeHF_psiLF_basis_blame = system.solution->zero_clone();
 	  LprimeHF_psiLF_basis_blame->pointwise_mult(*system.rhs,*system2.solution);
 	  std::cout << " L'_HF(psiLF): " << LprimeHF_psiLF_basis_blame->sum() << " vs " 
 	    << system.get_MHF_psiLF()-system.get_MLF_psiLF() << std::endl; //check
