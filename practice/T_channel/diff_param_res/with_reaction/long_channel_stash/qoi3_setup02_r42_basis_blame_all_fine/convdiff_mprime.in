@@ -1,0 +1,34 @@
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+print_residuals = false
+print_solutions = false
+
+fe_family = 'LAGRANGE'
+
+#regularization parameter
+beta = 0.001   #1.0e-8 #0.001
+
+#diffusion coefficient
+k = 0.1   #1.0 #0.1
+
+#reaction coefficient
+R = -42.0
+
+#QoI option
+QoI_option = 3
+
+#where to find files
+velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
+data_file = long_channel_data3_r4p2_blip.dat #long_channel_data3_r4p2_blip.dat
+
+#knobs for how hard to enfore pinning to constant
+prim_mag_screw = 1.0e6
+prim_grad_screw = 1.0e0
+aux_mag_screw = 1.0e5
+aux_grad_screw = 1.0e0
+
+#subdomains
+scalar_id = 0
+field_id = 1
+divided_mesh = channel_long.exo
