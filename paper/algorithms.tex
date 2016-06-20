@@ -48,14 +48,14 @@ Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lowe
 % 
 \subsection{Complexity Analysis}\label{sect:alg_complexity}
 %
-We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$, and the cost for computing the supplementary adjoint is $\orderof{6N}^{\gamma}$. \red{Solving the supplementary adjoint can be split into two $N\times N$ systems...}
+We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$. \red{The parts of the supplementary adjoint corresponding to the primary and auxiliary variables can be solved separately, and thus the cost of computing the supplementary adjoint is also $\orderof{3N}^{\gamma}$.}
 
 If one utilizes Algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
 %
 \begin{align}
 \label{eq:cost_adapt}
-C_{MF} &= \sum_{i=1}^{T}L_{i}(3N)^{\gamma} + 1(3N)^{\gamma} + 2^{\gamma}(3N)^{\gamma} \nonumber \\
-&= \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) (3N)^{\gamma}
+C_{MF} &= \sum_{i=1}^{T}L_{i}(3N)^{\gamma} + 1(3N)^{\gamma} + 2(3N)^{\gamma} \nonumber \\
+&= \sum_{i=1}^{T} (L_i + 3) (3N)^{\gamma}
 \end{align}
 % 
 where $L_i$ is the number of nonlinear solver steps needed to solve the KKT system for the low or mixed fidelity model at each adaptive step. The corresponding cost for solving the high fidelity inference problem, with a nonadaptive algorithm, based on a continuation scheme is,
@@ -71,17 +71,18 @@ Comparing Eq.~\eqref{eq:cost_adapt} and~\eqref{eq:cost_nadapt}, we have,
 %
 \begin{equation}
 \label{eq:cost_compare_0}
-C_{MF} < C_{HF} \implies \sum_{i=1}^{T} (L_i + 1 + 2^{\gamma}) < \sum\limits_{i=1}^{C}K_{i}
+C_{MF} < C_{HF} \implies \sum_{i=1}^{T} (L_i + 3) < \sum\limits_{i=1}^{C}K_{i}
 \end{equation}
 %
-If the low and multi-fidelity models are linear or nonlinear in a very small region $L_i \approx 1$, and we have the following condition,
+If the low and multi-fidelity models are linear, or nonlinear in a very small region, then $L_i \approx 1$, and we have the following condition,
 %
 \begin{equation}
 \label{eq:cost_compare_1}
-T < \frac{\sum\limits_{i=1}^{C}K_{i}}{2 + 2^{\gamma}}
+T < \frac{\sum\limits_{i=1}^{C}K_{i}}{4},
 \end{equation}
 % 
-The bound on $T$ will be strictest if Gaussian elimination is used, with $\gamma = 3$, giving $T < \frac{\sum\limits_{i=1}^{C}K_{i}}{10}$.
+for the adaptive algorithm to be less costly than solving the high-fidelity inverse problem.
+%The bound on $T$ will be strictest if Gaussian elimination is used, with $\gamma = 3$, giving $T < \frac{\sum\limits_{i=1}^{C}K_{i}}{10}$.
 %
 
 %does B+V's method for 'cheaply' getting auxiliary variables not really work when parameters are a field and not handful of scalars? does it even matter, since bulk of costs seem to be going to super-adjoint?

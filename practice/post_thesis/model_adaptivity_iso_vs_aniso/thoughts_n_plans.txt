@@ -224,6 +224,7 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
   -inv, quartered domain, 25x45x30, no stabilization (n in vel), n=0.1
     -iso 100: 159 (151 in linear); qoi = 1068855.6709150125
     -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3: 2470 (2300 in linear); qoi = 547417.81514302175
+THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
     -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, jac-fix: 
       12135 (11724 in linear); qoi = 547420.85898380179
       (wow we must've gotten really lucky before with the wrong jacobian...)
@@ -243,10 +244,9 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
       MF03: qoi = 547773.23232645926; estimated rel error = 0.00032135133846412049; actual relative error = 0.000644
         Final refinement fraction: 0.42269629629629629; if stop here, 2222 (2050 in linear)
   
-  THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
-
-  -make sure to output divvy at each step for adaptive case...
   
+  -make sure to output divvy at each step for adaptive case...
+====================================================================================
 -from last time...
   -integrated adaptivity steps into one time-able code
   -model from benjamin - haven't come up with reasonable LF or HF model to go with it
@@ -270,3 +270,15 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
   hmm...do you know anyone who might be able to help with the Damkohler number question? the expression on wikipedia is the most general I can find, but I don't know what the diffusive/convective 'mass transport rate' is in our equation...the reaction rate is change in concentration per time, so it has units [M/L^3/T] (Mass-Length-Time), but I'm not sure what in the convection-diffusion aspects of our equation has those units...the more specific reactions on the wiki page, as well as the other expressions I've found, seem to be derived for particular reactors and reaction orders (most assume first-order reactions, or particular idealized reactors)...
   
 mind maps?
+====================================================================================
+
+vikram will look into 'continuation in operator space' idea
+  -> see if karen knows anything about this?
+  
+field vs scalar error plots need colorbar readjusted to show more than just spastic fringes...
+    -wow those fringes are really spastic...can we fix them? are they the source of the spaz in the error?
+      -f and auxf aren't really oscillating at the fringes though..well pinned...
+      -are the basis functions for blaming even done properly? at the boundaries, they would only be half a hat...
+      -does the idea of 'locally supported basis functions' even make sense in the scalar bits?
+      -what space does the superadj live in?
+        -in full-field space...is that right, though? if so, then superadj components don't live in same space as aux var components...will need to change localization writeup, maybe procedure as well...
