@@ -1,12 +1,12 @@
 \section{Numerical Experiments}\label{sect:numexp}
 %
-We now use Algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi-model setting. We consider two kinds of multi-fidelity models, in a total of three experiments. In the first experiment, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In the second experiment, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. \red{The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.}
+We now use Algorithm~\ref{alg:refSeries} to solve goal oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in Section~\ref{sec:errLocal}. We first consider simple two-dimensional models in order to explore the behavior of the algorithm in relation to iteration number as well as the placement of observations and QoI regions. In Section~\ref{sec:cdvcdr}, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We apply Algorithm~\ref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In Section~\ref{sec:constvfield}, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. \red{The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.} Finally, in Section~\ref{sec:cdvcdr3D}, we consider a more realistic pair of three-dimensional models to illustrate computational savings when using Algorithm~\ref{alg:refSeries}, as compared to solving the high-fidelity inverse problem.
 
 %In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
 
-%
-\subsection{Error Estimate Localization}
-%
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Error Estimate Localization} \label{sec:errLocal}
+%------------------------------------------------------------------------------------------------------------------------%
 Algorithm~\ref{alg:refSeries} does not require a particular method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While perhaps simple to compute, this method results in non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret.
 
 We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subseteq Q$ and $U_{LF}=U$. Note that the error estimate in Equation \ref{eq:finErrExp} can be equivalently written as
@@ -28,10 +28,10 @@ where
 \end{equation}
 %
 can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$. The basis functions with the largest error contributions are flagged, and the elements in their support are refined. Using this method, elements in which the high-fidelity model is already being used are not interpreted as continuing to contribute to the error in the QoI and thus are not marked again for refinement. The only exceptions are elements near the interfaces between the low-fidelity and high-fidelity regions, as basis functions near the boundary may have their support divided between the two regions and thus have a nonzero error contribution. 
-%
+%------------------------------------------------------------------------------------------------------------------------%
 \subsection{Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
-%
-In this section, we consider a pair of models which differ in the physics included. In Section~\ref{sec:cdvcdrSetup} we describe a baseline setup for a simple problem in 2D. Section~\ref{sec:cdvcdrBaseRef} describes the results of applying Algorithm~\ref{alg:refSeries} to the baseline problem, and Section~\ref{sec:qoivdata} describes the results of changing the placement of observations or the QoI region from the baseline.
+%------------------------------------------------------------------------------------------------------------------------%
+In this section, we consider a pair of models which differ in the physics included. In Section~\ref{sec:cdvcdrSetup} we describe a baseline setup for a simple two-dimensional problem. Section~\ref{sec:cdvcdrBaseRef} describes the results of applying Algorithm~\ref{alg:refSeries} to the baseline problem, and Section~\ref{sec:qoivdata} describes the results of changing the placement of the observations or the QoI region from the baseline.
 %
 %------------------------------------------------------------%
 \subsubsection{Problem Setup} \label{sec:cdvcdrSetup}
@@ -69,7 +69,7 @@ k^{MF}_r=
 \end{cases}
 \end{equation}
 %
-The QoI we wish to calculate is the integral of the state,
+Homogeneous Dirichlet boundary conditions are applied on the entire boundary of the domain. The QoI we wish to calculate is the integral of the state,
 %
 \begin{equation}
 I(q,u)=\int_{(x_1,x_2)\in \Omega_I} u \:\textrm{d}A,
@@ -240,13 +240,13 @@ The error decomposition for three increasing, nested sets of observations and th
   \label{fig:dataStudy}
 \end{figure}
 
-%
-\subsection{Constant vs Field Parameters}
-%
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Constant vs Field Parameters} \label{sec:constvfield}
+%------------------------------------------------------------------------------------------------------------------------%
 It is not necessary for the low- and high-fidelity models to differ in the physics included. A low-fidelity model may be more computationally tractable due to a reduced number of degrees of freedom rather than reduced nonlinearity. In this section, we consider two models which differ in the space to which the parameter belongs, with the low-fidelity model having fewer degrees of freedom.
-%
+%------------------------------------------------------------%
 \subsubsection{Problem Setup}
-%
+%------------------------------------------------------------%
 We consider the same high-fidelity model as in Section~\ref{sec:cdvcdr}:
 \begin{equation}
 k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U,
@@ -256,9 +256,11 @@ with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r =
 k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in\R
 \end{equation}
 differs from the high-fidelity model only in that the parameter $q$ is a constant instead of a field. Then the intermediate mixed-fidelity models have parameter fields which are non-constant in only portions of the domain. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. The domain, mesh, boundary conditions, and velocity field, as well as the observations, unknown parameters to be inferred, and QoI, remain the same as described in Section~\ref{sec:cdvcdr}. As the inverse problem is ill-posed, except for perhaps in the case where the low-fidelity model is used throughout the domain, regularization is added; the Tikhonov regularization term is $\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient.
-%
+
+Although using such a pair of models has similarities to the problem of adaptive mesh refinement, we note that when seeking adaptive mesh refinement for the goal-oriented inverse problem, it is more efficient to use the approach discussed in \cite{BecVex05}.
+%------------------------------------------------------------%
 \subsubsection{Adaptive Model Refinement Results}
-%
+%------------------------------------------------------------%
 As with the previous examples in Section~\ref{sec:cdvcdr}, the decomposition (\ref{eq:basisblame}) of the error estimate is used to select additional regions of the domain in which to use the high-fidelity model. The number of degrees of freedom in the inverse problem increases with the proportion of the domain in which the high-fidelity model is used and the unknown parameter allowed to be a field. With each iteration, an additional $10\%$ of the elements are marked for refinement. This is repeated until the estimated absolute relative error in the QoI, is less than $1\%$.
 
 Figure~\ref{fig:svfRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the first two and last mixed-fidelity model thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node. 
@@ -325,7 +327,7 @@ Figure~\ref{fig:svfRef} shows the local error contributions, as well as the subd
 \label{fig:svfRef}
 \end{figure}
 %
-Comparing to Figure~\ref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest data point; here, all three data points and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models; the parameter field throughout all low-fidelity regions is constant. 
+Comparing to Figure~\ref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest data point; here, all three data points and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models; the parameter field in all the low-fidelity regions is constant and equal. 
 
 The corresponding true and estimated absolute errors in the QoI are shown in Figure~\ref{fig:svfErr}.
 %
@@ -336,25 +338,30 @@ The corresponding true and estimated absolute errors in the QoI are shown in Fig
 \label{fig:svfErr}
 \end{figure}
 %
-In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, compared to the example in Section~\ref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. \red{This example seems very close to mesh-refinement, which we estabilished would be more efficient using the original Becker+Vexler method. Do we still want to include this?}
-
-%
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, compared to the example in Section~\ref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. 
+%------------------------------------------------------------------------------------------------------------------------%
 \subsection{Convection-Diffusion(-Highly Nonlinear Reaction)}
-%
-\red{Not sure should even keep this section...if we split the supplementary adjoint solve, then the condition for adaptivity being more efficient doesn't depend on the linear solver...we don't need this section to make a cost argument if we have the 3D example...having this section seems to be overkill/redundant if all we want to say is that 'sometimes we need continuation for the HF inverse problem'...}
-%
+%------------------------------------------------------------------------------------------------------------------------%
+\red{Not sure should even keep this section...if we split the supplementary adjoint solve, then the condition for adaptivity being more efficient doesn't depend on the linear solver...we don't need this section to make a cost argument if we have the 3D example...having this section seems to be overkill/redundant if all we want to say is that 'sometimes we need continuation for the HF inverse problem'...if we want to make a 'robustness' argument, then merge with whatever vikram writes about operator continuation interpretation?
+%------------------------------------------------------------%
 \subsubsection{Results}
-%
+%------------------------------------------------------------%
 We consider the convection-diffusion-reaction term described in Section \ref{sec:cdvcdr}, with a reaction term $k_r=-616$ in the high-fidelity model. This reaction term is large enough that the Newton solver will not converge with a zero initial guess. We first solve the inverse problem with the low-fidelity model ($k_r=0$), and then use a simple continuation approach, using the solution at one value of $k_r$ as the initial guess for the next.\footnote{not arclength continuation, which is more difficult to implement, though libMesh appears to have a class for such continuation, which we can use if this seems like a viable direction} We increase the reaction term in increments of $\Delta k_r=100$, and halve the increment each time the step is too large (Newton solver does not converge at the next $k_r$ value). From $k_r=0$ to $k_r=-616$, this results in 9 continuation steps being taken.
-%
+%------------------------------------------------------------%
 \subsubsection{Computational Complexity}
-%
+%------------------------------------------------------------%
 We compare the complexity of Algorithm~\ref{alg:refSeries} and the continuation method for the high fidelity problem, in the context of the analysis developed in section~\ref{sect:alg_complexity}. For the high fidelity problem, with  with 9 continuation steps, we have $\sum\limits_{i=1}^{C} K_i=30$. 
  
 With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using Algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
 
-In other words, on using Algorithm~\ref{alg:refSeries} for a highly nonlinear problem, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, with a $20\%$ reduction in computational cost, while avoiding any need for continuation to handle nonlinearities. 
-%
-\subsection{Convection-Diffusion(-Reaction) in 3D} 
+In other words, on using Algorithm~\ref{alg:refSeries} for a highly nonlinear problem, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, with a $20\%$ reduction in computational cost, while avoiding any need for continuation to handle nonlinearities. }
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Convection-Diffusion(-Reaction) in 3D} \label{sec:cdvcdr3D}
+%------------------------------------------------------------------------------------------------------------------------%
+
+In the previous examples, while the low- and high-fidelity models are sufficiently different to illustrate the behavior of Algorithm~\ref{alg:refSeries}, they are both simple enough and similar enough that using Algorithm~\ref{alg:refSeries} saves little, if any, time. In this section, we consider a more realistic pair of models which differ in the physics included, and demonstrate computational savings when using the adaptive algorithm, while still achieving a small error in the QoI. In Section~\ref{sec:setup3D} we describe the setup of the models and their inverse problems, and in Section~\ref{sec:ref3D} we describe the results of applying Algorithm~\ref{alg:refSeries} to this pair of models.
+
+
 %previous 2D examples were toy problems were good illustrate something (error breakdown patterns), but too simple to really see any computational cost differences
 %bigger steps in 3D problem because qoi region bigger?
