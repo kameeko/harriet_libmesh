@@ -31,7 +31,7 @@ can be interpreted as the error contribution from the basis function $(\varphi,\
 %
 \subsection{Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
 %
-In this section, we consider a pair of models which differ in the physics included. In Section \ref{sec:cdvcdrSetup} we describe a baseline setup for a simple problem in 2D. Section \ref{sec:cdvcdrBaseRef} describes the results of applying Algorithm~\ref{alg:refSeries} to the baseline problem, and Section \ref{sec:qoivdata} describes the results of changing the placement of observations or the QoI region from the baseline.
+In this section, we consider a pair of models which differ in the physics included. In Section~\ref{sec:cdvcdrSetup} we describe a baseline setup for a simple problem in 2D. Section~\ref{sec:cdvcdrBaseRef} describes the results of applying Algorithm~\ref{alg:refSeries} to the baseline problem, and Section~\ref{sec:qoivdata} describes the results of changing the placement of observations or the QoI region from the baseline.
 %
 %------------------------------------------------------------%
 \subsubsection{Problem Setup} \label{sec:cdvcdrSetup}
@@ -243,7 +243,7 @@ The error decomposition for three increasing, nested sets of observations and th
 %
 \subsection{Constant vs Field Parameters}
 %
-It is not necessary for the low- and high-fidelity models to differ in the physics included. In this section, we consider two models which differ in the space to which the parameter belongs, with the low-fidelity model having fewer degrees of freedom.
+It is not necessary for the low- and high-fidelity models to differ in the physics included. A low-fidelity model may be more computationally tractable due to a reduced number of degrees of freedom rather than reduced nonlinearity. In this section, we consider two models which differ in the space to which the parameter belongs, with the low-fidelity model having fewer degrees of freedom.
 %
 \subsubsection{Problem Setup}
 %
@@ -251,7 +251,7 @@ We consider the same high-fidelity model as in Section~\ref{sec:cdvcdr}:
 \begin{equation}
 k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U,
 \end{equation}
-with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r = -4.2$. The low-fidelity model
+with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r = -42$. The low-fidelity model
 \begin{equation}
 k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in\R
 \end{equation}
@@ -259,16 +259,84 @@ differs from the high-fidelity model only in that the parameter $q$ is a constan
 %
 \subsubsection{Adaptive Model Refinement Results}
 %
-As with the previous examples in Section~\ref{sec:cdvcdr}, the decomposition of the error estimate (\ref{eq:basisblame}) is used to select additional regions of the domain in which to use the high-fidelity model. The number of degrees of freedom in the inverse problem increases with the proportion of the domain in which the high-fidelity model is used and the unknown parameter allowed to be a field. With each iteration, an additional $10\%$ of the elements are marked for refinement. This is repeated until the estimated absolute relative error in the QoI, is less than $1\%$.
+As with the previous examples in Section~\ref{sec:cdvcdr}, the decomposition (\ref{eq:basisblame}) of the error estimate is used to select additional regions of the domain in which to use the high-fidelity model. The number of degrees of freedom in the inverse problem increases with the proportion of the domain in which the high-fidelity model is used and the unknown parameter allowed to be a field. With each iteration, an additional $10\%$ of the elements are marked for refinement. This is repeated until the estimated absolute relative error in the QoI, is less than $1\%$.
 
-Figure~\ref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node.
+Figure~\ref{fig:svfRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the first two and last mixed-fidelity model thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node. 
+%
+\begin{figure}[h!]
+\captionsetup[subfigure]{justification=centering,aboveskip=-10pt}
+\centering
+\begin{subfigure}[b]{\textwidth}
+\centering
+	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_LF_divvy.png}
+  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_LF.png}
+  \vspace{-0.7\baselineskip}
+  \caption{MF$_0$ ($0\%$ HF)}
+  \vspace{0.8\baselineskip}
+\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+	\centering
+	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF01_divvy.png}
+  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF01.png}
+  \vspace{-0.7\baselineskip}
+  \caption{MF$_1$ ($10\%$ HF)}
+  \vspace{0.8\baselineskip}
+\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+  \centering
+  \includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF02_divvy.png}
+  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF02.png}
+  \vspace{-0.7\baselineskip}
+  \caption{MF$_2$ ($20\%$ HF)}
+  \vspace{0.8\baselineskip}
+\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF03_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF03.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_3$ ($30\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF04_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF04.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_4$ ($40\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF05_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF05.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_5$ ($50\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+\begin{subfigure}[b]{\textwidth}
+	\centering
+	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF06_divvy.png}
+  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF06.png}
+  \vspace{-0.7\baselineskip}
+  \caption{MF$_6$ ($60\%$ HF)}
+\end{subfigure}
+\caption{Local error contributions (right) and domain division (left; low-fidelity constant-parameter model used in red portion, high-fidelity field-parameter model used in blue portion) for mixed-fidelity models. The (weighted) residual, and thus the local error contribution, tends to spike sharply at the interface between the low- and high-fidelity regions; the color range is truncated to make the error distribution visible elsewhere in the domain.}
+\label{fig:svfRef}
+\end{figure}
+%
+Comparing to Figure~\ref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest data point; here, all three data points and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models; the parameter field throughout all low-fidelity regions is constant. 
 
-
-
-
-
-
-
+The corresponding true and estimated absolute errors in the QoI are shown in Figure~\ref{fig:svfErr}.
+%
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{svf/err_est.pdf}
+\caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity field-parameter model is used.}
+\label{fig:svfErr}
+\end{figure}
+%
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, compared to the example in Section~\ref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. \red{This example seems very close to mesh-refinement, which we estabilished would be more efficient using the original Becker+Vexler method. Do we still want to include this?}
 
 %
 \subsection{Convection-Diffusion(-Highly Nonlinear Reaction)}
