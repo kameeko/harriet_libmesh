@@ -392,11 +392,15 @@ The unknown parameters we wish to infer correspond to the source term $f(q)=q$; 
 %
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.3\textwidth]{placeholder.pdf}
-\caption{Locations of the observations and the QoI region.}
+\includegraphics[width=0.4\textwidth]{series3D/setup_arial_nolegend.pdf} \hfill
+\includegraphics[width=0.55\textwidth]{series3D/setup_3view.pdf} \\ 
+\vspace{\baselineskip}
+\includegraphics[width=0.6\textwidth]{series3D/setup_side_view.pdf}
+\caption{Three views of locations of the observations and the QoI region.}
 \label{fig:setup3D}
 \end{figure}
 %
+
 We continue to use the FEM with a continuous Galerkin formulation and Lagrange elements. The domain is discretized by a regular mesh of hexahedrons, with 25, 45, and 30 elements along the $x_1$, $x_2$, and $x_3$ directions, respectively; each variable has 37,076 degrees of freedom. The cell P\'{e}clet is small enough to not require stabilization.
 
 %------------------------------------------------------------%
