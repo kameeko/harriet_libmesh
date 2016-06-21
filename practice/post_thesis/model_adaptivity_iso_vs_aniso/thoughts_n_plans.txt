@@ -265,7 +265,7 @@ THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
   http://chemwiki.ucdavis.edu/Core/Physical_Chemistry/Kinetics/Methods_of_Determining_Reaction_Order#Second-Order_Reactions
   p.683 of 'remediation of hazardous waste contaminated soils' by donald l. wise (scan of chapter requested from iliad)
   'Evaluation of the kinetic oxidation of aqueous volatile organic compounds by permanganate' 
-    -total second order (two reactants); rate constants in desired range...
+    -total second order (two reactants); rate constants are O(e-8) at most...perhaps because aqueous and chemwiki reactions were gaseous?
   
   hmm...do you know anyone who might be able to help with the Damkohler number question? the expression on wikipedia is the most general I can find, but I don't know what the diffusive/convective 'mass transport rate' is in our equation...the reaction rate is change in concentration per time, so it has units [M/L^3/T] (Mass-Length-Time), but I'm not sure what in the convection-diffusion aspects of our equation has those units...the more specific reactions on the wiki page, as well as the other expressions I've found, seem to be derived for particular reactors and reaction orders (most assume first-order reactions, or particular idealized reactors)...
   
