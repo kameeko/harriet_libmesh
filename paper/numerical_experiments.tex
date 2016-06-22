@@ -371,7 +371,7 @@ The two models share a box domain $\Omega(x_1,x_2,x_3)$ which is $2300$m, $1650$
 \begin{subequations}
 \label{eq:cdvcdrHF3D}
 \begin{align}
-\nabla\cdot(n\vec{V}u - nD\nabla u) + k_rnu^2 = f(q) \quad &\text{in } \Omega, \label{eq:HFeq3D}\\
+\nabla\cdot(n\vec{V}u - nD\nabla u) + k_ru^2 = f(q) \quad &\text{in } \Omega, \label{eq:HFeq3D}\\
 u = 5 \quad &\text{on } \partial \Omega_{west}, \\
 \frac{\partial u}{\partial n} = 0 \quad &\text{on }\partial\Omega_{east}, \\
 \hat{n}\cdot(n\vec{V}u - nD\nabla u) = 0 \quad &\text{on }\partial\Omega\backslash(\partial\Omega_{east}\cup\partial\Omega_{west}),
@@ -408,15 +408,17 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 
 We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, for a range of error tolerances. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows ...
 %
+\begin{table}[h]
+\centering
 \begin{tabular}{c|c|c|c|c|c}
-Case & $\%HF$ & QoI & Relative Error (Estimated) & Relative Error (Actual) & Time (s) \\
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%HF$} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & \multirow{2}{*}{Time (s)} \\ 
+& & & (Estimated) & (Actual) & \\ \hline
 LF & 0 & 1068856 &  &  &  \\
 MF01 & 16.7 &  &  &  &  \\
 MF02 & 29.0 &  &  &  &  \\
 MF03 & 42.3 &  &  &  &  \\
 HF & 100 & 547420 &  &  &  \\
-\caption{...}
 \end{tabular}
+\caption{table of things}
+\end{table}
 
-%previous 2D examples were toy problems were good illustrate something (error breakdown patterns), but too simple to really see any computational cost differences
-%bigger steps in 3D problem because qoi region bigger?

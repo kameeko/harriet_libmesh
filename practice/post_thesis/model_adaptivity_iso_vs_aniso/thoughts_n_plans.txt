@@ -238,17 +238,21 @@ THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
       6587 (6446 in linear); qoi = 547421.59753930464
     -aniso 100-40-4, r = (0,4.2)e-3, jac-fix:  
       6210 (6130 in linear); qoi = 547419.95996741741
-    -adaptive: (r = 4.2e-4)
+    -adaptive: (r = 4.2e-4), 0.1 steps
       MF01: qoi = 577581.79809296422; estimated rel error = -0.038311485179517969; actual relative error = -0.0522
         Final refinement fraction: 0.16651851851851851; if stop here, 1113 (1035 in linear)
       MF02: qoi = 548904.34911934205; estimated rel error = 0.002185847354112873; actual relative error = -0.002718
         Final refinement fraction: 0.29025185185185187; if stop here, 1795 (1672 in linear)
       MF03: qoi = 547773.23232645926; estimated rel error = 0.00032135133846412049; actual relative error = -0.000644
         Final refinement fraction: 0.42269629629629629; if stop here, 2222 (2050 in linear)
+    -adaptive: (r = 4.2e-4), 0.05 steps
+      FILL ME IN
   
 THE LAST TWO REFINEMENTS HAVE THE WRONG SIGN...WAS THERE SOMETHING TWITCHY ABOUT OUTPUTTING c_points and aux_c points to file? weird seg fault during first run, if no such files already in directory...?
 AAAHHH ADAPTIVITY WAS DONE WITH REACTION 4.2e-4, while continution was 4.2e-3...
   -> not a typo...one of the codes includes porosity in reaction term, the other doesn't...e-4 is with multiplication by porosity...
+  
+  is there a good way to show 3d error dist? error seems most concentrated near qoi region, makes everything else almost invisible...
 ====================================================================================
 -from last time...
   -integrated adaptivity steps into one time-able code
