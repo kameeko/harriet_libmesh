@@ -245,8 +245,19 @@ THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
         Final refinement fraction: 0.29025185185185187; if stop here, 1795 (1672 in linear)
       MF03: qoi = 547773.23232645926; estimated rel error = 0.00032135133846412049; actual relative error = -0.000644
         Final refinement fraction: 0.42269629629629629; if stop here, 2222 (2050 in linear)
-    -adaptive: (r = 4.2e-4), 0.05 steps
-      FILL ME IN
+    -adaptive: (r = 4.2e-4), 0.05 steps (psi_and_superadj2)
+      MF01: qoi = 613418.65290589374; estimated rel error = -0.066492866621420899; actual rel error = -0.1075915977
+        Final refinement fraction: 0.0927; if stop here, 1040
+      MF02: qoi = 558522.85455398832; estimated rel error = 0.002080804223470499; actual rel error = -0.019877534
+        Final refinement fraction: 0.169; if stop here, 1864
+      MF03: qoi = 550323.00719542312; estimated rel error = 0.0045611526719650146; actual rel error = -0.0052751566
+        Final refinement fraction: 0.237; if stop here, 2417
+      MF04: qoi = 548224.52965272486; estimated rel error = 0.0030239362458373475; actual rel error = -0.0014675915
+        Final refinement fraction: 0.304; if stop here, 2965
+      MF05: qoi = 547743.82753993955; estimated rel error = 0.0011951462532848933; actual rel error = -0.0005912756
+        Final refinement fraction: 0.372; if stop here, 3309
+      MF06: qoi = 547531.83860096941; estimated rel error = 0.00035427666447780811; actual rel error = -0.0002043327
+        Final refinement fraction: 0.446; if stop here, 3642
   
 THE LAST TWO REFINEMENTS HAVE THE WRONG SIGN...WAS THERE SOMETHING TWITCHY ABOUT OUTPUTTING c_points and aux_c points to file? weird seg fault during first run, if no such files already in directory...?
 AAAHHH ADAPTIVITY WAS DONE WITH REACTION 4.2e-4, while continution was 4.2e-3...

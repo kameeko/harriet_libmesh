@@ -406,7 +406,7 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 \subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D}
 %------------------------------------------------------------%
 
-We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, for a range of error tolerances. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows ...
+We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with the initial guess $u=5$, $z=q=0$; instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess.
 %
 \begin{table}[h]
 \centering
