@@ -447,7 +447,7 @@ The domain divisions for the three adaptive iterations are shown in Figure~\ref{
 \includegraphics[width=\textwidth]{series3D/divvy3_whitebg_shiftaxes.png} 
 \caption{MF$_3$}
 \end{subfigure}
-\caption{Domain division for mixed-fidelity models (low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion).}
+\caption{Domain division for mixed-fidelity models (low-fidelity convection-diffusion model used in pink portion, high-fidelity convection-diffusion-reaction model used in blue portion).}
 \label{fig:divvy3D}
 \end{figure} 
 %
@@ -458,17 +458,17 @@ The amount of time required by the adaptive algorithm of course depends on the c
 \begin{tabular}{c|c|c|c|c|c}
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & Total \\ 
 & & & (Estimated) & (Actual) & Time (s) \\ \hline
-LF   & 0    &  &  & -0.48784 & 160 \\
-MF01 &  &  &  &  &  \\
-MF02 &  &  &  &  &  \\
-MF03 &  &  &  &  &  \\
-MF04 &  &  &  &  &  \\
-MF05 &  &  &  &  &  \\
-MF06 &  &  &  &  &  \\
+LF   & 0    & 1068856 & -0.37511 & -0.48784 & 160 \\
+MF01 & 9.27 & 613419  &  &  &  \\
+MF02 & 16.9 & 558523  &  &  &  \\
+MF03 & 23.7 & 550323  &  &  &  \\
+MF04 & 30.4 & 548225  &  &  &  \\
+MF05 & 37.2 & 547744  &  &  &  \\
+MF06 & 44.6 & 547532  &  &  &  \\
 HF   & 100  & 547420  & 0        & 0        & 6210 \\
 \end{tabular}
 \caption{Runtime and relative errors of adaptive algorithm iterations.}
-\label{tab:ref3D}
+\label{tab:ref3D_dainty}
 \end{table}
 %
 %similar final refinement percentage
