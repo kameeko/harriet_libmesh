@@ -346,10 +346,13 @@ In this case, we see that we must use the high-fidelity model in most of the dom
 %------------------------------------------------------------%
 \subsubsection{Results}
 %------------------------------------------------------------%
+
 We consider the convection-diffusion-reaction term described in Section \ref{sec:cdvcdr}, with a reaction term $k_r=-616$ in the high-fidelity model. This reaction term is large enough that the Newton solver will not converge with a zero initial guess. We first solve the inverse problem with the low-fidelity model ($k_r=0$), and then use a simple continuation approach, using the solution at one value of $k_r$ as the initial guess for the next.\footnote{not arclength continuation, which is more difficult to implement, though libMesh appears to have a class for such continuation, which we can use if this seems like a viable direction} We increase the reaction term in increments of $\Delta k_r=100$, and halve the increment each time the step is too large (Newton solver does not converge at the next $k_r$ value). From $k_r=0$ to $k_r=-616$, this results in 9 continuation steps being taken.
+
 %------------------------------------------------------------%
 \subsubsection{Computational Complexity}
 %------------------------------------------------------------%
+
 We compare the complexity of Algorithm~\ref{alg:refSeries} and the continuation method for the high fidelity problem, in the context of the analysis developed in section~\ref{sect:alg_complexity}. For the high fidelity problem, with  with 9 continuation steps, we have $\sum\limits_{i=1}^{C} K_i=30$. 
  
 With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using Algorithm~\ref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
@@ -406,19 +409,69 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 \subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D}
 %------------------------------------------------------------%
 
-We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with the initial guess $u=5$, $z=q=0$; instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess.
+We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with a constant initial guess ($(p,u,z)=(0,5,0)$); instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration.
 %
 \begin{table}[h]
 \centering
 \begin{tabular}{c|c|c|c|c|c}
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%HF$} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & \multirow{2}{*}{Time (s)} \\ 
-& & & (Estimated) & (Actual) & \\ \hline
-LF & 0 & 1068856 &  &  &  \\
-MF01 & 16.7 &  &  &  &  \\
-MF02 & 29.0 &  &  &  &  \\
-MF03 & 42.3 &  &  &  &  \\
-HF & 100 & 547420 &  &  &  \\
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & Total \\ 
+& & & (Estimated) & (Actual) & Time (s) \\ \hline
+LF   & 0    & 1068856 & -0.37511 & -0.48784 & 160 \\
+MF01 & 16.7 & 577582  & -0.03831 & -0.05222 & 1110 \\
+MF02 & 29.0 & 548904  & 0.00219  & -0.00272 & 1800 \\
+MF03 & 42.3 & 547773  & 0.00032  & -0.00064 & 2220 \\
+HF   & 100  & 547420  & 0        & 0        & 6210 \\
 \end{tabular}
-\caption{table of things}
+\caption{Runtime and relative errors of adaptive algorithm iterations.}
+\label{tab:ref3D}
 \end{table}
+%
+Compared to the previous examples in Section~\ref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within $0.1\%$, but in about a third of the time. %what happens if you go on forever? (running)
 
+The domain divisions for the three adaptive iterations are shown in Figure~\ref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations. %is there a way to see if any observations are more 'important' than others?
+%
+\begin{figure}[h]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/divvy1_whitebg_shiftaxes.png} 
+\caption{MF$_1$}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/divvy2_whitebg_shiftaxes.png} 
+\caption{MF$_2$}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/divvy3_whitebg_shiftaxes.png} 
+\caption{MF$_3$}
+\end{subfigure}
+\caption{Domain division for mixed-fidelity models (low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion).}
+\label{fig:divvy3D}
+\end{figure} 
+%
+The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. We also compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose at each iteration the basis functions with the largest $5\%$ of the error for model refinement. Table~\ref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations.
+%
+\begin{table}[h]
+\centering
+\begin{tabular}{c|c|c|c|c|c}
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & Total \\ 
+& & & (Estimated) & (Actual) & Time (s) \\ \hline
+LF   & 0    &  &  & -0.48784 & 160 \\
+MF01 &  &  &  &  &  \\
+MF02 &  &  &  &  &  \\
+MF03 &  &  &  &  &  \\
+MF04 &  &  &  &  &  \\
+MF05 &  &  &  &  &  \\
+MF06 &  &  &  &  &  \\
+HF   & 100  & 547420  & 0        & 0        & 6210 \\
+\end{tabular}
+\caption{Runtime and relative errors of adaptive algorithm iterations.}
+\label{tab:ref3D}
+\end{table}
+%
+%similar final refinement percentage
+%can we get a better sense of 'important' observations?
+%same weird sign flip at end
+%actual relative error decreases monotonically in magnitude, but not estimated...
