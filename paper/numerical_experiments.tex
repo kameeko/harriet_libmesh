@@ -106,9 +106,9 @@ For the numerical simulations, we use the finite element method (FEM), employing
 %
 We now present the results for solving the inference problem using Algorithm~\ref{alg:refSeries}. Once the QoI error estimate is calculated using Equation~(\ref{eq:finErrExp}), the error estimate is then decomposed into local contributions, as described in Equation~(\ref{eq:basisblame}). At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, is less than $1\%$.
 
-Figure~\ref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node.
+Figure~\ref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Lagrange basis function's contribution is plotted at its nonzero node.
 %
-\begin{figure}[h!]
+\begin{figure}[h]
 \captionsetup[subfigure]{justification=centering,aboveskip=-10pt}
 \centering
   \begin{subfigure}[b]{\textwidth}
@@ -162,7 +162,7 @@ The error estimate decomposition (\ref{eq:basisblame}) suggests the use of the h
 
 The error decomposition for three increasingly large, nested QoI regions $\Omega_I$ given the same set of observations is shown in Figure \ref{fig:qoiStudy}. The bottom row gives the baseline case presented in Section~\ref{sec:cdvcdrBaseRef}, although here we choose the basis functions $i$ whose error $\varepsilon_i$ are among the largest $5\%$, so the proportion of additional refined elements in each iteration is slightly larger. Although refinement is still most important around the data point closest to $x_1=0$, as the QoI region expands the other two data points become more important in that the error decomposition suggests refinement around them earlier. As the QoI region expands, it is also more clearly noticeable that refinement is not equally important in all parts of the QoI region.
 
-\begin{figure}
+\begin{figure}[h]
 \captionsetup[subfigure]{justification=centering}
 \centering
   \begin{subfigure}[t]{0.20\textwidth}
@@ -202,7 +202,7 @@ The error decomposition for three increasingly large, nested QoI regions $\Omega
 
 The error decomposition for three increasing, nested sets of observations and the same QoI region $\Omega_I$ is shown in Figure \ref{fig:dataStudy}. Again, the bottom row gives the baseline case presented in Section~\ref{sec:cdvcdrBaseRef}, although here the basis functions with the largest $5\%$ of the error are chosen, so the proportion of additional refined elements in each iteration is slightly larger. Refinement appears to be consistently most important around the data point closest to $x_1=0$ and the QoI region. However, as more data points are added, it becomes no longer necessarily true that refinement becomes less important around data points as their distance from the QoI region increases. The data points also interact with each other in that placing data points in regions of previously relatively uniform error contribution tends to result in a new error decomposition that is positive or negative around the data points, with valleys of zero magnitude in between.
 
-\begin{figure}
+\begin{figure}[h]
 \captionsetup[subfigure]{justification=centering}
 \centering
   \begin{subfigure}[t]{0.20\textwidth}
@@ -265,7 +265,7 @@ As with the previous examples in Section~\ref{sec:cdvcdr}, the decomposition (\r
 
 Figure~\ref{fig:svfRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the first two and last mixed-fidelity model thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node. 
 %
-\begin{figure}[h!]
+\begin{figure}[h]
 \captionsetup[subfigure]{justification=centering,aboveskip=-10pt}
 \centering
 \begin{subfigure}[b]{\textwidth}
@@ -381,7 +381,7 @@ u = 5 \quad &\text{on } \partial \Omega_{west}, \\
 \end{align} 
 \end{subequations}
 %
-where the state $u$ is the mass-fraction (in parts-per-billion) of some contaminant species and $f(q)$ is a source/sink field. The velocity field is a constant $\vec{V}=(2.1,0,0)$ m/day. Given this velocity field and letting the molecular diffusion be negligble, we follow \cite{Vestedetal93} to express the (diagonal) dispersion tensor $D$ as $D_{11}=\alpha_{LH}V_1$, $D_{22}=\alpha_{TH}V_1$, and $D_{33}=\alpha_{TV}V_1$, where $\alpha_{LH}=100$m, $\alpha_{TH}=40$m, and $\alpha_{TV}=4$m are the longitudinal horizontal, transverse horizontal, and transverse vertical dispersivities, respectively; the dispersivity values were drawn from within the range of observed values in various porous media \cite{Davis86}. We have porosity $n=0.1$. The reaction coefficient is $k_r=4.2\cdot10^{-4}$ 1/day, chosen from within the wide range of reaction-rate coefficients for second-order reactions. Although the reaction term $k_rnu^2$ does not correspond to any particular reaction of any particular species, we note that, in addition to second-order elementary reactions, a quadratic reaction term can appear in models of dissolution/precipitation processes in porous media \cite{Aha97} and biochemical degredation of petroleum hydrocarbons in soils \cite{Jack94}.
+where the state $u$ is the mass-fraction (in parts-per-billion) of some contaminant species and $f(q)$ is a source/sink field. The velocity field is a constant $\vec{V}=(2.1,0,0)$ m/day. Given this velocity field and letting the molecular diffusion be negligble, we follow \cite{Vestedetal93} to express the (diagonal) dispersion tensor $D$ as $D_{11}=\alpha_{LH}V_1$, $D_{22}=\alpha_{TH}V_1$, and $D_{33}=\alpha_{TV}V_1$, where $\alpha_{LH}=100$m, $\alpha_{TH}=40$m, and $\alpha_{TV}=4$m are the longitudinal horizontal, transverse horizontal, and transverse vertical dispersivities, respectively; the dispersivity values were drawn from within the range of observed values in various porous media \cite{Davis86}. We have porosity $n=0.1$. The reaction coefficient is $k_r=4.2\cdot10^{-4}$ 1/day, chosen from within the wide range of reaction-rate coefficients for second-order reactions. Although the reaction term $k_ru^2$ does not correspond to any particular reaction of any particular species, we note that, in addition to second-order elementary reactions, a quadratic reaction term can appear in models of dissolution/precipitation processes in porous media \cite{Aha97} and biochemical degredation of petroleum hydrocarbons in soils \cite{Jack94}.
 
 The low-fidelity model,
 %
@@ -395,7 +395,7 @@ The unknown parameters we wish to infer correspond to the source term $f(q)=q$; 
 %
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.4\textwidth]{series3D/setup_arial_nolegend.pdf} \hfill
+\includegraphics[width=0.4\textwidth]{series3D/setup_aerial_nolegend.pdf} \hfill
 \includegraphics[width=0.55\textwidth]{series3D/setup_3view.pdf} \\ 
 \vspace{\baselineskip}
 \includegraphics[width=0.6\textwidth]{series3D/setup_side_view.pdf}
@@ -409,7 +409,7 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 \subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D}
 %------------------------------------------------------------%
 
-We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the basis functions with the largest $10\%$ of the error for model refinement. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with a constant initial guess ($(p,u,z)=(0,5,0)$); instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration.
+We now present the results of solving the inference problem using Algorithm~\ref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the $10\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration may be larger. All simulations are run on a single processor. Table~\ref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with a constant initial guess ($(p,u,z)=(0,5,0)$); instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration.
 %
 \begin{table}[h]
 \centering
@@ -422,56 +422,95 @@ MF02 & 29.0 & 548904  & 0.00219  & -0.00272 & 1800 \\
 MF03 & 42.3 & 547773  & 0.00032  & -0.00064 & 2220 \\
 HF   & 100  & 547420  & 0        & 0        & 6210 \\
 \end{tabular}
-\caption{Runtime and relative errors of adaptive algorithm iterations.}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $10\%$ of basis function marked for refinement per iteration.}
 \label{tab:ref3D}
 \end{table}
 %
-Compared to the previous examples in Section~\ref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within $0.1\%$, but in about a third of the time. %what happens if you go on forever? (running)
+Compared to the previous examples in Section~\ref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within $0.1\%$, but in about a third of the time. %what happens if you go on forever? the sign corrects itself in the next two iterations, and then becomes wrong again...also final all-HF QoI doesn't quite agree with invHF version (agrees to five sig figs)...also 'continuation' this way is faster (4600) than the other continuation schemes you tried...if we want to open this can of worms, will probably have to do more in-depth search of existing continuation algorithms...
 
-The domain divisions for the three adaptive iterations are shown in Figure~\ref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations. %is there a way to see if any observations are more 'important' than others?
+The domain divisions for the three adaptive iterations are shown in Figure~\ref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations. Around the QoI region, the first iteration refines the domain completely in the $x_3$ direction, possibly reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.
 %
 \begin{figure}[h]
 \centering
 \begin{subfigure}[t]{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{series3D/divvy1_whitebg_shiftaxes.png} 
+\includegraphics[width=\textwidth]{series3D/run_0p1/divvy1_whitebg_shiftaxes.png} 
 \caption{MF$_1$}
+\label{fig:ref3D_1}
 \end{subfigure}
 \begin{subfigure}[t]{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{series3D/divvy2_whitebg_shiftaxes.png} 
+\includegraphics[width=\textwidth]{series3D/run_0p1/divvy2_whitebg_shiftaxes.png} 
 \caption{MF$_2$}
 \end{subfigure}
 \begin{subfigure}[t]{0.32\textwidth}
 \centering
-\includegraphics[width=\textwidth]{series3D/divvy3_whitebg_shiftaxes.png} 
+\includegraphics[width=\textwidth]{series3D/run_0p1/divvy3_whitebg_shiftaxes.png} 
 \caption{MF$_3$}
 \end{subfigure}
 \caption{Domain division for mixed-fidelity models (low-fidelity convection-diffusion model used in pink portion, high-fidelity convection-diffusion-reaction model used in blue portion).}
 \label{fig:divvy3D}
 \end{figure} 
 %
-The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. We also compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose at each iteration the basis functions with the largest $5\%$ of the error for model refinement. Table~\ref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations.
+The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. Refining a larger region per iteration runs the risks of refining in the wrong areas due to linearization about a $\Psi_{MF}$ that is very different from $\Psi_{HF}$, but can also allow one to reach the chosen error tolerance in fewer iterations and less runtime. We compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose the $5\%$ of the basis functions with the largest error for model refinement. Table~\ref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations, and Figure~\ref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.
 %
-\begin{table}[h]
+\begin{table}
 \centering
 \begin{tabular}{c|c|c|c|c|c}
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & Total \\ 
 & & & (Estimated) & (Actual) & Time (s) \\ \hline
 LF   & 0    & 1068856 & -0.37511 & -0.48784 & 160 \\
-MF01 & 9.27 & 613419  &  &  &  \\
-MF02 & 16.9 & 558523  &  &  &  \\
-MF03 & 23.7 & 550323  &  &  &  \\
-MF04 & 30.4 & 548225  &  &  &  \\
-MF05 & 37.2 & 547744  &  &  &  \\
-MF06 & 44.6 & 547532  &  &  &  \\
+MF01 & 9.27 & 613419  & -0.06649 & -0.10759 & 1040 \\
+MF02 & 16.9 & 558523  & 0.00208  & -0.01988 & 1860 \\
+MF03 & 23.7 & 550323  & 0.00456  & -0.00528 & 2420 \\
+MF04 & 30.4 & 548225  & 0.00302  & -0.00147 & 2970 \\
+MF05 & 37.2 & 547744  & 0.00120  & -0.00059 & 3309 \\
+MF06 & 44.6 & 547532  & 0.00035  & -0.00020 & 3642 \\
 HF   & 100  & 547420  & 0        & 0        & 6210 \\
 \end{tabular}
-\caption{Runtime and relative errors of adaptive algorithm iterations.}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $5\%$ of basis function marked for refinement per iteration.}
 \label{tab:ref3D_dainty}
 \end{table}
 %
-%similar final refinement percentage
-%can we get a better sense of 'important' observations?
-%same weird sign flip at end
-%actual relative error decreases monotonically in magnitude, but not estimated...
+\begin{figure}[h]
+\centering
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy1_whitebg_shiftaxes.png} 
+\caption{MF$_1$}
+\label{fig:ref3d_dainty1}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy2_whitebg_shiftaxes.png} 
+\caption{MF$_2$}
+\label{fig:ref3d_dainty2}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy3_whitebg_shiftaxes.png} 
+\caption{MF$_3$}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy4_whitebg_shiftaxes.png} 
+\caption{MF$_4$}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy5_whitebg_shiftaxes.png} 
+\caption{MF$_5$}
+\end{subfigure}
+\begin{subfigure}[t]{0.32\textwidth}
+\centering
+\includegraphics[width=\textwidth]{series3D/run_0p05/divvy6_whitebg_shiftaxes.png} 
+\caption{MF$_6$}
+\end{subfigure}
+\caption{Domain division for mixed-fidelity models (low-fidelity convection-diffusion model used in pink portion, high-fidelity convection-diffusion-reaction model used in blue portion).}
+\label{fig:divvy3D_dainty}
+\end{figure} 
+%
+We again observe that the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. It can also be seen in Figure~\ref{fig:ref3d_dainty1} that the largest error first comes from the QoI region and area below it, and the observations. Similarly to the examples in Section~\ref{sec:cdvcdr}, of the observations, refinement is least necessary around the ones furthest downstream of the QoI region.
+
+We see that although the more conservative refinement rate requires more iterations and runtime to reach the desired error tolerance, the adaptive algorithm requires about a half of the time of the high-fidelity inverse problem. We note that, although both refinement rates result in similar final refinement proportions for our chosen error tolerance ($42.4\%$ versus $44.6\%$), they do not necessarily produce the same refined regions (compare Figures~\ref{fig:ref3D_1} and \ref{fig:ref3d_dainty2}) or relative error for a given refinement proportion. A slower refinement rate also does not necessarily produce a smaller (estimated or true) relative error, or a more accurate relative error estimate, for a given refinement proportion.
+

@@ -275,7 +275,7 @@ AAAHHH ADAPTIVITY WAS DONE WITH REACTION 4.2e-4, while continution was 4.2e-3...
   
 -meaning of r? is there a non-dimensional version of r? either have units or non-dimensionalize? damenkoler number?
   -can you justify r?
--try a few more continuity sequences
+-try a few more continuation sequences
 -table of times and errors? (MF01, MF02, MF03)
 -reactive turbulent combustion - turbulence is hard, as is the shat tons of intermediate reactions...
   -refinement of graphs? poke manishika about graph theory?
@@ -289,9 +289,6 @@ AAAHHH ADAPTIVITY WAS DONE WITH REACTION 4.2e-4, while continution was 4.2e-3...
   
 mind maps?
 ====================================================================================
-
-vikram will look into 'continuation in operator space' idea
-  -> see if karen knows anything about this?
   
 field vs scalar error plots need colorbar readjusted to show more than just spastic fringes...
     -wow those fringes are really spastic...can we fix them? are they the source of the spaz in the error?
@@ -300,3 +297,14 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
       -does the idea of 'locally supported basis functions' even make sense in the scalar bits?
       -what space does the superadj live in?
         -in full-field space...superadj components don't live in same space as aux var components...will need to change localization writeup, maybe procedure as well...wait no you don't...
+        
+=============================================================================
+
+-vikram will look into 'continuation in operator space' idea
+  -> see if karen knows anything about this? 
+-couldn't find good reaction non-dimensionalization that didn't assume a particular ideal reactor or first-order reaction...but reaction coeff doesn't seem unreasonable for general second-order reactions?
+-plotting error distribution?
+  -isovolumes? only shows parts of domain within a set range, but hard to see how things would change within that range...
+  -what would we want to show? qoi and which observations are important? series of isovolumes? to see at what point particular observations pop up? do we want that much detail?
+-weird sign difference and timing of iterations-until-the-end...
+
