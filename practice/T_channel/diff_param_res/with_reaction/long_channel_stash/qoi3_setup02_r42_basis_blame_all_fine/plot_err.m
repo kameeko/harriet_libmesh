@@ -10,8 +10,11 @@ set(0,'defaultLegendInterpreter','latex');
 errEst = [0.0022021921; -7.03E-004; 3.57E-003; 5.81E-004; 8.30E-004; 3.92E-004; 1.69E-005];
 errTrue = [0.0018260025; 0.0006062894; 0.0008967747; 0.00060295; 0.0008887619; 0.0004020916; 1.69478960580405E-005];
 qoi = [0.0018016233; 0.0030213363; 0.002730851; 0.0030246758; 0.0027388639; 0.0032255341; 0.0036106779];
-relErrEst = abs(errEst./qoi);
-relErrTrue = abs(errTrue./qoi);
+% relErrEst = abs(errEst./qoi);
+% relErrTrue = abs(errTrue./qoi);
+relErrEst = abs(errEst./(qoi+errEst)); %relative to predicted I_HF
+qoiHF = 0.0036276258;
+relErrTrue = abs(errTrue/qoiHF);
 ref = [0; 0.1168; 0.206; 0.3032; 0.4049; 0.5006; 0.6023];
 
 figure('Position',[470 580 765 205])
