@@ -312,10 +312,16 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
   -briefer than thesis...lit review shouldn't be its own section...should be part of intro, context of what the problem is and what you're doing and what's been done
     -> 1.1 + 1.2 in thesis, pretty much what's in the thesis, can be briefer in motivation...single introduction section...
 
-distribution -> can you scale z axis to make it more obviously 3D?
+-distribution -> can you scale z axis to make it more obviously 3D?
   -or stack of slices?
-check the qoi error
 -estimate vs actual error, actual relative-to-HF error (in %age)
-  -should rel error for stopping be relative to estimated HF qoi
--how much does inverse problem take at each iteration? if you decided to use fresh data, even though breakdown not exact
+  -should rel error for stopping in algorithm? be relative to estimated HF qoi? or just describe algorithm in terms of some error-related tolerance?
+    -> if it makes more sense to do error relative to estimated HF qoi as stopping criterion, will need to update graphs in 2D also...
+-how much time does just inverse problem take at each iteration? if you decided to use fresh data, even though breakdown not exact
   -should all have (LF?) initial guess
+  
+formatting: 
+  -replace \ref with \cref
+  -replace [h] placement with [htbp]
+  -float captions have different font in example pdfs??
+  -don't need to say float-type \ref, can just do \cref{ref:ref}

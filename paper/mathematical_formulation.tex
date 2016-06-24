@@ -25,9 +25,9 @@ The unknown parameter $q$ can then be inferred by minimizing the difference betw
 \end{align}
 \end{subequations}
 %
-Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the constraints given by Equation (\ref{eq:weakForm}).
+Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the constraints given by \cref{eq:weakForm}.
 
-The constraints given by Eq.~\eqref{eq:weakForm} are typically models of physical processes or systems. However, a given physical system need not have a unique model that can describe it; there may be various models of different fidelities. This naturally introduces a hierarchy of models and, a tradeoff between fidelity and computational expense. Consider two models with which we infer parameters: a high-fidelity (HF) model and a low fidelity (LF) model. We then have a specific form of the inverse problem in Equation (\ref{eq:invOpt}) with this model,
+The constraints given by \cref{eq:weakForm} are typically models of physical processes or systems. However, a given physical system need not have a unique model that can describe it; there may be various models of different fidelities. This naturally introduces a hierarchy of models and, a tradeoff between fidelity and computational expense. Consider two models with which we infer parameters: a high-fidelity (HF) model and a low fidelity (LF) model. We then have a specific form of the inverse problem in \cref{eq:invOpt} with this model,
 \begin{equation}
 \begin{array}{r@{}c}
 \min\limits_{q_{HF},u_{HF}} & \quad J_{HF}(q_{HF},u_{HF})=\frac{1}{2}\|d-C_{HF}(u_{HF})\|_2^2 + R_{HF}(q_{HF}) \\ \textrm{s.t. }& \quad a_{HF}(u_{HF},q_{HF})(\phi_{HF})=\ell_{HF}(q_{HF})(\phi_{HF}),\quad\forall\phi_{HF}\in U_{HF},
@@ -40,7 +40,7 @@ J_{HF}(q_{HF},u_{HF})-(a_{HF}(u_{HF},q_{HF})(z_{HF})-\ell_{HF}(q_{HF})(z_{HF})).
 \end{multline}
 The inverse problem formulation and Lagrangian with the lower fidelity model can be similarly defined, and be identified with subscript $LF$.
 
-In the case of a goal-oriented inverse problem, the ultimate purpose of inferring the unknown parameters is to calculate some Quantity of Interest (QoI). Assuming a single scalar QoI, we denote this QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. Since our ultimate goal is to compute this QoI, the particular tradeoff we consider is the fidelity and resultant computational expense of the model we use, versus the error in the QoI. We thus seek to introduce the QoI functional $I$ into the inverse problem formulation, by introducing auxilary variables and additional adjoint equations. Then we use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those which occur due to the use of constraints other than those given by Eq.~\eqref{eq:invOpt_cons}.
+In the case of a goal-oriented inverse problem, the ultimate purpose of inferring the unknown parameters is to calculate some Quantity of Interest (QoI). Assuming a single scalar QoI, we denote this QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. Since our ultimate goal is to compute this QoI, the particular tradeoff we consider is the fidelity and resultant computational expense of the model we use, versus the error in the QoI. We thus seek to introduce the QoI functional $I$ into the inverse problem formulation, by introducing auxilary variables and additional adjoint equations. Then we use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those which occur due to the use of constraints other than those given by \cref{eq:invOpt_cons}.
 %
 %------------------------------------------------------------------------------%
 \subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
@@ -50,9 +50,9 @@ For a given hierarchy of models, consider the QoI calculated from inferring the 
 %
 \begin{theorem}
 \label{thm:error_estimate}
-Following the notation established in section~\ref{sec:setup}, let the bilinear form $a:U \times U \to \Reals$ be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator $C:U\to\Reals^{n_d}$ be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator $R:Q\to\Reals$ be differentiable with respect to the parameter $q$, and the functional $I:Q\times U\to\Reals$ be differentiable with respect to the state $u$ and parameter $q$.
+Following the notation established in \cref{sec:setup}, let the bilinear form $a:U \times U \to \Reals$ be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator $C:U\to\Reals^{n_d}$ be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator $R:Q\to\Reals$ be differentiable with respect to the parameter $q$, and the functional $I:Q\times U\to\Reals$ be differentiable with respect to the state $u$ and parameter $q$.
 
-Consider the Lagrangian equation induced by Eq.~\eqref{eq:invOpt},
+Consider the Lagrangian equation induced by \cref{eq:invOpt},
 %
 \begin{equation}
 \label{eq:InvsOpt_lag}
@@ -68,7 +68,7 @@ where $z\in U$ is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, 
 %
 where $\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
 
-Denote by $\Psi_{HF}$ and $\Psi_{LF}$, stationary points of the high and low fidelity versions of Eq.~\eqref{eq:InvsOpt_auglag} and, consider the adjoint problem,
+Denote by $\Psi_{HF}$ and $\Psi_{LF}$, stationary points of the high and low fidelity versions of \cref{eq:InvsOpt_auglag} and, consider the adjoint problem,
 %
 \begin{equation}
 \label{eq:superAdjEq}
@@ -96,7 +96,7 @@ Observe that,
 %
 since taking variations of $\mathcal{M}$ with respect to the auxiliary variables gives that $\xi_\Psi$ is a stationary point of $\mathcal{L}$.
 
-Extending the property in Equation (\ref{eq:MeqI}) to the augmented Lagrangians for the high and low fidelity models, we have,
+Extending the property in \cref{eq:MeqI} to the augmented Lagrangians for the high and low fidelity models, we have,
 %
 \begin{multline}
 \label{eq:repIwithM}
@@ -108,19 +108,19 @@ Applying Proposition 3 from~\cite{BecVex05} for the difference $\mathcal{M}_{HF}
 \label{eq:beckvex}
 \mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
 \end{equation}
-Combining Equations (\ref{eq:repIwithM}) and (\ref{eq:beckvex}) we obtain
+Combining \cref{eq:repIwithM} and \cref{eq:beckvex} we obtain
 \begin{multline}
 \label{eq:preadj}
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}(e^3)\textrm{.}
 \end{multline}
 
-Further, the error in the output $\mathcal{Q}$ defined in Equation (\ref{eq:superAdjEq}) can be expressed as a dual-weighted residual,
+Further, the error in the output $\mathcal{Q}$ defined in \cref{eq:superAdjEq} can be expressed as a dual-weighted residual,
 \begin{equation}
 \label{eq:adjOutErr}
 \mathcal M'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})=-\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda).
 \end{equation}
 
-Combining Equations (\ref{eq:preadj}) and (\ref{eq:adjOutErr}), we have,
+Combining \cref{eq:preadj} and \cref{eq:adjOutErr}, we have,
 \begin{multline}
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3). \nonumber
 \end{multline}

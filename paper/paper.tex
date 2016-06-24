@@ -1,18 +1,18 @@
 \documentclass[review]{siamart0516}
 %%\usepackage{lgrind}
 
-\usepackage[square,comma,numbers,sort&compress]{natbib}
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
 %\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
 \usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
 \usepackage{graphics}
-\usepackage{epsfig}
+%\usepackage{epsfig}
 %%\usepackage[hang,raggedright]{subfigure}
-\usepackage{epsf}
-\usepackage{setspace}
-\usepackage{hangcaption}
+%\usepackage{epsf}
+%\usepackage{setspace}
+%\usepackage{hangcaption}
 \usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
 \usepackage{multirow}
-\usepackage{threeparttable}
+%\usepackage{threeparttable}
 \usepackage{cancel}
 \usepackage{enumerate}
 \usepackage{color}
@@ -22,11 +22,12 @@
 %\usepackage[ruled]{algorithm}
 \usepackage{algpseudocode}
 \usepackage{varwidth}
-\usepackage{caption}
-\usepackage[font=small]{subcaption}
-\usepackage{longtable}
+%\usepackage{caption}
+%\usepackage[font=small]{subcaption}
+%\usepackage{longtable}
 \usepackage{mathrsfs}
 \usepackage{upgreek}
+\usepackage[caption=false]{subfig} % for \subfloat
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -70,6 +71,6 @@ Meep meep.
 
 %\appendix
 %%\include{appendix}
+\bibliographystyle{siamplain}
 \bibliography{masterBib}
-\bibliographystyle{plain}
 \end{document}
