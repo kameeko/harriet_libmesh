@@ -351,18 +351,19 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 We now present the results of solving the inference problem using \cref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the $10\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration may be larger. All simulations are run on a single processor; we use the default nonlinear solver in \texttt{libMesh} (Newton's method with Brent line-search), and linear solves are performed using PETSC's GMRES solver\footnote{\red{Do we need more detail on the flags?}}. \Cref{tab:ref3D} shows the runtime and error at the end of each iteration. For the high-fidelity inverse problem, the Newton solver does not converge with a constant initial guess ($(p,u,z)=(0,5,0)$); instead, we solve the low-fidelity inverse problem and use its solution as the initial guess for the high-fidelity inverse problem. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration.
 %
 \begin{table}[htbp]
-\centering
-\begin{tabular}{c|c|c|c|c|c|c|c}
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & Relative Error & Relative Error & Total \\ 
-& & & (Estimated) & (Actual) & (Estimated) & (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400936 &  &  &  & 160 \\
-MF01 & 16.7 & 577582  & -22143  &  &  &  & 1110 \\
-MF02 & 29.0 & 548904  & 1200    &  &  &  & 1800 \\
-MF03 & 42.3 & 547773  & 176     &  &  &  & 2220 \\
-HF   & 100  & 547420  & 0       & 0 &  &  & 6210 \\
-\end{tabular}
-\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $10\%$ of basis function marked for refinement per iteration; relative errors are with respect to estimated or actual high-fidelity QoI.}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $10\%$ of basis function marked for refinement per iteration; relative errors are with respect to true high-fidelity QoI.}
 \label{tab:ref3D}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
+& & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
+LF   & 0    & 1068856 & -400845 & -521436 & -95.2534 & 160 \\
+MF01 & 16.7 & 577582  & -22143  & -30162  & -5.5098  & 1110 \\
+MF02 & 29.0 & 548904  & 1200    & -1484   & -0.2711  & 1800 \\
+MF03 & 42.3 & 547773  & 176     & -353    & -0.0645  & 2220 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
+HF   & 100  & 547420  & --      & 0       & 0        & 6210 \\ \hline
+\end{tabular}
 \end{table}
 %
 Compared to the previous examples in \cref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within $0.1\%$, but in about a third of the time. %what happens if you go on forever? the sign corrects itself in the next two iterations, and then becomes wrong again (last few iterations of 5% rate run are correct sign though...)...also final all-HF QoI doesn't quite agree with invHF version (agrees to five sig figs; running both rates of adaptive to 100% HF gives same qoi to 8 sig figs)...also 'continuation' this way is faster (4600 with 10% rate, but 6600 with 5% rate) than the other continuation schemes you tried...if we want to open this can of worms, will probably have to do more in-depth search of existing continuation algorithms...
@@ -391,21 +392,22 @@ The amount of time required by the adaptive algorithm of course depends on the c
 \Cref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations, and \cref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.
 %
 \begin{table}
-\centering
-\begin{tabular}{c|c|c|c|c|c}
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Relative Error & Relative Error & Total \\ 
-& & & (Estimated) & (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -0.37511 & -0.48784 & 160 \\
-MF01 & 9.27 & 613419  & -0.06649 & -0.10759 & 1040 \\
-MF02 & 16.9 & 558523  & 0.00208  & -0.01988 & 1860 \\
-MF03 & 23.7 & 550323  & 0.00456  & -0.00528 & 2420 \\
-MF04 & 30.4 & 548225  & 0.00302  & -0.00147 & 2970 \\
-MF05 & 37.2 & 547744  & 0.00120  & -0.00059 & 3309 \\
-MF06 & 44.6 & 547532  & 0.00035  & -0.00020 & 3642 \\
-HF   & 100  & 547420  & 0        & 0        & 6210 \\
-\end{tabular}
-\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $5\%$ of basis function marked for refinement per iteration.}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $5\%$ of basis function marked for refinement per iteration; relative errors are with respect to true high-fidelity QoI.}
 \label{tab:ref3D_dainty}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
+& & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
+LF   & 0    & 1068856 & -400845 & -521436 & -95.2534 & 160 \\
+MF01 & 9.27 & 613419  & -40789  & -65999  & -12.0564 & 1040 \\
+MF02 & 16.9 & 558523  & 1162    & -11103  & -2.0282  & 1860 \\
+MF03 & 23.7 & 550323  & 2510    & -2903   & -0.5303  & 2420 \\
+MF04 & 30.4 & 548225  & 1658    & -805    & -0.1471  & 2970 \\
+MF05 & 37.2 & 547744  & 655     & -324    & -0.0591  & 3309 \\
+MF06 & 44.6 & 547532  & 194     & -112    & -0.0205  & 3642 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
+HF   & 100  & 547420  & --      & 0       & 0        & 6210 \\ \hline
+\end{tabular}
 \end{table}
 %
 \begin{figure}[htbp]

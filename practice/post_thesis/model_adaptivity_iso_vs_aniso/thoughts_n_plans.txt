@@ -319,9 +319,4 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
     -> if it makes more sense to do error relative to estimated HF qoi as stopping criterion, will need to update graphs in 2D also...
 -how much time does just inverse problem take at each iteration? if you decided to use fresh data, even though breakdown not exact
   -should all have (LF?) initial guess
-  
-formatting: 
-  -replace \ref with \cref
-  -replace [h] placement with [htbp]
-  -float captions have different font in example pdfs??
-  -don't need to say float-type \ref, can just do \cref{ref:ref}
+
