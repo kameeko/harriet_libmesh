@@ -452,7 +452,10 @@ The domain divisions for the three adaptive iterations are shown in Figure~\ref{
 \label{fig:divvy3D}
 \end{figure} 
 %
-The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. Refining a larger region per iteration runs the risks of refining in the wrong areas due to linearization about a $\Psi_{MF}$ that is very different from $\Psi_{HF}$, but can also allow one to reach the chosen error tolerance in fewer iterations and less runtime. We compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose the $5\%$ of the basis functions with the largest error for model refinement. Table~\ref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations, and Figure~\ref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.
+
+The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. Refining a larger region per iteration runs the risks of refining in the wrong areas due to linearization about a $\Psi_{MF}$ that is very different from $\Psi_{HF}$, but can also allow one to reach the chosen error tolerance in fewer iterations and less runtime. We compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose the $5\%$ of the basis functions with the largest error for model refinement. 
+
+Table~\ref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations, and Figure~\ref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.
 %
 \begin{table}
 \centering

@@ -302,10 +302,20 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
 
 -vikram will look into 'continuation in operator space' idea
   -> see if karen knows anything about this? 
+    -not that she knows yet
 -couldn't find good reaction non-dimensionalization that didn't assume a particular ideal reactor or first-order reaction...but reaction coeff doesn't seem unreasonable for general second-order reactions?
 -plotting error distribution?
   -isovolumes? only shows parts of domain within a set range, but hard to see how things would change within that range...
   -what would we want to show? qoi and which observations are important? series of isovolumes? to see at what point particular observations pop up? do we want that much detail?
 -weird sign difference and timing of iterations-until-the-end...
 -how should background/lit review differ from thesis'?
+  -briefer than thesis...lit review shouldn't be its own section...should be part of intro, context of what the problem is and what you're doing and what's been done
+    -> 1.1 + 1.2 in thesis, pretty much what's in the thesis, can be briefer in motivation...single introduction section...
 
+distribution -> can you scale z axis to make it more obviously 3D?
+  -or stack of slices?
+check the qoi error
+-estimate vs actual error, actual relative-to-HF error (in %age)
+  -should rel error for stopping be relative to estimated HF qoi
+-how much does inverse problem take at each iteration? if you decided to use fresh data, even though breakdown not exact
+  -should all have (LF?) initial guess
