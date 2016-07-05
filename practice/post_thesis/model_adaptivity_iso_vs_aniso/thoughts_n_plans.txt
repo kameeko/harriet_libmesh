@@ -222,7 +222,7 @@ natural continuation vs integrated adaptivity: (strict linear solve, gmres)
     -aniso 100-40-4, r = (0,e-3,1.5e-3,2e-3), v = nv: 1117 (1043 in linear)
     -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3, v = nv: 2480 (2300 in linear); qoi: 547209.61
   -inv, quartered domain, 25x45x30, no stabilization (n in vel), n=0.1
-    -iso 100: 159 (151 in linear); qoi = 1068855.6709150125
+    -iso 100, r=0: 159 (151 in linear); qoi = 1068855.6709150125
       error estimate vs 4.2e-3: -333214.34175340564
       error estimate vs 4.2e-4: -400936.34636102663
     -aniso 100-40-4, r = (0,1,1.5,2,2.5,3,3.5,4.2)e-3: 2470 (2300 in linear); qoi = 547417.81514302175
@@ -238,26 +238,38 @@ THERE WAS A BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)
       6587 (6446 in linear); qoi = 547421.59753930464
     -aniso 100-40-4, r = (0,4.2)e-3, jac-fix:  
       6210 (6130 in linear); qoi = 547419.95996741741
+THERE WAS ANOTHER BUG IN THE JACOBIAN OF HF CONTINUATION (REACTION TERM)...even though previous one passed jac check...
+    -aniso 100-40-4, r = (0,4.2)e-3, jac-fix:  
+      350 (330 in linear); qoi = 547417.92230248486
     -adaptive: (r = 4.2e-4), 0.1 steps
       MF01: qoi = 577581.79809296422; estimated rel error = -0.038311485179517969; actual relative error = -0.0522
         Final refinement fraction: 0.16651851851851851; if stop here, 1113 (1035 in linear)
+        just inv, psiLF start: 338 (322 in linear); just inv, r=0 start: 317 (301 in linear)
       MF02: qoi = 548904.34911934205; estimated rel error = 0.002185847354112873; actual relative error = -0.002718
         Final refinement fraction: 0.29025185185185187; if stop here, 1795 (1672 in linear)
+        just inv, psiLF start: 389 (374 in linear); just inv, r=0 start: 390 (374 in linear)
       MF03: qoi = 547773.23232645926; estimated rel error = 0.00032135133846412049; actual relative error = -0.000644
         Final refinement fraction: 0.42269629629629629; if stop here, 2222 (2050 in linear)
+        just inv, psiLF start: 248 (232 in linear); just inv, r=0 start: 246 (230 in linear)
     -adaptive: (r = 4.2e-4), 0.05 steps (psi_and_superadj2)
       MF01: qoi = 613418.65290589374; estimated rel error = -0.066492866621420899; actual rel error = -0.1075915977
         Final refinement fraction: 0.0927; if stop here, 1040
+        just inv, psiLF start: 267 (251 in linear); just inv, r=0 start: 265 (250 in linear)
       MF02: qoi = 558522.85455398832; estimated rel error = 0.002080804223470499; actual rel error = -0.019877534
         Final refinement fraction: 0.169; if stop here, 1864
+        just inv, psiLF start: 402 (387 in linear); just inv, r=0 start: 393 (377 in linear)
       MF03: qoi = 550323.00719542312; estimated rel error = 0.0045611526719650146; actual rel error = -0.0052751566
         Final refinement fraction: 0.237; if stop here, 2417
+        just inv, psiLF start: 266 (250 in linear); just inv, r=0 start: 251 (236 in linear)
       MF04: qoi = 548224.52965272486; estimated rel error = 0.0030239362458373475; actual rel error = -0.0014675915
         Final refinement fraction: 0.304; if stop here, 2965
+        just inv, psiLF start: 328 (312 in linear); just inv, r=0 start: 344 (328 in linear)
       MF05: qoi = 547743.82753993955; estimated rel error = 0.0011951462532848933; actual rel error = -0.0005912756
         Final refinement fraction: 0.372; if stop here, 3309
+        just inv, psiLF start: 248 (233 in linear); just inv, r=0 start: 247 (231 in linear)
       MF06: qoi = 547531.83860096941; estimated rel error = 0.00035427666447780811; actual rel error = -0.0002043327
         Final refinement fraction: 0.446; if stop here, 3642
+        just inv, psiLF start: 246 (230 in linear); just inv, r=0 start: 287 (269 in linear)
   
 THE LAST TWO REFINEMENTS HAVE THE WRONG SIGN...WAS THERE SOMETHING TWITCHY ABOUT OUTPUTTING c_points and aux_c points to file? weird seg fault during first run, if no such files already in directory...?
 AAAHHH ADAPTIVITY WAS DONE WITH REACTION 4.2e-4, while continution was 4.2e-3...
@@ -310,13 +322,57 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
 -weird sign difference and timing of iterations-until-the-end...
 -how should background/lit review differ from thesis'?
   -briefer than thesis...lit review shouldn't be its own section...should be part of intro, context of what the problem is and what you're doing and what's been done
-    -> 1.1 + 1.2 in thesis, pretty much what's in the thesis, can be briefer in motivation...single introduction section...
+*** -> 1.1 + 1.2 in thesis, pretty much what's in the thesis, can be briefer in motivation...single introduction section...
 
 -distribution -> can you scale z axis to make it more obviously 3D?
   -or stack of slices?
 -estimate vs actual error, actual relative-to-HF error (in %age)
   -should rel error for stopping in algorithm? be relative to estimated HF qoi? or just describe algorithm in terms of some error-related tolerance?
     -> if it makes more sense to do error relative to estimated HF qoi as stopping criterion, will need to update graphs in 2D also...
--how much time does just inverse problem take at each iteration? if you decided to use fresh data, even though breakdown not exact
-  -should all have (LF?) initial guess
+***how much time does just inverse problem take at each iteration? if8662.33 you decided to use fresh data, even though breakdown not exact
+  -should all have same (LF?) initial guess
 
+==========
+
+invMF debug: inv_MF -> psi_and_superadj phys module, inv_MF2 -> inv_HF_cont phys module (stabilization bits commented out)
+-divvy1.exo -> initial resid agree (psiLF -> r=0, aniso)
+  -do the end qois match? (577585 vs 577588 (577585 after porosity fix)) (was 577581 in psi_and_superadj...inv_MF and psi_and_superadj should only have differed in initial guess...)
+  -wait are they even using the same initial guess?
+    (LF norm: 100175.2947750192 vs 100175.29477501918)
+    (Computed QoI is 1064697.829690268 vs 1064697.829690268)
+    
+--definitely looks like the HF inv problem shouldn't take nearly as long as we thought...you just got really unlucky with your jac check...
+  -what if higher r term? have about 3 more orders of mag before it becomes unrealistic for general 2nd order reaction...
+    -r=0 init guess
+      -r=4.2e-3 (r in specialized code): well that stalled after a long-ass while...
+        -with some continuation (still stalled...)
+        -more continuation? (...the heck?)
+        -even more continuation...
+        -omigod this is so delicate wtf...
+          -rerunning with jac check...checked out with 1.e-6 until death by newton
+          -...also check that init residuals are diff for diff continuations?
+      -r=1e-3 (r in specialized code): 790 (755 in linear); qoi: 377326.74286693614
+      -adapt 0.05, 0.03 step fails newton at MF02
+        -smaller r? 
+          -1e-3, psi_and_superadj3
+          -3.5e-3, psi_and_superadj3, fails at MF03 (<1% at end of MF02)
+        -what if LF also had aniso? (psi_and_superadj4; 0.03 step, still fails in MF03)
+          -with looser tol? (psi_and_superadj4, still dies on MF03)
+          -different steps?
+            -0.1 (psi_and_superadj4, failed at MF01)
+            -0.01 (psi_and_superadj4, dafuq this also failed at MF01? definitely different areas refined than 0.1...)
+            -0.05 (psi_and_superadj4, failed at MF01)
+            -0.05, r=3.5e-3 (psi_and_superadj4, failed at MF01)
+      -what if loosened lin tols? (psi_and_superadj4/loose, still fails at MF03)
+        -what was the 2D r=1000 doing? wasn't there the weird creeping to 616 thing?
+          -r=1000 had tight tols, gmres; superlu also works fine
+  -what if non-diri west c BC?
+    -with LF init guess (165 (155 in linear), qoi = 1053771); doesn't converge (maybe forward ill-posed? but has react term...ksp residual norm suddenly spikes to e38, max/min ends at e14))
+    -with r=0 init guess (126 (116 in linear), qoi = 1026703); seems stuck in linear solve...thousands of iterations...
+    -with west-diri, r=0 init guess, converges in 520 (500 in linear), qoi = 547359
+
+--> poke over july 4
+
+-combustor example? what if it actually does drop reaction term? even if it doesn't make sense to do LF everywhere, it might make sense to use it *somewhere*...
+-adaptivity as offline? one-off solve with mixed faster than all-HF?
+-ask youseff if it makes sense to have multiple-vs-single reaction example? does it make sense to know/infer this particular set of parameters? stop by his office? maybe bart?
