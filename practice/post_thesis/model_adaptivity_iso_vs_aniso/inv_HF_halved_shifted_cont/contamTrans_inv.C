@@ -315,7 +315,7 @@ bool ContamTransSysInv::element_time_derivative(bool request_jacobian, DiffConte
                             (-(dispTens*(porosity*dphi[j][qp]))*dphi[i][qp] // Dispersion Term
                              + (U*dphi[j][qp])*phi[i][qp] // Convection Term
                              - (2.*react_rate*(porosity*c*phi[j][qp]))*phi[i][qp]); // Reaction Term
-            J_c_c(i,j) += JxW[qp]*(-2.*react_rate*z*phi[j][qp]*phi[i][qp]);
+            J_c_c(i,j) += JxW[qp]*(-2.*react_rate*porosity*z*phi[j][qp]*phi[i][qp]);
           }
           J_f_z(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]); 
           J_f_f(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]); 

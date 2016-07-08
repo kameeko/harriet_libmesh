@@ -24,7 +24,7 @@ initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 
 #discretization
-nx = 46 #92
-ny = 33 #66
-nz = 20
+nx = 25 #92
+ny = 45 #66
+nz = 30
 

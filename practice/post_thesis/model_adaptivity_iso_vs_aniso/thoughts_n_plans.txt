@@ -329,7 +329,7 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
 -estimate vs actual error, actual relative-to-HF error (in %age)
   -should rel error for stopping in algorithm? be relative to estimated HF qoi? or just describe algorithm in terms of some error-related tolerance?
     -> if it makes more sense to do error relative to estimated HF qoi as stopping criterion, will need to update graphs in 2D also...
-***how much time does just inverse problem take at each iteration? if8662.33 you decided to use fresh data, even though breakdown not exact
+***how much time does just inverse problem take at each iteration? if  you decided to use fresh data, even though breakdown not exact
   -should all have same (LF?) initial guess
 
 ==========
@@ -349,13 +349,24 @@ invMF debug: inv_MF -> psi_and_superadj phys module, inv_MF2 -> inv_HF_cont phys
         -more continuation? (...the heck?)
         -even more continuation...
         -omigod this is so delicate wtf...
-          -rerunning with jac check...checked out with 1.e-6 until death by newton
-          -...also check that init residuals are diff for diff continuations?
+          -rerunning with jac check...checked out with 1.e-6 until death by newton, also manual check looks fine...
+          -...also check that init residuals are diff for diff continuations? yes they are...
+        -loosening to previous defaults (only init tol and max iter specified, same as previous defaults) doesn't seem to help
+        -still running for 3.5e03 with even tinier steps...
+          IS THERE A REINIT MISSING? reinit was just in case the variables hadn't been defined right? checking in run2 to see if repeating a step registers correctly...although before, the weird 616 showed up when manually doing continuation in splitpsi, not later in automated version...
+            -repeating a step does show up correctly...
+            -is the inverse problem for large nonlinearity just ill-defined? but newton's should still find some sort of local extrema?
+        -> ****can tiptoe up to 3.22e-3...that takes 1900...well, 3.22 doesn't converge, but 3.21 does, and without any continuation (not even from LF)...seems that the ones it can get to, it can get to without any continuation...and the ones it can't get to, no amount of continuation will work...****
+          -not requiring that residual be reduced at each step cauches r=3.22 to spin off into infinite residual...which apparently is not a failure...
       -r=1e-3 (r in specialized code): 790 (755 in linear); qoi: 377326.74286693614
       -adapt 0.05, 0.03 step fails newton at MF02
         -smaller r? 
           -1e-3, psi_and_superadj3
-          -3.5e-3, psi_and_superadj3, fails at MF03 (<1% at end of MF02)
+          -3.5e-3, psi_and_superadj3, fails at MF03 (<1% at end of MF02, 3700)
+            -0.03 step, fails at MF05; goes to <1% of error, but kinks up to 7% at end...(dies at 23% refinement, last successful at 18% ref)
+              -final estimated HF qoi: 213215
+            -0.02 step, goes fairly smoothly to 0.6% error, then dies...(dies at 29% refinement, last successful at 26% ref)
+              -final estimated HF qoi: 213008
         -what if LF also had aniso? (psi_and_superadj4; 0.03 step, still fails in MF03)
           -with looser tol? (psi_and_superadj4, still dies on MF03)
           -different steps?
@@ -366,13 +377,31 @@ invMF debug: inv_MF -> psi_and_superadj phys module, inv_MF2 -> inv_HF_cont phys
       -what if loosened lin tols? (psi_and_superadj4/loose, still fails at MF03)
         -what was the 2D r=1000 doing? wasn't there the weird creeping to 616 thing?
           -r=1000 had tight tols, gmres; superlu also works fine
+      -what if data was from reaction too?
+        3.5? can't seem to get it for the inverse, but does the forward work at least? or does the inv break because there's no fwd steady-state?
+          -fwd has twice the domain in length and width, and non-diri BCs though
+            -running 3.5 with diri west, takes > 100 nonlinear steps...so maybe it really is quite nonlinear...initially 
+          -adapt with 0.03 step and react-data fails in the adjoint solve?? wtf? that's linear how can it fail?
+      -what if change steps in adaptive? (so not all same size...somewhere between 0.03 and 0.02?)
   -what if non-diri west c BC?
     -with LF init guess (165 (155 in linear), qoi = 1053771); doesn't converge (maybe forward ill-posed? but has react term...ksp residual norm suddenly spikes to e38, max/min ends at e14))
     -with r=0 init guess (126 (116 in linear), qoi = 1026703); seems stuck in linear solve...thousands of iterations...
     -with west-diri, r=0 init guess, converges in 520 (500 in linear), qoi = 547359
-
---> poke over july 4
+    -NEED TO REDO WITH bug fixed in west BC...uses previous assumption that "velocity" didn't include porosity...
 
 -combustor example? what if it actually does drop reaction term? even if it doesn't make sense to do LF everywhere, it might make sense to use it *somewhere*...
--adaptivity as offline? one-off solve with mixed faster than all-HF?
+  -if LF were no-reaction, it would just be conv-diff in the areas where it's used...
+-adaptivity as offline? one-off solve with mixed faster than all-HF? POKE ARGUMENT IN CHAD'S PAPER
+  -can we present this as more robust? 
 -ask youseff if it makes sense to have multiple-vs-single reaction example? does it make sense to know/infer this particular set of parameters? stop by his office? maybe bart?
+  -wait, can't you not have a variable exist in only parts of the domain? even if we do it the identity-jacobian way, is that the correct interpretation? would the MF model have pockets of zero concentration for extra species? or would the extra species exist but not react? second one makes more physical sense, but then you wouldn't have one model have more dofs than the other...
+  
+  dual motivation? robustness and time savings?
+  FD jacobian -> should converge to quadratically versus step size...clean up jacobian and let vikram look over?
+  
+think about:
+sergio's thesis -> chapter on weighting for importance sampling when you don't have a pdf, just samples; in high-dim, doing density optimation is an ass; solve weights as optimization problem
+  -should've been published in statistics journal
+  
+-- maybe rather than think of large overarching topics, start from a little problem and let it grow?
+  -apply to inverse problems? relation to filters? optimization instead of resampling?
