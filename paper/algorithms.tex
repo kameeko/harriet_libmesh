@@ -4,7 +4,7 @@ Based on the theoretical developments in the last section, we present below a go
 %
 \subsection{Goal Oriented Inference Algorithm}
 %
-Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, the error estimate (\ref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\ref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem (\ref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
+Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, the error estimate (\cref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\cref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem (\cref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]
@@ -18,20 +18,18 @@ Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, t
 	\State{Let the model MF$_0$ be the LF model applied everywhere in the domain.}
 	\State{$i\gets0$}
 	\State{Solve for stationary point $\Psi_{MF_0}$ of augmented Lagrangian $\mathcal{M}_{MF_0}$}
-	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for 
-	
-	supplementary adjoint $\Lambda_0$ (see Equation (\ref{eq:superAdjEq}))}
+	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for supplementary adjoint $\Lambda_0$ (see \cref{eq:superAdjEq})}
 	\State{Compute QoI error estimate
 		
 	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
 	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
 	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/I(q_{MF_i},u_{MF_i})|>$ \texttt{errTol}}
-		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see section~\ref{sect:error_est_localize}) and use this decomposition to guide formation of new \par\hskip\algorithmicindent mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see section~\cref{sect:error_est_localize}) and use this decomposition to guide formation of new \par\hskip\algorithmicindent mixed-fidelity model MF$_{i+1}$\end{varwidth}}
 		\State{$i\gets i+1$}
 		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
 		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for 
 		
-		$\quad\quad$supplementary adjoint $\Lambda_i$ (see Equation (\ref{eq:superAdjEq}))}
+		$\quad\quad$supplementary adjoint $\Lambda_i$ (see \cref{eq:superAdjEq})}
 		\State{Compute QoI error estimate
 		
 		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$}
@@ -44,12 +42,12 @@ Just as error estimates can be used to guide mesh-refinement \cite{BecRann01}, t
 \end{algorithm}
 %
 
-Algorithm~\ref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
+Algorithm~\cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
 \subsubsection{Error Estimate Localization}\label{sect:error_est_localize}
 %
-Algorithm~\ref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
+Algorithm~\cref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
 
-We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subseteq Q$ and $U_{LF}=U$. Note that the error estimate in Equation \ref{eq:finErrExp} can be equivalently written as,
+We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subseteq Q$ and $U_{LF}=U$. Note that the error estimate in \cref{eq:finErrExp} can be equivalently written as,
 %
 \begin{equation}
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi)+\mathcal{R}(e^3). \nonumber
@@ -71,9 +69,9 @@ can be interpreted as the error contribution from the basis function $(\varphi,\
 % 
 \subsection{Complexity Analysis}\label{sect:alg_complexity}
 %
-We now derive the computational complexity of using Algorithm~\ref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$. \red{The parts of the supplementary adjoint corresponding to the primary and auxiliary variables can be solved separately, and thus the cost of computing the supplementary adjoint is also $\orderof{3N}^{\gamma}$.}
+We now derive the computational complexity of using Algorithm~\cref{alg:refSeries} to solve an inference problem, and compare it to extant strategies. Let the state, adjoint, and parameter variables each have $N$ degrees of freedom, and assume that an `all at once' strategy is used to solve the KKT system. The cost of single linear solve with such a system is $\orderof{3N}^{\gamma}$, where $\gamma$ depends on the linear solver used~\cite{}. The cost of solving for the auxiliary variables, a linear system, is $\orderof{3N}^{\gamma}$. \red{The parts of the supplementary adjoint corresponding to the primary and auxiliary variables can be solved separately, and thus the cost of computing the supplementary adjoint is also $\orderof{3N}^{\gamma}$.}
 
-If one utilizes Algorithm~\ref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
+If one utilizes Algorithm~\cref{alg:refSeries} to solve the inference problem, with $T$ adaptive iterations the total computational cost is,
 %
 \begin{align}
 \label{eq:cost_adapt}
