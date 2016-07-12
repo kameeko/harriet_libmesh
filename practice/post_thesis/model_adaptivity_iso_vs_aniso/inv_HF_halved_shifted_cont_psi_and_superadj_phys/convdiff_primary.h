@@ -90,5 +90,7 @@ public:
  
   virtual void postprocess();
   
+  // Calculate Jacobians analytically ?
+  bool _analytic_jacobians;
 
 };

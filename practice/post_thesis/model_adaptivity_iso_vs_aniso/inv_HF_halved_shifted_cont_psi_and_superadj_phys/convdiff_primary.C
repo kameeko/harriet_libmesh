@@ -24,6 +24,7 @@ void ConvDiff_PrimarySys::init_data (){
   unsigned int conc_p = 1;
   GetPot infile("contamTrans.in");
   std::string fe_family = infile("fe_family", std::string("LAGRANGE"));
+  _analytic_jacobians = infile("analytic_jacobians", true);
 
   // LBB needs better-than-quadratic velocities for better-than-linear
   // pressures, and libMesh needs non-Lagrange elements for
@@ -121,7 +122,11 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
 
 // Element residual and jacobian calculations
 // Time dependent parts
-bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffContext& context){
+bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffContext& context)
+{
+  // Do we want to use analytic jacobians ?
+  bool compute_jacobian = request_jacobian && _analytic_jacobians;
+  
   const unsigned int dim = this->get_mesh().mesh_dimension();
   
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
@@ -198,22 +203,24 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
         Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] - R*c*c*phi[i][qp] + fc*phi[i][qp]);
         Rfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]); 
         
-        if (request_jacobian){
-          for (unsigned int j=0; j != n_c_dofs; j++){
-            J_c_zc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] 
-                              - 2.*R*phi[j][qp]*c*phi[i][qp]);
-            J_c_c(i,j) += JxW[qp]*(-2.*R*zc*phi[j][qp]*phi[i][qp]);
-
-            J_zc_c(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
-                                - 2.*R*c*phi[j][qp]*phi[i][qp]);
-            J_zc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-
-            J_fc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
-            J_fc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]);
-
+        if (compute_jacobian)
+	  {
+	    for (unsigned int j=0; j != n_c_dofs; j++)
+	      {
+	      J_c_zc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] 
+				      - 2.*R*phi[j][qp]*c*phi[i][qp]);
+	      J_c_c(i,j) += JxW[qp]*(-2.*R*zc*phi[j][qp]*phi[i][qp]);
+	      
+	      J_zc_c(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
+				      - 2.*R*c*phi[j][qp]*phi[i][qp]);
+	      J_zc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
+	      
+	      J_fc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
+	      J_fc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]);
             
-          } // end of the inner dof (j) loop
-        } // end - if (compute_jacobian && context.get_elem_solution_derivative())
+	    } // end of the inner dof (j) loop
+	    
+	  } // end - if (compute_jacobian)
 
       } // end of the outer dof (i) loop
       
@@ -241,21 +248,25 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
         for (unsigned int i=0; i != n_c_dofs; i++){
           Rc(i) += (cpred - cstar)*point_phi[i];
     
-          if (request_jacobian){
-            for (unsigned int j=0; j != n_c_dofs; j++)
-              J_c_c(i,j) += point_phi[j]*point_phi[i] ;
-          }
+          if (compute_jacobian)
+	    {
+	      for (unsigned int j=0; j != n_c_dofs; j++)
+		J_c_c(i,j) += point_phi[j]*point_phi[i] ;
+	    }
     
         }
       }
     }
 
-  return request_jacobian;
+  return compute_jacobian;
 }
 
 //for non-Dirichlet boundary conditions and the bit from diffusion term
 bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContext & context)
 {
+  // Do we want to use analytic jacobians ?
+  bool compute_jacobian = request_jacobian && _analytic_jacobians;
+
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
   FEMContext &ctxt = cast_ref<FEMContext&>(context);
@@ -320,7 +331,7 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
 //      if(isWest) //west boundary
 //        Rz(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
       
-      if(request_jacobian && context.get_elem_solution_derivative())
+      if(compute_jacobian)
       {
         for (unsigned int j=0; j != n_c_dofs; j++)
         {
@@ -329,11 +340,11 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
 //          if(isWest)
 //            J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
         }
-      } // end - if (request_jacobian && context.get_elem_solution_derivative())
+      } // end - if (compute_jacobian)
     } //end of outer dof (i) loop
   }
 
-  return request_jacobian;
+  return compute_jacobian;
 }
 
 // Postprocessed output

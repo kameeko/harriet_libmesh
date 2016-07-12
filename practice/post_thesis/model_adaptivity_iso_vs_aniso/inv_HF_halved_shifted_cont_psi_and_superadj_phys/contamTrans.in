@@ -18,3 +18,5 @@ bsource = -5.0
 data_file = Measurements_shifted.dat
 beta = 1.e-3
 do_continuation = true
+
+analytic_jacobians = false
