@@ -80,18 +80,21 @@ void ConvDiff_PrimarySys::init_data (){
   just_f.push_back(fc_var);
   ZeroFunction<Number> zero;
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
-  
-  //influx side as Diri instead of flux BC
-  ConstFunction<Number> westIn(-bsource);
-  std::vector<unsigned int> just_c; just_c.push_back(c_var);
-  std::vector<unsigned int> just_z; just_z.push_back(zc_var);
-  std::set<boundary_id_type> westside; 
-  if(dim == 2)
-    westside.insert(3); 
-  else if(dim == 3)
-    westside.insert(4); 
-  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &westIn));
-  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
+
+  diri_dbg = infile("use_Diri_BCs",false);
+  if(diri_dbg){
+    //influx side as Diri instead of flux BC
+    ConstFunction<Number> westIn(-bsource);
+    std::vector<unsigned int> just_c; just_c.push_back(c_var);
+    std::vector<unsigned int> just_z; just_z.push_back(zc_var);
+    std::set<boundary_id_type> westside; 
+    if(dim == 2)
+      westside.insert(3); 
+    else if(dim == 3)
+      westside.insert(4); 
+    this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &westIn));
+    this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
+  }
 
   qoi = 0.0;
 
@@ -328,8 +331,8 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
     {
       if(isEast)
         Rc(i) += JxW[qp]*(-U*face_normals[qp]*z)*phi[i][qp];
-//      if(isWest) //west boundary
-//        Rz(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
+      if(isWest && !diri_dbg) //west boundary
+        Rz(i) += JxW[qp]*(U*face_normals[qp]*c - bsource*vx)*phi[i][qp];
       
       if(compute_jacobian)
       {
@@ -337,8 +340,8 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
         {
           if(isEast)
             J_c_z(i,j) += JxW[qp]*(-U*face_normals[qp]*phi[j][qp])*phi[i][qp];
-//          if(isWest)
-//            J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
+          if(isWest && !diri_dbg)
+            J_z_c(i,j) += JxW[qp]*(U*face_normals[qp]*phi[j][qp])*phi[i][qp];
         }
       } // end - if (compute_jacobian)
     } //end of outer dof (i) loop

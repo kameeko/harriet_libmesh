@@ -78,9 +78,10 @@ void ContamTransSys::init_data(){
     //}
 all_bdys.insert(4);
     std::vector<unsigned int> all_of_em;
-	  all_of_em.push_back(c_var);
-	  ConstFunction<Number> five(5.0);
-	  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, all_of_em, &five));
+    all_of_em.push_back(c_var);
+    //ConstFunction<Number> five(5.0);
+      ConstFunction<Number> five(-bsource);
+    this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, all_of_em, &five));
   }
 
 	// Do the parent's initialization after variables and boundary constraints are defined

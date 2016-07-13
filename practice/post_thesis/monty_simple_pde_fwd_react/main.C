@@ -101,10 +101,10 @@ int main(int argc, char** argv){
   equation_systems.init ();
   
   //initial conditions
-  read_initial_parameters();
-  system.project_solution(initial_value, initial_grad,
-                          equation_systems.parameters);
-  finish_initialization();
+//  read_initial_parameters();
+//  system.project_solution(initial_value, initial_grad,
+//                          equation_systems.parameters);
+//  finish_initialization();
 
   // Set the time stepping options...
   system.deltat = deltat;
@@ -122,7 +122,8 @@ int main(int argc, char** argv){
     infile("relative_residual_tolerance", 0.0);
   solver->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
-    
+  solver->require_residual_reduction = infile("require_residual_reduction",true);    
+
   //...and the linear solver options
   solver->max_linear_iterations           = infile("max_linear_iterations", 10000);
   solver->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);

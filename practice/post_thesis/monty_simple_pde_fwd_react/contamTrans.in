@@ -13,7 +13,7 @@ porosity = 0.1 #0.1
 dispersivity_longitudinal = 100.0
 dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
-bsource = -5.0
+bsource = -0.0 #-5.0
 
 source_rate = 50.0;
 source_conc = 1000.0;
@@ -23,5 +23,5 @@ use_stabilization = false;
 use_smoothed_box = true;
 source_decay = 5e-2;
 stabilization_option = 4;
-use_Diri_BCs = false;
+use_Diri_BCs = true;
 

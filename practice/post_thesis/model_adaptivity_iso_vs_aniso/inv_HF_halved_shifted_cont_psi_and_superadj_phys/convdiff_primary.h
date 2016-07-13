@@ -93,4 +93,6 @@ public:
   // Calculate Jacobians analytically ?
   bool _analytic_jacobians;
 
+  bool diri_dbg;
+
 };
