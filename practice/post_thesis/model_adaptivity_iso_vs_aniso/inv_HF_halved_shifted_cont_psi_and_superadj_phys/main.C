@@ -100,8 +100,9 @@ int main(int argc, char** argv){
     infile("relative_residual_tolerance", 0.0);
   solver->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
-//solver->require_residual_reduction = false; //DEBUG
-  // And the linear solver options
+  solver->require_residual_reduction = infile("require_residual_reduction",true); 
+  
+// And the linear solver options
   solver->max_linear_iterations           = infile("max_linear_iterations", 10000);
   solver->initial_linear_tolerance        = infile("initial_linear_tolerance",1.e-13);
   solver->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);

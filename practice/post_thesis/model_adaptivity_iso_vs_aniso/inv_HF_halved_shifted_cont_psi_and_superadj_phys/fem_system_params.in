@@ -17,8 +17,10 @@ solver_verbose = true
 # Nonlinear solver tolerance
 relative_step_tolerance = 1e-10
 relative_residual_tolerance = 1.e-10
-absolute_residual_tolerance = 1.e-11
+absolute_residual_tolerance = 1.e-10 #1.e-11
 max_nonlinear_iterations = 100
+
+require_residual_reduction = true
 
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
