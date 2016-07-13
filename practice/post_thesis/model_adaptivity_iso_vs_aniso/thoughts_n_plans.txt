@@ -323,6 +323,7 @@ field vs scalar error plots need colorbar readjusted to show more than just spas
 -how should background/lit review differ from thesis'?
   -briefer than thesis...lit review shouldn't be its own section...should be part of intro, context of what the problem is and what you're doing and what's been done
 *** -> 1.1 + 1.2 in thesis, pretty much what's in the thesis, can be briefer in motivation...single introduction section...
+  -poke cube book?
 
 -distribution -> can you scale z axis to make it more obviously 3D?
   -or stack of slices?
@@ -363,7 +364,7 @@ invMF debug: inv_MF -> psi_and_superadj phys module, inv_MF2 -> inv_HF_cont phys
         -smaller r? 
           -1e-3, psi_and_superadj3
           -3.5e-3, psi_and_superadj3, fails at MF03 (<1% at end of MF02, 3700)
-            -0.03 step, fails at MF05; goes to <1% of error, but kinks up to 7% at end...(dies at 23% refinement, last successful at 18% ref)
+            -0.03 step, fails at MF05; goes to 0.6% of error, but kinks up to 7% at end...(dies at 23% refinement, last successful at 18% ref)
               -final estimated HF qoi: 213215
             -0.02 step, goes fairly smoothly to 0.6% error, then dies...(dies at 29% refinement, last successful at 26% ref)
               -final estimated HF qoi: 213008
@@ -388,7 +389,42 @@ invMF debug: inv_MF -> psi_and_superadj phys module, inv_MF2 -> inv_HF_cont phys
     -with r=0 init guess (126 (116 in linear), qoi = 1026703); seems stuck in linear solve...thousands of iterations...
     -with west-diri, r=0 init guess, converges in 520 (500 in linear), qoi = 547359
     -NEED TO REDO WITH bug fixed in west BC...uses previous assumption that "velocity" didn't include porosity...
+    
+    
+what if you use reinit anyways?
+white if write out and read in?
+loose tol and not-require-resid-reduction together?
+  or superlu and not-req...
+  
+  R = 0.003214 -> failed at finest steps thus far; previous step solves w/o continuation...
+  run2 - does 0.003212 solve w/o continuation?
 
+9245 - HF finest cont, gmres, no resid red required (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
+  -R = 0.003214 hit max NL iterations, R = 0.003215 spins off into infinity...
+8090 - HF finest cont, superlu, resid red required (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
+  -died at R = 0.003214
+8802 - HF rough cont, gmres, no resid red required (run2_psi_and_superadj_phys)
+  -hit max NL iter on 3.225, went to 3.5, hit jacobian disagreement (max abs diff O(e-6), max rel diff O(e-7)); residual started increasing wildly beforehand...??
+9887 - HF finer cont, gmres, no resid red required, tolerances like adj ex 2 (run2_psi_and_superadj_phys)
+  -hit max NL iter on 3.225 and 3.25, went to 3.3, hit jacobian disagreement; residual started increasing wildly beforehand...??
+11131 - HF finest cont, gmres, no resid red required, numerical jac (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
+ -died at R = 0.003214 ...analytical jacobian is very likely correct, stop worrying about it...
+13124 - adaptivity, 0.01 step, 0.9 decay
+11863 - even more fine, original 4.2 (compare final qoi) (run2_psi_and_superadj_phys)
+  -converged fine, ended at same qoi as original (to at least 9 sig figs)
+12414 - even more fine, 3.5, gently from 0 (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
+  -still couldn't make it to 3.3...
+11893 - even more fine, 3.5, gently from 0 (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
+  -failed at R = 0.0032136, same with vikram's (who used even gentler steps from 0)
+- even more fine, 3.5, starting from 3.212
+
+-> try with inverse crime data points?
+  -swift decay -> diri edge stands out starkly; also, source is cut by truncated domain...
+    -original domain, flux BCs -> still has stark edge...really swift decay..perhaps it just doesn't make sense to have 'ambient/at-infinity' concentration of 5 anymore given this amount of reaction...west edge is supposed to represent what comes for upstream, where there is no source...
+      -if set bsource = 0, then no edge ridge...most of action focused around source...
+      
+  -> move source to be within halved domain? enforcing incorrect flux or diri on edge that cuts through true source may also make things funky...although most sensors are fairly well away from edge...
+ 
 -combustor example? what if it actually does drop reaction term? even if it doesn't make sense to do LF everywhere, it might make sense to use it *somewhere*...
   -if LF were no-reaction, it would just be conv-diff in the areas where it's used...
 -adaptivity as offline? one-off solve with mixed faster than all-HF? POKE ARGUMENT IN CHAD'S PAPER
@@ -404,4 +440,5 @@ sergio's thesis -> chapter on weighting for importance sampling when you don't h
   -should've been published in statistics journal
   
 -- maybe rather than think of large overarching topics, start from a little problem and let it grow?
+  -this might not work well to stay on the photonics project...
   -apply to inverse problems? relation to filters? optimization instead of resampling?
