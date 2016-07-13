@@ -1,0 +1,35 @@
+# Solve a transient instead of a steady problem?
+transient = false
+
+# The interval between our timesteps
+deltat = 10000.0 
+
+# And the number of timesteps to take
+n_timesteps = 1
+
+# Write out every nth timestep to file.
+write_interval = 1
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false
+solver_verbose = true
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-8
+relative_residual_tolerance = 0. #1.e-8
+absolute_residual_tolerance = 1.e-13
+max_nonlinear_iterations = 300
+
+#discretization
+nx = 50
+ny = 90
+nz = 30
+
+#refinement
+max_r_steps = 0
+max_r_level = 7
+refine_percentage = 0.05 #if too low then might have islands of very-refined, which causes issues...
+coarsen_percentage = 0.0
+indicator_type = kelly #kelly or patch
+write_error = false
+flag_by_elem_frac = true #if false, flag by error fraction

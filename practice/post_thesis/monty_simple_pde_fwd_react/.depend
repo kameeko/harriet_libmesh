@@ -1,0 +1,7 @@
+contamTrans_sys.$(obj-suffix):\
+    contamTrans_sys.C\
+    contamTrans_sys.h
+main.$(obj-suffix):\
+    main.C\
+    contamTrans_sys.h\
+    initial.h
