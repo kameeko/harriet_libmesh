@@ -58,4 +58,6 @@ public:
   
   bool diri_dbg; //whether to use Dirichlet boundary conditions (for debugging)
   bool smooth_box; //whether to use box-source with smoothed edges (exponential decay)
+  
+  void set_R( double Rval ){ react_rate = Rval; }
 };

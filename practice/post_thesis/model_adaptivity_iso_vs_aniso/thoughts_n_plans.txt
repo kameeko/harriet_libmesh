@@ -409,19 +409,17 @@ loose tol and not-require-resid-reduction together?
   -hit max NL iter on 3.225 and 3.25, went to 3.3, hit jacobian disagreement; residual started increasing wildly beforehand...??
 11131 - HF finest cont, gmres, no resid red required, numerical jac (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
  -died at R = 0.003214 ...analytical jacobian is very likely correct, stop worrying about it...
-13124 - adaptivity, 0.01 step, 0.9 decay
 11863 - even more fine, original 4.2 (compare final qoi) (run2_psi_and_superadj_phys)
   -converged fine, ended at same qoi as original (to at least 9 sig figs)
 12414 - even more fine, 3.5, gently from 0 (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
   -still couldn't make it to 3.3...
 11893 - even more fine, 3.5, gently from 0 (inv_HF_halved_shifted_cont_psi_and_superadj_phys)
   -failed at R = 0.0032136, same with vikram's (who used even gentler steps from 0)
-- even more fine, 3.5, starting from 3.212
 
 -> try with inverse crime data points?
   -swift decay -> diri edge stands out starkly; also, source is cut by truncated domain...
     -original domain, flux BCs -> still has stark edge...really swift decay..perhaps it just doesn't make sense to have 'ambient/at-infinity' concentration of 5 anymore given this amount of reaction...west edge is supposed to represent what comes for upstream, where there is no source...
-      -if set bsource = 0, then no edge ridge...most of action focused around source...
+      -if set bsource = 0, then no edge ridge...most of action focused around source...very close for diri0...(requires zero initial guess to converge)
       
   -> move source to be within halved domain? enforcing incorrect flux or diri on edge that cuts through true source may also make things funky...although most sensors are fairly well away from edge...
  

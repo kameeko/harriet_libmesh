@@ -25,3 +25,4 @@ source_decay = 5e-2;
 stabilization_option = 4;
 use_Diri_BCs = true;
 
+do_continuation = true

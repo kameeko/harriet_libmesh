@@ -40,13 +40,17 @@ int main(int argc, char** argv){
   const int ny                          = infile("ny",100);
   const int nz                          = infile("nz",100);
   //const unsigned int dim                = 3;
-  const unsigned int max_r_steps        = infile("max_r_steps", 3);
-  const unsigned int max_r_level        = infile("max_r_level", 3);
-  const Real refine_percentage          = infile("refine_percentage", 0.1);
-  const Real coarsen_percentage         = infile("coarsen_percentage", 0.0);
-  const std::string indicator_type      = infile("indicator_type", "kelly");
-  const bool write_error                = infile("write_error",false);
-  const bool flag_by_elem_frac          = infile("flag_by_elem_frac",true);
+  //const unsigned int max_r_steps        = infile("max_r_steps", 3);
+  //const unsigned int max_r_level        = infile("max_r_level", 3);
+  //const Real refine_percentage          = infile("refine_percentage", 0.1);
+  //const Real coarsen_percentage         = infile("coarsen_percentage", 0.0);
+  //const std::string indicator_type      = infile("indicator_type", "kelly");
+  //const bool write_error                = infile("write_error",false);
+  //const bool flag_by_elem_frac          = infile("flag_by_elem_frac",true);
+  
+  GetPot infileForMesh("contamTrans.in");
+  bool doContinuation                  = infileForMesh("do_continuation",false);
+  Real target_R = infileForMesh("reaction_rate",1.e-3);
       
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -101,10 +105,10 @@ int main(int argc, char** argv){
   equation_systems.init ();
   
   //initial conditions
-//  read_initial_parameters();
-//  system.project_solution(initial_value, initial_grad,
-//                          equation_systems.parameters);
-//  finish_initialization();
+  read_initial_parameters();
+  system.project_solution(initial_value, initial_grad,
+                          equation_systems.parameters);
+  finish_initialization();
 
   // Set the time stepping options...
   system.deltat = deltat;
@@ -131,124 +135,52 @@ int main(int argc, char** argv){
   solver->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
     
   // Mesh Refinement object - to test effect of constant refined mesh (not refined at every timestep)
-  MeshRefinement mesh_refinement(mesh);
-  mesh_refinement.refine_fraction() = refine_percentage;
-  mesh_refinement.coarsen_fraction() = coarsen_percentage;
-  mesh_refinement.max_h_level() = max_r_level;
+  //MeshRefinement mesh_refinement(mesh);
+  //mesh_refinement.refine_fraction() = refine_percentage;
+  //mesh_refinement.coarsen_fraction() = coarsen_percentage;
+  //mesh_refinement.max_h_level() = max_r_level;
 
   // Print information about the system to the screen.
   equation_systems.print_info();
   
   ExodusII_IO exodusIO = ExodusII_IO(mesh); //for writing multiple timesteps to one file
   
-  Real sol_min = 100.0; //end adaptivity early if oscillations seem squashed
-  for (unsigned int r_step=0; r_step<max_r_steps; r_step++)
-    {
-      std::cout << "\nBeginning Solve " << r_step+1 << std::endl;
-      
-      for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
-        {
-      
-          std::cout << "\n\nSolving time step " << t_step << ", time = "
-                    << system.time << std::endl;
-          
-          system.solve();
-          system.postprocess();
-          
-          //print out solution minimum to debug oscillations
-          NumericVector<Number> &primal_solution = *system.solution;
-          sol_min = primal_solution.min();
-          std::cout << "Solution min: " << sol_min << std::endl;
-          
-          // Advance to the next timestep in a transient problem
-          system.time_solver->advance_timestep();
-   
-      } //end stepping through time loop
-      
-      if(sol_min-5.0 < -1.e-2){          
-        std::cout << "\n  Refining the mesh..." << std::endl;
-        
-        // The \p ErrorVector is a particular \p StatisticsVector
-        // for computing error information on a finite element mesh.
-        ErrorVector error;
-        
-        if (indicator_type == "patch")
-          {
-            // The patch recovery estimator should give a
-            // good estimate of the solution interpolation
-            // error.
-            PatchRecoveryErrorEstimator error_estimator;
-            error_estimator.set_patch_reuse(false); //anisotropy trips up reuse
-            error_estimator.estimate_error (system, error);
-          }
-        else if (indicator_type == "kelly")
-          {
-
-            // The Kelly error estimator is based on
-            // an error bound for the Poisson problem
-            // on linear elements, but is useful for
-            // driving adaptive refinement in many problems
-            KellyErrorEstimator error_estimator;
-
-            error_estimator.estimate_error (system, error);
-          }
-        
-        // Write out the error distribution
-        if(write_error){
-          std::ostringstream ss;
-          ss << r_step;
-#ifdef LIBMESH_HAVE_EXODUS_API
-          std::string error_output = "error_"+ss.str()+".e";
-#else
-          std::string error_output = "error_"+ss.str()+".gmv";
-#endif
-          error.plot_error( error_output, mesh );
-        }
-        
-        // This takes the error in \p error and decides which elements
-        // will be coarsened or refined. 
-        if(flag_by_elem_frac)
-          mesh_refinement.flag_elements_by_elem_fraction(error);
-        else
-          mesh_refinement.flag_elements_by_error_fraction (error);
-        
-        // This call actually refines and coarsens the flagged
-        // elements.
-        mesh_refinement.refine_and_coarsen_elements();
-        
-        // This call reinitializes the \p EquationSystems object for
-        // the newly refined mesh.  One of the steps in the
-        // reinitialization is projecting the \p solution,
-        // \p old_solution, etc... vectors from the old mesh to
-        // the current one.
-        equation_systems.reinit ();
-        
-        std::cout << "System has: " << equation_systems.n_active_dofs()
-                  << " degrees of freedom."
-                  << std::endl;
-      }else{
-        break;
-      }
-    } //end refinement loop
+  if(!doContinuation){
+    system.set_R(target_R);
+    system.solve();
     
-  //use that final refinement
-  for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
-    {
-  
-      std::cout << "\n\nSolving time step " << t_step << ", time = "
-                << system.time << std::endl;
-      
+    //print out solution minimum to debug oscillations/non-physicality
+    NumericVector<Number> &primal_solution = *system.solution;
+    double sol_min = primal_solution.min();
+    std::cout << "Solution min: " << sol_min << std::endl;
+  }else{ //natural continuation
+    std::vector<double> Rsteps;
+    if(FILE *fp=fopen("continuation_steps.txt","r")){
+      Real value;
+      int flag = 1;
+      while(flag != -1){
+        flag = fscanf(fp,"%lf",&value);
+        if(flag != -1){
+          Rsteps.push_back(value);
+        }
+      }
+      fclose(fp);
+    }else{
+      std::cout << "\n\n Need to define continuation steps in continuation_steps.txt\n\n" << std::endl;
+    }
+    
+    for(int i = 0; i < Rsteps.size(); i++){
+      double R = Rsteps[i];
+      system.set_R(R);
+      std::cout << "\n\nStarting iteration with R = " << R << "\n\n" << std::endl;
       system.solve();
-      system.postprocess();
       
-      //print out solution minimum to debug oscillations
+      //print out solution minimum to debug oscillations/non-physicality
       NumericVector<Number> &primal_solution = *system.solution;
-      std::cout << "Solution min: " << primal_solution.min() << std::endl;
-      
-      // Advance to the next timestep in a transient problem
-      system.time_solver->advance_timestep();
-
-    } //end stepping through time loop
+      double sol_min = primal_solution.min();
+      std::cout << "Solution min: " << sol_min << std::endl;
+    }
+  } //end continuation type switch
     
     
 #ifdef LIBMESH_HAVE_EXODUS_API
