@@ -108,6 +108,8 @@ int main(int argc, char** argv){
   solver->minimum_linear_tolerance        = infile("minimum_linear_tolerance",1.e-13);
   solver->linear_tolerance_multiplier     = infile("linear_tolerance_multiplier",1.e-3);
 
+  system.numerical_jacobian_h = infile("numerical_jacobian_step",1.e-8);
+
   // Print information about the system to the screen.
   equation_systems.print_info(); //DEBUG
   

@@ -22,6 +22,8 @@ max_nonlinear_iterations = 100
 
 require_residual_reduction = true
 
+numerical_jacobian_step = 1.e-10
+
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 
