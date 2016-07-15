@@ -148,7 +148,7 @@ int main(int argc, char** argv){
   if(!doContinuation){
     system.set_R(target_R);
     system.solve();
-    
+    system.postprocess();
     //print out solution minimum to debug oscillations/non-physicality
     NumericVector<Number> &primal_solution = *system.solution;
     double sol_min = primal_solution.min();
@@ -180,6 +180,7 @@ int main(int argc, char** argv){
       double sol_min = primal_solution.min();
       std::cout << "Solution min: " << sol_min << std::endl;
     }
+    system.postprocess();
   } //end continuation type switch
     
     
