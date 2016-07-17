@@ -8,7 +8,7 @@ poly_order = 1
 fe_family = 'LAGRANGE'
 
 vx = 2.0866 #762.11604 m/yr or 2.0866 m/day or 2.415e-5 m/s
-reaction_rate = 3.5e-2
+reaction_rate = 35. #3.5e-2
 porosity = 0.1 #0.1
 dispersivity_longitudinal = 100.0
 dispersivity_transverse_horizontal = 40.0
