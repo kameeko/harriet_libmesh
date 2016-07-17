@@ -429,9 +429,16 @@ loose tol and not-require-resid-reduction together?
   -can we present this as more robust? 
 -ask youseff if it makes sense to have multiple-vs-single reaction example? does it make sense to know/infer this particular set of parameters? stop by his office? maybe bart?
   -wait, can't you not have a variable exist in only parts of the domain? even if we do it the identity-jacobian way, is that the correct interpretation? would the MF model have pockets of zero concentration for extra species? or would the extra species exist but not react? second one makes more physical sense, but then you wouldn't have one model have more dofs than the other...
+   -infer for reaction coeff, qoi = avg outlet temp? it's okay to have a scalar param...just that here, the LF inv prob would take no time cuz param would be determined completely by regularization...can still present LF inv problem as (linear? what about temp?) KKT, to get corresponding states...might the HF problem be more nonlinear because of the exponent?
   
   dual motivation? robustness and time savings?
   FD jacobian -> should converge to quadratically versus step size...clean up jacobian and let vikram look over?
+  
+write the draft based on the online-offline light
+  -send to vikram first
+  -what about the 616 example?
+  
+future: time-depedent? all the cool stuff seems transient...
   
 think about:
 sergio's thesis -> chapter on weighting for importance sampling when you don't have a pdf, just samples; in high-dim, doing density optimation is an ass; solve weights as optimization problem
@@ -440,3 +447,14 @@ sergio's thesis -> chapter on weighting for importance sampling when you don't h
 -- maybe rather than think of large overarching topics, start from a little problem and let it grow?
   -this might not work well to stay on the photonics project...
   -apply to inverse problems? relation to filters? optimization instead of resampling?
+
+
+karen update:
+-example with high reaction (possible robustness example)
+  -adaptivity gets to <1% estimated error, but HF won't converge so we can't compare accuracy
+  -jacobian was fine, trying different solver tolerances didn't help
+  -looks like difficulty in convergence was due to non-physical-looking boundary condition (not as pronounced for lower reaction..)
+  -increasing reaction several orders of mag still did not require continuation past solving the LF inv prob first...
+-steady-state combustion also looks too simple, not likely to give NL solver trouble...
+-transience will probably be a big leap implementation-wise...idea seems simple, but debugging-wise...
+  -can't just solve KKT system in one go, would need to either write a wrapper around libmesh or go to another library...

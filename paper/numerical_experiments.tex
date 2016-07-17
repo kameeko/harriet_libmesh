@@ -1,6 +1,8 @@
 \section{Numerical Experiments}\label{sect:numexp}
 %
-We now use \cref{alg:refSeries} to solve goal oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in \cref{sec:errLocal}. We first consider simple two-dimensional models in order to explore the behavior of the algorithm in relation to iteration number as well as the placement of observations and QoI regions. In \cref{sec:cdvcdr}, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We apply \cref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In \cref{sec:constvfield}, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. \red{The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.} Finally, in \cref{sec:cdvcdr3D}, we consider a more realistic pair of three-dimensional models to illustrate computational savings when using \cref{alg:refSeries}, as compared to solving the high-fidelity inverse problem.
+We now use \cref{alg:refSeries} to solve goal oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in \cref{sec:errLocal}. We first consider simple two-dimensional models in order to explore the behavior of the algorithm in relation to iteration number as well as the placement of observations and QoI regions. In \cref{sec:cdvcdr}, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We apply \cref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In \cref{sec:constvfield}, the high fidelity model uses an infinite dimensional (field) representation of the inferred parameter, while the low fidelity model uses a scalar representation. 
+%\red{The third experiment has the same setting as the first one, except a highly nonlinear version of the reaction term is considered, and showcases the robustness and computatioanal cost benefits of using the adaptive algorithm.} 
+Finally, in \cref{sec:cdvcdr3D}, we consider a more realistic pair of three-dimensional models to illustrate computational savings when using \cref{alg:refSeries}, as compared to solving the high-fidelity inverse problem.
 
 %In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
 
@@ -74,14 +76,16 @@ The locations of the observations and the region $\Omega_I$ over which the QoI i
 \end{figure}
 %
 
-For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations. \red{The library offers easy calculation of adjoint systems, error estimates and subdomain restricted variables.}\footnote{But we don't use Libmesh's error estimates or restrict variables to subdomains...} The domain is discretized by a regular mesh of quadrilaterals, with 250 and 50 elements along the $x_1$ and $x_2$ directions, respectively, for a total of 12,500 elements, resulting in 12,801 degrees of freedom per variable. The diffusion coefficient is chosen so that the cell P\'{e}clet number never exceeds 0.1, and thus no stabilization is required.
+For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations. 
+%\red{The library offers easy calculation of adjoint systems, error estimates and subdomain restricted variables.}\footnote{But we don't use Libmesh's error estimates or restrict variables to subdomains...} 
+The domain is discretized by a regular mesh of quadrilaterals, with 250 and 50 elements along the $x_1$ and $x_2$ directions, respectively, for a total of 12,500 elements, resulting in 12,801 degrees of freedom per variable. The diffusion coefficient is chosen so that the cell P\'{e}clet number never exceeds 0.1, and thus no stabilization is required.
 %
 %------------------------------------------------------------%
 \subsubsection{Adaptive Model Refinement Results} \label{sec:cdvcdrBaseRef} 
 %------------------------------------------------------------%
 %
 
-We now present the results for solving the inference problem using \cref{alg:refSeries}. Once the QoI error estimate is calculated using \ref{eq:finErrExp}, the error estimate is then decomposed into local contributions, as described in \cref{eq:basisblame}. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i})$, is less than $1\%$.
+We now present the results for solving the inference problem using \cref{alg:refSeries}. Once the QoI error estimate is calculated using \ref{eq:finErrExp}, the error estimate is then decomposed into local contributions, as described in \cref{eq:basisblame}. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))$, is less than $1\%$.
 
 \Cref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Lagrange basis function's contribution is plotted at its nonzero node.
 %
@@ -188,7 +192,7 @@ k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in\R
 \end{equation}
 differs from the high-fidelity model only in that the parameter $q$ is a constant instead of a field. Then the intermediate mixed-fidelity models have parameter fields which are non-constant in only portions of the domain. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. The domain, mesh, boundary conditions, and velocity field, as well as the observations, unknown parameters to be inferred, and QoI, remain the same as described in \cref{sec:cdvcdr}. As the inverse problem is ill-posed, except for perhaps in the case where the low-fidelity model is used throughout the domain, regularization is added; the Tikhonov regularization term is $\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient.
 
-Although using such a pair of models has similarities to the problem of adaptive mesh refinement, we note that when seeking adaptive mesh refinement for the goal-oriented inverse problem, it is more efficient to use the approach discussed in \cite{BecVex05}.
+Although using such a pair of models has similarities to the problem of adaptive mesh refinement, we note that in this example only the parameter field changes in its level of refinement, not the state. Should the two models differ in the resolution of the state variables instead of the parameters, it is more efficient to use the approach discussed in \cite{BecVex05}.
 %------------------------------------------------------------%
 \subsubsection{Adaptive Model Refinement Results}
 %------------------------------------------------------------%
@@ -254,10 +258,13 @@ The corresponding true and estimated absolute errors in the QoI are shown in \cr
 \end{figure}
 %
 In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, compared to the example in \cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. 
+\if{0} %--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Convection-Diffusion(-Highly Nonlinear Reaction)}
 %------------------------------------------------------------------------------------------------------------------------%
 \red{Not sure should even keep this section...if we split the supplementary adjoint solve, then the condition for adaptivity being more efficient doesn't depend on the linear solver...we don't need this section to make a cost argument if we have the 3D example...having this section seems to be overkill/redundant if all we want to say is that 'sometimes we need continuation for the HF inverse problem'...if we want to make a 'robustness' argument, then merge with whatever vikram writes about operator continuation interpretation?
+
+Can't seem to replicate this...in HF continuation code, going up to 1000 with steps of 100 is fine, with both gmres and superlu...perhaps there was a bug/copy-paste mistake in the manual continuation version? All notes on this run were accidentally lost, so...
 %------------------------------------------------------------%
 \subsubsection{Results}
 %------------------------------------------------------------%
@@ -273,6 +280,7 @@ We compare the complexity of\cref{alg:refSeries} and the continuation method for
 With Gaussian elimination chosen as the linear solver, this gives us $T < 3$, i.e.\ a budget of 2 adaptive steps. Using \cref{alg:refSeries} with 2 refinement steps, and only $10\%$ of the domain refined to use the high-fidelity model, the estimated relative error is $<1\%$. Indeed, the ratio $\frac{C_{MF}}{C_{HF}}$ was $\frac{24}{30}$, indicating about $20\%$ reduction in computational cost, with the worst case linear solver used. 
 
 In other words, on using \cref{alg:refSeries} for a highly nonlinear problem, even with the worst case linear solver, one can get to $<1\%$ error in the QoI, with a $20\%$ reduction in computational cost, while avoiding any need for continuation to handle nonlinearities. }
+\fi{0} %--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--
 
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Convection-Diffusion(-Reaction) in 3D} \label{sec:cdvcdr3D}
@@ -334,15 +342,15 @@ We now present the results of solving the inference problem using \cref{alg:refS
 \hline
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
 & & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400845 & -521436 & -95.2534 & 160 \\
-MF01 & 16.7 & 577582  & -22143  & -30162  & -5.5098  & 1110 \\
-MF02 & 29.0 & 548904  & 1200    & -1484   & -0.2711  & 1800 \\
-MF03 & 42.3 & 547773  & 176     & -353    & -0.0645  & 2220 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
-HF   & 100  & 547420  & --      & 0       & 0        & 6210 \\ \hline
+LF   & 0    & 1068856 & -400845 & -521438 & -95.2534 & 160 \\
+MF01 & 16.7 & 577582  & -22143  & -30164  & -5.5098  & 1110 \\
+MF02 & 29.0 & 548904  & 1200    & -1486   & -0.2711  & 1800 \\
+MF03 & 42.3 & 547773  & 176     & -355    & -0.0645  & 2220 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
+HF   & 100  & 547418  & --      & 0       & 0        & 350 \\ \hline
 \end{tabular}
 \end{table}
 %
-Compared to the previous examples in \cref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within $0.1\%$, but in about a third of the time. %what happens if you go on forever? the sign corrects itself in the next two iterations, and then becomes wrong again (last few iterations of 5% rate run are correct sign though...)...also final all-HF QoI doesn't quite agree with invHF version (agrees to five sig figs; running both rates of adaptive to 100% HF gives same qoi to 8 sig figs)...also 'continuation' this way is faster (4600 with 10% rate, but 6600 with 5% rate) than the other continuation schemes you tried...if we want to open this can of worms, will probably have to do more in-depth search of existing continuation algorithms...
+Compared to the previous examples in \cref{sec:cdvcdr} with similar physics in the pair of models, we notice that in this case the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. This is likely due to the additional difference in the diffusive coefficient of the two models in this case. The sign difference does not, however, prevent the algorithm from finding a mixed-fidelity model for which the QoI matches the high-fidelity QoI to within the chosen tolerance. %what happens if you go on forever? the sign corrects itself in the next two iterations, and then becomes wrong again (last few iterations of 5% rate run are correct sign though...)...also final all-HF QoI doesn't quite agree with invHF version (agrees to five sig figs; running both rates of adaptive to 100% HF gives same qoi to 8 sig figs)...also 'continuation' this way is faster (4600 with 10% rate, but 6600 with 5% rate) than the other continuation schemes you tried...if we want to open this can of worms, will probably have to do more in-depth search of existing continuation algorithms...
 
 The domain divisions for the three adaptive iterations are shown in \cref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations. Around the QoI region, the first iteration refines the domain completely in the $x_3$ direction, possibly reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.
 %
@@ -375,14 +383,14 @@ The amount of time required by the adaptive algorithm of course depends on the c
 \hline
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
 & & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400845 & -521436 & -95.2534 & 160 \\
-MF01 & 9.27 & 613419  & -40789  & -65999  & -12.0564 & 1040 \\
-MF02 & 16.9 & 558523  & 1162    & -11103  & -2.0282  & 1860 \\
-MF03 & 23.7 & 550323  & 2510    & -2903   & -0.5303  & 2420 \\
-MF04 & 30.4 & 548225  & 1658    & -805    & -0.1471  & 2970 \\
-MF05 & 37.2 & 547744  & 655     & -324    & -0.0591  & 3309 \\
-MF06 & 44.6 & 547532  & 194     & -112    & -0.0205  & 3642 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
-HF   & 100  & 547420  & --      & 0       & 0        & 6210 \\ \hline
+LF   & 0    & 1068856 & -400845 & -521438 & -95.2534 & 160 \\
+MF01 & 9.27 & 613419  & -40789  & -66001  & -12.0564 & 1040 \\
+MF02 & 16.9 & 558523  & 1162    & -11105  & -2.0282  & 1860 \\
+MF03 & 23.7 & 550323  & 2510    & -2905   & -0.5303  & 2420 \\
+MF04 & 30.4 & 548225  & 1658    & -807    & -0.1471  & 2970 \\
+MF05 & 37.2 & 547744  & 655     & -326    & -0.0591  & 3309 \\
+MF06 & 44.6 & 547532  & 194     & -114    & -0.0205  & 3642 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
+HF   & 100  & 547418  & --      & 0       & 0        & 350 \\ \hline
 \end{tabular}
 \end{table}
 %
@@ -414,5 +422,9 @@ HF   & 100  & 547420  & --      & 0       & 0        & 6210 \\ \hline
 %
 We again observe that the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. It can also be seen in \cref{fig:ref3d_dainty1} that the largest error first comes from the QoI region and area below it, and the observations. Similarly to the examples in \cref{sec:cdvcdr}, of the observations, refinement is least necessary around the ones furthest downstream of the QoI region.
 
-We see that although the more conservative refinement rate requires more iterations and runtime to reach the desired error tolerance, the adaptive algorithm requires about a half of the time of the high-fidelity inverse problem. We note that, although both refinement rates result in similar final refinement proportions for our chosen error tolerance ($42.4\%$ versus $44.6\%$), they do not necessarily produce the same refined regions (compare \cref{fig:ref3D_1,fig:ref3d_dainty2}) or relative error for a given refinement proportion. A slower refinement rate also does not necessarily produce a smaller (estimated or true) relative error, or a more accurate relative error estimate, for a given refinement proportion.
+We see that although the more conservative refinement rate requires more iterations and runtime to reach the desired error tolerance, both refinement rates result in similar final refinement proportions for our chosen error tolerance ($42.4\%$ versus $44.6\%$). They do not, however, necessarily produce the same refined regions (compare \cref{fig:ref3D_1,fig:ref3d_dainty2}) or relative error for a given refinement proportion. A slower refinement rate also does not necessarily produce a smaller (estimated or true) relative error, or a more accurate relative error estimate, for a given refinement proportion.
+
+In this case, the high-fidelity inverse problem is only mildly nonlinear and requires few continuation steps and Newton iterations to converge; there are no savings in computational time from using the adaptive algorithm instead of solving the high-fidelity inverse problem. However, as discussed in \cref{sect:alg_complexity}, one would expect solving the high-fidelity inverse problem to require more time relative to using the adaptive algorithm as the nonlinearity of the high-fidelity model increases. 
+
+\Cref{alg:refSeries} is also ammenable to an offline-online decomposition, analagous to that proposed in \cite{LiebWill13}. In the case where both the low-fidelity and high-fidelity inverse problems are linear in the data, and the QoI is linear in the state and parameters, one may first compute and store the supplementary adjoint $\Lambda_0$ for the low-fidelity model. As new data is received, one can compute the $\Psi_{LF}$ for this new data; evaluating \cref{eq:finErrExp} with the stored $\Lambda_0$ and the new $\Psi_{LF}$ gives an exact estimate of the error in the QoI, and thus effectively the high-fidelity QoI. When these linearities do not all hold, one cannot obtain an exact error estimate. The offline phase would consist of adaptively creating a mixed-fidelity model with an appropriate error tolerance given some expected observations $d^*$, and storing its suppementary adjoint $\Lambda_{MF}^*$. As new data is received, one can compute the $\Psi_{MF}$ for the mixed-fidelity model and the new data; evaluating \cref{eq:finErrExp} with the stored $\Lambda_{MF}^*$ and the new $\Psi_{MF}$ gives an estimate of the error in the QoI, and thus an effective estimate of the high-fidelity QoI. The mixed-fidelity inverse problems can be expected to require less time to solve than the high-fidelity inverse problems; in \cref{tab:ref3D,tab:ref3D_dainty}, the inverse problem using the final mixed-fidelity models took 250 and 290 seconds, respectively.
 
