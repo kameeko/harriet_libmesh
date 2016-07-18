@@ -1,0 +1,41 @@
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+
+# The polynomial order and finite element type to use for the pressure
+# variable.
+poly_order = 1
+fe_family = 'LAGRANGE'
+
+do_2D = true;
+
+
+# Solve a transient instead of a steady problem?
+transient = false
+
+# The interval between our timesteps
+deltat = 10000.0 
+
+# And the number of timesteps to take
+n_timesteps = 1
+
+# Write out every nth timestep to file.
+write_interval = 1
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false
+solver_verbose = true
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-12
+relative_residual_tolerance = 0. #1.e-8
+absolute_residual_tolerance = 1.e-13
+max_nonlinear_iterations = 300
+
+require_residual_reduction = true
+
+#discretization
+nx = 50
+ny = 90
+nz = 30
+

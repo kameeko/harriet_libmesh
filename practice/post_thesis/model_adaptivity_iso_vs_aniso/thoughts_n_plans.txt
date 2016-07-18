@@ -434,11 +434,10 @@ loose tol and not-require-resid-reduction together?
   dual motivation? robustness and time savings?
   FD jacobian -> should converge to quadratically versus step size...clean up jacobian and let vikram look over?
   
-write the draft based on the online-offline light
-  -send to vikram first
-  -what about the 616 example?
+!! inv with R = O(e7) and matching data doesn't converge from LF...
+  -but then adaptivity, even with zero diri west bc, also has trouble converge MF01 with step 0.03...
   
-future: time-depedent? all the cool stuff seems transient...
+future: time-depedent? all the cool stuff seems transient...terminal_output_nvel_realqoi_pe1_n0p1_3p5e8_adapt_em10tol_0p03step.txt
   
 think about:
 sergio's thesis -> chapter on weighting for importance sampling when you don't have a pdf, just samples; in high-dim, doing density optimation is an ass; solve weights as optimization problem
@@ -458,3 +457,10 @@ karen update:
 -steady-state combustion also looks too simple, not likely to give NL solver trouble...
 -transience will probably be a big leap implementation-wise...idea seems simple, but debugging-wise...
   -can't just solve KKT system in one go, would need to either write a wrapper around libmesh or go to another library...
+  
+  makes more sense to just submit it and let them come back with comments if they have a problem...
+  more columns/subtable: time to get the model, time to solve its inverse problem, time to get its error estimate
+    -even if given an MF, it takes more time to solve the inv and get its error estimate than to solve the HF
+    -what if HF and LF on different grids? keep HF on finer grid (so no additional disc error), but maybe the given-MF solve+error will be less than HF inv?
+    -> send karen as soon as you get the results
+  talk to omar next? see if he has suggestions?

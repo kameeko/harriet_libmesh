@@ -1,0 +1,273 @@
+#include "libmesh/getpot.h"
+
+#include "contamTrans_sys.h"
+
+#include "libmesh/boundary_info.h"
+#include "libmesh/dirichlet_boundaries.h"
+#include "libmesh/dof_map.h"
+#include "libmesh/fe_base.h"
+#include "libmesh/fe_interface.h"
+#include "libmesh/fem_context.h"
+#include "libmesh/mesh.h"
+#include "libmesh/quadrature.h"
+#include "libmesh/string_to_enum.h"
+#include "libmesh/zero_function.h"
+#include "libmesh/elem.h"
+
+// Bring in everything from the libMesh namespace
+using namespace libMesh;
+
+//system initialization
+void ContamTransSys::init_data(){
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  GetPot infile("general.in");
+  unsigned int poly_order = infile("poly_order",1);
+  std::string fefamily = infile("fe_family", std::string("LAGRANGE"));
+
+  p_var = this->add_variable("p", static_cast<Order>(poly_order), Utility::string_to_enum<FEFamily>(fefamily));
+
+  //indicate variables that change in time
+  this->time_evolving(p_var);
+
+  // Useful debugging options'
+	// Set verify_analytic_jacobians to positive to use
+	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+	this->print_jacobians = infile("print_jacobians", false);
+	this->print_element_jacobians = infile("print_element_jacobians", false);
+
+	//set Dirichlet boundary conditions
+	std::set<boundary_id_type> east_bdy;
+	std::set<boundary_id_type> west_bdy;
+	if (dim == 3){
+    west_bdy.insert(4);
+    east_bdy.insert(2);
+  }
+  else if (dim == 2){
+    west_bdy.insert(3);
+    east_bdy.insert(1);
+  }
+  std::vector<unsigned int> all_of_em;
+  all_of_em.push_back(p_var);
+  Real westPressure = 2.606e5;
+  if(infile("do_square",true))
+    westPressure *= 1./46.;
+  ConstFunction<Number> WestPressure(westPressure);
+  ConstFunction<Number> EastPressure(0.0);
+  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(west_bdy, all_of_em, &WestPressure));
+  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(east_bdy, all_of_em, &EastPressure));
+
+	//set parameters
+  dyn_visc = 8.90e-4; //dynamic viscosity (Pa*s)
+
+	// Do the parent's initialization after variables and boundary constraints are defined
+	FEMSystem::init_data();
+}
+
+//context initialization
+void ContamTransSys::init_context(DiffContext & context){
+  FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  FEBase* c_elem_fe;
+  FEBase* c_side_fe;
+
+  ctxt.get_element_fe(p_var, c_elem_fe);
+	ctxt.get_side_fe(p_var, c_side_fe );
+
+	c_elem_fe->get_JxW();
+	c_elem_fe->get_phi();
+	c_elem_fe->get_dphi();
+	c_elem_fe->get_d2phi();
+	c_elem_fe->get_xyz();
+
+	c_side_fe->get_JxW();
+	c_side_fe->get_phi();
+	c_side_fe->get_dphi();
+	c_side_fe->get_xyz();
+}
+
+//element residual and jacobian calculations
+bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext & context)
+{
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  FEBase* c_elem_fe = NULL;
+  ctxt.get_element_fe( p_var, c_elem_fe );
+
+  // Element Jacobian * quadrature weights for interior integration
+  const std::vector<Real> &JxW = c_elem_fe->get_JxW();
+
+  const std::vector<std::vector<Real> >& phi = c_elem_fe->get_phi();
+  const std::vector<std::vector<RealGradient> >& dphi = c_elem_fe->get_dphi();
+  const std::vector<std::vector<RealTensor> >& d2phi = c_elem_fe->get_d2phi();
+
+  // Physical location of the quadrature points
+  const std::vector<Point>& qpoint = c_elem_fe->get_xyz();
+
+  // The number of local degrees of freedom in each variable
+  const unsigned int n_c_dofs = ctxt.get_dof_indices( p_var ).size();
+
+  // The subvectors and submatrices we need to fill:
+  DenseSubMatrix<Number> &J = ctxt.get_elem_jacobian(p_var, p_var);
+  DenseSubVector<Number> &R = ctxt.get_elem_residual(p_var);
+
+  // Now we will build the element Jacobian and residual.
+  // Constructing the residual requires the solution and its
+  // gradient from the previous timestep.  This must be
+  // calculated at each quadrature point by summing the
+  // solution degree-of-freedom values by the appropriate
+  // weight functions.
+  unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
+  
+  Real k = permelems[ctxt.get_elem().id()];
+
+  for (unsigned int qp=0; qp != n_qpoints; qp++)
+  {
+    Number p = ctxt.interior_value(p_var, qp);
+    Gradient grad_p = ctxt.interior_gradient(p_var, qp);
+    
+    // First, an i-loop over the  degrees of freedom.
+    for (unsigned int i=0; i != n_c_dofs; i++)
+    {
+      // The residual
+      R(i) += JxW[qp]*((k/dyn_visc)*grad_p*dphi[i][qp]);
+      
+      if (request_jacobian && ctxt.get_elem_solution_derivative())
+      {
+	      for (unsigned int j=0; j != n_c_dofs; j++)
+	      {
+	        J(i,j) += JxW[qp]*((k/dyn_visc)*dphi[j][qp]*dphi[i][qp]); 
+	      } // end of the inner dof (j) loop
+      } // end - if (request_jacobian && context.get_elem_solution_derivative())
+
+    } // end of the outer dof (i) loop
+  } // end of the quadrature point (qp) loop
+
+  return request_jacobian;
+}
+
+//for non-Dirichlet boundary conditions and the bit from diffusion term
+bool ContamTransSys::side_time_derivative(bool request_jacobian, DiffContext & context)
+{
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  FEMContext &ctxt = cast_ref<FEMContext&>(context);
+
+  // First we get some references to cell-specific data that
+  // will be used to assemble the linear system.
+  FEBase* side_fe = NULL;
+  ctxt.get_side_fe(p_var, side_fe );
+
+  // Element Jacobian * quadrature weights for interior integration
+  const std::vector<Real> &JxW = side_fe->get_JxW();
+
+  // Side basis functions
+  const std::vector<std::vector<Real> > &phi = side_fe->get_phi();
+
+  // Side Quadrature points
+  const std::vector<Point > &qside_point = side_fe->get_xyz();
+
+  //normal vector
+  const std::vector<Point> &face_normals = side_fe->get_normals();
+
+  // The number of local degrees of freedom in each variable
+  const unsigned int n_c_dofs = ctxt.get_dof_indices(p_var).size();
+
+  // The subvectors and submatrices we need to fill:
+  DenseSubMatrix<Number> &J = ctxt.get_elem_jacobian(p_var, p_var);
+  DenseSubVector<Number> &R = ctxt.get_elem_residual(p_var);
+
+  unsigned int n_qpoints = ctxt.get_side_qrule().n_points();
+  
+  Real k = permelems[ctxt.get_elem().id()];
+
+  for (unsigned int qp=0; qp != n_qpoints; qp++)
+  {
+    Number p = ctxt.side_value(p_var, qp);
+    Gradient grad_p = ctxt.side_gradient(p_var, qp);
+
+    for (unsigned int i=0; i != n_c_dofs; i++)
+    {
+      R(i) += JxW[qp]*(0.);
+      
+      if(request_jacobian && context.get_elem_solution_derivative())
+      {
+        for (unsigned int j=0; j != n_c_dofs; j++)
+	      {
+            J(i,j) += JxW[qp]*(0.);
+	      }
+      } // end - if (request_jacobian && context.get_elem_solution_derivative())
+    } //end of outer dof (i) loop
+  }
+
+  return request_jacobian;
+}
+
+//generate data
+void ContamTransSys::postprocess(){
+
+  std::ostringstream file_name;
+  file_name << "Measurements" << time << ".dat";
+  std::ofstream output(file_name.str());
+  
+  GetPot infile("general.in");
+  bool do_square = infile("do_square",true);
+  
+  //location of (bottoms of) wells
+  std::vector<Point> wells;
+  if(!do_square){
+    wells.push_back(Point(497541.44, 539374.57, 8.23)); //R-1
+    wells.push_back(Point(499882.61, 539296.05, 5.57)); //R-11
+    wells.push_back(Point(500174.36, 538579.77, 36.73)); //R-13
+    wells.push_back(Point(498442.06, 538969.46, 0)); //R-15
+    wells.push_back(Point(499563.69, 538995.82, 13.15)); //R-28
+    wells.push_back(Point(497855.44, 539040.32, 4.57)); //R-33#1
+    wells.push_back(Point(497855.44, 539040.32, 39.62)); //R-33#2
+    wells.push_back(Point(500972.02, 537650.74, 26.73)); //R-34
+    wells.push_back(Point(500581.13, 539285.95, 69.01)); //R-35a
+    wells.push_back(Point(500553.15, 539289.64, 11.15)); //R-35b
+    wells.push_back(Point(501062.87, 538806.13, 4.86)); //R-36
+    wells.push_back(Point(499174, 539122.84, 3.66)); //R-42
+    wells.push_back(Point(499029.6, 539378.56, 3.32)); //R-43#1
+    wells.push_back(Point(499029.6, 539378.56, 23.2)); //R-43#2
+    wells.push_back(Point(499890.7, 538615.08, 4.94)); //R-44#1
+    wells.push_back(Point(499890.7, 538615.08, 32.46)); //R-44#2
+    wells.push_back(Point(499948.08, 538891.8, 3.59)); //R-45#1
+    wells.push_back(Point(499948.08, 538891.8, 32.51)); //R-45#2
+    wells.push_back(Point(499465.44, 538608.21, 3.05)); //R-50#1
+    wells.push_back(Point(499465.44, 538608.21, 32.92)); //R-50#2
+    wells.push_back(Point(498987.1, 538710.37, 7.62)); //R-61#1
+    wells.push_back(Point(498987.1, 538710.37, 36.58)); //R-61#2
+    wells.push_back(Point(498574.44, 539304.64, 4.57)); //R-62
+  }else{
+    wells.push_back(Point(50.0, 50.0, 0.0));
+  }
+  const unsigned int dim = this->get_mesh().mesh_dimension();
+
+  //write out data (get concentration at bottom of wells)
+  for(int i=0; i<wells.size(); i++){
+    Point pt_orig = wells[i];
+    Point pt;
+    if(dim == 2 && !do_square){
+      pt = Point(pt_orig(0)-497150.0, pt_orig(2), 0.); //vertical slice
+      //pt = Point(pt_orig(0)-497150.0, pt_orig(1)-537350.0, 0.); //horizontal slice
+    }else if(dim == 3 && !do_square){
+      pt = Point(pt_orig(0)-497150.0, pt_orig(1)-537350.0, pt_orig(2));
+    }else if(do_square){
+      pt = pt_orig;
+    }
+    Number p = point_value(p_var, pt);
+    if(output.is_open()){
+      if(dim == 2)
+        output << pt(0) << "  " << pt(1) << " " << p << "\n";
+      else if(dim == 3)
+        output << pt(0) << "  " << pt(1) << "  " << pt(2) << " " << p << "\n";
+    }
+  }
+
+  output.close();
+
+}
+

@@ -24,7 +24,7 @@ Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, t
 	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
 	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
 	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/I(q_{MF_i},u_{MF_i})|>$ \texttt{errTol}}
-		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see section~\cref{sect:error_est_localize}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see \cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
 		\State{$i\gets i+1$}
 		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
 		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for 
@@ -42,7 +42,7 @@ Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, t
 \end{algorithm}
 %
 
-Algorithm~\cref{alg:refSeries} can be naturally extended to an online-offline setting, where a multi-fidelity model adaptive constraint can be generated for a given data set in the offline phase. In the online phase, additional data points are added to the data set, and instead of solving the complete inverse problem with all the data points, and the high-fidelity constraints, an iterative algorithm can be initiated using the multi-fidelity representation developed in the offline phase. The adaptive procedure, with the supplementary adjoint can be used to adapt the preexisting multi-fidelity representation to the new data points.  
+\Cref{alg:refSeries} can be naturally extended to an online-offline setting, where a multi-fidelity model adaptive constraint can be generated for a given data set in the offline phase. In the online phase, additional data points are added to the data set, and instead of solving the complete inverse problem with all the data points, and the high-fidelity constraints, an iterative algorithm can be initiated using the multi-fidelity representation developed in the offline phase. The adaptive procedure, with the supplementary adjoint can be used to adapt the preexisting multi-fidelity representation to the new data points.  
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]
@@ -51,7 +51,7 @@ Algorithm~\cref{alg:refSeries} can be naturally extended to an online-offline se
 \label{alg:refonoff}
 \begin{algorithmic}[1]
 \State{Define maximum acceptable absolute relative QoI error \texttt{errTol}}
-\State{Given a data set $d_1 \in \R^{n_{d_1}}$, and an adaptively build a mixed-fidelity model for low error in the QoI, use Algorithm~\ref{} to build a MF model MF$_1$} 
+\State{Given a data set $d_1 \in \R^{n_{d_1}}$, and an adaptively build a mixed-fidelity model for low error in the QoI, use \cref{alg:refSeries} to build a MF model MF$_1$} 
 \Procedure{$\texttt{Online}$}{HF model, MF model MF$_1$, \texttt{errTol}, $d_2 \in \R^{n_{d_2}}$}
 	\State{$i\gets1$}
 	\State{Solve for stationary point $\Psi_{MF_1}$ of augmented Lagrangian $\mathcal{M}_{MF_1}$ formed using new data set $d_2$}
@@ -61,7 +61,7 @@ Algorithm~\cref{alg:refSeries} can be naturally extended to an online-offline se
 	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_1})(\Lambda_1)+\mathcal M_{HF}(\Psi_{MF_1})-\mathcal M_{MF_1}(\Psi_{MF_1})$}
 	\State{Calculate QoI $I(q_{MF_1},u_{MF_1})$}
 	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/I(q_{MF_i},u_{MF_i})|>$ \texttt{errTol}}
-		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see section~\cref{sect:error_est_localize}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see \cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
 		\State{$i\gets i+1$}
 		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
 		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for 
@@ -78,9 +78,9 @@ Algorithm~\cref{alg:refSeries} can be naturally extended to an online-offline se
 \end{algorithmic}
 \end{algorithm}
 %
-Algorithm~\cref{alg:refonoff} lends itself to a quasi-incremental data assimilation approach, where the data set $d_2$ is an augmentation of the original set $d_1$. In such a situation, we expect that the model refinement will be concentrated around the new data points, that also inform the QoI. Thus, in the online phase, even though the inverse problem will be solved with all data points, the use of high-fidelity models will be limited, and the bulk of the computation (computing the auxilary variables, and supplementary adjoint) will be focused on identifying those new data points, which have the maximum impact on the QoI.
+\Cref{alg:refonoff} lends itself to a quasi-incremental data assimilation approach, where the data set $d_2$ is an augmentation of the original set $d_1$. In such a situation, we expect that the model refinement will be concentrated around the new data points, that also inform the QoI. Thus, in the online phase, even though the inverse problem will be solved with all data points, the use of high-fidelity models will be limited, and the bulk of the computation (computing the auxilary variables, and supplementary adjoint) will be focused on identifying those new data points, which have the maximum impact on the QoI.
 
-Algorithm~\cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
+\Cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh-refinement, though in this case the method described in~\cite{BecVex05} could be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
 %------------------------------------------------------------------------------------------------------------------------%
 \subsubsection{Error Estimate Localization}\label{sec:errLocal}
 %------------------------------------------------------------------------------------------------------------------------%
