@@ -94,10 +94,10 @@ int main(int argc, char** argv){
   equation_systems.init ();
   
   //initial conditions
-  read_initial_parameters();
-  system.project_solution(initial_value, initial_grad,
-                          equation_systems.parameters);
-  finish_initialization();
+  //read_initial_parameters();
+  //system.project_solution(initial_value, initial_grad,
+  //                        equation_systems.parameters);
+  //finish_initialization();
 
   // Set the time stepping options...
   system.deltat = deltat;

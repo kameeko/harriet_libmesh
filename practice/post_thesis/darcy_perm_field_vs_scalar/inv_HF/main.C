@@ -26,6 +26,9 @@
 #include "contamTrans_sys.h"
 #include "initial.h"
 
+//for debugging
+#include "libmesh/sparse_matrix.h"
+
 int main(int argc, char** argv){
 
 	//initialize libMesh
@@ -40,6 +43,7 @@ int main(int argc, char** argv){
   const int ny                          = infile("ny",100);
   const int nz                          = infile("nz",100);
   bool do_2D                            = infile("do_2D",true);
+  bool do_square                        = infile("do_square",true);
       
 #ifdef LIBMESH_HAVE_EXODUS_API
   const unsigned int write_interval    = infile("write_interval", 5);
@@ -53,8 +57,12 @@ int main(int argc, char** argv){
   unsigned int dim;
   if(do_2D){ 
     dim = 2;
-    MeshTools::Generation::build_square(mesh, nx, nz, 0.0, 4600.0, 0.0, 100.0, QUAD9); //vertical slice
-    //MeshTools::Generation::build_square(mesh, nx, ny, 0.0, 4600.0, 0.0, 3300.0, QUAD9); //horizontal slice
+    if(do_square)
+      MeshTools::Generation::build_square(mesh, nx, nz, 0.0, 100.0, 0.0, 100.0, QUAD9); //vertical slice
+    else{
+      MeshTools::Generation::build_square(mesh, nx, nz, 0.0, 4600.0, 0.0, 100.0, QUAD9); //vertical slice
+      //MeshTools::Generation::build_square(mesh, nx, ny, 0.0, 4600.0, 0.0, 3300.0, QUAD9); //horizontal slice
+    }
   }else{
     dim = 3;
     MeshTools::Generation::build_cube(mesh, 
@@ -88,7 +96,7 @@ int main(int argc, char** argv){
   // Initialize the system
   equation_systems.init ();
   
-  //initial conditions
+  //initial conditions/guess
   read_initial_parameters();
   system.project_solution(initial_value, initial_grad,
                           equation_systems.parameters);
@@ -125,6 +133,15 @@ int main(int argc, char** argv){
 
   system.solve();
   system.postprocess();
+  
+  Number QoI_computed = system.get_QoI_value("computed", 0);
+  std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;
+  
+  std::ostringstream Jfile_name;
+  Jfile_name << "J.dat";
+  std::ofstream outputJ(Jfile_name.str());
+  system.matrix->print(outputJ);
+  outputJ.close();
     
 #ifdef LIBMESH_HAVE_EXODUS_API
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)

@@ -2,6 +2,7 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/elem.h"
 #include "libmesh/point_locator_tree.h"
+#include "libmesh/getpot.h"
 
 using namespace libMesh;
 
@@ -15,20 +16,21 @@ public:
   ContamTransSys(EquationSystems& es, const std::string& name_in, const unsigned int number_in):
     FEMSystem(es, name_in, number_in){
     
-    const unsigned int dim = this->get_mesh().mesh_dimension();
-    
-    //read in permeability field, assign values to each element (piecewise-constant field)
-    std::vector<Point> permpts; 
-    std::vector<Real> permvals;
-		if(FILE *fp=fopen("true_perm.dat","r")){
+    GetPot infile("general.in");
+		std::string find_data_here = infile("data_file","Measurements0.dat");
+		qoi_option = infile("QoI_option",1);
+		
+		const unsigned int dim = this->get_mesh().mesh_dimension();
+
+		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
 		  if(dim == 3){
 				Real x, y, z, value;
 				int flag = 1;
 				while(flag != -1){
 					flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
 					if(flag != -1){
-						permpts.push_back(Point(x,y,z));
-						permvals.push_back(value);
+						datapts.push_back(Point(x,y,z));
+						datavals.push_back(value);
 					}
 				}
 				fclose(fp);
@@ -38,8 +40,8 @@ public:
 				while(flag != -1){
 					flag = fscanf(fp,"%lf %lf %lf",&x,&y,&value);
 					if(flag != -1){
-						permpts.push_back(Point(x,y));
-						permvals.push_back(value);
+						datapts.push_back(Point(x,y));
+						datavals.push_back(value);
 					}
 				}
 				fclose(fp);
@@ -47,13 +49,13 @@ public:
 	  }
 	  //find elements in which data points reside
 	  PointLocatorTree point_locator(this->get_mesh());
-	  for(unsigned int dnum=0; dnum<this->get_mesh().n_elem(); dnum++){
-	  	Point data_point = permpts[dnum];
+	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+	  	Point data_point = datapts[dnum];
 	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
-	  	permelems[this_elem->id()] = permvals[dnum];
+	  	dataelems.push_back(this_elem->id());
 	  }
     
-    }
+  }
 
   // System initialization
   virtual void init_data ();
@@ -66,17 +68,34 @@ public:
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext& context);
 
-  //boundary residual and jacobian calculations
-  virtual bool side_time_derivative (bool request_jacobian,
-                                        DiffContext& context);
-
   // Postprocessed output
   virtual void postprocess ();
+  
+  //to calculate QoI
+  virtual void element_postprocess(DiffContext &context);
+  
+  //return QoI
+  Number &get_QoI_value(std::string type, unsigned int QoI_index){
+    return computed_QoI[QoI_index]; //no exact QoI available
+  }
 
   // Indices for each variable;
-  unsigned int p_var;
+  unsigned int p_var, z_var, k_var;
 
   Real dyn_visc; //dynamic viscosity (Pa*s)
-  std::map<dof_id_type,Real> permelems; //permeability value in each element
+  
+  Real avg_perm; //m^2
+  Real beta; //regularization parameter
+  
+  //data-related stuff
+  std::vector<Point> datapts; 
+  std::vector<Real> datavals;
+  std::vector<dof_id_type> dataelems;
+  
+  //to hold computed QoI
+  Number computed_QoI[1];
+  
+  //options for QoI location and nature
+  int qoi_option;
   
 };

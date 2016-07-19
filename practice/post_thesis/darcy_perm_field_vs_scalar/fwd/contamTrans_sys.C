@@ -243,6 +243,8 @@ void ContamTransSys::postprocess(){
     wells.push_back(Point(498574.44, 539304.64, 4.57)); //R-62
   }else{
     wells.push_back(Point(50.0, 50.0, 0.0));
+    wells.push_back(Point(50.0, 30.0, 0.0));
+    wells.push_back(Point(20.0, 45.0, 0.0));
   }
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
@@ -261,9 +263,9 @@ void ContamTransSys::postprocess(){
     Number p = point_value(p_var, pt);
     if(output.is_open()){
       if(dim == 2)
-        output << pt(0) << "  " << pt(1) << " " << p << "\n";
+        output << pt(0) << " " << pt(1) << " " << p << "\n";
       else if(dim == 3)
-        output << pt(0) << "  " << pt(1) << "  " << pt(2) << " " << p << "\n";
+        output << pt(0) << " " << pt(1) << "  " << pt(2) << " " << p << "\n";
     }
   }
 

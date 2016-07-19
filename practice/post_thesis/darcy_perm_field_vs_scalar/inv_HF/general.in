@@ -1,4 +1,4 @@
-verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+verify_analytic_jacobians = 1.e-6 #if too large, will print out jacobians that disagree...
 print_jacobians = false
 print_element_jacobians = false
 
@@ -8,7 +8,9 @@ poly_order = 1
 fe_family = 'LAGRANGE'
 
 do_2D = true;
+do_square = true;
 
+beta = 1.e-3
 
 # Solve a transient instead of a steady problem?
 transient = false
@@ -30,12 +32,12 @@ solver_verbose = true
 relative_step_tolerance = 1e-12
 relative_residual_tolerance = 0. #1.e-8
 absolute_residual_tolerance = 1.e-13
-max_nonlinear_iterations = 300
+max_nonlinear_iterations = 1
 
 require_residual_reduction = true
 
 #discretization
-nx = 50
-ny = 90
-nz = 30
+nx = 10 #50
+ny = 10 #50
+nz = 10 #50
 
