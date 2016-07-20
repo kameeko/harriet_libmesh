@@ -72,7 +72,8 @@ void ContamTransSys::init_data(){
 	//set parameters
   //avg_perm = 2.72e-10; //m^2
   avg_perm = 275.8; //darcies
-  beta = infile("beta",1.e-6);
+  beta1 = infile("beta1",1.e-6);
+  beta2 = infile("beta2",1.e-6);
   
   //DEBUG
   //std::vector<unsigned int> k_set;
@@ -149,19 +150,18 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
   {
     Number 
-      p = ctxt.interior_value(p_var, qp),
-      z = ctxt.interior_value(z_var, qp),
       k = ctxt.interior_value(k_var, qp);
     Gradient 
       grad_p = ctxt.interior_gradient(p_var, qp),
-      grad_z = ctxt.interior_gradient(z_var, qp);
+      grad_z = ctxt.interior_gradient(z_var, qp),
+      grad_k = ctxt.interior_gradient(k_var, qp);
     
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_p_dofs; i++)
     {
       Rp(i) += JxW[qp]*(-k*grad_z*dphi[i][qp]);
       Rz(i) += JxW[qp]*(k*grad_p*dphi[i][qp]);
-      Rk(i) += JxW[qp]*(beta*(k-avg_perm) - grad_p*grad_z)*phi[i][qp];
+      Rk(i) += JxW[qp]*(beta1*(k-avg_perm)*phi[i][qp] + beta2*grad_k*dphi[i][qp] - grad_p*grad_z*phi[i][qp]);
       
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
@@ -175,7 +175,7 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
 	        
 	        J_k_p(i,j) += JxW[qp]*(-dphi[j][qp]*grad_z)*phi[i][qp];
 	        J_k_z(i,j) += JxW[qp]*(-grad_p*dphi[j][qp])*phi[i][qp];
-	        J_k_k(i,j) += JxW[qp]*(beta*phi[j][qp])*phi[i][qp];
+	        J_k_k(i,j) += JxW[qp]*(beta1*phi[j][qp]*phi[i][qp] + beta2*dphi[j][qp]*dphi[i][qp]);
 	      } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
     } // end of the outer dof (i) loop

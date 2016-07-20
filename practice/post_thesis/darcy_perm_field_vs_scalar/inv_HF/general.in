@@ -10,7 +10,9 @@ fe_family = 'LAGRANGE'
 do_2D = true;
 do_square = true;
 
-beta = 1.e-5
+beta1 = 1.e-7
+beta2 = 1.e-6
+data_file = Measurements2.dat
 
 # Solve a transient instead of a steady problem?
 transient = false

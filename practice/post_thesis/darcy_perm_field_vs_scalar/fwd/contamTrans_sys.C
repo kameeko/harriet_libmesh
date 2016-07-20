@@ -120,11 +120,24 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
   unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
   
   Real k = permelems[ctxt.get_elem().id()];
+  
+  //DEBUG
+  //Real k = 275.8; //darcies
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
   {
     Number p = ctxt.interior_value(p_var, qp);
     Gradient grad_p = ctxt.interior_gradient(p_var, qp);
+    
+    //DEBUG
+    //Number x = qpoint[qp](0);
+    //Number y = qpoint[qp](1);
+    //if(std::sqrt((x-50.)*(x-50.)+(y-50.)*(y-50.)) < 20.){
+    //  k = 10.*275.8;
+    //}else{
+    //  k = 275.8;
+    //}
+    //k = 275.8*exp(-1.e-2*std::sqrt((x-50.)*(x-50.)+(y-50.)*(y-50.)));
     
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_c_dofs; i++)
@@ -240,9 +253,13 @@ void ContamTransSys::postprocess(){
     wells.push_back(Point(498987.1, 538710.37, 36.58)); //R-61#2
     wells.push_back(Point(498574.44, 539304.64, 4.57)); //R-62
   }else{
-    wells.push_back(Point(50.0, 50.0, 0.0));
-    wells.push_back(Point(50.0, 30.0, 0.0));
-    wells.push_back(Point(20.0, 45.0, 0.0));
+    wells.push_back(Point(7.1, 86.4, 0.0));
+    wells.push_back(Point(20.1, 45.4, 0.0));
+    wells.push_back(Point(50.2, 50.3, 0.0));
+    wells.push_back(Point(50.2, 30.1, 0.0));
+    wells.push_back(Point(72.7, 45.3, 0.0));
+    wells.push_back(Point(72.7, 65.9, 0.0));
+    wells.push_back(Point(85.8, 44.7, 0.0));
   }
   const unsigned int dim = this->get_mesh().mesh_dimension();
 

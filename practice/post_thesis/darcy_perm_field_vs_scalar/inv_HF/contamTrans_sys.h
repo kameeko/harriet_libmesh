@@ -83,7 +83,8 @@ public:
   unsigned int p_var, z_var, k_var;
   
   Real avg_perm; //m^2
-  Real beta; //regularization parameter
+  Real beta1; //regularization parameter (for deviation-from-average)
+  Real beta2; //regularization parameter (for smoothness)
   
   //data-related stuff
   std::vector<Point> datapts; 
