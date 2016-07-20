@@ -326,7 +326,7 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
 
 // Postprocessed output
 void ConvDiff_PrimarySys::postprocess (){
-	
+	/*
 	std::ofstream output("c_points.dat");
 	for(int i = 0; i<datavals.size(); i++){
 		Point pt = datapts[i];
@@ -336,5 +336,12 @@ void ConvDiff_PrimarySys::postprocess (){
     }
 	}
 	output.close();
-  FEMSystem::postprocess();
+  */
+  for(int i = 0; i<datavals.size(); i++){
+		Point pt = datapts[i];
+		Number c = point_value(c_var, pt);
+		primal_c_vals.push_back(c);
+	}
+	
+	FEMSystem::postprocess();
 }

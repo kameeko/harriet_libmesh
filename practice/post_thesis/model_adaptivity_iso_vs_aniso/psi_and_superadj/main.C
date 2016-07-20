@@ -37,10 +37,11 @@
 // The main program
 int main(int argc, char** argv)
 {
-
+  clock_t begin = std::clock();
+  
   // Initialize libMesh
   LibMeshInit init(argc, argv);
-	
+  
   // Parameters
   GetPot solverInfile("fem_system_params.in");
   const bool transient                  = solverInfile("transient", false);
@@ -84,18 +85,18 @@ int main(int argc, char** argv)
   
   //name system
   ConvDiff_PrimarySys & system_primary = 
-  	equation_systems.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
-	ConvDiff_AuxSys & system_aux = 
-  	equation_systems.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+    equation_systems.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+  ConvDiff_AuxSys & system_aux = 
+    equation_systems.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
   ConvDiff_MprimeSys & system_mix = 
-		equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for superadj
+    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for superadj
   ConvDiff_PrimarySadjSys & system_sadj_primary = 
     equation_systems.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
   ConvDiff_AuxSadjSys & system_sadj_aux = 
     equation_systems.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
-		
-	//steady-state problem	
- 	system_primary.time_solver =
+    
+  //steady-state problem  
+  system_primary.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system_primary));
   system_aux.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system_aux));
@@ -108,16 +109,16 @@ int main(int argc, char** argv)
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
-	equation_systems.init ();
-	equation_systems_mix.init();
-	
-	//initial guess for primary state
-	read_initial_parameters();
+  equation_systems.init ();
+  equation_systems_mix.init();
+  
+  //initial guess for primary state
+  read_initial_parameters();
   system_primary.project_solution(initial_value, initial_grad,
                           equation_systems.parameters);
   finish_initialization();
 
-	//nonlinear solver options
+  //nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
   system_sadj_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_primary); 
   solver_sadj_primary->quiet = solverInfile("solver_quiet", true);
@@ -188,25 +189,25 @@ int main(int argc, char** argv)
   /*if(doDivvyMatlab){
     //DOF maps and such to help visualize
     std::ofstream output_global_dof("global_dof_map.dat");
-	  for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
-	    std::vector< dof_id_type > di;
-	    system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(i), di);
-		  if(output_global_dof.is_open()){
-			  output_global_dof << i << " ";
-			  for(unsigned int j = 0; j < di.size(); j++)
-			    output_global_dof << di[j] << " ";
-			  output_global_dof << "\n";
-		  }
-	  }
-	  output_global_dof.close();
-	  std::ofstream output_elem_cent("elem_centroids.dat");
-	  for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
-		  Point elem_cent = system_mix.get_mesh().elem(i)->centroid();
-		  if(output_elem_cent.is_open()){
-			  output_elem_cent << elem_cent(0) << " " << elem_cent(1) << "\n";
-		  }
-	  }
-	  output_elem_cent.close();
+    for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
+      std::vector< dof_id_type > di;
+      system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(i), di);
+      if(output_global_dof.is_open()){
+        output_global_dof << i << " ";
+        for(unsigned int j = 0; j < di.size(); j++)
+          output_global_dof << di[j] << " ";
+        output_global_dof << "\n";
+      }
+    }
+    output_global_dof.close();
+    std::ofstream output_elem_cent("elem_centroids.dat");
+    for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
+      Point elem_cent = system_mix.get_mesh().elem(i)->centroid();
+      if(output_elem_cent.is_open()){
+        output_elem_cent << elem_cent(0) << " " << elem_cent(1) << "\n";
+      }
+    }
+    output_elem_cent.close();
   }*/
   
   //inverse dof map (elements in support of each node, assuming every 6 dofs belong to same node)
@@ -215,8 +216,8 @@ int main(int argc, char** argv)
   for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
     std::vector< dof_id_type > di;
     system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(i), di);
-	  for(unsigned int j = 0; j < di.size(); j++)
-	    node_to_elem[round(floor(di[j]/6.))].insert(i);
+    for(unsigned int j = 0; j < di.size(); j++)
+      node_to_elem[round(floor(di[j]/6.))].insert(i);
   }
 
   int refIter = 0;
@@ -238,23 +239,26 @@ int main(int argc, char** argv)
     
     system_primary.postprocess();
     system_aux.postprocess();
+    
+    system_sadj_primary.set_c_vals(system_primary.get_c_vals());
+    system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
     equation_systems_mix.reinit();
     //combine primary and auxiliary variables into psi
-	  DirectSolutionTransfer sol_transfer(init.comm()); 
-	  sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
-		  system_mix.variable(system_mix.variable_number("aux_c")));
-	  sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
-		  system_mix.variable(system_mix.variable_number("aux_zc")));
-	  sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
-		  system_mix.variable(system_mix.variable_number("aux_fc")));
+    DirectSolutionTransfer sol_transfer(init.comm()); 
+    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
+      system_mix.variable(system_mix.variable_number("aux_c")));
+    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
+      system_mix.variable(system_mix.variable_number("aux_zc")));
+    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
+      system_mix.variable(system_mix.variable_number("aux_fc")));
     AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone();
-	  sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
-		  system_mix.variable(system_mix.variable_number("c")));
-	  sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
-		  system_mix.variable(system_mix.variable_number("zc")));
-	  sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
-		  system_mix.variable(system_mix.variable_number("fc")));
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
+      system_mix.variable(system_mix.variable_number("c")));
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
+      system_mix.variable(system_mix.variable_number("zc")));
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
+      system_mix.variable(system_mix.variable_number("fc")));
 
     if(!splitSuperAdj){ //solve super-adjoint as single adjoint
       system_mix.assemble_qoi_sides = true; //QoI doesn't involve sides
@@ -263,9 +267,9 @@ int main(int argc, char** argv)
       std::pair<unsigned int, Real> adjsolve = system_mix.adjoint_solve();
       std::cout << "number of iterations to solve adjoint: " << adjsolve.first << std::endl;
       std::cout << "final residual of adjoint solve: " << adjsolve.second << std::endl;
-	    std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
-	
-	    NumericVector<Number> &dual_sol = system_mix.get_adjoint_solution(0); //DEBUG
+      std::cout << "\n~*~*~*~*~*~*~*~*~ adjoint solve end ~*~*~*~*~*~*~*~*~" << std::endl;
+  
+      NumericVector<Number> &dual_sol = system_mix.get_adjoint_solution(0); //DEBUG
       
       system_mix.assemble(); //calculate residual to correspond to solution
       
@@ -289,42 +293,42 @@ int main(int argc, char** argv)
       NumericVector<Number> &primal_sol = *system_mix.solution;
       dual_sol.swap(primal_sol);
       sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_c")),
-		    system_mix.variable(system_mix.variable_number("aux_c")));
-	    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
-		    system_mix.variable(system_mix.variable_number("aux_zc")));
-	    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
-		    system_mix.variable(system_mix.variable_number("aux_fc")));
-	    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
-		    system_mix.variable(system_mix.variable_number("c")));
-	    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
-		    system_mix.variable(system_mix.variable_number("zc")));
-	    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
-		    system_mix.variable(system_mix.variable_number("fc")));
-	    //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
-	    dual_sol.swap(primal_sol);
-	    //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl; //DEBUG
-	    //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl; //DEBUG
-	  }
-	  NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
-/*	
-	  NumericVector<Number> &primal_solution = *system_mix.solution; //DEBUG
-	  primal_solution.swap(dual_solution); //DEBUG
+        system_mix.variable(system_mix.variable_number("aux_c")));
+      sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
+        system_mix.variable(system_mix.variable_number("aux_zc")));
+      sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
+        system_mix.variable(system_mix.variable_number("aux_fc")));
+      sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
+        system_mix.variable(system_mix.variable_number("c")));
+      sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
+        system_mix.variable(system_mix.variable_number("zc")));
+      sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
+        system_mix.variable(system_mix.variable_number("fc")));
+      //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+      dual_sol.swap(primal_sol);
+      //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 0, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 1, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_primary.calculate_norm(*system_sadj_primary.solution, 2, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 0, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 1, L2) << std::endl; //DEBUG
+      //std::cout << system_sadj_aux.calculate_norm(*system_sadj_aux.solution, 2, L2) << std::endl; //DEBUG
+    }
+    NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
+/*  
+    NumericVector<Number> &primal_solution = *system_mix.solution; //DEBUG
+    primal_solution.swap(dual_solution); //DEBUG
     ExodusII_IO(mesh).write_timestep("super_adjoint.exo",
                                    equation_systems,
-                                   1, //This number indicates how many time steps are being written to the file
+                                   1, /  his number indicates how many time steps are being written to the file
                                    system_mix.time); //DEBUG
     primal_solution.swap(dual_solution); //DEBUG
 */
     //adjoint-weighted residual
     AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
-	  adjresid->pointwise_mult(*system_mix.rhs,dual_solution); 
-	  adjresid->scale(-0.5);
-	  std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << adjresid->sum() << std::endl; //DEBUG
+    adjresid->pointwise_mult(*system_mix.rhs,dual_solution); 
+    adjresid->scale(-0.5);
+    std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << adjresid->sum() << std::endl; //DEBUG
     
     //LprimeHF(psiLF)
     AutoPtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
@@ -334,10 +338,10 @@ int main(int argc, char** argv)
     //QoI and error estimate
     std::cout << "QoI: " << std::setprecision(17) << system_primary.getQoI() << std::endl;
     std::cout << "QoI Error estimate: " << std::setprecision(17) 
-	      << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
-	      
-	  relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
-	  std::cout << "Estimated relative qoi error: " << relError << std::endl << std::endl;
+        << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
+        
+    relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
+    std::cout << "Estimated relative qoi error: " << relError << std::endl << std::endl;
     
     //output at each iteration
     std::stringstream ss;
@@ -354,47 +358,47 @@ int main(int argc, char** argv)
     
     if(refIter < maxIter && relError > qoiErrorTol){ //if further refinement needed
     
-	    //collapse error contributions into nodes
-	    std::vector<std::pair<Number,dof_id_type> > node_errs(round(system_mix.n_dofs()/6.));
-	    for(unsigned int node_num = 0; node_num < node_errs.size(); node_num++){
-	      node_errs[node_num] = std::pair<Number,dof_id_type>
-	                           (fabs((*adjresid)(6*node_num) + (*LprimeHF_psiLF)(6*node_num)
-	                          + (*adjresid)(6*node_num+1) + (*LprimeHF_psiLF)(6*node_num+1)
-	                          + (*adjresid)(6*node_num+2) + (*LprimeHF_psiLF)(6*node_num+2)
-	                          + (*adjresid)(6*node_num+3) + (*LprimeHF_psiLF)(6*node_num+3)
-	                          + (*adjresid)(6*node_num+4) + (*LprimeHF_psiLF)(6*node_num+4)
-	                          + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5)), node_num);
-	    }
-	
-	    //find nodes contributing the most
-	    //double refPcnt = std::min((refIter+1)*refStep,1.);
-	    double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
-	    int cutoffLoc = round(node_errs.size()*refPcnt);
-	    std::sort(node_errs.begin(), node_errs.end()); 
-	    std::reverse(node_errs.begin(), node_errs.end()); 
-	    
-	    //find elements in support of worst offenders
-	    std::vector<dof_id_type> markMe;
-	    markMe.reserve(cutoffLoc*8);
-	    for(int i = 0; i < cutoffLoc; i++){
-	      markMe.insert(markMe.end(), node_to_elem[node_errs[i].second].begin(), node_to_elem[node_errs[i].second].end());
-	    }
-	
-	    //mark those elements for refinement.
-	    for(int i = 0; i < markMe.size(); i++){
-	      mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
-	    }
-	
+      //collapse error contributions into nodes
+      std::vector<std::pair<Number,dof_id_type> > node_errs(round(system_mix.n_dofs()/6.));
+      for(unsigned int node_num = 0; node_num < node_errs.size(); node_num++){
+        node_errs[node_num] = std::pair<Number,dof_id_type>
+                             (fabs((*adjresid)(6*node_num) + (*LprimeHF_psiLF)(6*node_num)
+                            + (*adjresid)(6*node_num+1) + (*LprimeHF_psiLF)(6*node_num+1)
+                            + (*adjresid)(6*node_num+2) + (*LprimeHF_psiLF)(6*node_num+2)
+                            + (*adjresid)(6*node_num+3) + (*LprimeHF_psiLF)(6*node_num+3)
+                            + (*adjresid)(6*node_num+4) + (*LprimeHF_psiLF)(6*node_num+4)
+                            + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5)), node_num);
+      }
+  
+      //find nodes contributing the most
+      //double refPcnt = std::min((refIter+1)*refStep,1.);
+      double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
+      int cutoffLoc = round(node_errs.size()*refPcnt);
+      std::sort(node_errs.begin(), node_errs.end()); 
+      std::reverse(node_errs.begin(), node_errs.end()); 
+      
+      //find elements in support of worst offenders
+      std::vector<dof_id_type> markMe;
+      markMe.reserve(cutoffLoc*8);
+      for(int i = 0; i < cutoffLoc; i++){
+        markMe.insert(markMe.end(), node_to_elem[node_errs[i].second].begin(), node_to_elem[node_errs[i].second].end());
+      }
+  
+      //mark those elements for refinement.
+      for(int i = 0; i < markMe.size(); i++){
+        mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
+      }
+  
       //to test whether assignment matches matlab's
       /*std::string stash_assign = "divvy_c_poke.txt";
-	    std::ofstream output_dbg(stash_assign.c_str());
-	    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+      std::ofstream output_dbg(stash_assign.c_str());
+      MeshBase::element_iterator       elem_it  = mesh.elements_begin();
       const MeshBase::element_iterator elem_end = mesh.elements_end();
       for (; elem_it != elem_end; ++elem_it){
         Elem* elem = *elem_it;
-        		
+            
         if(output_dbg.is_open()){
-        	output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
+          output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
         }
       }
       output_dbg.close();*/
@@ -419,7 +423,7 @@ int main(int argc, char** argv)
     Elem* elem = *elem_it;
     numMarked += elem->subdomain_id();
     if(output_dbg.is_open()){
-    	output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
+      output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
     }
   }
   output_dbg.close();

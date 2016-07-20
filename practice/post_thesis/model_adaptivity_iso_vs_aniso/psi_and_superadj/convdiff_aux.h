@@ -78,5 +78,7 @@ public:
   int qoi_option;
   
   virtual void postprocess();
+  std::vector<Real> primal_auxc_vals;
+  std::vector<Real> get_auxc_vals(){ return primal_auxc_vals; }
   
 };

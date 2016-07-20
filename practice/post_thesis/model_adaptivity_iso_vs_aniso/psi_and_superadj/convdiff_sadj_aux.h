@@ -31,7 +31,7 @@ public:
 			}
 			fclose(fp);
 	  }
-	  
+/*	  
 	  //read in auxiliary variables at data points
 	  if(FILE *fp=fopen("auxc_points.dat","r")){
 	    int flag = 1;
@@ -43,7 +43,7 @@ public:
 	    }
 	    fclose(fp);
 	  }
-	  
+*/	  
 	  //find elements in which data points reside
 	  PointLocatorTree point_locator(this->get_mesh());
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
@@ -88,5 +88,5 @@ public:
   int qoi_option;
   
   std::vector<Real> primal_auxc_vals;
-  
+  void set_auxc_vals(std::vector<Real> auxc_vals){ primal_auxc_vals = auxc_vals; }
 };

@@ -360,7 +360,7 @@ bool ConvDiff_AuxSys::side_time_derivative(bool request_jacobian, DiffContext & 
 
 // Postprocessed output
 void ConvDiff_AuxSys::postprocess (){
-	
+/*	
 	std::ofstream output("auxc_points.dat");
 	for(int i = 0; i<datavals.size(); i++){
 		Point pt = datapts[i];
@@ -370,5 +370,12 @@ void ConvDiff_AuxSys::postprocess (){
     }
 	}
 	output.close();
+*/
+  for(int i = 0; i<datavals.size(); i++){
+		Point pt = datapts[i];
+		Number c = point_value(aux_c_var, pt);
+		primal_auxc_vals.push_back(c);
+	}
+	
   FEMSystem::postprocess();
 }

@@ -86,5 +86,7 @@ public:
   void clearQoI(){ qoi = 0.; }
  
   virtual void postprocess();
+  std::vector<Real> primal_c_vals;
+  std::vector<Real> get_c_vals(){ return primal_c_vals; }
   
 };
