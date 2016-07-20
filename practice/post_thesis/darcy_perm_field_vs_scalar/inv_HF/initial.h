@@ -12,8 +12,8 @@ Number initial_value(const Point& p, const Parameters& parameters,
     
   Number init_val = 0.;   
   if(unknown_name == "k"){
-    //init_val = 2.72e-10/8.90e-4; //DEBUG
-    init_val = 2.72e-10; //avg_perm; m^2
+    //init_val = 2.72e-10; //avg_perm; m^2
+    init_val = 275.8; //avg_perm; darcies
   }  
   return init_val;
 }

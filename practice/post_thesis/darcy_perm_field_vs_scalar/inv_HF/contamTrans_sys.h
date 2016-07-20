@@ -81,8 +81,6 @@ public:
 
   // Indices for each variable;
   unsigned int p_var, z_var, k_var;
-
-  Real dyn_visc; //dynamic viscosity (Pa*s)
   
   Real avg_perm; //m^2
   Real beta; //regularization parameter

@@ -137,12 +137,6 @@ int main(int argc, char** argv){
   Number QoI_computed = system.get_QoI_value("computed", 0);
   std::cout<< "Computed QoI is " << std::setprecision(17) << QoI_computed << std::endl;
   
-  std::ostringstream Jfile_name;
-  Jfile_name << "J.dat";
-  std::ofstream outputJ(Jfile_name.str());
-  system.matrix->print(outputJ);
-  outputJ.close();
-    
 #ifdef LIBMESH_HAVE_EXODUS_API
   for (unsigned int t_step=0; t_step != n_timesteps; ++t_step)
     {

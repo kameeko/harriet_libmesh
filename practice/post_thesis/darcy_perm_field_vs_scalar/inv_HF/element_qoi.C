@@ -33,7 +33,6 @@ void ContamTransSys::element_postprocess (DiffContext &context)
   Number dQoI = 0.;
   
   const unsigned int dim = this->get_mesh().mesh_dimension();
-  Real elem_vol = ctxt.get_elem().volume();
 
   // Loop over quadrature points
   for (unsigned int qp = 0; qp != n_qpoints; qp++)
@@ -42,7 +41,7 @@ void ContamTransSys::element_postprocess (DiffContext &context)
       Number p = ctxt.interior_value(p_var, qp);
 
       // Update the elemental increment dR for each qp
-      dQoI += JxW[qp] * p/elem_vol;
+      dQoI += JxW[qp] * p;
     }
 
   // Update the computed value of the global functional R, by adding the contribution from this element

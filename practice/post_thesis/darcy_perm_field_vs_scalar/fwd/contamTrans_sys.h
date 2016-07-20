@@ -76,7 +76,6 @@ public:
   // Indices for each variable;
   unsigned int p_var;
 
-  Real dyn_visc; //dynamic viscosity (Pa*s)
   std::map<dof_id_type,Real> permelems; //permeability value in each element
   
 };

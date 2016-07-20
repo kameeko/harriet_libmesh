@@ -58,7 +58,8 @@ void ContamTransSys::init_data(){
   p_set.push_back(p_var);
   std::vector<unsigned int> z_set;
   z_set.push_back(z_var);
-  Real westPressure = 2.606e5;
+  //Real westPressure = 2.606e5; //Pa
+  Real westPressure = 2.606e2; //kPa
   if(infile("do_square",true))
     westPressure *= 1./46.;
   ConstFunction<Number> WestPressure(westPressure);
@@ -69,13 +70,9 @@ void ContamTransSys::init_data(){
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(eastwest_bdy, z_set, &homoDiri));
 
 	//set parameters
-  dyn_visc = 8.90e-4; //dynamic viscosity (Pa*s)
-  avg_perm = 2.72e-10; //m^2
+  //avg_perm = 2.72e-10; //m^2
+  avg_perm = 275.8; //darcies
   beta = infile("beta",1.e-6);
-  
-  //DEBUG
-  //avg_perm *= 1./dyn_visc;
-  //dyn_visc = 1.;
   
   //DEBUG
   //std::vector<unsigned int> k_set;
@@ -162,22 +159,22 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     // First, an i-loop over the  degrees of freedom.
     for (unsigned int i=0; i != n_p_dofs; i++)
     {
-      Rp(i) += JxW[qp]*(-(k/dyn_visc)*grad_z*dphi[i][qp]);
-      Rz(i) += JxW[qp]*((k/dyn_visc)*grad_p*dphi[i][qp]);
-      Rk(i) += JxW[qp]*(beta*(k-avg_perm) - (1./dyn_visc)*grad_p*grad_z)*phi[i][qp];
+      Rp(i) += JxW[qp]*(-k*grad_z*dphi[i][qp]);
+      Rz(i) += JxW[qp]*(k*grad_p*dphi[i][qp]);
+      Rk(i) += JxW[qp]*(beta*(k-avg_perm) - grad_p*grad_z)*phi[i][qp];
       
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
 	      for (unsigned int j=0; j != n_p_dofs; j++)
 	      {
-	        J_p_z(i,j) += JxW[qp]*(-(k/dyn_visc)*dphi[j][qp]*dphi[i][qp]);
-	        J_p_k(i,j) += JxW[qp]*(-(phi[j][qp]/dyn_visc)*grad_z*dphi[i][qp]);
+	        J_p_z(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp]);
+	        J_p_k(i,j) += JxW[qp]*(-phi[j][qp]*grad_z*dphi[i][qp]);
 	      
-	        J_z_p(i,j) += JxW[qp]*((k/dyn_visc)*dphi[j][qp]*dphi[i][qp]); 
-	        J_z_k(i,j) += JxW[qp]*((phi[j][qp]/dyn_visc)*grad_p*dphi[i][qp]);
+	        J_z_p(i,j) += JxW[qp]*(k*dphi[j][qp]*dphi[i][qp]); 
+	        J_z_k(i,j) += JxW[qp]*(phi[j][qp]*grad_p*dphi[i][qp]);
 	        
-	        J_k_p(i,j) += JxW[qp]*(-(1./dyn_visc)*dphi[j][qp]*grad_z)*phi[i][qp];
-	        J_k_z(i,j) += JxW[qp]*(-(1./dyn_visc)*grad_p*dphi[j][qp])*phi[i][qp];
+	        J_k_p(i,j) += JxW[qp]*(-dphi[j][qp]*grad_z)*phi[i][qp];
+	        J_k_z(i,j) += JxW[qp]*(-grad_p*dphi[j][qp])*phi[i][qp];
 	        J_k_k(i,j) += JxW[qp]*(beta*phi[j][qp])*phi[i][qp];
 	      } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())

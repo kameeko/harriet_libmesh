@@ -49,16 +49,14 @@ void ContamTransSys::init_data(){
   }
   std::vector<unsigned int> all_of_em;
   all_of_em.push_back(p_var);
-  Real westPressure = 2.606e5;
+  //Real westPressure = 2.606e5; //Pa
+  Real westPressure = 2.606e2; //kPa
   if(infile("do_square",true))
     westPressure *= 1./46.;
   ConstFunction<Number> WestPressure(westPressure);
   ConstFunction<Number> EastPressure(0.0);
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(west_bdy, all_of_em, &WestPressure));
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(east_bdy, all_of_em, &EastPressure));
-
-	//set parameters
-  dyn_visc = 8.90e-4; //dynamic viscosity (Pa*s)
 
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
@@ -132,13 +130,13 @@ bool ContamTransSys::element_time_derivative(bool request_jacobian, DiffContext 
     for (unsigned int i=0; i != n_c_dofs; i++)
     {
       // The residual
-      R(i) += JxW[qp]*((k/dyn_visc)*grad_p*dphi[i][qp]);
+      R(i) += JxW[qp]*(k*grad_p*dphi[i][qp]);
       
       if (request_jacobian && ctxt.get_elem_solution_derivative())
       {
 	      for (unsigned int j=0; j != n_c_dofs; j++)
 	      {
-	        J(i,j) += JxW[qp]*((k/dyn_visc)*dphi[j][qp]*dphi[i][qp]); 
+	        J(i,j) += JxW[qp]*(k*dphi[j][qp]*dphi[i][qp]); 
 	      } // end of the inner dof (j) loop
       } // end - if (request_jacobian && context.get_elem_solution_derivative())
 
