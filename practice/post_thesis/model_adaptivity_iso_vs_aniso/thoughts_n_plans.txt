@@ -464,3 +464,19 @@ karen update:
     -what if HF and LF on different grids? keep HF on finer grid (so no additional disc error), but maybe the given-MF solve+error will be less than HF inv?
     -> send karen as soon as you get the results
   talk to omar next? see if he has suggestions?
+  
+*do explicit passing of c and auxc points...will not do to have reproducibility be so difficult in the future...
+  0.05 step running
+generate data from k with larger chunks of heterogeneity
+test adding grad-k to regularization
+  -even with less peaky k, still get almost linear p
+  -smoothness of k does not prevent p from being non-linear; seems that inferred k has too-small range of magnitudes
+poke diff-mesh lf-hf
+
+would we be saving the superadj from the offline and not recomputing?
+
+diff-mesh ...HF needs to do the HF mesh repeatedly, so even if superadj needs HF mesh too, it's only linear...
+  diff vs conv-diff-react? (so no stability limit on coarseness of LF)
+  back project fine error breakdown onto coarse, then find which coarse elements to refine
+  -> poke adjoint_refinement_estimator.C?
+    -split HF basis blame equally among all LF bases that overlap its support

@@ -1,0 +1,10 @@
+convdiff_primary.$(obj-suffix):\
+    convdiff_primary.C\
+    convdiff_primary.h
+element_qoi.$(obj-suffix):\
+    element_qoi.C\
+    convdiff_primary.h
+main.$(obj-suffix):\
+    main.C\
+    convdiff_primary.h\
+    initial.h
