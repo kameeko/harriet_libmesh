@@ -27,10 +27,15 @@
 
 #include "libmesh/dof_map.h" //alternate error breakdown
 #include "libmesh/direct_solution_transfer.h"
+#include "libmesh/mesh_function.h"
 
 //FOR DEBUGGING
 #include "libmesh/sparse_matrix.h" //DEBUG
 #include "libmesh/gmv_io.h" //DEBUG
+
+//#ifdef LIBMESH_TRILINOS_HAVE_DTK
+//#include "libmesh/dtk_solution_transfer.h"
+//#endif
 
 //bool greaterThan (std::pair<double,double> i, std::pair<double,double> j) { return (i.first > j.first); }
 
@@ -46,9 +51,12 @@ int main(int argc, char** argv)
   GetPot solverInfile("fem_system_params.in");
   const bool transient                  = solverInfile("transient", false);
   unsigned int n_timesteps              = solverInfile("n_timesteps", 1);
-  const int nx                          = solverInfile("nx",100);
-  const int ny                          = solverInfile("ny",100);
-  const int nz                          = solverInfile("nz",100);
+  const int nx_LF                       = solverInfile("nx_LF",100);
+  const int ny_LF                       = solverInfile("ny_LF",100);
+  const int nz_LF                       = solverInfile("nz_LF",100);
+  const int nx_ratio                    = solverInfile("nx_ratio",2);
+  const int ny_ratio                    = solverInfile("ny_ratio",2);
+  const int nz_ratio                    = solverInfile("nz_ratio",2);
   GetPot infile("contamTrans.in");
   //std::string find_mesh_here            = infile("initial_mesh","mesh.exo");
   bool doContinuation                   = infile("do_continuation",false);
@@ -62,34 +70,52 @@ int main(int argc, char** argv)
     maxIter = round(ceil(1./refStep));
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
-  Mesh mesh2(init.comm()); //high-fidelity mesh, for super-adj
+  Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
+  Mesh mesh_LF(init.comm()); //low-fidelity mesh
   
   //create mesh
   unsigned int dim;
-  if(nz == 0){ //to check if oscillations happen in 2D as well...
+  const int nx_HF = nx_ratio*nx_LF;
+  const int ny_HF = ny_ratio*ny_LF;
+  const int nz_HF = nz_ratio*nz_LF;
+  const double Lx = 2300; //4600
+  const double Ly = 1650; //3300
+  const double Lz = 100;
+  if(nz_LF == 0){ //to check if oscillations happen in 2D as well...
     dim = 2;
-    MeshTools::Generation::build_square(mesh, nx, ny, 0., 2300., 0., 1650., QUAD9);
-    MeshTools::Generation::build_square(mesh2, nx, ny, 0., 2300., 0., 1650., QUAD9);
+    MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
+    MeshTools::Generation::build_square(mesh_HF, nx_HF, ny_HF, 0., Lx, 0., Ly, QUAD9);
+    MeshTools::Generation::build_square(mesh_LF, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
   }else{
     dim = 3;
-    MeshTools::Generation::build_cube(mesh, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
-    MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
-    //MeshTools::Generation::build_cube(mesh, nx, ny, nz, 0., 4600., 0., 3300., 0., 100., HEX27);
-    //MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 4600., 0., 3300., 0., 100., HEX27);
+    MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    //MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    //MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
   }
+  double dx = Lx/nx_HF;
+  double dy = Ly/ny_HF;
+  double dz = 0.;
+  if(dim == 3){dz = Lz/nz_HF; }
   
   mesh.print_info(); //DEBUG
-  mesh2.print_info(); //DEBUG
+  mesh_HF.print_info(); //DEBUG
   
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  EquationSystems equation_systems_mix(mesh2);
+  EquationSystems equation_systems_mix(mesh_HF);
+  EquationSystems equation_systems_mix_MF(mesh);
+  EquationSystems equation_systems_LF (mesh_LF);
 
   //systems - coarser mesh
   ConvDiff_PrimarySys & system_primary = 
     equation_systems.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
   ConvDiff_AuxSys & system_aux = 
     equation_systems.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+  ConvDiff_PrimarySys & system_mix_MF = 
+    equation_systems_mix_MF.add_system<ConvDiff_PrimarySys>("Diff_ConvDiff_MprimeSys"); //for psi
     
   //systems - fine mesh
   ConvDiff_MprimeSys & system_mix = 
@@ -115,6 +141,7 @@ int main(int argc, char** argv)
   // Initialize the system
   equation_systems.init ();
   equation_systems_mix.init();
+  equation_systems_LF.init();
   
   //initial guess for primary state
   read_initial_parameters();
@@ -214,16 +241,66 @@ int main(int argc, char** argv)
     output_elem_cent.close();
   }*/
   
-  //inverse dof map (elements in support of each node, assuming every 6 dofs belong to same node)
+  //inverse dof map for LF mesh (elements in support of each node, assuming every nvar dofs belong to same node)
   std::vector<std::set<dof_id_type> > node_to_elem; 
-  node_to_elem.resize(round(system_mix.n_dofs()/6.));
-  for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
+  node_to_elem.resize(round(system_mix_MF.n_dofs()/6.));
+  for(unsigned int i = 0 ; i < system_mix_MF.get_mesh().n_elem(); i++){
     std::vector< dof_id_type > di;
-    system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(i), di);
+    system_mix_MF.get_dof_map().dof_indices(system_mix_MF.get_mesh().elem(i), di);
     for(unsigned int j = 0; j < di.size(); j++)
       node_to_elem[round(floor(di[j]/6.))].insert(i);
   }
-
+  
+  //find fine elements contained by coarse elements
+  int elem_ratio = nx_ratio*ny_ratio;
+  if(dim > 2)
+    elem_ratio *= nz_ratio;
+  MeshBase::element_iterator       elem_it_LF  = mesh_LF.elements_begin();
+  const MeshBase::element_iterator elem_end_LF = mesh_LF.elements_end();
+  MeshBase::element_iterator       elem_it_HF  = mesh_HF.elements_begin();
+  const MeshBase::element_iterator elem_end_HF = mesh_HF.elements_end();
+  std::vector<std::set<dof_id_type> > elem_mapping;
+  elem_mapping.resize(mesh_LF.n_elem());
+  int n_babies_found = 0;
+  for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
+    Elem* elem = *elem_it_LF;
+    Point elem_cent = elem->centroid();
+    n_babies_found = 0;
+    for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
+      if(n_babies_found >= elem_ratio)
+        break;
+      Elem* elem_HF = *elem_it_HF;
+      Point elem_cent_diff = elem_HF->centroid();
+      elem_cent_diff.subtract(elem_cent);
+      if(std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) && 
+          std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) && 
+          std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1)){
+        elem_mapping[elem->id()].insert(elem_HF->id());
+        n_babies_found += 1;   
+      }
+    }
+  }
+  
+  //mapping fine nodes to coarse nodes that they overlap
+  std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
+  fine_to_coarse_nodes.resize(round(system_mix_MF.n_dofs()/6.));
+  for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
+    Elem* elem = *elem_it_LF;
+    std::vector< dof_id_type > di_LF;
+    system_mix_MF.get_dof_map().dof_indices(elem, di_LF);
+    for (int baby_id = 0; baby_id < elem_ratio; baby_id ++){ //for each fine element in the coarse element
+      std::vector< dof_id_type > di_HF;
+      system_sadj_primary.get_dof_map().dof_indices(system_sadj_primary.get_mesh().elem(baby_id), di_HF);
+      for(unsigned int j = 0; j < di_LF.size(); j++){ //for each coarse node in elem
+        dof_id_type node_LF = round(floor(di_LF[j]/6.));
+        for(unsigned int k = 0; k < di_LF.size(); k++){ //for each fine node in elem
+          dof_id_type node_HF = round(floor(di_HF[k]/6.));
+          fine_to_coarse_nodes[node_HF].insert(node_LF);
+        }
+      }
+    }
+  }
+  
   int refIter = 0;
   double relError = 2.*qoiErrorTol;
   while(refIter <= maxIter && relError > qoiErrorTol){
@@ -234,6 +311,7 @@ int main(int argc, char** argv)
       system_sadj_aux.solution->zero();
     }
     system_mix.solution->zero();
+    system_mix_MF.solution->zero();
     
     system_primary.solve();
     system_primary.clearQoI();
@@ -248,22 +326,30 @@ int main(int argc, char** argv)
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
     equation_systems_mix.reinit();
+    equation_systems_mix_MF.reinit();
     //combine primary and auxiliary variables into psi
-    DirectSolutionTransfer sol_transfer(init.comm()); //NEED PROJECTION INSTEAD OF DIRECT TRANSFER
+    DirectSolutionTransfer sol_transfer(init.comm()); 
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
-      system_mix.variable(system_mix.variable_number("aux_c")));
+      system_mix_MF.variable(system_mix.variable_number("aux_c")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
-      system_mix.variable(system_mix.variable_number("aux_zc")));
+      system_mix_MF.variable(system_mix.variable_number("aux_zc")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
-      system_mix.variable(system_mix.variable_number("aux_fc")));
-    AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone();
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
-      system_mix.variable(system_mix.variable_number("c")));
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
-      system_mix.variable(system_mix.variable_number("zc")));
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
-      system_mix.variable(system_mix.variable_number("fc")));
+      system_mix_MF.variable(system_mix.variable_number("aux_fc")));
 
+    std::vector<dof_id_type> all_the_vars;
+    system_mix_MF.get_all_variable_numbers(all_the_vars);
+    MeshFunction psi_MF_meshfx(equation_systems, *system_mix_MF.solution, system_mix_MF.get_dof_map(), all_the_vars); 
+    system_mix.project_solution(psi_MF_meshfx); 
+    AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
+    
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
+      system_mix_MF.variable(system_mix.variable_number("c")));
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
+      system_mix_MF.variable(system_mix.variable_number("zc")));
+    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
+      system_mix_MF.variable(system_mix.variable_number("fc")));
+    system_mix.project_solution(psi_MF_meshfx); //project all of psi
+      
     system_mix.assemble(); //calculate residual to correspond to solution
     
     //super adjoint solve
@@ -344,49 +430,72 @@ int main(int argc, char** argv)
     output2.close();
     
     if(refIter < maxIter && relError > qoiErrorTol){ //if further refinement needed
-//AAAHHH THIS NEEDS MAJOR REWORKING    
+///////////////////////////////////////////////////////////////////////////////////////////////// 
       //collapse error contributions into nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs(round(system_mix.n_dofs()/6.));
       for(unsigned int node_num = 0; node_num < node_errs.size(); node_num++){
         node_errs[node_num] = std::pair<Number,dof_id_type>
-                             (fabs((*adjresid)(6*node_num) + (*LprimeHF_psiLF)(6*node_num)
+                             ((*adjresid)(6*node_num) + (*LprimeHF_psiLF)(6*node_num)
                             + (*adjresid)(6*node_num+1) + (*LprimeHF_psiLF)(6*node_num+1)
                             + (*adjresid)(6*node_num+2) + (*LprimeHF_psiLF)(6*node_num+2)
                             + (*adjresid)(6*node_num+3) + (*LprimeHF_psiLF)(6*node_num+3)
                             + (*adjresid)(6*node_num+4) + (*LprimeHF_psiLF)(6*node_num+4)
-                            + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5)), node_num);
+                            + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5), node_num);
+      }
+      
+      //redistributed error contributions from fine to coarse nodes
+      std::vector<std::pair<Number,dof_id_type> > node_errs_coarse(round(system_mix_MF.n_dofs()/3.));
+      for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //initialize pairs
+        node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(0.0, node_num);
+      }
+      for(unsigned int fine_node = 0; fine_node < fine_to_coarse_nodes.size(); fine_node++){ //redistribute error
+        for(dof_id_type coarse_node : fine_to_coarse_nodes[fine_node]){
+          node_errs_coarse[coarse_node].first += node_errs[fine_node].first/fine_to_coarse_nodes[fine_node].size();
+        }
+      }
+      for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //magnitudes of redistributed errors
+        Number meep = node_errs_coarse[node_num].first;
+        node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(fabs(meep), node_num);
       }
   
       //find nodes contributing the most
       //double refPcnt = std::min((refIter+1)*refStep,1.);
       double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
-      int cutoffLoc = round(node_errs.size()*refPcnt);
-      std::sort(node_errs.begin(), node_errs.end()); 
-      std::reverse(node_errs.begin(), node_errs.end()); 
+      int cutoffLoc = round(node_errs_coarse.size()*refPcnt);
+      std::sort(node_errs_coarse.begin(), node_errs_coarse.end()); 
+      std::reverse(node_errs_coarse.begin(), node_errs_coarse.end()); 
       
       //find elements in support of worst offenders
       std::vector<dof_id_type> markMe;
-      markMe.reserve(cutoffLoc*8);
+      if(dim == 2)
+        markMe.reserve(cutoffLoc*4);
+      else if(dim == 3)
+        markMe.reserve(cutoffLoc*8);
       for(int i = 0; i < cutoffLoc; i++){
-        markMe.insert(markMe.end(), node_to_elem[node_errs[i].second].begin(), node_to_elem[node_errs[i].second].end());
+        markMe.insert(markMe.end(), node_to_elem[node_errs_coarse[i].second].begin(), node_to_elem[node_errs_coarse[i].second].end());
       }
   
-      //mark those elements for refinement.
+      //mark those elements for refinement NEED TO MAKE SURE NO ELEMENTS ARE REFINED PAST HF LEVEL...
       for(int i = 0; i < markMe.size(); i++){
         mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
       }
+      
+      //refine to new MF mesh ********************************************************
       
 #ifdef LIBMESH_HAVE_EXODUS_API
     std::stringstream ss2;
     ss2 << refIter + 1;
     std::string str = ss2.str();
     std::string write_divvy = "divvy" + str + ".exo";
-    ExodusII_IO (mesh).write_equation_systems(write_divvy,equation_systems); //DEBUG
+    ExodusII_IO (mesh).write_equation_systems(write_divvy,equation_systems); //IS THIS STILL THE RIGHT DIVVY?
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
-    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////// 
+    } //end refinement loop
     refIter += 1;
   }
   
+  //IS THIS STILL THE RIGHT DIVVY?
   std::string stash_assign = "divvy_final.txt";
   std::ofstream output_dbg(stash_assign.c_str());
   MeshBase::element_iterator       elem_it  = mesh.elements_begin();
