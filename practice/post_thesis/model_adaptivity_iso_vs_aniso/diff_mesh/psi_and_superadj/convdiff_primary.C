@@ -174,15 +174,16 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
 	      grad_fc = ctxt.interior_gradient(fc_var, qp);
 			
-			NumberVectorValue U(porosity*vx, 0.0, 0.0);
-	    
+			NumberVectorValue U;
 	    Real R; //reaction coefficient
 	    NumberTensorValue k;
 	    if(subdomain == cdr_subdomain_id){	
+	      U = NumberVectorValue(porosity*vx, 0.0, 0.0);
 				R = react_rate; 
 				k = porosity*dispTens;
 		  }
 			else if(subdomain == cd_subdomain_id){
+			  U = NumberVectorValue(0.0, 0.0, 0.0);
 				R = 0.0;
 		    k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
 		                                   0., dispTens(0,0), 0.,

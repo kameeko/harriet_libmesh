@@ -119,7 +119,6 @@ void ConvDiff_MprimeSys::init_context(DiffContext &context){
 bool ConvDiff_MprimeSys::element_time_derivative (bool request_jacobian, DiffContext& context){
 
 	const unsigned int dim = this->get_mesh().mesh_dimension();
-	Real PI = 3.14159265359;
 
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
@@ -316,9 +315,6 @@ bool ConvDiff_MprimeSys::side_time_derivative(bool request_jacobian, DiffContext
 
   // Side basis functions
   const std::vector<std::vector<Real> > &phi = side_fe->get_phi();
-
-  // Side Quadrature points
-  const std::vector<Point > &qside_point = side_fe->get_xyz();
 
   //normal vector
   const std::vector<Point> &face_normals = side_fe->get_normals();

@@ -16,15 +16,17 @@ solver_verbose = true
 
 # Nonlinear solver tolerance
 relative_step_tolerance = 1e-10
-relative_residual_tolerance = 1.e-10
-absolute_residual_tolerance = 1.e-11
+relative_residual_tolerance = 0
+absolute_residual_tolerance = 1.e-10
 max_nonlinear_iterations = 100
 
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 
 #discretization
-nx = 30 #92
-ny = 50 #66
-nz = 30
-
+nx_LF = 4 #16 25 for HF
+ny_LF = 4 #32 45 for HF
+nz_LF = 4 # 16 30 for HF
+nx_ratio = 2
+ny_ratio = 2
+nz_ratio = 2

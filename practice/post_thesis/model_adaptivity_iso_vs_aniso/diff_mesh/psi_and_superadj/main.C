@@ -71,7 +71,10 @@ int main(int argc, char** argv)
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
   Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
-  Mesh mesh_LF(init.comm()); //low-fidelity mesh
+  //Mesh mesh_LF(init.comm()); //low-fidelity mesh
+  
+  MeshRefinement mesh_refinement(mesh);
+  mesh_refinement.max_h_level() = 1;
   
   //create mesh
   unsigned int dim;
@@ -85,14 +88,11 @@ int main(int argc, char** argv)
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
     MeshTools::Generation::build_square(mesh_HF, nx_HF, ny_HF, 0., Lx, 0., Ly, QUAD9);
-    MeshTools::Generation::build_square(mesh_LF, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
+    //MeshTools::Generation::build_square(mesh_LF, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
   }else{
     dim = 3;
     MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    //MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    //MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
   }
   double dx = Lx/nx_HF;
@@ -106,30 +106,37 @@ int main(int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   EquationSystems equation_systems_mix(mesh_HF);
-  EquationSystems equation_systems_mix_MF(mesh);
-  EquationSystems equation_systems_LF (mesh_LF);
+  //EquationSystems equation_systems_mix_MF(mesh);
+  //EquationSystems equation_systems_LF (mesh_LF);
 
   //systems - coarser mesh
   ConvDiff_PrimarySys & system_primary = 
     equation_systems.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
   ConvDiff_AuxSys & system_aux = 
     equation_systems.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
-  ConvDiff_PrimarySys & system_mix_MF = 
-    equation_systems_mix_MF.add_system<ConvDiff_PrimarySys>("Diff_ConvDiff_MprimeSys"); //for psi
+  ConvDiff_MprimeSys & system_mix_MF = 
+    equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi
     
   //systems - fine mesh
   ConvDiff_MprimeSys & system_mix = 
-    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for combined components of psi and superadj
+    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi and superadj
   ConvDiff_PrimarySadjSys & system_sadj_primary = 
     equation_systems_mix.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
   ConvDiff_AuxSadjSys & system_sadj_aux = 
     equation_systems_mix.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
+    
+  //keep solution at previous refinement iteration as init guess
+  system_primary.project_solution_on_reinit() = true;
+  system_aux.project_solution_on_reinit() = true;
+  system_mix_MF.project_solution_on_reinit() = true;
   
   //steady-state problem  
   system_primary.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system_primary));
   system_aux.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system_aux));
+  system_mix_MF.time_solver =
+    AutoPtr<TimeSolver>(new SteadySolver(system_mix_MF));
   system_mix.time_solver =
     AutoPtr<TimeSolver>(new SteadySolver(system_mix));
   system_sadj_primary.time_solver =
@@ -139,14 +146,16 @@ int main(int argc, char** argv)
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
-  equation_systems.init ();
+  equation_systems.init();
   equation_systems_mix.init();
-  equation_systems_LF.init();
+  //equation_systems_LF.init();
   
   //initial guess for primary state
   read_initial_parameters();
   system_primary.project_solution(initial_value, initial_grad,
                           equation_systems.parameters);
+  //system_aux.project_solution(initial_value, initial_grad,
+  //                        equation_systems.parameters); //DEBUG
   finish_initialization();
 
   //nonlinear solver options
@@ -255,12 +264,12 @@ int main(int argc, char** argv)
   int elem_ratio = nx_ratio*ny_ratio;
   if(dim > 2)
     elem_ratio *= nz_ratio;
-  MeshBase::element_iterator       elem_it_LF  = mesh_LF.elements_begin();
-  const MeshBase::element_iterator elem_end_LF = mesh_LF.elements_end();
+  MeshBase::element_iterator       elem_it_LF  = mesh.elements_begin();
+  const MeshBase::element_iterator elem_end_LF = mesh.elements_end();
   MeshBase::element_iterator       elem_it_HF  = mesh_HF.elements_begin();
   const MeshBase::element_iterator elem_end_HF = mesh_HF.elements_end();
   std::vector<std::set<dof_id_type> > elem_mapping;
-  elem_mapping.resize(mesh_LF.n_elem());
+  elem_mapping.resize(mesh.n_elem());
   int n_babies_found = 0;
   for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
     Elem* elem = *elem_it_LF;
@@ -304,6 +313,9 @@ int main(int argc, char** argv)
   int refIter = 0;
   double relError = 2.*qoiErrorTol;
   while(refIter <= maxIter && relError > qoiErrorTol){
+    equation_systems.reinit(); //project previous solution onto new mesh
+    //equation_systems_mix_MF.reinit(); 
+    
     if(!doContinuation){ //clear out previous solutions
       system_primary.solution->zero();
       system_aux.solution->zero();
@@ -313,6 +325,7 @@ int main(int argc, char** argv)
     system_mix.solution->zero();
     system_mix_MF.solution->zero();
     
+    std::cout << "\n Begin primary solve..." << std::endl;
     system_primary.solve();
     system_primary.clearQoI();
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
@@ -326,28 +339,34 @@ int main(int argc, char** argv)
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
     equation_systems_mix.reinit();
-    equation_systems_mix_MF.reinit();
     //combine primary and auxiliary variables into psi
     DirectSolutionTransfer sol_transfer(init.comm()); 
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
-      system_mix_MF.variable(system_mix.variable_number("aux_c")));
+      system_mix_MF.variable(system_mix_MF.variable_number("aux_c")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
-      system_mix_MF.variable(system_mix.variable_number("aux_zc")));
+      system_mix_MF.variable(system_mix_MF.variable_number("aux_zc")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
-      system_mix_MF.variable(system_mix.variable_number("aux_fc")));
+      system_mix_MF.variable(system_mix_MF.variable_number("aux_fc")));
 
     std::vector<dof_id_type> all_the_vars;
     system_mix_MF.get_all_variable_numbers(all_the_vars);
-    MeshFunction psi_MF_meshfx(equation_systems, *system_mix_MF.solution, system_mix_MF.get_dof_map(), all_the_vars); 
+    MeshFunction* psi_MF_meshfx = new libMesh::MeshFunction(equation_systems, *system_mix_MF.solution, system_mix_MF.get_dof_map(), all_the_vars);
+    psi_MF_meshfx->init();
+std::cout << std::boolalpha << (*system_mix_MF.solution).initialized() << "\n" 
+                            << psi_MF_meshfx->initialized() << "\n" 
+                            << system_mix.is_initialized() << std::endl; //DEBUG
+libmesh_assert(psi_MF_meshfx->initialized());
+std::cout << "...test assertion successful..." << std::endl;
     system_mix.project_solution(psi_MF_meshfx); 
+      //Assertion `this->initialized()' failed. ( libMesh::MeshFunction::operator() (this=0xf23530, p=..., output=..., subdomain_ids=0x0) at src/mesh/mesh_function.C:223 )
     AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
     
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
-      system_mix_MF.variable(system_mix.variable_number("c")));
+      system_mix_MF.variable(system_mix_MF.variable_number("c")));
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
-      system_mix_MF.variable(system_mix.variable_number("zc")));
+      system_mix_MF.variable(system_mix_MF.variable_number("zc")));
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
-      system_mix_MF.variable(system_mix.variable_number("fc")));
+      system_mix_MF.variable(system_mix_MF.variable_number("fc")));
     system_mix.project_solution(psi_MF_meshfx); //project all of psi
       
     system_mix.assemble(); //calculate residual to correspond to solution
@@ -430,7 +449,7 @@ int main(int argc, char** argv)
     output2.close();
     
     if(refIter < maxIter && relError > qoiErrorTol){ //if further refinement needed
-///////////////////////////////////////////////////////////////////////////////////////////////// 
+
       //collapse error contributions into nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs(round(system_mix.n_dofs()/6.));
       for(unsigned int node_num = 0; node_num < node_errs.size(); node_num++){
@@ -475,27 +494,39 @@ int main(int argc, char** argv)
         markMe.insert(markMe.end(), node_to_elem[node_errs_coarse[i].second].begin(), node_to_elem[node_errs_coarse[i].second].end());
       }
   
-      //mark those elements for refinement NEED TO MAKE SURE NO ELEMENTS ARE REFINED PAST HF LEVEL...
+      //mark those elements for refinement
+      mesh_refinement.clean_refinement_flags(); //remove all refinement flags
       for(int i = 0; i < markMe.size(); i++){
-        mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
+        mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
+      }
+      
+      int prev_nelems = mesh.n_elem();
+      mesh_refinement.refine_elements(); //refine to new MF mesh
+      int new_nelems = mesh.n_elem();
+      
+      //mark new elements as HF subdomain = 1
+      for(int i = 0; i < (new_nelems-prev_nelems); i++){
+        mesh.elem(prev_nelems+i)->subdomain_id() = 1;
       }
       
       //refine to new MF mesh ********************************************************
+      //project_on_reinit -> project previous primary and aux sols as init guess?
+      //elem nums change with refinement...how to map marked elements in LF mesh to partially refined MF mesh?
+      //do elems that are not refined keep their elem ids? if so, can keep a list of elem ids that are still eligible for refinement...
+      //all elements, refined or not, retain their elem ids and are included in the iteration...new smaller elems are just added on to the end...
       
 #ifdef LIBMESH_HAVE_EXODUS_API
     std::stringstream ss2;
     ss2 << refIter + 1;
     std::string str = ss2.str();
     std::string write_divvy = "divvy" + str + ".exo";
-    ExodusII_IO (mesh).write_equation_systems(write_divvy,equation_systems); //IS THIS STILL THE RIGHT DIVVY?
+    ExodusII_IO (mesh).write_equation_systems(write_divvy,equation_systems); 
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
-///////////////////////////////////////////////////////////////////////////////////////////////// 
     } //end refinement loop
     refIter += 1;
   }
   
-  //IS THIS STILL THE RIGHT DIVVY?
   std::string stash_assign = "divvy_final.txt";
   std::ofstream output_dbg(stash_assign.c_str());
   MeshBase::element_iterator       elem_it  = mesh.elements_begin();

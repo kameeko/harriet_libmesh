@@ -14,7 +14,7 @@ porosity = 0.1 #0.1
 dispersivity_longitudinal = 100.0
 dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
-bsource = -5.0
+bsource = -0.0
 
 data_file = Measurements_shifted.dat
 beta = 1.e-3

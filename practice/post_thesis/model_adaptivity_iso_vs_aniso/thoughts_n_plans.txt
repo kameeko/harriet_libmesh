@@ -478,5 +478,18 @@ would we be saving the superadj from the offline and not recomputing?
 diff-mesh ...HF needs to do the HF mesh repeatedly, so even if superadj needs HF mesh too, it's only linear...
   diff vs conv-diff-react? (so no stability limit on coarseness of LF)
   back project fine error breakdown onto coarse, then find which coarse elements to refine
-  -> poke adjoint_refinement_estimator.C?
+  -> poke adjoint_refinement_estimator.C? that seems to be about neighboring elements rather than nodes
     -split HF basis blame equally among all LF bases that overlap its support
+  -if need more dof difference, can go back to 60-6-0.6, full domain
+  
+  add photo album to cart
+
+
+checking if high-R inverse also doesn't take much longer...(we'd only really checked for fwd)
+
+inv_HF appears to be not full rank? lack of BCs on k?
+  -J_p_ lines seem to be a lot smaller in magnitude that the others...would non-dimensionalization help? rank is approximately 2/3 of matrix size plus 2 sides and 3 data points...
+    -> writing p in terms of MPa instead of Pa just scales the whole equation...same for writing k in darcies...scale BCs / average?
+    
+karen's idea: rerun case, timing all the individual pieces
+  -if need to dot MF residual against HF super adj, how to project/integrate/decompose?
