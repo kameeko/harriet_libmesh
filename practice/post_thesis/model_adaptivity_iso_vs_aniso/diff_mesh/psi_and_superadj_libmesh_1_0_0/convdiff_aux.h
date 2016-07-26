@@ -5,12 +5,12 @@
 
 using namespace libMesh;
 
-class ConvDiff_PrimarySadjSys : public FEMSystem
+class ConvDiff_AuxSys : public FEMSystem
 {
 public:
 
   // Constructor
-  ConvDiff_PrimarySadjSys(EquationSystems& es,
+  ConvDiff_AuxSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
@@ -18,7 +18,7 @@ public:
     GetPot infile("contamTrans.in");
 		std::string find_data_here = infile("data_file","Measurements0.dat");
 		qoi_option = infile("QoI_option",1);
-   
+    
     //read in data
 		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
 			Real x, y, z, value;
@@ -32,19 +32,7 @@ public:
 			}
 			fclose(fp);
 	  }
-/*	  
-	  //read in primary variables at data points
-	  if(FILE *fp=fopen("c_points.dat","r")){
-	    int flag = 1;
-	    Real meep;
-	    while(flag != -1){
-	      flag = fscanf(fp,"%lf",&meep);
-	      if(flag != -1)
-	        primal_c_vals.push_back(meep);
-	    }
-	    fclose(fp);
-	  }
-*/	  
+	  
 	  //find elements in which data points reside
 	  PointLocatorTree point_locator(this->get_mesh());
 	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
@@ -52,7 +40,6 @@ public:
 	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
 	  	dataelems.push_back(this_elem->id());
 	  }
-
   }
 
   // System initialization
@@ -65,13 +52,13 @@ public:
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext& context);
-                                        
+  
   //boundary residual and jacobian calculations
   virtual bool side_time_derivative (bool request_jacobian,
                                         DiffContext& context);
-
+                                        
   // Indices for each variable;
-  unsigned int c_var, zc_var, fc_var;
+  unsigned int aux_c_var, aux_zc_var, aux_fc_var;
   
   Real beta; //regularization parameter
   Real vx; //west-east velocity (along x-axis, for now); m/s
@@ -85,9 +72,13 @@ public:
   std::vector<Real> datavals;
   std::vector<dof_id_type> dataelems;
   
+	int cd_subdomain_id, cdr_subdomain_id;
+  
   //options for QoI location and nature
   int qoi_option;
- 
-  std::vector<Real> primal_c_vals;
-  void set_c_vals(std::vector<Real> c_vals){ primal_c_vals = c_vals; }
+  
+  virtual void postprocess();
+  std::vector<Real> primal_auxc_vals;
+  std::vector<Real> get_auxc_vals(){ return primal_auxc_vals; }
+  
 };

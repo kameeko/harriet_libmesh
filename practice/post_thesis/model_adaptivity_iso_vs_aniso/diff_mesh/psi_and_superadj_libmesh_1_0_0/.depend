@@ -1,0 +1,29 @@
+convdiff_aux.$(obj-suffix):\
+    convdiff_aux.C\
+    convdiff_aux.h
+convdiff_mprime.$(obj-suffix):\
+    convdiff_mprime.C\
+    convdiff_mprime.h
+convdiff_primary.$(obj-suffix):\
+    convdiff_primary.C\
+    convdiff_primary.h
+convdiff_sadj_aux.$(obj-suffix):\
+    convdiff_sadj_aux.C\
+    convdiff_sadj_aux.h
+convdiff_sadj_primary.$(obj-suffix):\
+    convdiff_sadj_primary.C\
+    convdiff_sadj_primary.h
+element_qoi.$(obj-suffix):\
+    element_qoi.C\
+    convdiff_primary.h
+element_qoi_derivative.$(obj-suffix):\
+    element_qoi_derivative.C\
+    convdiff_mprime.h
+main.$(obj-suffix):\
+    main.C\
+    convdiff_aux.h\
+    convdiff_mprime.h\
+    convdiff_primary.h\
+    convdiff_sadj_aux.h\
+    convdiff_sadj_primary.h\
+    initial.h

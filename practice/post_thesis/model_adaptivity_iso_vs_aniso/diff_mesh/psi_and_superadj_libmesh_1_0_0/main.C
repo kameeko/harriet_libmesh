@@ -138,21 +138,21 @@ int main(int argc, char** argv)
   
   //steady-state problem  
   system_primary.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_primary));
+    UniquePtr<TimeSolver>(new SteadySolver(system_primary));
   system_aux.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_aux));
+    UniquePtr<TimeSolver>(new SteadySolver(system_aux));
   //system_mix_MF.time_solver =
-  //  AutoPtr<TimeSolver>(new SteadySolver(system_mix_MF));
-  system_mix.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_mix));
+  //  UniquePtr<TimeSolver>(new SteadySolver(system_mix_MF));
   system_primary_proj.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_primary_proj));
+    UniquePtr<TimeSolver>(new SteadySolver(system_primary_proj));
   system_aux_proj.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_aux_proj));
+    UniquePtr<TimeSolver>(new SteadySolver(system_aux_proj));
+  system_mix.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_mix));
   system_sadj_primary.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_sadj_primary));
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary));
   system_sadj_aux.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_sadj_aux));
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux));
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
@@ -164,13 +164,11 @@ int main(int argc, char** argv)
   read_initial_parameters();
   system_primary.project_solution(initial_value, initial_grad,
                           equation_systems.parameters);
-  //system_aux.project_solution(initial_value, initial_grad,
-  //                        equation_systems.parameters); //DEBUG
   finish_initialization();
 
   //nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
-  system_sadj_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_primary); 
+  system_sadj_primary.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_sadj_primary); 
   solver_sadj_primary->quiet = solverInfile("solver_quiet", true);
   solver_sadj_primary->verbose = !solver_sadj_primary->quiet;
   solver_sadj_primary->max_nonlinear_iterations =
@@ -182,7 +180,7 @@ int main(int argc, char** argv)
   solver_sadj_primary->absolute_residual_tolerance =
     solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_sadj_aux = new NewtonSolver(system_sadj_aux); 
-  system_sadj_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_aux); 
+  system_sadj_aux.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_sadj_aux); 
   solver_sadj_aux->quiet = solverInfile("solver_quiet", true);
   solver_sadj_aux->verbose = !solver_sadj_aux->quiet;
   solver_sadj_aux->max_nonlinear_iterations =
@@ -194,7 +192,7 @@ int main(int argc, char** argv)
   solver_sadj_aux->absolute_residual_tolerance =
     solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_primary = new NewtonSolver(system_primary); 
-  system_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_primary); 
+  system_primary.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_primary); 
   solver_primary->quiet = solverInfile("solver_quiet", true);
   solver_primary->verbose = !solver_primary->quiet;
   solver_primary->max_nonlinear_iterations =
@@ -206,7 +204,7 @@ int main(int argc, char** argv)
   solver_primary->absolute_residual_tolerance =
     solverInfile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_aux = new NewtonSolver(system_aux); 
-  system_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_aux); 
+  system_aux.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_aux); 
   solver_aux->quiet = solverInfile("solver_quiet", true);
   solver_aux->verbose = !solver_aux->quiet;
   solver_aux->max_nonlinear_iterations =
@@ -349,126 +347,70 @@ int main(int argc, char** argv)
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
     equation_systems_mix.reinit();
-
-    //bug (?) with FEMContext::interior_values means we can't transfer over psi as a whole
     
-   
+    //bug (?) with FEMContext::interior_values means we can't transfer over psi as a whole
+/*    
     //combine primary and auxiliary variables into psi
     DirectSolutionTransfer sol_transfer(init.comm()); 
-/*     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
+    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
       system_mix_MF.variable(system_mix_MF.variable_number("aux_c")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
       system_mix_MF.variable(system_mix_MF.variable_number("aux_zc")));
     sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
       system_mix_MF.variable(system_mix_MF.variable_number("aux_fc")));
-
     std::vector<dof_id_type> all_the_vars;
     system_mix_MF.get_all_variable_numbers(all_the_vars);
     MeshFunction* psi_MF_meshfx = new libMesh::MeshFunction(equation_systems, *system_mix_MF.solution, system_mix_MF.get_dof_map(), all_the_vars);
     psi_MF_meshfx->init();
-std::cout << std::boolalpha << psi_MF_meshfx->initialized() << "\n" 
-                            << system_mix.is_initialized() << "\n" 
-                            << system_mix_MF.is_initialized() << std::endl; //DEBUG
-libmesh_assert(psi_MF_meshfx->initialized());
-std::cout << "...test assertion successful..." << std::endl;
     system_mix.project_solution(psi_MF_meshfx); 
-      //Assertion `this->initialized()' failed. ( libMesh::MeshFunction::operator() (this=0xf23530, p=..., output=..., subdomain_ids=0x0) at src/mesh/mesh_function.C:223 )
-    AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
-   
+
+    UniquePtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
+    
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
       system_mix_MF.variable(system_mix_MF.variable_number("c")));
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
       system_mix_MF.variable(system_mix_MF.variable_number("zc")));
     sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
       system_mix_MF.variable(system_mix_MF.variable_number("fc")));
-    //system_mix.project_solution(psi_MF_meshfx); //project all of psi
-*/ 
-///////////////////////////////////////////////////////////////////////////////////////
-#ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); 
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API
+    system_mix.project_solution(psi_MF_meshfx); //project all of psi
+*/     
     
-    //copy psi MF to intermediary mesh
-    Mesh mesh_middle(mesh);
-    EquationSystems es_middle(mesh_middle);
-    ConvDiff_PrimarySys & sys_primary_middle = 
-      es_middle.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for psi
-    ConvDiff_AuxSys & sys_aux_middle = 
-      es_middle.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for psi
-    sys_primary_middle.project_solution_on_reinit() = true;
-    sys_primary_middle.time_solver =
-      AutoPtr<TimeSolver>(new SteadySolver(sys_primary_middle));
-    sys_aux_middle.project_solution_on_reinit() = true;
-    sys_aux_middle.time_solver =
-      AutoPtr<TimeSolver>(new SteadySolver(sys_aux_middle));
-    es_middle.init();
-    DirectSolutionTransfer mid_sol_trans(init.comm());
-    mid_sol_trans.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
-      sys_aux_middle.variable(sys_aux_middle.variable_number("aux_c")));
-    mid_sol_trans.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
-      sys_aux_middle.variable(sys_aux_middle.variable_number("aux_zc")));
-    mid_sol_trans.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
-      sys_aux_middle.variable(sys_aux_middle.variable_number("aux_fc")));
-    mid_sol_trans.transfer(system_primary.variable(system_primary.variable_number("c")),
-      sys_primary_middle.variable(sys_primary_middle.variable_number("c")));
-    mid_sol_trans.transfer(system_primary.variable(system_primary.variable_number("zc")),
-      sys_primary_middle.variable(sys_primary_middle.variable_number("zc")));
-    mid_sol_trans.transfer(system_primary.variable(system_primary.variable_number("fc")),
-      sys_primary_middle.variable(sys_primary_middle.variable_number("fc")));
+    //project variables
+    std::vector<dof_id_type> primary_vars;
+    std::vector<dof_id_type> aux_vars;
+    system_primary.get_all_variable_numbers(primary_vars);
+    system_aux.get_all_variable_numbers(aux_vars);
+    MeshFunction* primary_MF_meshfx = 
+      new libMesh::MeshFunction(equation_systems, 
+                                *system_primary.solution, 
+                                system_primary.get_dof_map(), 
+                                primary_vars);
+    MeshFunction* aux_MF_meshfx = 
+      new libMesh::MeshFunction(equation_systems, 
+                                *system_aux.solution, 
+                                system_aux.get_dof_map(), 
+                                aux_vars);
+    primary_MF_meshfx->init();
+    aux_MF_meshfx->init();
+    system_primary_proj.project_solution(primary_MF_meshfx);
+    system_aux_proj.project_solution(aux_MF_meshfx);
     
-    //refine intermediary mesh to HF fineness
-    MeshRefinement mr(mesh_middle);
-    MeshBase::element_iterator       elem_it3  = mesh_middle.elements_begin();
-    const MeshBase::element_iterator elem_end3 = mesh_middle.elements_end();
-    for (; elem_it3 != elem_end3; ++elem_it3){
-      Elem* elem = *elem_it3;
-      dof_id_type elem_id = elem->id();
-      if(elem_id < nx_LF*ny_LF*nz_LF)
-        elem->set_refinement_flag(Elem::REFINE);
-    }
-    mr.refine_elements();
-
-    //project on reinit
-    es_middle.reinit();
-    
-#ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh_middle).write_equation_systems("mid_proj.exo",es_middle); 
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API  
-  
-    //copy to fine equation system
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_c")),
+    //combine into one psi
+    DirectSolutionTransfer sol_transfer(init.comm()); 
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_c")),
       system_mix.variable(system_mix.variable_number("aux_c")));
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_zc")),
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_zc")),
       system_mix.variable(system_mix.variable_number("aux_zc")));
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_fc")),
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_fc")),
       system_mix.variable(system_mix.variable_number("aux_fc")));
-    AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("c")),
+    UniquePtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("c")),
       system_mix.variable(system_mix.variable_number("c")));
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("zc")),
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("zc")),
       system_mix.variable(system_mix.variable_number("zc")));
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("fc")),
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("fc")),
       system_mix.variable(system_mix.variable_number("fc")));
-    
-    //so superadj can read  (FEMContext::interior_values bug)
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_c")),
-      system_aux_proj.variable(system_aux_proj.variable_number("aux_c")));
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_zc")),
-      system_aux_proj.variable(system_aux_proj.variable_number("aux_zc")));
-    mid_sol_trans.transfer(sys_aux_middle.variable(sys_aux_middle.variable_number("aux_fc")),
-      system_aux_proj.variable(system_aux_proj.variable_number("aux_fc")));
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("c")),
-      system_primary_proj.variable(system_primary_proj.variable_number("c")));
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("zc")),
-      system_primary_proj.variable(system_primary_proj.variable_number("zc")));
-    mid_sol_trans.transfer(sys_primary_middle.variable(sys_primary_middle.variable_number("fc")),
-      system_primary_proj.variable(system_primary_proj.variable_number("fc")));
-      
-#ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh_HF).write_equation_systems("post_proj.exo",equation_systems_mix); 
-#endif // #ifdef LIBMESH_HAVE_EXODUS_API    
-///////////////////////////////////////////////////////////////////////////////////////
-      
+ 
     system_mix.assemble(); //calculate residual to correspond to solution
     
     //super adjoint solve
@@ -519,13 +461,13 @@ std::cout << "...test assertion successful..." << std::endl;
     primal_solution.swap(dual_solution); //DEBUG
 */
     //adjoint-weighted residual
-    AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
+    UniquePtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
     adjresid->pointwise_mult(*system_mix.rhs,dual_solution); 
     adjresid->scale(-0.5);
     std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << adjresid->sum() << std::endl; //DEBUG
     
     //LprimeHF(psiLF)
-    AutoPtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
+    UniquePtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
     LprimeHF_psiLF->pointwise_mult(*system_mix.rhs,*just_aux);
     std::cout << " L'_HF(psiLF): " << LprimeHF_psiLF->sum() << std::endl; //DEBUG
     
@@ -611,7 +553,11 @@ std::cout << "...test assertion successful..." << std::endl;
         mesh.elem(prev_nelems+i)->subdomain_id() = 1;
       }
       
-      //all elements, refined or not, retain their elem ids and are included in the iteration...new smaller elems are just added on to the end...once refined, old elements become 'inactive' though...
+      //refine to new MF mesh ********************************************************
+      //project_on_reinit -> project previous primary and aux sols as init guess?
+      //elem nums change with refinement...how to map marked elements in LF mesh to partially refined MF mesh?
+      //do elems that are not refined keep their elem ids? if so, can keep a list of elem ids that are still eligible for refinement...
+      //all elements, refined or not, retain their elem ids and are included in the iteration...new smaller elems are just added on to the end...
       
 #ifdef LIBMESH_HAVE_EXODUS_API
     std::stringstream ss2;
