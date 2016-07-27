@@ -535,7 +535,7 @@ int main(int argc, char** argv)
                             + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5), node_num);
         dbg_sum1 += node_errs[node_num].first; //DEBUG
       }
-      std::cout << "Should match QoI error estimate: " << dbg_sum1 << "\n" << std::endl; //DEBUG
+      std::cout << "Should match QoI error estimate: " << dbg_sum1 << std::endl; //DEBUG
       
       //redistributed error contributions from fine to coarse nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs_coarse(round(system_primary.n_dofs()/3.));
@@ -574,11 +574,12 @@ int main(int argc, char** argv)
       //mark those elements for refinement
       mesh_refinement.clean_refinement_flags(); //remove all refinement flags
       for(int i = 0; i < markMe.size(); i++){
-        mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
+        if(mesh.elem(markMe[i])->active()) //don't mark already-refined elements
+          mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
       }
       
       int prev_nelems = mesh.n_elem();
-      mesh_refinement.refine_elements(); //refine to new MF mesh //dies here??
+      mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
         //mesh_test is fine with asking to marking the same element for refinement multiple times...even compiled against new libmesh
       int new_nelems = mesh.n_elem();
       
