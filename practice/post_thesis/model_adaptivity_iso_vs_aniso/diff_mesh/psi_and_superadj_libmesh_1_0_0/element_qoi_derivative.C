@@ -87,10 +87,11 @@ void ConvDiff_MprimeSys::element_qoi_derivative (DiffContext &context,
 				 		
 				Qc(i) += JxW[qp]*(-k*grad_auxzc*dphi[i][qp] + U*grad_auxzc*phi[i][qp] 
 	      	- 2.*R*zc*auxc*phi[i][qp] - 2.*R*auxzc*c*phi[i][qp]);
-				if((qoi_option == 1 && 
+				if((qoi_option == 0) ||
+          (qoi_option == 1 && 
       			(dim == 3 && (fabs(ptx - 1150.) <= 50. && fabs(pty - 825.) <= 50. && ptz >= 80.))) ||
       		(qoi_option == 1 && 
-      			(dim == 2 && (fabs(ptx - 1150.) <= 50. && fabs(pty - 825.) <= 50.))) 	){
+      			(dim == 2 && (fabs(ptx - 1150.) <= 50. && fabs(pty - 825.) <= 50.))) 	){			
 	      		
 					Qc(i) += JxW[qp]*phi[i][qp]; 
 				}

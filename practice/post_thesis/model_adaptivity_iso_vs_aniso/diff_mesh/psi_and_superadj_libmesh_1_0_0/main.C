@@ -293,6 +293,7 @@ int main(int argc, char** argv)
     Elem* elem = *elem_it_LF;
     Point elem_cent = elem->centroid();
     n_babies_found = 0;
+    elem_it_HF = mesh_HF.elements_begin();
     for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
       if(n_babies_found >= elem_ratio)
         break;
@@ -310,12 +311,13 @@ int main(int argc, char** argv)
   
   //mapping fine nodes to coarse nodes that they overlap
   std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
-  fine_to_coarse_nodes.resize(round(system_aux.n_dofs()/3.));
+  fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/3.));
+  elem_it_LF = mesh.elements_begin();
   for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
     Elem* elem = *elem_it_LF;
     std::vector< dof_id_type > di_LF;
     system_aux.get_dof_map().dof_indices(elem, di_LF);
-    for (int baby_id = 0; baby_id < elem_ratio; baby_id ++){ //for each fine element in the coarse element
+    for (dof_id_type baby_id : elem_mapping[elem->id()]){ //for each fine element in the coarse element
       std::vector< dof_id_type > di_HF;
       system_sadj_primary.get_dof_map().dof_indices(system_sadj_primary.get_mesh().elem(baby_id), di_HF);
       for(unsigned int j = 0; j < di_LF.size(); j++){ //for each coarse node in elem
@@ -331,7 +333,7 @@ int main(int argc, char** argv)
   int refIter = 0;
   double relError = 2.*qoiErrorTol;
   while(refIter <= maxIter && relError > qoiErrorTol){
-    equation_systems.reinit(); //project previous solution onto new mesh
+    //equation_systems.reinit(); //project previous solution onto new mesh
     //equation_systems_mix_MF.reinit(); 
     
     if(!doContinuation){ //clear out previous solutions
@@ -394,14 +396,11 @@ int main(int argc, char** argv)
     std::vector<dof_id_type> aux_vars;
     system_primary.get_all_variable_numbers(primary_vars);
     system_aux.get_all_variable_numbers(aux_vars);
-    //UniquePtr<MeshFunction> primary_MF_meshfx = UniquePtr<MeshFunction>(
     MeshFunction* primary_MF_meshfx = 
       new libMesh::MeshFunction(equation_systems, 
                                 *system_primary.solution, 
                                 system_primary.get_dof_map(), 
                                 primary_vars);
-    
-    //UniquePtr<MeshFunction> aux_MF_meshfx = UniquePtr<MeshFunction>(
     MeshFunction* aux_MF_meshfx = 
       new libMesh::MeshFunction(equation_systems, 
                                 *system_aux.solution, 
@@ -409,10 +408,10 @@ int main(int argc, char** argv)
                                 aux_vars);
     primary_MF_meshfx->init();
     aux_MF_meshfx->init();
-    //system_primary_proj.project_solution(primary_MF_meshfx.release());
-    //system_aux_proj.project_solution(aux_MF_meshfx.release());
     system_primary_proj.project_solution(primary_MF_meshfx);
     system_aux_proj.project_solution(aux_MF_meshfx);
+    delete primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+    delete aux_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
     
     //DEBUG
     //system_primary_dbg.project_solution(primary_MF_meshfx);
@@ -521,6 +520,9 @@ int main(int argc, char** argv)
     
     if(refIter < maxIter && relError > qoiErrorTol){ //if further refinement needed
 
+      double dbg_sum1 = 0.; //DEBUG
+      double dbg_sum2 = 0.; //DEBUG
+
       //collapse error contributions into nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs(round(system_mix.n_dofs()/6.));
       for(unsigned int node_num = 0; node_num < node_errs.size(); node_num++){
@@ -531,7 +533,9 @@ int main(int argc, char** argv)
                             + (*adjresid)(6*node_num+3) + (*LprimeHF_psiLF)(6*node_num+3)
                             + (*adjresid)(6*node_num+4) + (*LprimeHF_psiLF)(6*node_num+4)
                             + (*adjresid)(6*node_num+5) + (*LprimeHF_psiLF)(6*node_num+5), node_num);
+        dbg_sum1 += node_errs[node_num].first; //DEBUG
       }
+      std::cout << "Should match QoI error estimate: " << dbg_sum1 << "\n" << std::endl; //DEBUG
       
       //redistributed error contributions from fine to coarse nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs_coarse(round(system_primary.n_dofs()/3.));
@@ -545,9 +549,11 @@ int main(int argc, char** argv)
       }
       for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //magnitudes of redistributed errors
         Number meep = node_errs_coarse[node_num].first;
+        dbg_sum2 += meep; //DEBUG
         node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(fabs(meep), node_num);
       }
-  
+      std::cout << "Should match QoI error estimate: " << dbg_sum2 << std::endl; //DEBUG
+      
       //find nodes contributing the most
       //double refPcnt = std::min((refIter+1)*refStep,1.);
       double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
@@ -563,7 +569,7 @@ int main(int argc, char** argv)
         markMe.reserve(cutoffLoc*8);
       for(int i = 0; i < cutoffLoc; i++){
         markMe.insert(markMe.end(), node_to_elem[node_errs_coarse[i].second].begin(), node_to_elem[node_errs_coarse[i].second].end());
-      }
+      } 
   
       //mark those elements for refinement
       mesh_refinement.clean_refinement_flags(); //remove all refinement flags
@@ -572,7 +578,8 @@ int main(int argc, char** argv)
       }
       
       int prev_nelems = mesh.n_elem();
-      mesh_refinement.refine_elements(); //refine to new MF mesh
+      mesh_refinement.refine_elements(); //refine to new MF mesh //dies here??
+        //mesh_test is fine with asking to marking the same element for refinement multiple times...even compiled against new libmesh
       int new_nelems = mesh.n_elem();
       
       //mark new elements as HF subdomain = 1
@@ -586,6 +593,8 @@ int main(int argc, char** argv)
       //do elems that are not refined keep their elem ids? if so, can keep a list of elem ids that are still eligible for refinement...
       //all elements, refined or not, retain their elem ids and are included in the iteration...new smaller elems are just added on to the end...
       
+      equation_systems.reinit(); //project previous solution onto new mesh
+      
 #ifdef LIBMESH_HAVE_EXODUS_API
     std::stringstream ss2;
     ss2 << refIter + 1;
@@ -595,6 +604,7 @@ int main(int argc, char** argv)
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API
 
     } //end refinement loop
+
     refIter += 1;
   }
   
