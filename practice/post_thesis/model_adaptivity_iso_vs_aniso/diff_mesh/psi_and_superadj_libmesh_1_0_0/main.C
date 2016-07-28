@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
   Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
-  Mesh mesh_HF_dbg(init.comm());
+  //Mesh mesh_HF_dbg(init.comm());
   
   int n_LF_elems = mesh.n_elem();
   
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
     MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
+    //MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
   }
   double dx = Lx/nx_HF;
   double dy = Ly/ny_HF;
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   EquationSystems equation_systems_mix(mesh_HF);
-  EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
+  //EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
 
   //systems - coarser mesh
   ConvDiff_PrimarySys & system_primary = 
@@ -120,10 +120,10 @@ int main(int argc, char** argv)
   //  equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi
   
   //DEBUG
-  ConvDiff_PrimarySys & system_primary_dbg = 
-    equation_systems_dbg.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
-  ConvDiff_AuxSys & system_aux_dbg = 
-    equation_systems_dbg.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+  //ConvDiff_PrimarySys & system_primary_dbg = 
+  //  equation_systems_dbg.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+  //ConvDiff_AuxSys & system_aux_dbg = 
+  //  equation_systems_dbg.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
     
   //systems - fine mesh
   ConvDiff_MprimeSys & system_mix = 
@@ -161,16 +161,16 @@ int main(int argc, char** argv)
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary));
   system_sadj_aux.time_solver =
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux));
-  system_primary_dbg.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system_primary_dbg)); //DEBUG
-  system_aux_dbg.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system_aux_dbg)); //DEBUG
+  //system_primary_dbg.time_solver =
+  //  UniquePtr<TimeSolver>(new SteadySolver(system_primary_dbg)); //DEBUG
+  //system_aux_dbg.time_solver =
+  //  UniquePtr<TimeSolver>(new SteadySolver(system_aux_dbg)); //DEBUG
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
   equation_systems.init();
   equation_systems_mix.init();
-  equation_systems_dbg.init();
+  //equation_systems_dbg.init();
   
   //initial guess for primary state
   read_initial_parameters();
@@ -395,11 +395,12 @@ int main(int argc, char** argv)
 */     
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
+    //ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API 
         
     //project variables
     std::cout << "Begin projecting psi...\n" << std::endl;
+    clock_t begin_proj = std::clock();
     std::vector<dof_id_type> primary_vars;
     std::vector<dof_id_type> aux_vars;
     system_primary.get_all_variable_numbers(primary_vars);
@@ -417,19 +418,20 @@ int main(int argc, char** argv)
     primary_MF_meshfx->init();
     aux_MF_meshfx->init();
     system_primary_proj.project_solution(primary_MF_meshfx);
-    system_aux_proj.project_solution(aux_MF_meshfx);
-    delete primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
-    delete aux_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+    system_aux_proj.project_solution(aux_MF_meshfx); 
     std::cout << "\nFinished projecting psi...\n" << std::endl;
-
+    clock_t end_proj = std::clock();
     //DEBUG
-    system_primary_dbg.project_solution(primary_MF_meshfx);
-    system_aux_dbg.project_solution(aux_MF_meshfx);
+    //system_primary_dbg.project_solution(primary_MF_meshfx);
+    //system_aux_dbg.project_solution(aux_MF_meshfx);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh_HF_dbg).write_equation_systems("post_proj.exo",equation_systems_dbg); //DEBUG
+    //ExodusII_IO (mesh_HF_dbg).write_equation_systems("post_proj.exo",equation_systems_dbg); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API     
     
+    delete primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+    delete aux_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+
     //combine into one psi
     DirectSolutionTransfer sol_transfer(init.comm()); 
     sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_c")),
@@ -518,6 +520,7 @@ int main(int argc, char** argv)
     clock_t end = clock();
     std::cout << "Time so far: " << double(end-begin)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
     const MeshBase::element_iterator elem_end = mesh.elements_end();

@@ -24,9 +24,9 @@ initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 
 #discretization
-nx_LF = 4 #16 #25 for HF
-ny_LF = 4 #32 #45 for HF
-nz_LF = 4 #16 #30 for HF
+nx_LF = 16 #25 for HF
+ny_LF = 32 #45 for HF
+nz_LF = 16 #30 for HF
 nx_ratio = 2
 ny_ratio = 2
 nz_ratio = 2

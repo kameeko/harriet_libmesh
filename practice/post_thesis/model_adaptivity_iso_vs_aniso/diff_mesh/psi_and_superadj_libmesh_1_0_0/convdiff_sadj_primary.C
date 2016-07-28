@@ -196,14 +196,14 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
 	      grad_fc = ctxt.interior_gradient(fc_var, qp);
-	    
+    
 	    Number primal_c = c_at_qp[qp];
 	    Number primal_zc = zc_at_qp[qp];
 	    Number primal_fc = fc_at_qp[qp];
 	    Gradient primal_grad_c = grad_c_at_qp[qp];
 	    Gradient primal_grad_zc = grad_zc_at_qp[qp];
 	    Gradient primal_grad_fc = grad_fc_at_qp[qp];
-			
+
 			Real R = react_rate; 
 			NumberTensorValue k = porosity*dispTens;
 			NumberVectorValue U(porosity*vx, 0.0, 0.0);
@@ -247,7 +247,7 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	  		Number cpred = ctxt.point_value(c_var, data_point);
         Number cstar = datavals[dnum];
 	  		Number primal_cpred = primal_c_vals[dnum];
-std::cout << primal_cpred << std::endl; //DEBUG        
+
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
 		    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
 		    
