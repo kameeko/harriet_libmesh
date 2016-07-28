@@ -247,7 +247,7 @@ bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, Di
 	  		Number cpred = ctxt.point_value(c_var, data_point);
         Number cstar = datavals[dnum];
 	  		Number primal_cpred = primal_c_vals[dnum];
-        
+std::cout << primal_cpred << std::endl; //DEBUG        
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
 		    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
 		    
