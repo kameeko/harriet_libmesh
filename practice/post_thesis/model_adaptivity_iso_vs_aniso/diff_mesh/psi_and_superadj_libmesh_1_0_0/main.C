@@ -73,6 +73,8 @@ int main(int argc, char** argv)
   Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
   Mesh mesh_HF_dbg(init.comm());
   
+  int n_LF_elems = mesh.n_elem();
+  
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.max_h_level() = 1;
   
@@ -346,8 +348,11 @@ int main(int argc, char** argv)
     //system_mix_MF.solution->zero();
     
     std::cout << "\n Begin primary solve..." << std::endl;
+    clock_t begin_inv = std::clock();
     system_primary.solve();
     system_primary.clearQoI();
+    clock_t end_inv = std::clock();
+    clock_t begin_err_est = std::clock();
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
     system_aux.solve();
     std::cout << "\n End auxiliary solve..." << std::endl;
@@ -503,7 +508,21 @@ int main(int argc, char** argv)
         << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
         
     relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
-    std::cout << "Estimated relative qoi error: " << relError << std::endl << std::endl;
+    std::cout << "Estimated relative qoi error: " << relError << std::endl;
+    
+    //informative outputs
+    clock_t end = clock();
+    std::cout << "Time so far: " << double(end-begin)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.elements_end();
+    double numMarked = 0.;
+    for (; elem_it != elem_end; ++elem_it){
+      Elem* elem = *elem_it;
+      numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
+    }
+    std::cout << "Refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl << std::endl;
     
     //output at each iteration
     std::stringstream ss;
@@ -587,13 +606,7 @@ int main(int argc, char** argv)
       for(int i = 0; i < (new_nelems-prev_nelems); i++){
         mesh.elem(prev_nelems+i)->subdomain_id() = 1;
       }
-      
-      //refine to new MF mesh ********************************************************
-      //project_on_reinit -> project previous primary and aux sols as init guess?
-      //elem nums change with refinement...how to map marked elements in LF mesh to partially refined MF mesh?
-      //do elems that are not refined keep their elem ids? if so, can keep a list of elem ids that are still eligible for refinement...
-      //all elements, refined or not, retain their elem ids and are included in the iteration...new smaller elems are just added on to the end...
-      
+
       equation_systems.reinit(); //project previous solution onto new mesh
       
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -616,7 +629,7 @@ int main(int argc, char** argv)
   double numMarked = 0.;
   for (; elem_it != elem_end; ++elem_it){
     Elem* elem = *elem_it;
-    numMarked += elem->subdomain_id();
+    numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
     if(output_dbg.is_open()){
       output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
     }
@@ -625,6 +638,8 @@ int main(int argc, char** argv)
   
   std::cout << "\nRefinement concluded..." << std::endl;
   std::cout << "Final refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl;
+    //ALSO DO REFINEMENT FRACTION AT EVERY STEP?
+    //ALSO MORE COMPLETE TIMER?
   std::cout << "Final estimated relative error: " << relError << std::endl;
   
   return 0; //done

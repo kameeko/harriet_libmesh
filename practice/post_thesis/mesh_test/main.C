@@ -92,7 +92,7 @@ int main (int argc, char** argv){
   for (; elem_it3 != elem_end3; ++elem_it3){
     Elem* elem = *elem_it3;
     dof_id_type elem_id = elem->id();
-    if(refine_these.find(elem_id) != refine_these.end()){
+    if((refine_these.find(elem_id) != refine_these.end()) && elem->active()) {
       elem->set_refinement_flag(Elem::REFINE);
     }
   }
