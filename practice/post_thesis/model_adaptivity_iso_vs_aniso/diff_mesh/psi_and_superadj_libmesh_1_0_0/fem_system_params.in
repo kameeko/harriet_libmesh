@@ -26,10 +26,12 @@ initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 max_linear_iterations = 200 #10000
 
+direct_transfer_if_possible = true; #DEBUG
+
 #discretization
-nx_LF = 8 #16 #25 for HF
-ny_LF = 8 #32 #45 for HF
-nz_LF = 8 #16 #30 for HF
-nx_ratio = 2
-ny_ratio = 2
-nz_ratio = 2
+nx_LF = 4 #16 #25 for HF
+ny_LF = 4 #32 #45 for HF
+nz_LF = 4 #16 #30 for HF
+nx_ratio = 1
+ny_ratio = 1
+nz_ratio = 1
