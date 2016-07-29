@@ -54,10 +54,11 @@ int main(int argc, char** argv)
   const int nx_LF                       = solverInfile("nx_LF",100);
   const int ny_LF                       = solverInfile("ny_LF",100);
   const int nz_LF                       = solverInfile("nz_LF",100);
-  const int nx_ratio                    = solverInfile("nx_ratio",2);
-  const int ny_ratio                    = solverInfile("ny_ratio",2);
-  const int nz_ratio                    = solverInfile("nz_ratio",2);
-  const bool xfer_if_possible           = solverInfile("direct_transfer_if_possible",true); //DEBUG
+  int nx_ratio                          = solverInfile("nx_ratio",2);
+  int ny_ratio                          = solverInfile("ny_ratio",2);
+  int nz_ratio                          = solverInfile("nz_ratio",2);
+  const bool xfer_if_possible           = solverInfile("direct_transfer_if_possible",true); 
+  const bool useBuffer                  = solverInfile("use_buffer_zone",false); //for mesh refinement
   GetPot infile("contamTrans.in");
   //std::string find_mesh_here            = infile("initial_mesh","mesh.exo");
   bool doContinuation                   = infile("do_continuation",false);
@@ -65,7 +66,6 @@ int main(int argc, char** argv)
   double refStep                        = infile("refinement_step",0.1); //additional proportion of domain refined per step
     //this refers to additional basis functions...number of elements will be more...
   double qoiErrorTol                    = infile("relative_error_tolerance",0.01); //stopping criterion
-  //bool doDivvyMatlab                    = infile("do_divvy_in_Matlab",false); //output files to determine next refinement in Matlab
 
   if(refStep*maxIter > 1)
     maxIter = round(ceil(1./refStep));
@@ -78,7 +78,9 @@ int main(int argc, char** argv)
   
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.max_h_level() = 1;
-  
+  if(!useBuffer)
+    mesh_refinement.face_level_mismatch_limit() = 0;
+
   //create mesh
   unsigned int dim;
   const int nx_HF = nx_ratio*nx_LF;
@@ -88,7 +90,14 @@ int main(int argc, char** argv)
   const double Ly = 1650; //3300
   const double Lz = 100;
   if((nx_ratio != ny_ratio) || (nx_ratio != nz_ratio) || (ny_ratio != nz_ratio))
-    std::cout << "\n\nAAAAAHHHHH can't refine element in only some of its dimensions...\n\n" << std::endl;
+    std::cout << "\n\nAAAAAHHHHH can't refine element unequally in its dimensions...?\n\n" << std::endl;
+  if(!(nx_ratio & (nx_ratio-1)) == 0){
+    nx_ratio = round(std::pow(2.,std::floor(std::log2(nx_ratio))));
+    ny_ratio = nx_ratio;
+    nz_ratio = nz_ratio;
+    std::cout << "\n\nAAAAHHHHH elem size ratios to be power of 2...using ratio = " << nx_ratio << "instead..." << std::endl;
+  }
+  int elem_ref_iters = round(std::log2(nx_ratio)); //number of refinements to get from LF to HF element
   if(nz_LF == 0){ //to check if oscillations happen in 2D as well...
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
@@ -252,31 +261,7 @@ int main(int argc, char** argv)
   solver_sadj_aux->initial_linear_tolerance        = solverInfile("initial_linear_tolerance",1.e-13);
   solver_sadj_aux->minimum_linear_tolerance        = solverInfile("minimum_linear_tolerance",1.e-13);
   solver_sadj_aux->linear_tolerance_multiplier     = solverInfile("linear_tolerance_multiplier",1.e-3);
-  
-  /*if(doDivvyMatlab){
-    //DOF maps and such to help visualize
-    std::ofstream output_global_dof("global_dof_map.dat");
-    for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
-      std::vector< dof_id_type > di;
-      system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(i), di);
-      if(output_global_dof.is_open()){
-        output_global_dof << i << " ";
-        for(unsigned int j = 0; j < di.size(); j++)
-          output_global_dof << di[j] << " ";
-        output_global_dof << "\n";
-      }
-    }
-    output_global_dof.close();
-    std::ofstream output_elem_cent("elem_centroids.dat");
-    for(unsigned int i = 0 ; i < system_mix.get_mesh().n_elem(); i++){
-      Point elem_cent = system_mix.get_mesh().elem(i)->centroid();
-      if(output_elem_cent.is_open()){
-        output_elem_cent << elem_cent(0) << " " << elem_cent(1) << "\n";
-      }
-    }
-    output_elem_cent.close();
-  }*/
-  
+ 
   //inverse dof map for LF mesh (elements in support of each node, assuming every nvar dofs belong to same node)
   std::vector<std::set<dof_id_type> > node_to_elem; 
   node_to_elem.resize(round(system_aux.n_dofs()/3.));
@@ -375,7 +360,8 @@ int main(int argc, char** argv)
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
     system_aux.solve();
     std::cout << "\n End auxiliary solve..." << std::endl;
-    
+    clock_t end_aux = std::clock();
+
     system_primary.postprocess();
     system_aux.postprocess();
 /*
@@ -392,8 +378,6 @@ outputJ2.close();
 */    
     system_sadj_primary.set_c_vals(system_primary.get_c_vals());
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
-
-    std::cout << "\nQoI: " << std::setprecision(17) << system_primary.getQoI() << std::endl;
 
     equation_systems_mix.reinit();
     
@@ -512,6 +496,7 @@ outputJ2.close();
     
     //super adjoint solve
     std::cout << "\n Begin primary super-adjoint solve...\n" << std::endl;
+    clock_t begin_sadj = std::clock();
     system_sadj_primary.solve();
     std::cout << "\n End primary super-adjoint solve, being auxiliary super-adjoint solve...\n" << std::endl;
 /*
@@ -581,8 +566,10 @@ outputJ.close();
     std::cout << "QoI Error estimate: " << std::setprecision(17) 
         << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
         
+    std::cout << "\nQoI: " << std::setprecision(17) << system_primary.getQoI() << std::endl;
     relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
     std::cout << "Estimated relative qoi error: " << relError << std::endl;
+    std::cout << "Estimated HF QoI: " << std::setprecision(17) << system_primary.getQoI()+adjresid->sum()+LprimeHF_psiLF->sum() << std::endl;
     
     //informative outputs
     clock_t end = clock();
@@ -590,12 +577,15 @@ outputJ.close();
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
     MeshBase::element_iterator       elem_it  = mesh.elements_begin();
     const MeshBase::element_iterator elem_end = mesh.elements_end();
     double numMarked = 0.;
     for (; elem_it != elem_end; ++elem_it){
       Elem* elem = *elem_it;
-      numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
+      if(elem->active())
+        numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
     }
     std::cout << "Refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl << std::endl;
     
@@ -673,21 +663,32 @@ outputJ.close();
       } 
       
       if(mesh_diff){
+        std::set<dof_id_type> refineMe;
         //mark those elements for refinement
-        mesh_refinement.clean_refinement_flags(); //remove all refinement flags
         for(int i = 0; i < markMe.size(); i++){
-          if(mesh.elem(markMe[i])->active()) //don't mark already-refined elements
-            mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
+          if(mesh.elem(markMe[i])->active()){ //don't mark already-refined elements; markMe can only contain ids for coarse elements
+            refineMe.insert(markMe[i]); 
+          }
         }
-        
-        int prev_nelems = mesh.n_elem();
-        mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-          //mesh_test is fine with asking to marking the same element for refinement multiple times...even compiled against new libmesh
-        int new_nelems = mesh.n_elem();
-        
-        //mark new elements as HF subdomain = 1
-        for(int i = 0; i < (new_nelems-prev_nelems); i++){
-          mesh.elem(prev_nelems+i)->subdomain_id() = 1;
+        for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
+          
+          mesh_refinement.clean_refinement_flags(); //remove all refinement flags
+          for(dof_id_type ref_id : refineMe){ //mark elements for refinement
+            mesh.elem(ref_id)->set_refinement_flag(Elem::REFINE);
+          }
+          
+          mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
+          
+          //mark new elements as HF subdomain = 1 (not buffer elements, if any)
+          //also collect them in case we need to refine them again
+          refineMe.clear();
+          for(dof_id_type justRefined : refineMe){
+            for(int ii=0; ii<mesh.elem(justRefined)->n_children(); ii++){
+              Elem* elem_ii = mesh.elem(justRefined)->child(ii);
+              elem_ii->subdomain_id() = 1;
+              refineMe.insert(elem_ii->id());
+            }
+          }
         }
       }else{
         for(int i = 0; i < markMe.size(); i++){
@@ -717,7 +718,8 @@ outputJ.close();
   double numMarked = 0.;
   for (; elem_it != elem_end; ++elem_it){
     Elem* elem = *elem_it;
-    numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
+    if(elem->active())
+      numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
     if(output_dbg.is_open()){
       output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
     }
