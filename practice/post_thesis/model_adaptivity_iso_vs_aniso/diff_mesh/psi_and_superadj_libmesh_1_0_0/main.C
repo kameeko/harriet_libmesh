@@ -86,6 +86,8 @@ int main(int argc, char** argv)
   const double Lx = 2300; //4600
   const double Ly = 1650; //3300
   const double Lz = 100;
+  if((nx_ratio != ny_ratio) || (nx_ratio != nz_ratio) || (ny_ratio != nz_ratio))
+    std::cout << "\n\nAAAAAHHHHH can't refine element in only some of its dimensions...\n\n" << std::endl;
   if(nz_LF == 0){ //to check if oscillations happen in 2D as well...
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
@@ -284,6 +286,10 @@ int main(int argc, char** argv)
       node_to_elem[round(floor(di[j]/3.))].insert(i);
   }
   
+  bool mesh_diff = false; //whether two models should differ in mesh
+  if(nx_ratio > 1 || ny_ratio > 1 || nz_ratio > 1)
+    mesh_diff = true;
+  
   //find fine elements contained by coarse elements
   int elem_ratio = nx_ratio*ny_ratio;
   if(dim > 2)
@@ -293,47 +299,55 @@ int main(int argc, char** argv)
   MeshBase::element_iterator       elem_it_HF  = mesh_HF.elements_begin();
   const MeshBase::element_iterator elem_end_HF = mesh_HF.elements_end();
   std::vector<std::set<dof_id_type> > elem_mapping;
-  elem_mapping.resize(mesh.n_elem());
-  int n_babies_found = 0;
-  for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
-    Elem* elem = *elem_it_LF;
-    Point elem_cent = elem->centroid();
-    n_babies_found = 0;
-    elem_it_HF = mesh_HF.elements_begin();
-    for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
-      if(n_babies_found >= elem_ratio)
-        break;
-      Elem* elem_HF = *elem_it_HF;
-      Point elem_cent_diff = elem_HF->centroid();
-      elem_cent_diff.subtract(elem_cent);
-      if(std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) && 
-          std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) && 
-          std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1)){
-        elem_mapping[elem->id()].insert(elem_HF->id());
-        n_babies_found += 1;   
-      }
-    }
-  }
-  
-  //mapping fine nodes to coarse nodes that they overlap
-  std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
-  fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/3.));
-  elem_it_LF = mesh.elements_begin();
-  for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
-    Elem* elem = *elem_it_LF;
-    std::vector< dof_id_type > di_LF;
-    system_aux.get_dof_map().dof_indices(elem, di_LF);
-    for (dof_id_type baby_id : elem_mapping[elem->id()]){ //for each fine element in the coarse element
-      std::vector< dof_id_type > di_HF;
-      system_sadj_primary.get_dof_map().dof_indices(system_sadj_primary.get_mesh().elem(baby_id), di_HF);
-      for(unsigned int j = 0; j < di_LF.size(); j++){ //for each coarse node in elem
-        dof_id_type node_LF = round(floor(di_LF[j]/3.));
-        for(unsigned int k = 0; k < di_LF.size(); k++){ //for each fine node in elem
-          dof_id_type node_HF = round(floor(di_HF[k]/3.));
-          fine_to_coarse_nodes[node_HF].insert(node_LF);
+  if(mesh_diff){
+    elem_mapping.resize(mesh.n_elem());
+    int n_babies_found = 0;
+    for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
+      Elem* elem = *elem_it_LF;
+      Point elem_cent = elem->centroid();
+      n_babies_found = 0;
+      elem_it_HF = mesh_HF.elements_begin();
+      for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
+        if(n_babies_found >= elem_ratio)
+          break;
+        Elem* elem_HF = *elem_it_HF;
+        Point elem_cent_diff = elem_HF->centroid();
+        elem_cent_diff.subtract(elem_cent);
+        if(std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) && 
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) && 
+            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1)){
+          elem_mapping[elem->id()].insert(elem_HF->id());
+          n_babies_found += 1;   
         }
       }
     }
+  }else{ //this mapping not needed
+    elem_mapping.resize(0);
+  }
+  
+  //mapping fine basis functions to coarse basis functions that they overlap
+  std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
+  if(mesh_diff){
+    fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/3.));
+    elem_it_LF = mesh.elements_begin();
+    for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
+      Elem* elem = *elem_it_LF;
+      std::vector< dof_id_type > di_LF;
+      system_aux.get_dof_map().dof_indices(elem, di_LF);
+      for (dof_id_type baby_id : elem_mapping[elem->id()]){ //for each fine element in the coarse element
+        std::vector< dof_id_type > di_HF;
+        system_sadj_primary.get_dof_map().dof_indices(system_sadj_primary.get_mesh().elem(baby_id), di_HF);
+        for(unsigned int j = 0; j < di_LF.size(); j++){ //for each coarse node in elem
+          dof_id_type node_LF = round(floor(di_LF[j]/3.));
+          for(unsigned int k = 0; k < di_LF.size(); k++){ //for each fine node in elem
+            dof_id_type node_HF = round(floor(di_HF[k]/3.));
+            fine_to_coarse_nodes[node_HF].insert(node_LF);
+          }
+        }
+      }
+    }
+  }else{ //this mapping not needed
+    fine_to_coarse_nodes.resize(0);
   }
   
   int refIter = 0;
@@ -587,18 +601,25 @@ outputJ.close();
       
       //redistributed error contributions from fine to coarse nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs_coarse(round(system_primary.n_dofs()/3.));
-      for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //initialize pairs
-        node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(0.0, node_num);
-      }
-      for(unsigned int fine_node = 0; fine_node < fine_to_coarse_nodes.size(); fine_node++){ //redistribute error
-        for(dof_id_type coarse_node : fine_to_coarse_nodes[fine_node]){
-          node_errs_coarse[coarse_node].first += node_errs[fine_node].first/fine_to_coarse_nodes[fine_node].size();
+      if(mesh_diff){
+        for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //initialize pairs
+          node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(0.0, node_num);
         }
-      }
-      for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //magnitudes of redistributed errors
-        Number meep = node_errs_coarse[node_num].first;
-        dbg_sum2 += meep; //DEBUG
-        node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(fabs(meep), node_num);
+        for(unsigned int fine_node = 0; fine_node < fine_to_coarse_nodes.size(); fine_node++){ //redistribute error
+          for(dof_id_type coarse_node : fine_to_coarse_nodes[fine_node]){
+            node_errs_coarse[coarse_node].first += node_errs[fine_node].first/fine_to_coarse_nodes[fine_node].size();
+          }
+        }
+        for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //magnitudes of redistributed errors
+          Number meep = node_errs_coarse[node_num].first;
+          dbg_sum2 += meep; //DEBUG
+          node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(fabs(meep), node_num);
+        }
+      }else{
+        for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){
+          node_errs_coarse[node_num] = node_errs[node_num];
+          dbg_sum2 += node_errs_coarse[node_num].first; //DEBUG
+        }
       }
       std::cout << "Should match QoI error estimate: " << dbg_sum2 << std::endl; //DEBUG
       
@@ -618,22 +639,28 @@ outputJ.close();
       for(int i = 0; i < cutoffLoc; i++){
         markMe.insert(markMe.end(), node_to_elem[node_errs_coarse[i].second].begin(), node_to_elem[node_errs_coarse[i].second].end());
       } 
-  
-      //mark those elements for refinement
-      mesh_refinement.clean_refinement_flags(); //remove all refinement flags
-      for(int i = 0; i < markMe.size(); i++){
-        if(mesh.elem(markMe[i])->active()) //don't mark already-refined elements
-          mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
-      }
       
-      int prev_nelems = mesh.n_elem();
-      mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-        //mesh_test is fine with asking to marking the same element for refinement multiple times...even compiled against new libmesh
-      int new_nelems = mesh.n_elem();
-      
-      //mark new elements as HF subdomain = 1
-      for(int i = 0; i < (new_nelems-prev_nelems); i++){
-        mesh.elem(prev_nelems+i)->subdomain_id() = 1;
+      if(mesh_diff){
+        //mark those elements for refinement
+        mesh_refinement.clean_refinement_flags(); //remove all refinement flags
+        for(int i = 0; i < markMe.size(); i++){
+          if(mesh.elem(markMe[i])->active()) //don't mark already-refined elements
+            mesh.elem(markMe[i])->set_refinement_flag(Elem::REFINE);
+        }
+        
+        int prev_nelems = mesh.n_elem();
+        mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
+          //mesh_test is fine with asking to marking the same element for refinement multiple times...even compiled against new libmesh
+        int new_nelems = mesh.n_elem();
+        
+        //mark new elements as HF subdomain = 1
+        for(int i = 0; i < (new_nelems-prev_nelems); i++){
+          mesh.elem(prev_nelems+i)->subdomain_id() = 1;
+        }
+      }else{
+        for(int i = 0; i < markMe.size(); i++){
+            mesh.elem(markMe[i])->subdomain_id() = 1;
+        }
       }
 
       equation_systems.reinit(); //project previous solution onto new mesh

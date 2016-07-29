@@ -492,4 +492,32 @@ inv_HF appears to be not full rank? lack of BCs on k?
     -> writing p in terms of MPa instead of Pa just scales the whole equation...same for writing k in darcies...scale BCs / average?
     
 karen's idea: rerun case, timing all the individual pieces
-  -if need to dot MF residual against HF super adj, how to project/integrate/decompose?
+  -coarse meshes, everything runs, no obvious errors
+  -every variable has at least one diri boundary
+  -finer meshes
+    -first iteration's super-adjoint solve fails
+      -psi being projected and accessed correctly by sadj
+      -changing qoi (whole domain vs subsection) doesn't help
+      -at 8x16x8, initial KSP residual norm for first sadj is O(e58); at 4x8x4, it was O(e3) and solved fine
+        -6x12x6: if residual reduction not required, then residual increases dramatically after first linear solve and stalls on linear solve (very slow KSP residual reduction); if residual reduction required, then newton step fails...
+      -4x4x4 first sadj jacobian is full rank but ill-conditioned, though condition number of same order as primary jacobian...
+      -8x8x8 sadj:
+        Assembling the System
+Nonlinear Residual: 6408.0385292980991
+Linear solve starting, tolerance 1e-13
+  0 KSP Residual norm 9.779060907636e+54 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 5.069248672075e+51 % max 7.842150326739e+51 min 7.842150326739e+51 max/min 1.000000000000e+00
+  2 KSP Residual norm 1.091382838461e+49 % max 1.032461120317e+52 min 1.459564645116e+48 max/min 7.073760821566e+03
+  3 KSP Residual norm 2.635937601912e+44 % max 1.142635515713e+52 min 9.271264243769e+45 max/min 1.232448440331e+06
+  4 KSP Residual norm 2.812416767823e+43 % max 1.155534220359e+52 min 2.164331042849e+41 max/min 5.338990189030e+10
+  5 KSP Residual norm 1.646686096020e+43 % max 1.283638432024e+52 min 1.914631912225e+39 max/min 6.704361417083e+12
+  6 KSP Residual norm 1.637252346916e+43 % max 1.301160090289e+52 min 5.681088057913e+38 max/min 2.290336071233e+13
+  7 KSP Residual norm 1.608266889843e+43 % max 1.308936119952e+52 min 2.365624823764e+38 max/min 5.533151777927e+13
+  8 KSP Residual norm 1.375630224895e+43 % max 1.431157487362e+52 min 2.141913993162e+38 max/min 6.681675790582e+13
+  9 KSP Residual norm 1.098594172753e+43 % max 1.488428933954e+52 min 1.568262913297e+38 max/min 9.490940079847e+13
+ 10 KSP Residual norm 5.632376673046e+42 % max 1.599610903185e+52 min 1.119857438308e+38 max/min 1.428405838516e+14
+ 11 KSP Residual norm 3.236814500301e+42 % max 1.601959613229e+52 min 4.447162336264e+37 max/min 3.602206288189e+14
+ 12 KSP Residual norm 1.282453048404e+42 % max 1.662926917888e+52 min 2.689026251344e+37 max/min 6.184123033594e+14
+ 13 KSP Residual norm 1.020010558369e+42 % max 1.734038018811e+52 min 2.516263862971e+37 max/min 6.891320279759e+14
+ 14 KSP Residual norm 6.529459516046e+41 % max 2.007470256356e+52 min 2.515549088754e+37 max/min 7.980246799123e+14
+Linear solve finished, step 14, residual 6.5294595160463495e+41
