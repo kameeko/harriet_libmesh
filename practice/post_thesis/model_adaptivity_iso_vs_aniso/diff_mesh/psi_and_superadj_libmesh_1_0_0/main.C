@@ -363,7 +363,7 @@ int main(int argc, char** argv)
     
     system_primary.postprocess();
     system_aux.postprocess();
-
+/*
 std::ostringstream Jfile_name1;
 Jfile_name1 << "J_primary.dat";
 std::ofstream outputJ1(Jfile_name1.str());
@@ -374,7 +374,7 @@ Jfile_name2 << "J_aux.dat";
 std::ofstream outputJ2(Jfile_name2.str());
 system_aux.matrix->print(outputJ2);
 outputJ2.close();
-    
+*/    
     system_sadj_primary.set_c_vals(system_primary.get_c_vals());
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
@@ -468,13 +468,13 @@ outputJ2.close();
     //super adjoint solve
     std::cout << "\n Begin super-adjoint solves...\n" << std::endl;
     system_sadj_primary.solve();
-
+/*
 std::ostringstream Jfile_name;
 Jfile_name << "J_sadj_primary.dat";
 std::ofstream outputJ(Jfile_name.str());
 system_sadj_primary.matrix->print(outputJ);
 outputJ.close();
-
+*/
     system_sadj_aux.solve();
     std::cout << "\n End super-adjoint solves...\n" << std::endl;
     
