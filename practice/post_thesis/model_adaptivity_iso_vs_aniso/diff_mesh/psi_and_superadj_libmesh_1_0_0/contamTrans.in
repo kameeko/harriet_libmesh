@@ -19,9 +19,9 @@ bsource = -0.0
 data_file = Measurements_diri0_r4p2em3_bigdom.dat #Measurements_shifted.dat
 beta = 1.e-3
 
-QoI_option = 0 #0 uses whole domain, for debugging
+QoI_option = 1 #0 uses whole domain, for debugging
 
-max_model_refinements = 0
+max_model_refinements = 2
 refinement_step = 0.05
 relative_error_tolerance = 0.05
 do_divvy_in_Matlab = false

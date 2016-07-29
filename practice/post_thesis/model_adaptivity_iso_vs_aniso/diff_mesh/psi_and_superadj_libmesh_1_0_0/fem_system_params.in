@@ -15,23 +15,23 @@ solver_quiet = false
 solver_verbose = true
 
 # Nonlinear solver tolerance
-relative_step_tolerance = 1.e-9 #1e-10
+relative_step_tolerance = 1e-10
 relative_residual_tolerance = 0
-absolute_residual_tolerance = 1.e-9 #1.e-10
-max_nonlinear_iterations = 3 #100
+absolute_residual_tolerance = 1.e-10
+max_nonlinear_iterations = 100
 
-require_residual_reduction = false
+require_residual_reduction = true
 
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
-max_linear_iterations = 200 #10000
+max_linear_iterations = 10000
 
 direct_transfer_if_possible = true; #DEBUG
 
 #discretization
-nx_LF = 4 #16 #25 for HF
-ny_LF = 4 #32 #45 for HF
-nz_LF = 4 #16 #30 for HF
-nx_ratio = 1
-ny_ratio = 1
-nz_ratio = 1
+nx_LF = 16 #16 #25 for HF
+ny_LF = 32 #32 #45 for HF
+nz_LF = 16 #16 #30 for HF
+nx_ratio = 2
+ny_ratio = 2
+nz_ratio = 2

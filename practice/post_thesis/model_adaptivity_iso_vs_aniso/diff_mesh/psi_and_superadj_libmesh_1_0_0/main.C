@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
   Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
-  Mesh mesh_HF_dbg(init.comm());
+  //Mesh mesh_HF_dbg(init.comm());
   
   int n_LF_elems = mesh.n_elem();
   
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
     MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
+    //MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
   }
   double dx = Lx/nx_HF;
   double dy = Ly/ny_HF;
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
   EquationSystems equation_systems_mix(mesh_HF);
-  EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
+  //EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
 
   //systems - coarser mesh
   ConvDiff_PrimarySys & system_primary = 
@@ -123,10 +123,10 @@ int main(int argc, char** argv)
   //  equation_systems.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi
   
   //DEBUG
-  ConvDiff_PrimarySys & system_primary_dbg = 
-    equation_systems_dbg.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
-  ConvDiff_AuxSys & system_aux_dbg = 
-    equation_systems_dbg.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+  //ConvDiff_PrimarySys & system_primary_dbg = 
+  //  equation_systems_dbg.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+  //ConvDiff_AuxSys & system_aux_dbg = 
+  //  equation_systems_dbg.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
     
   //systems - fine mesh
   ConvDiff_MprimeSys & system_mix = 
@@ -164,16 +164,16 @@ int main(int argc, char** argv)
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary));
   system_sadj_aux.time_solver =
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux));
-  system_primary_dbg.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system_primary_dbg)); //DEBUG
-  system_aux_dbg.time_solver =
-    UniquePtr<TimeSolver>(new SteadySolver(system_aux_dbg)); //DEBUG
+  //system_primary_dbg.time_solver =
+  //  UniquePtr<TimeSolver>(new SteadySolver(system_primary_dbg)); //DEBUG
+  //system_aux_dbg.time_solver =
+  //  UniquePtr<TimeSolver>(new SteadySolver(system_aux_dbg)); //DEBUG
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
   equation_systems.init();
   equation_systems_mix.init();
-  equation_systems_dbg.init();
+  //equation_systems_dbg.init();
   
   //initial guess for primary state
   read_initial_parameters();
@@ -425,7 +425,7 @@ outputJ2.close();
 */     
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
+    //ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API 
         
     //project variables
@@ -435,8 +435,10 @@ outputJ2.close();
       std::cout << "...actually projecting..." << std::endl;
       std::vector<dof_id_type> primary_vars;
       std::vector<dof_id_type> aux_vars;
-      system_primary.get_all_variable_numbers(primary_vars);
-      system_aux.get_all_variable_numbers(aux_vars);
+      //system_primary.get_all_variable_numbers(primary_vars); //out of order, and order matters
+      //system_aux.get_all_variable_numbers(aux_vars); //out of order, and order matters...
+      primary_vars.push_back(0); primary_vars.push_back(1); primary_vars.push_back(2); 
+      aux_vars.push_back(0); aux_vars.push_back(1); aux_vars.push_back(2); 
       MeshFunction* primary_MF_meshfx = 
         new libMesh::MeshFunction(equation_systems, 
                                   *system_primary.solution, 
@@ -453,11 +455,11 @@ outputJ2.close();
       system_aux_proj.project_solution(aux_MF_meshfx);
 
       //DEBUG
-      system_primary_dbg.project_solution(primary_MF_meshfx);
-      system_aux_dbg.project_solution(aux_MF_meshfx);
+      //system_primary_dbg.project_solution(primary_MF_meshfx);
+      //system_aux_dbg.project_solution(aux_MF_meshfx);
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh_HF_dbg).write_equation_systems("post_proj.exo",equation_systems_dbg); //DEBUG
+    //ExodusII_IO (mesh_HF_dbg).write_equation_systems("post_proj.exo",equation_systems_dbg); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API     
 
       delete primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
@@ -483,12 +485,12 @@ outputJ2.close();
     clock_t end_proj = std::clock();
 
     //DEBUG
-    std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 0, L2) << std::endl; //DEBUG 
-    std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 1, L2) << std::endl; //DEBUG
-    std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 2, L2) << std::endl; //DEBUG
-    std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 0, L2) << std::endl; //DEBUG
-    std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 1, L2) << std::endl; //DEBUG
-    std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 2, L2) << std::endl; //DEBUG
+    //std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 0, L2) << std::endl; //DEBUG 
+    //std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 1, L2) << std::endl; //DEBUG
+    //std::cout << system_primary_proj.calculate_norm(*system_primary_proj.solution, 2, L2) << std::endl; //DEBUG
+    //std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 0, L2) << std::endl; //DEBUG
+    //std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 1, L2) << std::endl; //DEBUG
+    //std::cout << system_aux_proj.calculate_norm(*system_aux_proj.solution, 2, L2) << std::endl; //DEBUG
 
     //combine into one psi
     DirectSolutionTransfer sol_transfer(init.comm()); 
@@ -509,8 +511,9 @@ outputJ2.close();
     system_mix.assemble(); //calculate residual to correspond to solution
     
     //super adjoint solve
-    std::cout << "\n Begin super-adjoint solves...\n" << std::endl;
+    std::cout << "\n Begin primary super-adjoint solve...\n" << std::endl;
     system_sadj_primary.solve();
+    std::cout << "\n End primary super-adjoint solve, being auxiliary super-adjoint solve...\n" << std::endl;
 /*
 std::ostringstream Jfile_name;
 Jfile_name << "J_sadj_primary.dat";
