@@ -45,6 +45,7 @@ int main (int argc, char** argv){
 
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.max_h_level() = 1; //only controls how much refinement can be done in one go...
+  mesh_refinement.face_level_mismatch_limit() = 0; //lets neighbors differ by more than one level of refinement
 
   //initial elem ids
 	std::string stash_assign = "coarse.txt";
@@ -84,8 +85,8 @@ int main (int argc, char** argv){
   
   //test how max refinement level holds out
   refine_these.insert(12);
-  //refine_these.erase(10);
-  //refine_these.insert(25); //will still work even with max_h_level = 1
+  refine_these.erase(10); //debug mode will be sad without this
+  refine_these.insert(25); //will still work even with max_h_level = 1
   mesh_refinement.clean_refinement_flags();
   MeshBase::element_iterator       elem_it3  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end3 = mesh.elements_end();
@@ -96,7 +97,7 @@ int main (int argc, char** argv){
       elem->set_refinement_flag(Elem::REFINE);
     }
   }
-  mesh_refinement.refine_elements(); //does asking to refine 10 again break things?
+  mesh_refinement.refine_elements(); 
   
   //post-refinement elem ids
 	std::string stash_assign2 = "refined.txt";

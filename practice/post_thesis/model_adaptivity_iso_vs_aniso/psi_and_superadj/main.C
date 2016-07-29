@@ -231,11 +231,15 @@ int main(int argc, char** argv)
     }
     system_mix.solution->zero();
     
+    clock_t begin_inv = std::clock();
     system_primary.solve();
     system_primary.clearQoI();
+    clock_t end_inv = std::clock();
+    clock_t begin_err_est = std::clock();
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;
     system_aux.solve();
     std::cout << "\n End auxiliary solve..." << std::endl;
+    clock_t end_aux = std::clock();
     
     system_primary.postprocess();
     system_aux.postprocess();
@@ -282,8 +286,11 @@ int main(int argc, char** argv)
       //std::cout << system_mix.calculate_norm(dual_sol, 5, L2) << std::endl; //DEBUG
     }else{ //solve super-adjoint as
       system_mix.assemble(); //calculate residual to correspond to solution
+      std::cout << "\n Begin primary super-adjoint solve...\n" << std::endl;
       system_sadj_primary.solve();
+      std::cout << "\n End primary super-adjoint solve, begin auxiliary super-adjoint solve...\n" << std::endl;
       system_sadj_aux.solve();
+      std::cout << "\n End auxiliary super-adjoint solve...\n" << std::endl;
       const std::string & adjoint_solution0_name = "adjoint_solution0";
       system_mix.add_vector(adjoint_solution0_name, false, GHOSTED);
       system_mix.set_vector_as_adjoint(adjoint_solution0_name,0);
@@ -341,7 +348,27 @@ int main(int argc, char** argv)
         << adjresid->sum()+LprimeHF_psiLF->sum() << std::endl; 
         
     relError = fabs((adjresid->sum()+LprimeHF_psiLF->sum())/system_primary.getQoI());
-    std::cout << "Estimated relative qoi error: " << relError << std::endl << std::endl;
+    
+    //print out information
+    std::cout << "Estimated absolute relative qoi error: " << relError << std::endl << std::endl;
+    std::cout << "Estimated HF QoI: " << std::setprecision(17) << system_primary.getQoI()+adjresid->sum()+LprimeHF_psiLF->sum() << std::endl;
+    clock_t end = clock();
+    std::cout << "Time so far: " << double(end-begin)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to get superadjoint: " << double(end-end_aux)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    
+    //proportion of domain refined at this iteration
+    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
+    const MeshBase::element_iterator elem_end = mesh.elements_end();
+    double numMarked = 0.;
+    for (; elem_it != elem_end; ++elem_it){
+      Elem* elem = *elem_it;
+      numMarked += elem->subdomain_id();
+    }
+    std::cout << "Refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl << std::endl;
+
     
     //output at each iteration
     std::stringstream ss;
