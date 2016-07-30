@@ -678,11 +678,12 @@ outputJ.close();
           }
           
           mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-          
+
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
           //also collect them in case we need to refine them again
+          std::set<dof_id_type> tmp_cpy = refineMe;
           refineMe.clear();
-          for(dof_id_type justRefined : refineMe){
+          for(dof_id_type justRefined : tmp_cpy){
             for(int ii=0; ii<mesh.elem(justRefined)->n_children(); ii++){
               Elem* elem_ii = mesh.elem(justRefined)->child(ii);
               elem_ii->subdomain_id() = 1;
