@@ -409,7 +409,7 @@ outputJ2.close();
 */     
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    //ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
+    ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API 
         
     //project variables
@@ -673,10 +673,25 @@ outputJ.close();
         for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
           
           mesh_refinement.clean_refinement_flags(); //remove all refinement flags
-          for(dof_id_type ref_id : refineMe){ //mark elements for refinement
-            mesh.elem(ref_id)->set_refinement_flag(Elem::REFINE);
-          }
+//          for(dof_id_type ref_id : refineMe){ //mark elements for refinement
+//            mesh.elem(ref_id)->set_refinement_flag(Elem::REFINE);
+//          }
           
+          //more explicit marking of elements
+          MeshBase::element_iterator       eit  = mesh.elements_begin();
+          const MeshBase::element_iterator eend = mesh.elements_end();
+          double numMarked = 0.;
+          for (; eit != eend; ++eit){
+            Elem* elem = *eit;
+            if((refineMe.find(elem->id()) != refineMe.end())){
+              if(elem->active())
+                mesh.elem(elem->id())->set_refinement_flag(Elem::REFINE);
+              else
+                mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
+            }else
+              mesh.elem(elem->id())->set_refinement_flag(Elem::DO_NOTHING);
+          }
+
           mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
 
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
