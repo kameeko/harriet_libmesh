@@ -299,9 +299,15 @@ std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinem
         Elem* elem_HF = *elem_it_HF;
         Point elem_cent_diff = elem_HF->centroid();
         elem_cent_diff.subtract(elem_cent);
-        if(std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) && 
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) && 
-            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1)){
+        bool isBaby = false;
+        if(dim == 2)
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1));
+        else if(dim == 3)
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) &&
+            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1));
+        if(isBaby){
           elem_mapping[elem->id()].insert(elem_HF->id());
           n_babies_found += 1;   
         }
