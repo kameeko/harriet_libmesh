@@ -80,7 +80,7 @@ int main(int argc, char** argv)
   mesh_refinement.max_h_level() = 1;
   if(!useBuffer)
     mesh_refinement.face_level_mismatch_limit() = 0;
-
+std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinement.face_level_mismatch_limit()) << "\n" << std::endl;//DEBUG
   //create mesh
   unsigned int dim;
   const int nx_HF = nx_ratio*nx_LF;
@@ -683,17 +683,17 @@ outputJ.close();
           double numMarked = 0.;
           for (; eit != eend; ++eit){
             Elem* elem = *eit;
-            if((refineMe.find(elem->id()) != refineMe.end())){
-              if(elem->active())
+            if(elem->active()){
+              if((refineMe.find(elem->id()) != refineMe.end()))
                 mesh.elem(elem->id())->set_refinement_flag(Elem::REFINE);
               else
-                mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
+                mesh.elem(elem->id())->set_refinement_flag(Elem::DO_NOTHING);
             }else
-              mesh.elem(elem->id())->set_refinement_flag(Elem::DO_NOTHING);
+              mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
           }
 
           mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-
+equation_systems.reinit(); //DEBUG
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
           //also collect them in case we need to refine them again
           std::set<dof_id_type> tmp_cpy = refineMe;
