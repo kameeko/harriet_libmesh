@@ -80,7 +80,7 @@ int main(int argc, char** argv)
   mesh_refinement.max_h_level() = 1;
   if(!useBuffer)
     mesh_refinement.face_level_mismatch_limit() = 0;
-
+std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinement.face_level_mismatch_limit()) << "\n" << std::endl;//DEBUG
   //create mesh
   unsigned int dim;
   const int nx_HF = nx_ratio*nx_LF;
@@ -299,9 +299,15 @@ int main(int argc, char** argv)
         Elem* elem_HF = *elem_it_HF;
         Point elem_cent_diff = elem_HF->centroid();
         elem_cent_diff.subtract(elem_cent);
-        if(std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) && 
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) && 
-            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1)){
+        bool isBaby = false;
+        if(dim == 2)
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1));
+        else if(dim == 3)
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) &&
+            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1));
+        if(isBaby){
           elem_mapping[elem->id()].insert(elem_HF->id());
           n_babies_found += 1;   
         }
@@ -683,17 +689,17 @@ outputJ.close();
           double numMarked = 0.;
           for (; eit != eend; ++eit){
             Elem* elem = *eit;
-            if((refineMe.find(elem->id()) != refineMe.end())){
-              if(elem->active())
+            if(elem->active()){
+              if((refineMe.find(elem->id()) != refineMe.end()))
                 mesh.elem(elem->id())->set_refinement_flag(Elem::REFINE);
               else
-                mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
+                mesh.elem(elem->id())->set_refinement_flag(Elem::DO_NOTHING);
             }else
-              mesh.elem(elem->id())->set_refinement_flag(Elem::DO_NOTHING);
+              mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
           }
 
           mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-
+equation_systems.reinit(); //DEBUG
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
           //also collect them in case we need to refine them again
           std::set<dof_id_type> tmp_cpy = refineMe;

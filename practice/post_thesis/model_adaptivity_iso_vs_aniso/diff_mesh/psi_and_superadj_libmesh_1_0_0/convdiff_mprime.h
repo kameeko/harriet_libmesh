@@ -20,20 +20,26 @@ public:
     GetPot infile("contamTrans.in");
 		std::string find_data_here = infile("data_file","Measurements0.dat");
 		qoi_option = infile("QoI_option",1);
-    
+    const unsigned int dim = this->get_mesh().mesh_dimension();
+
     //read in data
-		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
-			Real x, y, z, value;
-			int flag = 1;
-			while(flag != -1){
-				flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
-				if(flag != -1){
-					datapts.push_back(Point(x,y,z));
-					datavals.push_back(value);
-				}
-			}
-			fclose(fp);
-	  }
+    if(FILE *fp=fopen(find_data_here.c_str(),"r")){
+      Real x, y, z, value;
+      int flag = 1;
+      while(flag != -1){
+        flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
+        if(flag != -1){
+          if(dim == 3)
+            datapts.push_back(Point(x,y,z));
+          else if(dim == 2)
+            datapts.push_back(Point(x,y,0.));
+          datavals.push_back(value);
+        }
+      }
+      fclose(fp);
+    }else{
+      std::cout << "\n\nAAAAAHHHHH NO DATA FOUND?!?!\n\n" << std::endl;
+    }
 	  
 	  //find elements in which data points reside
 	  PointLocatorTree point_locator(this->get_mesh());
