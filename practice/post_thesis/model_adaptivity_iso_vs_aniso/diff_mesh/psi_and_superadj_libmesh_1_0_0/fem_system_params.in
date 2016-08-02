@@ -31,7 +31,7 @@ direct_transfer_if_possible = false; #DEBUG
 #discretization
 nx_LF = 3 #16 #25 for HF
 ny_LF = 3 #32 #45 for HF
-nz_LF = 3 #16 #30 for HF
+nz_LF = 0 #16 #30 for HF
 nx_ratio = 4
 ny_ratio = 4
 nz_ratio = 4
