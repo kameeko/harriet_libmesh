@@ -510,6 +510,9 @@ check on detailed-time runs
       -LF: 170632.22587129171
       -running in _v2: 2724
   
+  -original R, 4:1
+    YOU'RE STILL SOLVING SADJ ON HF MESH
+  
   what if you need to refine an element that was previously partially refined as a buffer?
     -even with no buffers, multi-level not working; see gdb output in dbg.txt on bassi
 #0  libMesh::MeshRefinement::test_level_one (this=0x7fffffffc950, libmesh_assert_pass=true) at src/mesh/mesh_refinement.C:410
@@ -520,6 +523,7 @@ check on detailed-time runs
   -> what's max_h_level for? can you refine twice in one call? or is that only for uniform refinement?
   -> reinit calls coarsen_elements, which, according to its documentation, must satisfy the level-one rule...still not sure how the _face_level_mismatch_limit is being changed, but if we constrain refinement to the level-one rule, than reinit seems fine...
       -> setting use_buffer_zone to true makes it stop complaining about the second reinit...maybe reinit is bugged/designed so that it doesn't work with all levels of hanging nodes?
+        -> reinit creates its own MeshRefinement object, just for the function call...need to recompile libmesh to work with it...
     
   MF01 fwd seems much more fragile than same-mesh cd vs cdr; need to take itty-bitty steps...
     -> put LF and HF both to HF mesh, see if it's the physics or node mismatch?
@@ -538,15 +542,22 @@ check on detailed-time runs
     -> oddly, using 'flat' data meant for 2D works fine for 4.2e-4 in 3D (and 2D)
 
   MF01 appears less sensitive in 2D...debug do everything in 2D first, before bumping up to 3D for pictures?
-    -if you let it refine indefinitely, and some point it stops refining...??
+    -if you let it refine indefinitely, at some point it stops refining...??
     -refining completely in one go doesn't give zero estimated error ??
       -for 8x8x8 same-mesh, superlu, fully-refined gives effectively no error
       -for 8x8x8 diff-mesh, superlu, fully-refined gives enormous error...not sure if due to large (absolute) residuals due to coarseness...
+      -for 16x32x16 diff-mesh
+        -primary solve for MF01 also almost 0...very sketchy...LF solved fine though...
       -for 16x32 diff-mesh, ridiculous estimated error (appears to mostly be from aux solve, which has large absolute residual, but stops because of rel step size tol...)
         -primary solve for MF01 also almost 0...very sketchy...LF solved fine though...
-      -for 16x32x16 diff-mesh
+        -if no continuation, then primary solve for MF01 is completely 0...
+        -> when you refine the mesh, you no longer know which element the data points belong in... (8/3/16)
+          -> 16x32x16 case - gets below 5% tol in one step (MF01 solves fully, successfully)
+          -> 16x32 case - all iterations solved fine
+            -> if LF = 4x8, with 4x ratio, compiled against tweaked libmesh with EquationSystems patch is fine with or without buffer
     -very coarse aux sadj is dying via newton even with superlu...??
     -wtf the linear inv LF doesn't even solve in one step with superlu...??
+      -gmres and superlu end up in the same place, at least in terms of QoI: 84387911.200470656 vs 84387911.200470656
       -pre diff-mesh code also has that; see inv_HF_halved_shifted_cont_psi_and_superadj_phys/terminal_output_nvel_realqoi_pe1_n0p1_3p5em2_jacfix2_sofinerer_superlu2.txt
       -> is there something wrong with superlu?
       -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal
