@@ -42,6 +42,12 @@
 // The main program
 int main(int argc, char** argv)
 {
+  //for record-keeping
+  std::cout << "Running: " << argv[0];
+  for (int i=1; i<argc; i++)
+    std::cout << " " << argv[i];
+  std::cout << std::endl << std::endl;
+
   clock_t begin = std::clock();
   
   // Initialize libMesh
@@ -74,18 +80,13 @@ int main(int argc, char** argv)
   Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
   //Mesh mesh_HF_dbg(init.comm());
   
-  int n_LF_elems = mesh.n_elem();
-  
   MeshRefinement mesh_refinement(mesh);
   mesh_refinement.max_h_level() = 1;
   if(!useBuffer)
     mesh_refinement.face_level_mismatch_limit() = 0;
-std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinement.face_level_mismatch_limit()) << "\n" << std::endl;//DEBUG
+
   //create mesh
   unsigned int dim;
-  const int nx_HF = nx_ratio*nx_LF;
-  const int ny_HF = ny_ratio*ny_LF;
-  const int nz_HF = nz_ratio*nz_LF;
   const double Lx = 2300; //4600
   const double Ly = 1650; //3300
   const double Lz = 100;
@@ -98,6 +99,9 @@ std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinem
     std::cout << "\n\nAAAAHHHHH elem size ratios to be power of 2...using ratio = " << nx_ratio << "instead..." << std::endl;
   }
   int elem_ref_iters = round(std::log2(nx_ratio)); //number of refinements to get from LF to HF element
+  const int nx_HF = nx_ratio*nx_LF;
+  const int ny_HF = ny_ratio*ny_LF;
+  const int nz_HF = nz_ratio*nz_LF;
   if(nz_LF == 0){ //to check if oscillations happen in 2D as well...
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
@@ -114,7 +118,9 @@ std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinem
   double dy = Ly/ny_HF;
   double dz = 0.;
   if(dim == 3){dz = Lz/nz_HF; }
-  
+
+  int n_LF_elems = mesh.n_elem();
+
   mesh.print_info(); //DEBUG
   mesh_HF.print_info(); //DEBUG
   
@@ -184,6 +190,9 @@ std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinem
   equation_systems_mix.init();
   //equation_systems_dbg.init();
   
+  if(!useBuffer && (nx_ratio > 2))
+    equation_systems.face_lvl_mismatch_unlim = true;
+
   //initial guess for primary state
   read_initial_parameters();
   system_primary.project_solution(initial_value, initial_grad,
@@ -275,6 +284,9 @@ std::cout << "face_level_mismatch_limit: " << static_cast<unsigned>(mesh_refinem
   bool mesh_diff = false; //whether two models should differ in mesh
   if(nx_ratio > 1 || ny_ratio > 1 || nz_ratio > 1)
     mesh_diff = true;
+
+  //to keep track of fully-refined coarse elements (to distinguish from those refined as buffer)
+  std::set<dof_id_type> fullyRefined;
   
   //find fine elements contained by coarse elements
   int elem_ratio = nx_ratio*ny_ratio;
@@ -415,7 +427,10 @@ outputJ2.close();
 */     
 
 #ifdef LIBMESH_HAVE_EXODUS_API
-    ExodusII_IO (mesh).write_equation_systems("pre_proj.exo",equation_systems); //DEBUG
+    std::stringstream ssdbg;
+    ssdbg << refIter;
+    std::string write_dbg = "pre_proj" + ssdbg.str() + ".exo";
+    ExodusII_IO (mesh).write_equation_systems(write_dbg,equation_systems); //DEBUG
 #endif // #ifdef LIBMESH_HAVE_EXODUS_API 
         
     //project variables
@@ -499,7 +514,7 @@ outputJ2.close();
       system_mix.variable(system_mix.variable_number("fc")));
 
     system_mix.assemble(); //calculate residual to correspond to solution
-    
+
     //super adjoint solve
     std::cout << "\n Begin primary super-adjoint solve...\n" << std::endl;
     clock_t begin_sadj = std::clock();
@@ -585,15 +600,7 @@ outputJ.close();
     std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
     std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
-    MeshBase::element_iterator       elem_it  = mesh.elements_begin();
-    const MeshBase::element_iterator elem_end = mesh.elements_end();
-    double numMarked = 0.;
-    for (; elem_it != elem_end; ++elem_it){
-      Elem* elem = *elem_it;
-      if(elem->active())
-        numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
-    }
-    std::cout << "Refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl << std::endl;
+    std::cout << "Refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl << std::endl;
     
     //output at each iteration
     std::stringstream ss;
@@ -672,8 +679,17 @@ outputJ.close();
         std::set<dof_id_type> refineMe;
         //mark those elements for refinement
         for(int i = 0; i < markMe.size(); i++){
-          if(mesh.elem(markMe[i])->active()){ //don't mark already-refined elements; markMe can only contain ids for coarse elements
+          if(fullyRefined.find(markMe[i]) != fullyRefined.end()) //already fully refined element
+            break;
+          else if(mesh.elem(markMe[i])->active()){ //don't mark already-refined elements; markMe can only contain ids for coarse elements
             refineMe.insert(markMe[i]); 
+            fullyRefined.insert(markMe[i]);
+          }else{ //previously refined as part of buffer
+            std::vector<const Elem *> activeDesc; //active descendants
+            mesh.elem(markMe[i])->active_family_tree(activeDesc);
+            for(int ad = 0; ad < activeDesc.size(); ad++)
+              refineMe.insert(activeDesc[ad]->id());
+            fullyRefined.insert(markMe[i]);
           }
         }
         for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
@@ -698,8 +714,9 @@ outputJ.close();
               mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
           }
 
-          mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement??
-equation_systems.reinit(); //DEBUG
+          mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement?? 
+          equation_systems.reinit(); 
+          
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
           //also collect them in case we need to refine them again
           std::set<dof_id_type> tmp_cpy = refineMe;
@@ -708,7 +725,8 @@ equation_systems.reinit(); //DEBUG
             for(int ii=0; ii<mesh.elem(justRefined)->n_children(); ii++){
               Elem* elem_ii = mesh.elem(justRefined)->child(ii);
               elem_ii->subdomain_id() = 1;
-              refineMe.insert(elem_ii->id());
+              if(mesh.elem(justRefined)->level() < (elem_ref_iters-1)) //more refinement needed
+                refineMe.insert(elem_ii->id());
             }
           }
         }
@@ -717,6 +735,9 @@ equation_systems.reinit(); //DEBUG
             mesh.elem(markMe[i])->subdomain_id() = 1;
         }
       }
+      
+      system_primary.updateDataLoc(); //update data-element map
+      system_aux.updateDataLoc(); //update data-element map
 
       equation_systems.reinit(); //project previous solution onto new mesh
       
@@ -737,11 +758,11 @@ equation_systems.reinit(); //DEBUG
   std::ofstream output_dbg(stash_assign.c_str());
   MeshBase::element_iterator       elem_it  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end = mesh.elements_end();
-  double numMarked = 0.;
+  //double numMarked = 0.;
   for (; elem_it != elem_end; ++elem_it){
     Elem* elem = *elem_it;
-    if(elem->active())
-      numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
+    //if(elem->active())
+    //  numMarked += elem->subdomain_id(); //assumes HF is subdomain 1, LF is subdomain 0
     if(output_dbg.is_open()){
       output_dbg << elem->id() << " " << elem->subdomain_id() << "\n";
     }
@@ -749,7 +770,7 @@ equation_systems.reinit(); //DEBUG
   output_dbg.close();
   
   std::cout << "\nRefinement concluded..." << std::endl;
-  std::cout << "Final refinement fraction: " << numMarked/system_mix.get_mesh().n_elem() << std::endl;
+  std::cout << "Final refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl;
   std::cout << "Final estimated relative error: " << relError << std::endl;
   
   return 0; //done

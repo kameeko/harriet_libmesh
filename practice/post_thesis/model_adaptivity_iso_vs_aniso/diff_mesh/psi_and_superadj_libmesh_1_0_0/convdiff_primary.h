@@ -88,6 +88,18 @@ public:
   Real qoi;
   double getQoI(){ return qoi; }
   void clearQoI(){ qoi = 0.; }
+
+  //update elements where data points reside when mesh is changed
+  void updateDataLoc(){
+    PointLocatorTree point_locator(this->get_mesh());
+    for(unsigned int ind=0; ind<dataelems.size(); ind++){
+      if(!(this->get_mesh().elem(dataelems[ind])->active())){ //element has been refined
+        Point data_point = datapts[ind];
+        Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+        dataelems[ind] = this_elem->id();
+      }
+    }
+  }
  
   virtual void postprocess();
   std::vector<Real> primal_c_vals;

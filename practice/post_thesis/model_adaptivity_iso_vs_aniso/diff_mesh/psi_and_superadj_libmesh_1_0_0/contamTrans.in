@@ -16,13 +16,15 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
 bsource = -0.0
 
-data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat #Measurements_shifted.dat
+data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat 
+#data_file = Measurements_diri0_r4p2em3_bigdom.dat
+#data_file = Measurements_shifted.dat
 beta = 1.e-3
 
-QoI_option = 0 #0 uses whole domain, for debugging
+QoI_option = 1 #0 uses whole domain, for debugging
 
-max_model_refinements = 2
+max_model_refinements = 20
 refinement_step = 0.03
-relative_error_tolerance = 0.05
+relative_error_tolerance = 0.01
 do_divvy_in_Matlab = false
 do_continuation = true
