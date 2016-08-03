@@ -1,0 +1,37 @@
+# Solve a transient instead of a steady problem?
+transient = false
+
+# The interval between our timesteps
+deltat = 10000.0 
+
+# And the number of timesteps to take
+n_timesteps = 1
+
+# Write out every nth timestep to file.
+write_interval = 1
+
+# Turn this off to see the NewtonSolver chatter
+solver_quiet = false
+solver_verbose = true
+
+# Nonlinear solver tolerance
+relative_step_tolerance = 1e-10
+relative_residual_tolerance = 0
+absolute_residual_tolerance = 1.e-10
+max_nonlinear_iterations = 100
+
+require_residual_reduction = false
+
+initial_linear_tolerance = 1.e-13
+minimum_linear_tolerance = 1.e-20
+max_linear_iterations = 10000
+
+direct_transfer_if_possible = true; #DEBUG
+use_buffer_zone = false; #setting to false appears to cause problems for reinit if nx_ratio >= 4
+
+#discretization
+nx_LF = 4 #16 #25 for HF
+ny_LF = 8 #32 #45 for HF
+nz_LF = 0 #16 #30 for HF
+ratio_sadj = 2
+ratio_HF = 4

@@ -1,0 +1,30 @@
+verify_analytic_jacobians = 0 #if too large, will print out jacobians that disagree...
+print_jacobians = false
+print_element_jacobians = false
+
+# The polynomial order and finite element type to use for the pressure
+# variable.
+poly_order = 1
+fe_family = 'LAGRANGE'
+
+vx = 2.0866 #762.11604 m/yr or 2.0866 m/day or 2.415e-5 m/s
+reaction_rate = 4.2e-4
+reaction_order = 2 #adaptivity code assumes order 2
+porosity = 0.1 #0.1
+dispersivity_longitudinal = 100.0
+dispersivity_transverse_horizontal = 40.0
+dispersivity_transverse_vertical = 4.0
+bsource = -0.0
+
+data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat 
+#data_file = Measurements_diri0_r4p2em3_bigdom.dat
+#data_file = Measurements_shifted.dat
+beta = 1.e-3
+
+QoI_option = 0 #0 uses whole domain, for debugging
+
+max_model_refinements = 3
+refinement_step = 0.05
+relative_error_tolerance = 1.e-10
+do_divvy_in_Matlab = false
+do_continuation = true
