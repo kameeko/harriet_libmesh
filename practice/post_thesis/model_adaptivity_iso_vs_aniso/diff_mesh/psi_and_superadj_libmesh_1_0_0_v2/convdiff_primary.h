@@ -16,38 +16,36 @@ public:
     : FEMSystem(es, name_in, number_in){
     
     GetPot infile("contamTrans.in");
-    std::string find_data_here = infile("data_file","Measurements0.dat");
-    qoi_option = infile("QoI_option",1);
-
+		std::string find_data_here = infile("data_file","Measurements0.dat");
+		qoi_option = infile("QoI_option",1);
     const unsigned int dim = this->get_mesh().mesh_dimension();
-
+    
     //read in data
-    if(FILE *fp=fopen(find_data_here.c_str(),"r")){
-      Real x, y, z, value;
-      int flag = 1;
-      while(flag != -1){
-        flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
-        if(flag != -1){
+		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
+			Real x, y, z, value;
+			int flag = 1;
+			while(flag != -1){
+				flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
+				if(flag != -1){
           if(dim == 3)
-            datapts.push_back(Point(x,y,z));
+					  datapts.push_back(Point(x,y,z));
           else if(dim == 2)
             datapts.push_back(Point(x,y,0.));
-          datavals.push_back(value);
-        }
-      }
-      fclose(fp);
-    }else{
-      std::cout << "\n\nAAAAAHHHHH NO DATA FOUND?!?!\n\n" << std::endl;
-    }
-
-    
-    //find elements in which data points reside
-    PointLocatorTree point_locator(this->get_mesh());
-    for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
-      Point data_point = datapts[dnum];
-      Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
-      dataelems.push_back(this_elem->id());
-    }
+					datavals.push_back(value);
+				}
+			}
+			fclose(fp);
+	  }else{
+	    std::cout << "\n\nAAAAAHHHHH NO DATA FOUND?!?!\n\n" << std::endl;
+	  }
+	  
+	  //find elements in which data points reside
+	  PointLocatorTree point_locator(this->get_mesh());
+	  for(unsigned int dnum=0; dnum<datavals.size(); dnum++){
+	  	Point data_point = datapts[dnum];
+	  	Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+	  	dataelems.push_back(this_elem->id());
+	  }
   }
 
   // System initialization
@@ -82,21 +80,29 @@ public:
   std::vector<Point> datapts; 
   std::vector<Real> datavals;
   std::vector<dof_id_type> dataelems;
-  
+	
+	int cd_subdomain_id, cdr_subdomain_id;
+	
   //options for QoI location and nature
   int qoi_option;
   Real qoi;
   double getQoI(){ return qoi; }
   void clearQoI(){ qoi = 0.; }
 
-  void set_R( double Rval ){ react_rate = Rval; }
-  Real get_R(){ return react_rate; }
+  //update elements where data points reside when mesh is changed
+  void updateDataLoc(){
+    PointLocatorTree point_locator(this->get_mesh());
+    for(unsigned int ind=0; ind<dataelems.size(); ind++){
+      if(!(this->get_mesh().elem(dataelems[ind])->active())){ //element has been refined
+        Point data_point = datapts[ind];
+        Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+        dataelems[ind] = this_elem->id();
+      }
+    }
+  }
  
   virtual void postprocess();
+  std::vector<Real> primal_c_vals;
+  std::vector<Real> get_c_vals(){ return primal_c_vals; }
   
-  // Calculate Jacobians analytically ?
-  bool _analytic_jacobians;
-
-  bool diri_dbg;
-
 };

@@ -1,0 +1,142 @@
+*** Warning, This code is deprecated, and likely to be removed in future library versions! ./include/libmesh/auto_ptr.h, line 270, compiled Apr 12 2016 at 09:24:50 ***
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=4276737
+    n_local_nodes()=4276737
+  n_elem()=524288
+    n_local_elem()=524288
+    n_active_elem()=524288
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=1
+   System #0, "ContamTransInv"
+    Type "Implicit"
+    Variables={ "c" "zc" "fc" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=1635075
+    n_local_dofs()=1635075
+    n_constrained_dofs()=57732
+    n_local_constrained_dofs()=57732
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 78.9369
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 81
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 57732
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+
+
+Starting iteration with R = 0
+
+
+Assembling the System
+Nonlinear Residual: 1.37995
+Linear solve starting, tolerance 7.24662e-12
+
+ -----------------------------------------------------------------------------
+| Time:           Thu Aug  4 10:44:01 2016                                    |
+| OS:             Linux                                                       |
+| HostName:       bassi                                                       |
+| OS Release:     3.19.0-64-generic                                           |
+| OS Version:     #72~14.04.1-Ubuntu SMP Fri Jun 24 17:59:48 UTC 2016         |
+| Machine:        x86_64                                                      |
+| Username:       kameeko                                                     |
+| Configuration:  ./configure  'prefix=/home/kameeko/software/libmesh_build_petsc_mpi_superlu'|
+|  'PETSC_DIR=/home/kameeko/software/petsc_build_superlu'                     |
+|  'PETSC_ARCH=arch-linux2-c-debug'                                           |
+|  '--enable-everything'                                                      |
+|  '--enable-cxx11'                                                           |
+|  '--disable-netcdf-4'                                                       |
+|  '--disable-testsets'                                                       |
+|  'CXX=mpicxx'                                                               |
+|  'CC=mpicc'                                                                 |
+|  'F77=mpif77'                                                               |
+|  'FC=mpif90'                                                                |
+|  'CPPFLAGS='                                                                |
+|  'LIBS='                                                                    |
+|  '--with-mpi-dir=/usr/lib/openmpi'                                          |
+ -----------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=1575.8, Active time=1443.04                                                     |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     1          0.4992      0.499230    0.4992      0.499230    0.03     0.03     |
+|   build_constraint_matrix()        524288     0.8998      0.000002    0.8998      0.000002    0.06     0.06     |
+|   build_sparsity()                 1          4.8922      4.892171    5.7516      5.751603    0.34     0.40     |
+|   cnstrn_elem_mat_vec()            524288     0.5241      0.000001    0.5241      0.000001    0.04     0.04     |
+|   create_dof_constraints()         1          2.9439      2.943867    4.0988      4.098775    0.20     0.28     |
+|   distribute_dofs()                1          0.5000      0.499980    1.9332      1.933167    0.03     0.13     |
+|   dof_indices()                    6291456    6.2636      0.000001    6.2636      0.000001    0.43     0.43     |
+|   enforce_constraints_exactly()    2          0.1119      0.055966    0.1119      0.055966    0.01     0.01     |
+|   prepare_send_list()              2          0.0000      0.000005    0.0000      0.000005    0.00     0.00     |
+|   reinit()                         1          1.4332      1.433186    1.4332      1.433186    0.10     0.10     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        565266     1.3932      0.000002    1.3932      0.000002    0.10     0.10     |
+|   init_shape_functions()           40979      0.1267      0.000003    0.1267      0.000003    0.01     0.01     |
+|   inverse_map()                    381        0.0026      0.000007    0.0026      0.000007    0.00     0.00     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       1          25.2730     25.273034   32.5484     32.548355   1.75     2.26     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             565266     1.0651      0.000002    1.0651      0.000002    0.07     0.07     |
+|   compute_face_map()               40960      0.0453      0.000001    0.0453      0.000001    0.00     0.00     |
+|   init_face_shape_functions()      1          0.0000      0.000021    0.0000      0.000021    0.00     0.00     |
+|   init_reference_to_physical_map() 40979      0.9288      0.000023    0.9288      0.000023    0.06     0.06     |
+|                                                                                                                 |
+| GenericProjector                                                                                                |
+|   operator()                       1          13.3376     13.337611   1390.7795   1390.779480 0.92     96.38    |
+|   project_edges                    1572864    0.2783      0.000000    0.2783      0.000000    0.02     0.02     |
+|   project_interior                 1572864    0.3218      0.000000    0.3218      0.000000    0.02     0.02     |
+|   project_nodes                    1572864    1373.8453   0.000873    1373.8453   0.000873    95.20    95.20    |
+|   project_sides                    1572864    0.2610      0.000000    0.2610      0.000000    0.02     0.02     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 1          1.2585      1.258516    1.2585      1.258516    0.09     0.09     |
+|   renumber_nodes_and_elem()        2          0.2072      0.103608    0.2072      0.103608    0.01     0.01     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.6914      0.691437    0.6914      0.691437    0.05     0.05     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0120      0.011959    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               1          0.0629      0.062890    0.0629      0.062890    0.00     0.00     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          1          0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  1          5.8363      5.836334    5.8363      5.836334    0.40     0.40     |
+|   operator()                       18         0.0023      0.000125    0.0046      0.000256    0.00     0.00     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   project_fem_vector()             1          0.0260      0.026013    1390.8489   1390.848938 0.00     96.38    |
+|   project_vector(FunctionBase)     1          0.0000      0.000011    1390.8489   1390.848949 0.00     96.38    |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            1.489e+07  1443.0433                                       100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+

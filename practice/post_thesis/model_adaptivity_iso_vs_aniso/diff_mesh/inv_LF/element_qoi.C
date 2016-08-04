@@ -43,7 +43,8 @@ void ConvDiff_PrimarySys::element_postprocess (DiffContext &context)
       const Real z = (dim == 3)?xyz[qp](2):0;
 
       // If in the sub-domain omega, add the contribution to the integral R
-      if((qoi_option == 1 && 
+      if((qoi_option == 0) ||
+          (qoi_option == 1 && 
       			(dim == 3 && (fabs(x - 1150.) <= 50. && fabs(y - 825.) <= 50. && z >= 80.))) ||
       		(qoi_option == 1 && 
       			(dim == 2 && (fabs(x - 1150.) <= 50. && fabs(y - 825.) <= 50.))) 	){

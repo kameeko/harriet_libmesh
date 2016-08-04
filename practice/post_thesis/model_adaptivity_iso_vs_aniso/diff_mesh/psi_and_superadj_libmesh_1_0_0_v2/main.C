@@ -593,7 +593,7 @@ outputJ.close();
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
-    std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to get auxiliary variables: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
     std::cout << "Refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl << std::endl;
     
@@ -656,7 +656,7 @@ outputJ.close();
       //find nodes contributing the most
       //double refPcnt = std::min((refIter+1)*refStep,1.);
       double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
-      int cutoffLoc = round(node_errs_coarse.size()*refPcnt);
+      int cutoffLoc = std::max(round(node_errs_coarse.size()*refPcnt), 1.);
       std::sort(node_errs_coarse.begin(), node_errs_coarse.end()); 
       std::reverse(node_errs_coarse.begin(), node_errs_coarse.end()); 
       
@@ -675,7 +675,7 @@ outputJ.close();
         //mark those elements for refinement
         for(int i = 0; i < markMe.size(); i++){
           if(fullyRefined.find(markMe[i]) != fullyRefined.end()) //already fully refined element
-            break;
+            continue;
           else if(mesh.elem(markMe[i])->active()){ //don't mark already-refined elements; markMe can only contain ids for coarse elements
             refineMe.insert(markMe[i]); 
             fullyRefined.insert(markMe[i]);
@@ -687,6 +687,19 @@ outputJ.close();
             fullyRefined.insert(markMe[i]);
           }
         }
+/*        
+        //DEBUG
+        std::cout << "----- marking debug ------\n" << std::endl;
+        std::cout << "elements to refine: " << std::endl;
+        for(dof_id_type eep : refineMe)
+          std::cout << eep << std::endl;
+        std::cout << "fullyRefined.size(): " << fullyRefined.size() << std::endl;
+        for(dof_id_type nani : fullyRefined) 
+          std::cout << nani << std::endl;
+        for(int i = 0; i < cutoffLoc; i++){
+          std::cout << node_errs_coarse[i].second << std::endl;
+        std::cout << "----- marking debug ------\n" << std::endl;        
+*/
         for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
           
           mesh_refinement.clean_refinement_flags(); //remove all refinement flags

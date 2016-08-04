@@ -481,9 +481,6 @@ diff-mesh ...HF needs to do the HF mesh repeatedly, so even if superadj needs HF
   -> poke adjoint_refinement_estimator.C? that seems to be about neighboring elements rather than nodes
     -split HF basis blame equally among all LF bases that overlap its support
   -if need more dof difference, can go back to 60-6-0.6, full domain
-  
-  add photo album to cart
-
 
 checking if high-R inverse also doesn't take much longer...(we'd only really checked for fwd)
 
@@ -504,14 +501,23 @@ karen's idea: rerun case, timing all the individual pieces
 check on detailed-time runs
   -running in psi_and_superadj - should also update qois and err est for point-pass
   
-  -original 2:1 timing breakdown, higher R?
-    -current R already sensitive to adaptive step size...let it take small steps for as long as possible, see how error estimate/truth evolves?
-      -HF: 85991.739688138085
+  -original 2:1 timing breakdown
+    -compare timing of single iteration (inv + aux + sadj) compare to HF?
+      -HF: 85991.739688138085 (830)
       -LF: 170632.22587129171
-      -running in _v2: 2724
+      -running in _v2: 5458 **
   
-  -original R, 4:1
-    YOU'RE STILL SOLVING SADJ ON HF MESH
+  -original R, 32x64x32 HF, 4:1
+    -3D version: LF mesh too coarse to register qoi 1 (LF = 8x16x8)
+      -using qoi0
+        -first refinement fraction is less than the refinement step...?!? not seen in 2D version...
+          -> you confused break and continue...
+      -qoi2
+        -0.01 step: slightly more time to finish LF+MF01 than HF...fwd in MF01 takes more than superadj...
+        -0.005 step: slightly less time to finish LF+MF01 than HF...estimated relative error is small, but way off...
+  -original R, 64x128 HF, 4:1
+    -qoi2: HF qoi = 6834.3800652242126 (15 to solve for)
+        -0.005 step: 
   
   what if you need to refine an element that was previously partially refined as a buffer?
     -even with no buffers, multi-level not working; see gdb output in dbg.txt on bassi

@@ -1,0 +1,1141 @@
+Running: ./diff_convdiff_mprime-opt -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=561
+    n_local_nodes()=561
+  n_elem()=128
+    n_local_elem()=128
+    n_active_elem()=128
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ Mesh Information:
+  elem_dimensions()={2}
+  spatial_dimension()=2
+  n_nodes()=2145
+    n_local_nodes()=2145
+  n_elem()=512
+    n_local_elem()=512
+    n_active_elem()=512
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 1.63932
+Linear solve starting, tolerance 6.10008e-12
+Linear solve finished, step 2, residual 5.02675e-15
+Trying full Newton step
+  Current Residual: 1.08206e-11
+  Nonlinear solver converged, step 0, residual 1.08206e-11
+  Nonlinear solver relative step size inf > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 314294
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.299616
+Trying full Newton step
+  Current Residual: 1469.8
+  Nonlinear step: |du|/|u| = 1, |du| = 5.34489e+14
+Assembling the System
+Nonlinear Residual: 1469.8
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 2.45513e-11
+Trying full Newton step
+  Current Residual: 3.18199
+  Nonlinear step: |du|/|u| = 1.79245e-10, |du| = 95804.6
+Assembling the System
+Nonlinear Residual: 3.18199
+Linear solve starting, tolerance 3.14268e-12
+Linear solve finished, step 2, residual 4.63416e-17
+Trying full Newton step
+  Current Residual: 2.8865
+  Nonlinear solver current_residual 2.8865 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 1.59397e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+*** Warning, This code is untested, experimental, or likely to see future API changes: src/solution_transfer/direct_solution_transfer.C, line 39, compiled Aug  3 2016 at 11:52:41 ***
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 59.1535
+Linear solve starting, tolerance 1.69052e-13
+Linear solve finished, step 3, residual 3.00168e-15
+Trying full Newton step
+  Current Residual: 1.27742e-12
+  Nonlinear solver converged, step 0, residual 1.27742e-12
+  Nonlinear solver relative step size inf > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 3.08363e+15
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 42.8815
+Trying full Newton step
+  Current Residual: 307.729
+  Nonlinear step: |du|/|u| = 1, |du| = 4.39147e+14
+Assembling the System
+Nonlinear Residual: 307.729
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 3, residual 1.16164e-07
+Trying full Newton step
+  Current Residual: 1.19194
+  Nonlinear step: |du|/|u| = 2.14895e-07, |du| = 9.43706e+07
+Assembling the System
+Nonlinear Residual: 1.19194
+Linear solve starting, tolerance 8.38966e-12
+Linear solve finished, step 2, residual 9.0734e-14
+Trying full Newton step
+  Current Residual: 1.32619
+  Nonlinear step: |du|/|u| = 4.53523e-15, |du| = 1.99163
+  Nonlinear solver current_residual 1.32619 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 4.53523e-15 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -17539
+ L'_HF(psiLF): -149328
+QoI Error estimate: -166867.22826883467
+
+QoI: 1899337.9564680818
+Estimated relative qoi error: 0.087855469691730373
+Estimated HF QoI: 1732470.728199247
+Time so far: 0.92017800000000005 seconds...
+Time for inverse problem: 0.014250000000000001 seconds...
+Time to project psi: 0.17741199999999999 seconds...
+Time for extra error estimate bits: 0.66484900000000002 seconds...
+
+    Time to get auxiliary problems: 0.037418 seconds...
+    Time to get superadjoint: 0.29112199999999999 seconds...
+
+Refinement fraction: 0
+
+Should match QoI error estimate: -166867.22826883476
+Should match QoI error estimate: -166867.22826883491
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/mesh_refinement.C, line 1225, compiled Aug  3 2016 at 11:51:44 ***
+*** Warning, This code is deprecated, and likely to be removed in future library versions! src/mesh/mesh_refinement.C, line 880, compiled Aug  3 2016 at 11:51:44 ***
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 8.9635715638136428
+Linear solve starting, tolerance 1.1156267263342289e-12
+Linear solve finished, step 2, residual 3.502844981995072e-16
+Trying full Newton step
+  Current Residual: 0.6897835971220273
+  Nonlinear step: |du|/|u| = 0.36859008786121472, |du| = 2.8521463163789695
+Assembling the System
+Nonlinear Residual: 0.6897835971220273
+Linear solve starting, tolerance 1.449730037322261e-11
+Linear solve finished, step 2, residual 2.782361309092978e-17
+Trying full Newton step
+  Current Residual: 0.010394247183909605
+  Nonlinear step: |du|/|u| = 0.041911270119497017, |du| = 0.3207115355798128
+Assembling the System
+Nonlinear Residual: 0.010394247183909605
+Linear solve starting, tolerance 9.6207063609956251e-10
+Linear solve finished, step 2, residual 1.5790464149203259e-18
+Trying full Newton step
+  Current Residual: 1.6085832913629938e-06
+  Nonlinear step: |du|/|u| = 0.00047792310234479079, |du| = 0.0036567793765685881
+Assembling the System
+Nonlinear Residual: 1.6085832913629938e-06
+Linear solve starting, tolerance 6.2166504238190508e-06
+Linear solve finished, step 1, residual 3.3634697341244167e-16
+Trying full Newton step
+  Current Residual: 3.9729508678853708e-14
+  Nonlinear solver converged, step 3, residual 3.9729508678853708e-14
+  Nonlinear solver relative step size 3.6260858129751727e-08 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 547691007094261.38
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.039329899802838388
+Trying full Newton step
+  Current Residual: 26.158320762982402
+  Nonlinear step: |du|/|u| = 0.19456380043858787, |du| = 107725345760401.47
+Assembling the System
+Nonlinear Residual: 26.158320762982402
+Linear solve starting, tolerance 3.8228753636783008e-13
+Linear solve finished, step 2, residual 3.2678664489873935e-12
+Trying full Newton step
+  Current Residual: 4.8293046191114133
+  Nonlinear solver current_residual 4.8293046191114133 > 1e-10
+  Nonlinear solver converged, step 1, relative step size 1.6820333476267964e-11 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 12.515241051837652
+Linear solve starting, tolerance 7.990257605570984e-13
+Linear solve finished, step 2, residual 3.9214105317291293e-15
+Trying full Newton step
+  Current Residual: 1.1757422032317293e-12
+  Nonlinear solver converged, step 0, residual 1.1757422032317293e-12
+  Nonlinear solver relative step size 0.71246437258329853 > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 470909511447321.94
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.7917714495671887
+Trying full Newton step
+  Current Residual: 16.653127064542197
+  Nonlinear step: |du|/|u| = 0.15877658626257751, |du| = 69411227705038.352
+Assembling the System
+Nonlinear Residual: 16.653127064542197
+Linear solve starting, tolerance 6.0048782197140497e-13
+Linear solve finished, step 2, residual 6.9331734167175838e-09
+Trying full Newton step
+  Current Residual: 1.2959554370328759
+  Nonlinear step: |du|/|u| = 6.1312742461916433e-10, |du| = 268036.54296683153
+Assembling the System
+Nonlinear Residual: 1.2959554370328759
+Linear solve starting, tolerance 7.7163147082397098e-12
+Linear solve finished, step 2, residual 8.3204497334180087e-16
+Trying full Newton step
+  Current Residual: 1.2017453443363484
+  Nonlinear solver current_residual 1.2017453443363484 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 4.6337457700100578e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): 5297.3455313458726
+ L'_HF(psiLF): -113504.95154282353
+QoI Error estimate: -108207.60601147766
+
+QoI: 1839043.5822223809
+Estimated relative qoi error: 0.058839065619486215
+Estimated HF QoI: 1730835.9762109031
+Time so far: 1.8202100000000001 seconds...
+Time for inverse problem: 0.084400000000000003 seconds...
+Time to project psi: 0.19031500000000001 seconds...
+Time for extra error estimate bits: 0.69360500000000003 seconds...
+
+    Time to get auxiliary problems: 0.044722999999999999 seconds...
+    Time to get superadjoint: 0.28874100000000003 seconds...
+
+Refinement fraction: 0.046875
+
+Should match QoI error estimate: -108207.60601147723
+Should match QoI error estimate: -108207.60601147723
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 7.1779720224768715
+Linear solve starting, tolerance 1.3931511530953759e-12
+Linear solve finished, step 2, residual 3.3701237914268904e-16
+Trying full Newton step
+  Current Residual: 0.25914211298932099
+  Nonlinear step: |du|/|u| = 0.22429967644728996, |du| = 1.7459043747745071
+Assembling the System
+Nonlinear Residual: 0.25914211298932099
+Linear solve starting, tolerance 3.8588864946131281e-11
+Linear solve finished, step 2, residual 6.8196936809974147e-17
+Trying full Newton step
+  Current Residual: 0.0038119803547761208
+  Nonlinear step: |du|/|u| = 0.026087250991102706, |du| = 0.20240406026848048
+Assembling the System
+Nonlinear Residual: 0.0038119803547761208
+Linear solve starting, tolerance 2.6233083776181487e-09
+Linear solve finished, step 2, residual 1.5226041363914766e-18
+Trying full Newton step
+  Current Residual: 9.7682320090174365e-07
+  Nonlinear step: |du|/|u| = 0.00041072742991345683, |du| = 0.0031865743171962681
+Assembling the System
+Nonlinear Residual: 9.7682320090174365e-07
+Linear solve starting, tolerance 1.023726708248597e-05
+Linear solve finished, step 1, residual 1.2096267745679747e-15
+Trying full Newton step
+  Current Residual: 9.3575286731279809e-14
+  Nonlinear solver converged, step 3, residual 9.3575286731279809e-14
+  Nonlinear solver relative step size 1.1942564111745935e-07 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 1308323039542947
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.047330553087395096
+Trying full Newton step
+  Current Residual: 81.19646716028852
+  Nonlinear step: |du|/|u| = 0.40312265129772956, |du| = 296567042757779.31
+Assembling the System
+Nonlinear Residual: 81.19646716028852
+Linear solve starting, tolerance 1.2315806770581748e-13
+Linear solve finished, step 2, residual 2.394793274274853e-11
+Trying full Newton step
+  Current Residual: 3.5214257097096273
+  Nonlinear step: |du|/|u| = 1.7053156300548184e-10, |du| = 125455.71721463605
+Assembling the System
+Nonlinear Residual: 3.5214257097096273
+Linear solve starting, tolerance 2.8397589000463647e-12
+Linear solve finished, step 2, residual 8.0737063458690978e-17
+Trying full Newton step
+  Current Residual: 3.130375744718993
+  Nonlinear solver current_residual 3.130375744718993 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 1.2642739204378581e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 7.5972412446232402
+Linear solve starting, tolerance 1.3162672709751389e-12
+Linear solve finished, step 2, residual 2.0039091813167807e-13
+Trying full Newton step
+  Current Residual: 1.1285625905893149e-12
+  Nonlinear solver converged, step 0, residual 1.1285625905893149e-12
+  Nonlinear solver relative step size 0.48243955978240899 > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 1286902460149422.8
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 4.0500512988788255
+Trying full Newton step
+  Current Residual: 149.27947041439128
+  Nonlinear step: |du|/|u| = 0.34489468263644441, |du| = 134315311210802.16
+Assembling the System
+Nonlinear Residual: 149.27947041439128
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 2.5346444705518e-06
+Trying full Newton step
+  Current Residual: 1.2320980726729729
+  Nonlinear step: |du|/|u| = 2.0327734824633499e-07, |du| = 79164052.291175187
+Assembling the System
+Nonlinear Residual: 1.2320980726729729
+Linear solve starting, tolerance 8.1162370283605102e-12
+Linear solve finished, step 2, residual 2.4523489961029491e-14
+Trying full Newton step
+  Current Residual: 1.1417823430211265
+  Nonlinear solver current_residual 1.1417823430211265 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 4.3069019946791295e-15 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): 365.94035203613134
+ L'_HF(psiLF): -62938.526823640153
+QoI Error estimate: -62572.586471604023
+
+QoI: 1791442.911241808
+Estimated relative qoi error: 0.034928596428579137
+Estimated HF QoI: 1728870.324770204
+Time so far: 2.9194990000000001 seconds...
+Time for inverse problem: 0.13825100000000001 seconds...
+Time to project psi: 0.240762 seconds...
+Time for extra error estimate bits: 0.80643600000000004 seconds...
+
+    Time to get auxiliary problems: 0.107709 seconds...
+    Time to get superadjoint: 0.28663699999999998 seconds...
+
+Refinement fraction: 0.09375
+
+Should match QoI error estimate: -62572.586471603863
+Should match QoI error estimate: -62572.586471603972
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 7.6485819169371769
+Linear solve starting, tolerance 1.307431901573257e-12
+Linear solve finished, step 2, residual 5.338626975428493e-15
+Trying full Newton step
+  Current Residual: 0.15010702785188912
+  Nonlinear step: |du|/|u| = 0.14386845238153154, |du| = 1.1366240764723998
+Assembling the System
+Nonlinear Residual: 0.15010702785188912
+Linear solve starting, tolerance 6.6619132648919134e-11
+Linear solve finished, step 2, residual 1.3033632754722365e-17
+Trying full Newton step
+  Current Residual: 0.00011631669639961891
+  Nonlinear step: |du|/|u| = 0.0041822159071352406, |du| = 0.033007927036241044
+Assembling the System
+Nonlinear Residual: 0.00011631669639961891
+Linear solve starting, tolerance 8.5972180344977225e-08
+Linear solve finished, step 2, residual 2.3559990192241753e-20
+Trying full Newton step
+  Current Residual: 7.5626849165533418e-11
+  Nonlinear solver converged, step 2, residual 7.5626849165533418e-11
+  Nonlinear solver relative step size 3.3923358175044233e-06 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 542660648745405.38
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.024474385035278535
+Trying full Newton step
+  Current Residual: 16.159537298048406
+  Nonlinear step: |du|/|u| = 0.064943630385538298, |du| = 50040712128885.25
+Assembling the System
+Nonlinear Residual: 16.159537298048406
+Linear solve starting, tolerance 6.1882959985541815e-13
+Linear solve finished, step 2, residual 1.2086780164130951e-11
+Trying full Newton step
+  Current Residual: 3.8300154204629955
+  Nonlinear solver current_residual 3.8300154204629955 > 1e-10
+  Nonlinear solver converged, step 1, relative step size 4.694866369330284e-11 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 8.2800088895380952
+Linear solve starting, tolerance 1.2077281719630927e-12
+Linear solve finished, step 2, residual 7.656256062114082e-14
+Trying full Newton step
+  Current Residual: 3.8730591599245803e-13
+  Nonlinear solver converged, step 0, residual 3.8730591599245803e-13
+  Nonlinear solver relative step size 0.29681524899624145 > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 433240017757521.25
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 4.968915573365476
+Trying full Newton step
+  Current Residual: 97.76889463966188
+  Nonlinear step: |du|/|u| = 0.13374239824185841, |du| = 52251828304772.461
+Assembling the System
+Nonlinear Residual: 97.76889463966188
+Linear solve starting, tolerance 1.0228201962245878e-13
+Linear solve finished, step 2, residual 1.6374058667898382e-07
+Trying full Newton step
+  Current Residual: 1.1710611660294965
+  Nonlinear step: |du|/|u| = 1.2646519472873402e-08, |du| = 4940869.714308287
+Assembling the System
+Nonlinear Residual: 1.1710611660294965
+Linear solve starting, tolerance 8.5392636098635021e-12
+Linear solve finished, step 2, residual 3.0125736943840283e-15
+Trying full Newton step
+  Current Residual: 1.0013619494317778
+  Nonlinear solver current_residual 1.0013619494317778 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 3.3090728195162559e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -10890.143964570048
+ L'_HF(psiLF): -26376.416381671483
+QoI Error estimate: -37266.560346241531
+
+QoI: 1766470.3162088224
+Estimated relative qoi error: 0.021096624157388943
+Estimated HF QoI: 1729203.7558625808
+Time so far: 3.984578 seconds...
+Time for inverse problem: 0.114206 seconds...
+Time to project psi: 0.26889800000000003 seconds...
+Time for extra error estimate bits: 0.81008100000000005 seconds...
+
+    Time to get auxiliary problems: 0.079908999999999994 seconds...
+    Time to get superadjoint: 0.28658 seconds...
+
+Refinement fraction: 0.109375
+
+Should match QoI error estimate: -37266.560346241589
+Should match QoI error estimate: -37266.560346241611
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 19.255548760595257
+Linear solve starting, tolerance 5.1933082377086539e-13
+Linear solve finished, step 2, residual 4.1138520088013107e-14
+Trying full Newton step
+  Current Residual: 0.41708878367956725
+  Nonlinear step: |du|/|u| = 0.1666759520435819, |du| = 2.4261896391538915
+Assembling the System
+Nonlinear Residual: 0.41708878367956725
+Linear solve starting, tolerance 2.3975710667114472e-11
+Linear solve finished, step 2, residual 2.3065415201528121e-16
+Trying full Newton step
+  Current Residual: 0.0023207497286428691
+  Nonlinear step: |du|/|u| = 0.012419922840822595, |du| = 0.17976553530002484
+Assembling the System
+Nonlinear Residual: 0.0023207497286428691
+Linear solve starting, tolerance 4.3089523512937399e-09
+Linear solve finished, step 2, residual 1.0344875201315808e-18
+Trying full Newton step
+  Current Residual: 1.0749608022533159e-07
+  Nonlinear step: |du|/|u| = 8.5808897257728757e-05, |du| = 0.0012419523905925244
+Assembling the System
+Nonlinear Residual: 1.0749608022533159e-07
+Linear solve starting, tolerance 9.3026647846490375e-05
+Linear solve finished, step 1, residual 2.3953952537906332e-16
+Trying full Newton step
+  Current Residual: 5.1118675202103753e-14
+  Nonlinear solver converged, step 3, residual 5.1118675202103753e-14
+  Nonlinear solver relative step size 4.2671440461201588e-09 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 1581593544524041.5
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.02182323437279008
+Trying full Newton step
+  Current Residual: 134.3481319278998
+  Nonlinear step: |du|/|u| = 0.15758193761331013, |du| = 159473509045721.69
+Assembling the System
+Nonlinear Residual: 134.3481319278998
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 3.6641939162966792e-11
+Trying full Newton step
+  Current Residual: 4.2242001136095295
+  Nonlinear solver current_residual 4.2242001136095295 > 1e-10
+  Nonlinear solver converged, step 1, relative step size 7.0581298974955695e-11 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 23.42184355398134
+Linear solve starting, tolerance 4.2695187408935446e-13
+Linear solve finished, step 2, residual 2.759014195524496e-14
+Trying full Newton step
+  Current Residual: 6.8449379146072365e-13
+  Nonlinear solver converged, step 0, residual 6.8449379146072365e-13
+  Nonlinear solver relative step size 0.71250082858265629 > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 1566872674001770
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 4.0280570309360151
+Trying full Newton step
+  Current Residual: 61.045572854288139
+  Nonlinear step: |du|/|u| = 0.26342360825809424, |du| = 113388359715873.27
+Assembling the System
+Nonlinear Residual: 61.045572854288139
+Linear solve starting, tolerance 1.6381204291209386e-13
+Linear solve finished, step 3, residual 1.8710864261019106e-09
+Trying full Newton step
+  Current Residual: 1.2129359540587636
+  Nonlinear step: |du|/|u| = 4.2639826372942275e-09, |du| = 1835393.57018811
+Assembling the System
+Nonlinear Residual: 1.2129359540587636
+Linear solve starting, tolerance 8.2444583875493942e-12
+Linear solve finished, step 2, residual 1.602588653223389e-14
+Trying full Newton step
+  Current Residual: 1.2160105371047834
+  Nonlinear step: |du|/|u| = 4.6030958268405994e-16, |du| = 0.19813618399028177
+  Nonlinear solver current_residual 1.2160105371047834 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 4.603095824297655e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -56453.223183401729
+ L'_HF(psiLF): -1889774024.1295507
+QoI Error estimate: -1889830477.3527341
+
+QoI: 1804468.3565421328
+Estimated relative qoi error: 1047.3059671570961
+Estimated HF QoI: -1888026008.996192
+Time so far: 5.4028330000000002 seconds...
+Time for inverse problem: 0.23083899999999999 seconds...
+Time to project psi: 0.31109700000000001 seconds...
+Time for extra error estimate bits: 0.91389699999999996 seconds...
+
+    Time to get auxiliary problems: 0.12589700000000001 seconds...
+    Time to get superadjoint: 0.292126 seconds...
+
+Refinement fraction: 0.203125
+
+Should match QoI error estimate: -1889830477.352731
+Should match QoI error estimate: -1889830477.3527319
+
+ Begin primary solve...
+Assembling the System
+Nonlinear Residual: 7.5931211270167402
+Linear solve starting, tolerance 1.3169814932122516e-12
+Linear solve finished, step 2, residual 8.0639230674459616e-15
+Trying full Newton step
+  Current Residual: 0.053238631939321879
+  Nonlinear step: |du|/|u| = 0.051848524883004905, |du| = 0.75825843639482438
+Assembling the System
+Nonlinear Residual: 0.053238631939321879
+Linear solve starting, tolerance 1.8783352681559111e-10
+Linear solve finished, step 2, residual 1.1573669130547688e-16
+Trying full Newton step
+  Current Residual: 2.5235660501995635e-05
+  Nonlinear step: |du|/|u| = 0.0012228400520231488, |du| = 0.017873598904984734
+Assembling the System
+Nonlinear Residual: 2.5235660501995635e-05
+Linear solve starting, tolerance 3.9626464301218508e-07
+Linear solve finished, step 1, residual 3.5334870584776557e-13
+Trying full Newton step
+  Current Residual: 1.1007618970924029e-11
+  Nonlinear solver converged, step 2, residual 1.1007618970924029e-11
+  Nonlinear solver relative step size 8.1561935932914641e-07 > 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 204668935495106.72
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 0.78158801556641744
+Trying full Newton step
+  Current Residual: 29.73883778668857
+  Nonlinear step: |du|/|u| = 0.037205253000618485, |du| = 38287475909721.047
+Assembling the System
+Nonlinear Residual: 29.73883778668857
+Linear solve starting, tolerance 3.3626061891618745e-13
+Linear solve finished, step 2, residual 1.1153048937359935e-08
+Trying full Newton step
+  Current Residual: 4.0595618450570674
+  Nonlinear step: |du|/|u| = 6.8642965812752708e-10, |du| = 706396.45996016823
+Assembling the System
+Nonlinear Residual: 4.0595618450570674
+Linear solve starting, tolerance 2.4633200285336276e-12
+Linear solve finished, step 2, residual 1.2437298050772305e-15
+Trying full Newton step
+  Current Residual: 3.4842130679721071
+  Nonlinear solver current_residual 3.4842130679721071 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 1.2291808854298138e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 7.1245568754667792
+Linear solve starting, tolerance 1.4035960656633583e-12
+Linear solve finished, step 2, residual 1.398272041057231e-15
+Trying full Newton step
+  Current Residual: 1.4532978957065004e-13
+  Nonlinear solver converged, step 0, residual 1.4532978957065004e-13
+  Nonlinear solver relative step size 0.21072055037376172 > 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 240788424717587.12
+Linear solve starting, tolerance 1e-13
+Linear solve finished, step 2, residual 2.4553302347525312
+Trying full Newton step
+  Current Residual: 17.924390806444904
+  Nonlinear step: |du|/|u| = 0.057351896252963601, |du| = 24969937892738.391
+Assembling the System
+Nonlinear Residual: 17.924390806444904
+Linear solve starting, tolerance 5.5789901637295223e-13
+Linear solve finished, step 2, residual 1.8065584685049014e-08
+Trying full Newton step
+  Current Residual: 1.2268113515751664
+  Nonlinear step: |du|/|u| = 1.6408074785873281e-09, |du| = 714376.7426336169
+Assembling the System
+Nonlinear Residual: 1.2268113515751664
+Linear solve starting, tolerance 8.1512124803544437e-12
+Linear solve finished, step 2, residual 1.3157173124979137e-14
+Trying full Newton step
+  Current Residual: 1.1452247406559395
+  Nonlinear solver current_residual 1.1452247406559395 > 1e-10
+  Nonlinear solver converged, step 2, relative step size 2.0350254560714001e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.678871334516
+ L'_HF(psiLF): -1199441557.3483613
+QoI Error estimate: -1199503423.0272326
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567326
+Estimated HF QoI: -1197710720.9867303
+Time so far: 6.7906950000000004 seconds...
+Time for inverse problem: 0.19552800000000001 seconds...
+Time to project psi: 0.32120300000000002 seconds...
+Time for extra error estimate bits: 0.99227699999999996 seconds...
+
+    Time to get auxiliary problems: 0.20210900000000001 seconds...
+    Time to get superadjoint: 0.28695199999999998 seconds...
+
+Refinement fraction: 0.2109375
+
+Should match QoI error estimate: -1199503423.0272326
+Should match QoI error estimate: -1199503423.0272305
+
+ Begin primary solve...
+Assembling the System
+Linear solve unnecessary; residual 1.1007991324608647e-11 meets absolute tolerance 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 3.6470663668403138
+Linear solve starting, tolerance 2.7419298126630027e-12
+Linear solve finished, step 2, residual 5.18050418175744e-16
+Trying full Newton step
+  Current Residual: 4.0782166258185928
+  Nonlinear step: |du|/|u| = 2.4974099235033111e-16, |du| = 0.25700543502803919
+  Nonlinear solver current_residual 4.0782166258185928 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 2.4974099235033106e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Linear solve unnecessary; residual 1.4532978957065004e-13 meets absolute tolerance 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 3.9173198493506161
+Linear solve starting, tolerance 2.5527657644952645e-12
+Linear solve finished, step 2, residual 5.2922164677430426e-14
+Trying full Newton step
+  Current Residual: 1.2172081145827998
+  Nonlinear solver current_residual 1.2172081145827998 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 7.3933966239191931e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.678871483484
+ L'_HF(psiLF): -1199441557.3483613
+QoI Error estimate: -1199503423.0272326
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567326
+Estimated HF QoI: -1197710720.9867303
+Time so far: 7.6920659999999996 seconds...
+Time for inverse problem: 0.015037999999999999 seconds...
+Time to project psi: 0.32252599999999998 seconds...
+Time for extra error estimate bits: 0.69334300000000004 seconds...
+
+    Time to get auxiliary problems: 0.075420000000000001 seconds...
+    Time to get superadjoint: 0.112344 seconds...
+
+Refinement fraction: 0.2109375
+
+Should match QoI error estimate: -1199503423.0272336
+Should match QoI error estimate: -1199503423.0272305
+
+ Begin primary solve...
+Assembling the System
+Linear solve unnecessary; residual 1.1007991324608647e-11 meets absolute tolerance 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 4.1348014843800414
+Linear solve starting, tolerance 2.4184957942423123e-12
+Linear solve finished, step 2, residual 1.2499003963073243e-15
+Trying full Newton step
+  Current Residual: 4.1497783737249048
+  Nonlinear step: |du|/|u| = 1.5939785781670148e-16, |du| = 0.16403440782862169
+  Nonlinear solver current_residual 4.1497783737249048 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 1.5939785781670148e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Linear solve unnecessary; residual 1.4532978957065004e-13 meets absolute tolerance 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 3.3540819302786544
+Linear solve starting, tolerance 2.9814417798581348e-12
+Linear solve finished, step 2, residual 2.8001286670629824e-14
+Trying full Newton step
+  Current Residual: 1.1379700822264647
+  Nonlinear solver current_residual 1.1379700822264647 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 8.145975212114469e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.67887145366
+ L'_HF(psiLF): -1199441557.348361
+QoI Error estimate: -1199503423.0272324
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567315
+Estimated HF QoI: -1197710720.9867301
+Time so far: 8.5946429999999996 seconds...
+Time for inverse problem: 0.014444 seconds...
+Time to project psi: 0.32445099999999999 seconds...
+Time for extra error estimate bits: 0.69464700000000001 seconds...
+
+    Time to get auxiliary problems: 0.074978000000000003 seconds...
+    Time to get superadjoint: 0.113164 seconds...
+
+Refinement fraction: 0.2109375
+
+Should match QoI error estimate: -1199503423.0272336
+Should match QoI error estimate: -1199503423.0272305
+
+ Begin primary solve...
+Assembling the System
+Linear solve unnecessary; residual 1.1007991324608647e-11 meets absolute tolerance 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 4.2047610270259579
+Linear solve starting, tolerance 2.3782564420963147e-12
+Linear solve finished, step 2, residual 1.7514593893843548e-15
+Trying full Newton step
+  Current Residual: 3.6806208736042985
+  Nonlinear solver current_residual 3.6806208736042985 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 1.0430397147621848e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Linear solve unnecessary; residual 1.4532978957065004e-13 meets absolute tolerance 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 3.9836812296015451
+Linear solve starting, tolerance 2.5102410116785921e-12
+Linear solve finished, step 2, residual 1.8339791678317855e-14
+Trying full Newton step
+  Current Residual: 1.1835064952932552
+  Nonlinear solver current_residual 1.1835064952932552 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 5.7142365026063142e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.678870708645
+ L'_HF(psiLF): -1199441557.3483613
+QoI Error estimate: -1199503423.0272319
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567292
+Estimated HF QoI: -1197710720.9867296
+Time so far: 9.4971580000000007 seconds...
+Time for inverse problem: 0.014903 seconds...
+Time to project psi: 0.32478000000000001 seconds...
+Time for extra error estimate bits: 0.695183 seconds...
+
+    Time to get auxiliary problems: 0.075151999999999997 seconds...
+    Time to get superadjoint: 0.112294 seconds...
+
+Refinement fraction: 0.2109375
+
+Should match QoI error estimate: -1199503423.0272326
+Should match QoI error estimate: -1199503423.0272295
+
+ Begin primary solve...
+Assembling the System
+Linear solve unnecessary; residual 1.1007991324608647e-11 meets absolute tolerance 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 3.6927738247257849
+Linear solve starting, tolerance 2.707991465126509e-12
+Linear solve finished, step 2, residual 1.0613213906494079e-15
+Trying full Newton step
+  Current Residual: 2.9684832045705472
+  Nonlinear solver current_residual 2.9684832045705472 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 1.7186401290941564e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Linear solve unnecessary; residual 1.4532978957065004e-13 meets absolute tolerance 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 4.1827014382751448
+Linear solve starting, tolerance 2.3907993787201276e-12
+Linear solve finished, step 2, residual 5.8450523872211273e-14
+Trying full Newton step
+  Current Residual: 1.2045260841231624
+  Nonlinear solver current_residual 1.2045260841231624 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 4.8576300269987318e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.678871066259
+ L'_HF(psiLF): -1199441557.3483608
+QoI Error estimate: -1199503423.0272319
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567292
+Estimated HF QoI: -1197710720.9867296
+Time so far: 10.403810999999999 seconds...
+Time for inverse problem: 0.014792 seconds...
+Time to project psi: 0.32504300000000003 seconds...
+Time for extra error estimate bits: 0.69740999999999997 seconds...
+
+    Time to get auxiliary problems: 0.075441999999999995 seconds...
+    Time to get superadjoint: 0.11397699999999999 seconds...
+
+Refinement fraction: 0.2109375
+
+Should match QoI error estimate: -1199503423.0272322
+Should match QoI error estimate: -1199503423.0272288
+
+ Begin primary solve...
+Assembling the System
+Linear solve unnecessary; residual 1.1007991324608647e-11 meets absolute tolerance 1e-10
+
+ End primary solve, begin auxiliary solve...
+Assembling the System
+Nonlinear Residual: 3.1763961468119541
+Linear solve starting, tolerance 3.1482219275566985e-12
+Linear solve finished, step 2, residual 3.3965593123564094e-15
+Trying full Newton step
+  Current Residual: 3.3367785463393176
+  Nonlinear step: |du|/|u| = 1.408365034731769e-16, |du| = 0.1449331425422431
+  Nonlinear solver current_residual 3.3367785463393176 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 1.408365034731769e-16 < 1e-10
+
+ End auxiliary solve...
+Begin projecting psi...
+
+...actually projecting...
+
+Finished projecting psi...
+
+
+ Begin primary super-adjoint solve...
+
+Assembling the System
+Linear solve unnecessary; residual 1.4532978957065004e-13 meets absolute tolerance 1e-10
+
+ End primary super-adjoint solve, being auxiliary super-adjoint solve...
+
+Assembling the System
+Nonlinear Residual: 4.0559487669570506
+Linear solve starting, tolerance 2.4655143776637087e-12
+Linear solve finished, step 2, residual 5.4461775902828075e-15
+Trying full Newton step
+  Current Residual: 1.0926895411884896
+  Nonlinear solver current_residual 1.0926895411884896 > 1e-10
+  Nonlinear solver converged, step 0, relative step size 4.0355755128839873e-16 < 1e-10
+
+ End super-adjoint solves...
+
+
+ -0.5*M'_HF(psiLF)(superadj): -61865.678871543118
+ L'_HF(psiLF): -1199441557.3483613
+QoI Error estimate: -1199503423.0272329
+
+QoI: 1792702.0405022951
+Estimated relative qoi error: 669.10361896567338
+Estimated HF QoI: -1197710720.9867306
+Time so far: 11.303058 seconds...
+Time for inverse problem: 0.01486 seconds...
+Time to project psi: 0.32108700000000001 seconds...
+Time for extra error estimate bits: 0.68995300000000004 seconds...
+
+    Time to get auxiliary problems: 0.073165999999999995 seconds...
+    Time to get superadjoint: 0.113132 seconds...
+
+Refinement fraction: 0.2109375
+
+
+Refinement concluded...
+Final refinement fraction: 0.2109375
+Final estimated relative error: 669.10361896567338
+
+ --------------------------------------------------------------------------
+| Time:           Thu Aug  4 10:59:46 2016                                 |
+| OS:             Linux                                                    |
+| HostName:       bassi                                                    |
+| OS Release:     3.19.0-64-generic                                        |
+| OS Version:     #72~14.04.1-Ubuntu SMP Fri Jun 24 17:59:48 UTC 2016      |
+| Machine:        x86_64                                                   |
+| Username:       kameeko                                                  |
+| Configuration:  ./configure  'prefix=/home/kameeko/software/libmesh-07_28_16_build_petsc'|
+|  'PETSC_DIR=/home/kameeko/software/petsc_build_superlu'                  |
+|  'PETSC_ARCH=arch-linux2-c-debug'                                        |
+|  '--enable-everything'                                                   |
+ --------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=11.3229, Active time=10.3785                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     122        0.0216      0.000177    0.0216      0.000177    0.21     0.21     |
+|   build_constraint_matrix()        69827      0.0817      0.000001    0.0817      0.000001    0.79     0.79     |
+|   build_sparsity()                 122        0.2411      0.001976    0.2854      0.002339    2.32     2.75     |
+|   cnstrn_elem_mat_vec()            40342      0.0506      0.000001    0.0506      0.000001    0.49     0.49     |
+|   constrain_elem_vector()          29485      0.0111      0.000000    0.0111      0.000000    0.11     0.11     |
+|   create_dof_constraints()         122        0.3815      0.003127    0.4701      0.003854    3.68     4.53     |
+|   distribute_dofs()                122        0.0228      0.000187    0.1365      0.001119    0.22     1.32     |
+|   dof_indices()                    1504818    0.6223      0.000000    0.6223      0.000000    6.00     6.00     |
+|   enforce_constraints_exactly()    294        0.0713      0.000242    0.0713      0.000242    0.69     0.69     |
+|   old_dof_indices()                291856     0.1505      0.000001    0.1505      0.000001    1.45     1.45     |
+|   prepare_send_list()              129        0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         122        0.0921      0.000755    0.0921      0.000755    0.89     0.89     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   build_parallel_solution_vector() 21         0.2841      0.013531    0.3068      0.014609    2.74     2.96     |
+|   build_solution_vector()          21         0.0006      0.000027    0.3074      0.014636    0.01     2.96     |
+|                                                                                                                 |
+| ExodusII_IO                                                                                                     |
+|   write_nodal_data()               21         0.0403      0.001921    0.0403      0.001921    0.39     0.39     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        107027     0.0809      0.000001    0.0809      0.000001    0.78     0.78     |
+|   init_shape_functions()           27963      0.0584      0.000002    0.0584      0.000002    0.56     0.56     |
+|   inverse_map()                    1667525    1.6179      0.000001    1.6179      0.000001    15.59    15.59    |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       89         0.8279      0.009302    1.1634      0.013072    7.98     11.21    |
+|   assembly(get_residual)           68         0.2690      0.003956    0.4794      0.007050    2.59     4.62     |
+|   postprocess()                    22         0.0327      0.001485    0.0728      0.003308    0.31     0.70     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             107027     0.0869      0.000001    0.0869      0.000001    0.84     0.84     |
+|   compute_face_map()               15810      0.0277      0.000002    0.0644      0.000004    0.27     0.62     |
+|   init_face_shape_functions()      179        0.0003      0.000002    0.0003      0.000002    0.00     0.00     |
+|   init_reference_to_physical_map() 27963      0.0522      0.000002    0.0522      0.000002    0.50     0.50     |
+|                                                                                                                 |
+| GenericProjector                                                                                                |
+|   copy_dofs                        178632     0.5042      0.000003    0.8313      0.000005    4.86     8.01     |
+|   operator()                       138        0.3297      0.002389    4.5818      0.033202    3.18     44.15    |
+|   project_edges                    37416      0.0051      0.000000    0.0051      0.000000    0.05     0.05     |
+|   project_interior                 37416      0.0054      0.000000    0.0054      0.000000    0.05     0.05     |
+|   project_nodes                    37416      0.5425      0.000014    3.2598      0.000087    5.23     31.41    |
+|   project_sides                    37416      0.0051      0.000000    0.0051      0.000000    0.05     0.05     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   contract()                       41         0.0005      0.000012    0.0017      0.000042    0.00     0.02     |
+|   find_neighbors()                 12         0.0056      0.000465    0.0056      0.000465    0.05     0.05     |
+|   renumber_nodes_and_elem()        65         0.0016      0.000025    0.0016      0.000025    0.02     0.02     |
+|                                                                                                                 |
+| MeshOutput                                                                                                      |
+|   write_equation_systems()         21         0.0002      0.000011    0.3479      0.016568    0.00     3.35     |
+|                                                                                                                 |
+| MeshRefinement                                                                                                  |
+|   _coarsen_elements()              41         0.0003      0.000007    0.0003      0.000007    0.00     0.00     |
+|   _refine_elements()               61         0.0038      0.000062    0.0056      0.000091    0.04     0.05     |
+|   add_node()                       4860       0.0015      0.000000    0.0015      0.000000    0.01     0.01     |
+|   make_coarsening_compatible()     41         0.0025      0.000060    0.0025      0.000060    0.02     0.02     |
+|   make_flags_parallel_consistent() 102        0.0034      0.000034    0.0034      0.000034    0.03     0.03     |
+|   make_refinement_compatible()     61         0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     2          0.0005      0.000269    0.0005      0.000269    0.01     0.01     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          44         0.0312      0.000710    3.8032      0.086437    0.30     36.65    |
+|                                                                                                                 |
+| OldSolutionValue                                                                                                |
+|   Number eval_at_node()            12960      0.0055      0.000000    0.2017      0.000016    0.05     1.94     |
+|   check_old_context(c)             178632     0.1156      0.000001    0.2348      0.000001    1.11     2.26     |
+|   check_old_context(c,p)           9504       0.0102      0.000001    0.0218      0.000002    0.10     0.21     |
+|   eval_at_point()                  9504       0.0699      0.000007    0.1957      0.000021    0.67     1.89     |
+|   eval_old_dofs()                  178632     0.0746      0.000000    0.3182      0.000002    0.72     3.07     |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      122        0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               12         0.0003      0.000024    0.0003      0.000024    0.00     0.00     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          68         2.3824      0.035035    2.3824      0.035035    22.96    22.96    |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  38         0.0316      0.000831    0.0316      0.000831    0.30     0.30     |
+|   operator()                       135549     0.6882      0.000005    2.1907      0.000016    6.63     21.11    |
+|                                                                                                                 |
+| System                                                                                                          |
+|   project_fem_vector()             23         0.0033      0.000142    3.2752      0.142399    0.03     31.56    |
+|   project_vector(FunctionBase)     23         0.0001      0.000002    3.2752      0.142401    0.00     31.56    |
+|   project_vector(old,new)          115        0.3953      0.003437    1.7826      0.015501    3.81     17.18    |
+|                                                                                                                 |
+| TopologyMap                                                                                                     |
+|   init()                           61         0.0328      0.000537    0.0328      0.000537    0.32     0.32     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            4750125    10.3785                                         100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+

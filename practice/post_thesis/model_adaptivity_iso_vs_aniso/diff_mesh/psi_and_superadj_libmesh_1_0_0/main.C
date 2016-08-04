@@ -680,7 +680,7 @@ outputJ.close();
         //mark those elements for refinement
         for(int i = 0; i < markMe.size(); i++){
           if(fullyRefined.find(markMe[i]) != fullyRefined.end()) //already fully refined element
-            break;
+            continue;
           else if(mesh.elem(markMe[i])->active()){ //don't mark already-refined elements; markMe can only contain ids for coarse elements
             refineMe.insert(markMe[i]); 
             fullyRefined.insert(markMe[i]);
