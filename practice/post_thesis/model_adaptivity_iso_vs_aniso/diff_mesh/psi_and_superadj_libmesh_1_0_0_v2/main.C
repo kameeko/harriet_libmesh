@@ -592,11 +592,13 @@ outputJ.close();
     std::cout << "Time so far: " << double(end-begin)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
-    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "    Time to get auxiliary variables: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    std::cout << "Primary and auxiliary system dofs (each): " << system_primary.solution->size() << std::endl;
+    std::cout << "Primary and auxiliary superadjoint system dofs (each: " << system_sadj_primary.solution->size() << "\n" << std::endl;
     std::cout << "Refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl << std::endl;
-    
+
     //output at each iteration
     std::stringstream ss;
     ss << refIter;
