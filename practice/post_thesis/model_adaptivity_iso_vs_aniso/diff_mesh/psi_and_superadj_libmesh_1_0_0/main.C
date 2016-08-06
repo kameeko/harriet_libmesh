@@ -60,9 +60,8 @@ int main(int argc, char** argv)
   const int nx_LF                       = solverInfile("nx_LF",100);
   const int ny_LF                       = solverInfile("ny_LF",100);
   const int nz_LF                       = solverInfile("nz_LF",100);
-  int nx_ratio                          = solverInfile("nx_ratio",2);
-  int ny_ratio                          = solverInfile("ny_ratio",2);
-  int nz_ratio                          = solverInfile("nz_ratio",2);
+  int ratio_sadj                        = solverInfile("ratio_sadj",2);
+  int ratio_HF                          = solverInfile("ratio_HF",2);
   const bool xfer_if_possible           = solverInfile("direct_transfer_if_possible",true); 
   const bool useBuffer                  = solverInfile("use_buffer_zone",false); //for mesh refinement
   GetPot infile("contamTrans.in");
@@ -77,7 +76,7 @@ int main(int argc, char** argv)
     maxIter = round(ceil(1./refStep));
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
-  Mesh mesh_HF(init.comm()); //high-fidelity mesh, for super-adj
+  Mesh mesh_sadj(init.comm()); //high(er)-fidelity mesh, for super-adj
   //Mesh mesh_HF_dbg(init.comm());
   
   MeshRefinement mesh_refinement(mesh);
@@ -90,43 +89,43 @@ int main(int argc, char** argv)
   const double Lx = 2300; //4600
   const double Ly = 1650; //3300
   const double Lz = 100;
-  if((nx_ratio != ny_ratio) || (nx_ratio != nz_ratio) || (ny_ratio != nz_ratio))
-    std::cout << "\n\nAAAAAHHHHH can't refine element unequally in its dimensions...?\n\n" << std::endl;
-  if(!(nx_ratio & (nx_ratio-1)) == 0){
-    nx_ratio = round(std::pow(2.,std::floor(std::log2(nx_ratio))));
-    ny_ratio = nx_ratio;
-    nz_ratio = nz_ratio;
-    std::cout << "\n\nAAAAHHHHH elem size ratios to be power of 2...using ratio = " << nx_ratio << "instead..." << std::endl;
+  if(!(ratio_HF & (ratio_HF-1)) == 0){
+    ratio_HF = round(std::pow(2.,std::floor(std::log2(ratio_HF))));
+    std::cout << "\n\nAAAAHHHHH elem size ratios to be power of 2...using HF ratio = " << ratio_HF << "instead..." << std::endl;
   }
-  int elem_ref_iters = round(std::log2(nx_ratio)); //number of refinements to get from LF to HF element
-  const int nx_HF = nx_ratio*nx_LF;
-  const int ny_HF = ny_ratio*ny_LF;
-  const int nz_HF = nz_ratio*nz_LF;
-  if(nz_LF == 0){ //to check if oscillations happen in 2D as well...
+  if(!(ratio_sadj & (ratio_sadj-1)) == 0){
+    ratio_sadj = round(std::pow(2.,std::floor(std::log2(ratio_sadj))));
+    std::cout << "\n\nAAAAHHHHH elem size ratios to be power of 2...using super-adjoint ratio = " << ratio_sadj << "instead..." << std::endl;
+  }
+  int elem_ref_iters = round(std::log2(ratio_HF)); //number of refinements to get from LF to HF element
+  const int nx_sadj = ratio_sadj*nx_LF;
+  const int ny_sadj = ratio_sadj*ny_LF;
+  const int nz_sadj = ratio_sadj*nz_LF;
+  if(nz_LF == 0){ //easier to debug
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
-    MeshTools::Generation::build_square(mesh_HF, nx_HF, ny_HF, 0., Lx, 0., Ly, QUAD9);
+    MeshTools::Generation::build_square(mesh_sadj, nx_sadj, ny_sadj, 0., Lx, 0., Ly, QUAD9);
     //MeshTools::Generation::build_square(mesh_LF, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
   }else{
     dim = 3;
     MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
-    MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    MeshTools::Generation::build_cube(mesh_sadj, nx_sadj, ny_sadj, nz_sadj, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
   }
-  double dx = Lx/nx_HF;
-  double dy = Ly/ny_HF;
+  double dx = Lx/nx_sadj;
+  double dy = Ly/ny_sadj;
   double dz = 0.;
-  if(dim == 3){dz = Lz/nz_HF; }
+  if(dim == 3){dz = Lz/nz_sadj; }
 
   int n_LF_elems = mesh.n_elem();
 
   mesh.print_info(); //DEBUG
-  mesh_HF.print_info(); //DEBUG
+  mesh_sadj.print_info(); //DEBUG
   
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  EquationSystems equation_systems_mix(mesh_HF);
+  EquationSystems equation_systems_mix(mesh_sadj);
   //EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
 
   //systems - coarser mesh
@@ -190,7 +189,7 @@ int main(int argc, char** argv)
   equation_systems_mix.init();
   //equation_systems_dbg.init();
   
-  if(!useBuffer && (nx_ratio > 2))
+  if(!useBuffer && (ratio_HF > 2))
     equation_systems.face_lvl_mismatch_unlim = true;
 
   //initial guess for primary state
@@ -280,31 +279,27 @@ int main(int argc, char** argv)
     for(unsigned int j = 0; j < di.size(); j++)
       node_to_elem[round(floor(di[j]/3.))].insert(i);
   }
-  
-  bool mesh_diff = false; //whether two models should differ in mesh
-  if(nx_ratio > 1 || ny_ratio > 1 || nz_ratio > 1)
-    mesh_diff = true;
 
   //to keep track of fully-refined coarse elements (to distinguish from those refined as buffer)
   std::set<dof_id_type> fullyRefined;
   
   //find fine elements contained by coarse elements
-  int elem_ratio = nx_ratio*ny_ratio;
+  int elem_ratio = ratio_sadj*ratio_sadj;
   if(dim > 2)
-    elem_ratio *= nz_ratio;
+    elem_ratio *= ratio_sadj;
   MeshBase::element_iterator       elem_it_LF  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end_LF = mesh.elements_end();
-  MeshBase::element_iterator       elem_it_HF  = mesh_HF.elements_begin();
-  const MeshBase::element_iterator elem_end_HF = mesh_HF.elements_end();
+  MeshBase::element_iterator       elem_it_HF  = mesh_sadj.elements_begin();
+  const MeshBase::element_iterator elem_end_HF = mesh_sadj.elements_end();
   std::vector<std::set<dof_id_type> > elem_mapping;
-  if(mesh_diff){
+  if(ratio_sadj > 1){
     elem_mapping.resize(mesh.n_elem());
     int n_babies_found = 0;
     for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
       Elem* elem = *elem_it_LF;
       Point elem_cent = elem->centroid();
       n_babies_found = 0;
-      elem_it_HF = mesh_HF.elements_begin();
+      elem_it_HF = mesh_sadj.elements_begin();
       for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
         if(n_babies_found >= elem_ratio)
           break;
@@ -313,12 +308,12 @@ int main(int argc, char** argv)
         elem_cent_diff.subtract(elem_cent);
         bool isBaby = false;
         if(dim == 2)
-          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1));
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_sadj-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_sadj-1));
         else if(dim == 3)
-          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(nx_ratio-1) &&
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ny_ratio-1) &&
-            std::abs(elem_cent_diff(2)) < 0.51*dz*(nz_ratio-1));
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_sadj-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_sadj-1) &&
+            std::abs(elem_cent_diff(2)) < 0.51*dz*(ratio_sadj-1));
         if(isBaby){
           elem_mapping[elem->id()].insert(elem_HF->id());
           n_babies_found += 1;   
@@ -331,7 +326,7 @@ int main(int argc, char** argv)
   
   //mapping fine basis functions to coarse basis functions that they overlap
   std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
-  if(mesh_diff){
+  if(ratio_sadj > 1){
     fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/3.));
     elem_it_LF = mesh.elements_begin();
     for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
@@ -436,7 +431,7 @@ outputJ2.close();
     //project variables
     std::cout << "Begin projecting psi...\n" << std::endl;
     clock_t begin_proj = std::clock();
-    if(mesh_diff || !xfer_if_possible){
+    if((ratio_sadj > 1) || !xfer_if_possible){
       std::cout << "...actually projecting..." << std::endl;
       std::vector<dof_id_type> primary_vars;
       std::vector<dof_id_type> aux_vars;
@@ -597,11 +592,13 @@ outputJ.close();
     std::cout << "Time so far: " << double(end-begin)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
-    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
-    std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to get auxiliary variables: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    std::cout << "Primary and auxiliary system dofs (each): " << system_primary.solution->size() << std::endl;
+    std::cout << "Primary and auxiliary superadjoint system dofs (each: " << system_sadj_primary.solution->size() << "\n" << std::endl;
     std::cout << "Refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl << std::endl;
-    
+
     //output at each iteration
     std::stringstream ss;
     ss << refIter;
@@ -636,7 +633,7 @@ outputJ.close();
       
       //redistributed error contributions from fine to coarse nodes
       std::vector<std::pair<Number,dof_id_type> > node_errs_coarse(round(system_primary.n_dofs()/3.));
-      if(mesh_diff){
+      if(ratio_sadj > 1){
         for(unsigned int node_num = 0; node_num < node_errs_coarse.size(); node_num++){ //initialize pairs
           node_errs_coarse[node_num] = std::pair<Number,dof_id_type>(0.0, node_num);
         }
@@ -661,7 +658,7 @@ outputJ.close();
       //find nodes contributing the most
       //double refPcnt = std::min((refIter+1)*refStep,1.);
       double refPcnt = std::min(refStep,1.); //additional refinement (compared to previous iteration)
-      int cutoffLoc = round(node_errs_coarse.size()*refPcnt);
+      int cutoffLoc = std::max(round(node_errs_coarse.size()*refPcnt), 1.);
       std::sort(node_errs_coarse.begin(), node_errs_coarse.end()); 
       std::reverse(node_errs_coarse.begin(), node_errs_coarse.end()); 
       
@@ -675,7 +672,7 @@ outputJ.close();
         markMe.insert(markMe.end(), node_to_elem[node_errs_coarse[i].second].begin(), node_to_elem[node_errs_coarse[i].second].end());
       } 
       
-      if(mesh_diff){
+      if(ratio_sadj > 1){
         std::set<dof_id_type> refineMe;
         //mark those elements for refinement
         for(int i = 0; i < markMe.size(); i++){
@@ -692,6 +689,19 @@ outputJ.close();
             fullyRefined.insert(markMe[i]);
           }
         }
+/*        
+        //DEBUG
+        std::cout << "----- marking debug ------\n" << std::endl;
+        std::cout << "elements to refine: " << std::endl;
+        for(dof_id_type eep : refineMe)
+          std::cout << eep << std::endl;
+        std::cout << "fullyRefined.size(): " << fullyRefined.size() << std::endl;
+        for(dof_id_type nani : fullyRefined) 
+          std::cout << nani << std::endl;
+        for(int i = 0; i < cutoffLoc; i++){
+          std::cout << node_errs_coarse[i].second << std::endl;
+        std::cout << "----- marking debug ------\n" << std::endl;        
+*/
         for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
           
           mesh_refinement.clean_refinement_flags(); //remove all refinement flags
@@ -714,7 +724,7 @@ outputJ.close();
               mesh.elem(elem->id())->set_refinement_flag(Elem::INACTIVE);
           }
 
-          mesh_refinement.refine_elements(); //refine to new MF mesh ...dies here at second refinement?? 
+          mesh_refinement.refine_elements(); //refine to new MF mesh
           equation_systems.reinit(); 
           
           //mark new elements as HF subdomain = 1 (not buffer elements, if any)
