@@ -20,19 +20,18 @@ relative_residual_tolerance = 0
 absolute_residual_tolerance = 1.e-10
 max_nonlinear_iterations = 100
 
-require_residual_reduction = true
+require_residual_reduction = false
 
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 max_linear_iterations = 10000
 
-direct_transfer_if_possible = true; #DEBUG
+direct_transfer_if_possible = false; #DEBUG
 use_buffer_zone = true; #setting to false appears to cause problems for reinit if nx_ratio >= 4
 
 #discretization
-nx_LF = 8 #25 for HF
-ny_LF = 16 #45 for HF
-nz_LF = 0 #30 for HF
-nx_ratio = 4
-ny_ratio = 4
-nz_ratio = 4
+nx_LF = 32 #16 #25 for HF
+ny_LF = 64 #32 #45 for HF
+nz_LF = 0 #16 #30 for HF
+ratio_sadj = 2
+ratio_HF = 4

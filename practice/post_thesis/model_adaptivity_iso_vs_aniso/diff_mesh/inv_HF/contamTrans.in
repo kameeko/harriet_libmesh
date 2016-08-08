@@ -15,13 +15,13 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
 bsource = 0.0 #-5.0
 
-data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat 
-#data_file = Measurements_diri0_r4p2em3_bigdom.dat
+#data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat 
+data_file = Measurements_diri0_r4p2em3_bigdom.dat
 #data_file = Measurements_shifted.dat
 beta = 1.e-3
 do_continuation = true
 
-qoi_option = 2
+QoI_option = 2
 
 analytic_jacobians = true
 use_Diri_BCs = true

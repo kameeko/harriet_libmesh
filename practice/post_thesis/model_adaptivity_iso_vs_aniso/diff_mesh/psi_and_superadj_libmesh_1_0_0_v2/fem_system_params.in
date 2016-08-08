@@ -30,8 +30,8 @@ direct_transfer_if_possible = true; #DEBUG
 use_buffer_zone = true; #setting to false appears to cause problems for reinit if nx_ratio >= 4
 
 #discretization
-nx_LF = 16 #16 #25 for HF
-ny_LF = 32 #32 #45 for HF
-nz_LF = 16 #16 #30 for HF
+nx_LF = 8 #16 #25 for HF
+ny_LF = 16 #32 #45 for HF
+nz_LF = 8 #16 #30 for HF
 ratio_sadj = 2
-ratio_HF = 2
+ratio_HF = 4

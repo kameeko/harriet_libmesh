@@ -110,6 +110,7 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_elem_fe->get_JxW();
   c_elem_fe->get_phi();
   c_elem_fe->get_dphi();
+  c_elem_fe->get_xyz();
 
   FEBase* c_side_fe = NULL;
   ctxt.get_side_fe(c_var, c_side_fe);
@@ -117,6 +118,7 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_side_fe->get_JxW();
   c_side_fe->get_phi();
   c_side_fe->get_dphi();
+  c_side_fe->get_xyz();
 }
 
 // Element residual and jacobian calculations

@@ -1,6 +1,7 @@
 #include "libmesh/fem_system.h"
 #include "libmesh/getpot.h"
 #include "libmesh/point_locator_tree.h"
+#include "libmesh/elem.h"
 
 using namespace libMesh;
 

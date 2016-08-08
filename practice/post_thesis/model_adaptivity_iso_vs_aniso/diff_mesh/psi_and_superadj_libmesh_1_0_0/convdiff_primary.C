@@ -185,13 +185,11 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 				k = porosity*dispTens;
 		  }
 			else if(subdomain == cd_subdomain_id){
-			  //U = NumberVectorValue(0.0, 0.0, 0.0);
-        U = NumberVectorValue(porosity*vx, 0.0, 0.0); //DEBUG
+			  U = NumberVectorValue(0.0, 0.0, 0.0);
 				R = 0.0;
-        k = porosity*dispTens; //DEBUG
-		    //k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
-		    //                               0., dispTens(0,0), 0.,
-		    //                               0., 0., dispTens(0,0));
+		    k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
+		                                   0., dispTens(0,0), 0.,
+		                                   0., 0., dispTens(0,0));
 		  }
     	
 			// First, an i-loop over the  degrees of freedom.

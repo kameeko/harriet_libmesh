@@ -24,6 +24,8 @@
 #include "libmesh/euler_solver.h"
 #include "libmesh/continuation_system.h"
 
+#include "libmesh/sparse_matrix.h"
+
 //local includes
 #include "convdiff_primary.h"
 #include "initial.h"
@@ -86,7 +88,7 @@ int main(int argc, char** argv){
   //system.max_continuation_parameter = std::fabs(infileForMesh("reaction_rate",1.e-3));
   
   //steady-state problem  
-  system.time_solver = AutoPtr<TimeSolver>(new SteadySolver(system));
+  system.time_solver = UniquePtr<TimeSolver>(new SteadySolver(system));
   libmesh_assert_equal_to (n_timesteps, 1);
   
   // Initialize the system
@@ -100,7 +102,7 @@ int main(int argc, char** argv){
 
   // And the nonlinear solver options
   NewtonSolver *solver = new NewtonSolver(system); 
-  system.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver); 
+  system.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver); 
   solver->quiet = infile("solver_quiet", true);
   solver->verbose = !solver->quiet;
   solver->max_nonlinear_iterations =
@@ -182,6 +184,14 @@ int main(int argc, char** argv){
       system.set_R(R);
       std::cout << "\n\nStarting iteration with R = " << R << "\n\n" << std::endl;
       system.solve();
+      
+      //DEBUG
+//      std::ostringstream Jfile_name;
+//      Jfile_name << "J.dat";
+//      std::ofstream outputJ(Jfile_name.str());
+//      system.matrix->print(outputJ);
+//      outputJ.close();
+
     }
   } //end continuation type switch
   
