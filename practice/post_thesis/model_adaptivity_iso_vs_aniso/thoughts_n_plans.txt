@@ -569,3 +569,61 @@ check on detailed-time runs
       -pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal
       -ksp_type preonly -pc_type lu -pc_factor_mat_solver_package superlu
           -> neither gets the linear solves in one go, but the one on top doesn't seem seem to solve to residual 0...and yet doesn't break the 8x8x8 tests?
+          
+split indicator vs error?
+  -sadj on HF mesh when want to estimate error, on slightly coarser mesh when just want to find places to refine?
+    -> do 2D case with much larger diff between HF and LF meshes? you can totally do finer mesh than bare minimum for not-need-stability...
+maybe there's just something about the mixed systems that makes the linear solves harder somehow? like how helmholtz/maxwells doesn't play nice with gmres? maybe the "pc_type ilu" makes a difference in the timing in how much it costs? play with different flags?
+  11702 - repeating a 2:1 run with different flags
+  11628 - timing if refined in one go? is the effect of initial guess so great?
+    -what if you do same-mesh, make LF aniso and with velocity? and refine in one go, direct transfer option off? then timing should be similar...
+      -12317 in v1 (MAKE SURE TO UNDO CHANGE IN CONVDIFF_PRIMARY AFTERWARDS)
+        -wtf not even first R=0 solve matches...initial residual is same, but then krylov iterations are not...
+          -same for R=4.2e-4 (same residual, then krylov iterations differ...)
+            -> adapt HF replication was run without ilu precond... -> terminal_output_dbg_10itermax.txt ; if same flags, then lin iters look the same, but then the residuals start diverging...
+              -in 2D things are exactly the same...in 3D (8x8x8) with 2D data, starts diverging...tkdiff shows no noticeable differences...
+                -matches when updated to new libmesh
+        -diff vs cdr forgets to make U=0 along boundaries when touching LF subdomain...eh they all do...
+
+--------------------------------
+        
+-ksp_monitor_singular_value -ksp_gmres_modifiedgramschmidt -ksp_gmres_restart 500 -pc_type ilu -pc_factor_levels 4 -pc_factor_shift_type nonzero
+
+-pc_type lu -pc_factor_mat_solver_package superlu -pc_factor_nonzeros_along_diagonal
+-ksp_type preonly -pc_type lu -pc_factor_mat_solver_package superlu
+    
+do we really need sadj to be at least as fine as MF mesh? wasn't the point of having regular adjoint on slightly finer mesh so that it wouldn't give 0 when weighted with residual? but here our highest ideal is the HF mesh, so in areas where the MF mesh is refined up to HF, we can't/don't need the adj to give nonzero weight with residual...
+  -> no not really...
+  
+do a run where you use the final MF (and maybe its aux and superadj) on new data and time? vs HF?
+
+interpretations:
+-adaptivity is faster than doing HF inv
+  -> our HF inv's are too easy
+-online-offline - use adaptivity to choose MF that you then solve inverse problem with once data arrives
+  -> do you calculate aux and/or superadj with new data or use ones saved from adaptivity?
+    -LF and HF on same mesh
+      -table 3: single MF iteration (MF + error estimate) sometimes faster than HF inv, but sometimes slower
+    -LF and HF on diff meshes (x2 difference)
+      -MF inv problems sometimes take longer than HF inv problem...even with significantly fewer DOFs...
+        -vikram inquiring list as to whether such mixed models should have a different linear solver...maybe gmres is not appropriate somehow?
+        -try a version with similar HF setup (and bcs, and data) as in paper? (can't, qoi region too small to show up on coarse mesh...)
+    -LF and HF on diff meshes (x4 difference, superadj on x2 (more error, but probably closer to what would happen in practice?))
+      -letting 0.03 step, with buffer, qoi2 run for a while in _v2 -> has trouble solving MF02 inv...
+      -terminal_output_4p2em4_adapt_0p05step_0p05tol_flat_HF4x_sadj2x_buffer.txt: -> has trouble solving MF01 inv...
+      -2D, HF128x256 : you get all the way to 100% refinement and the estimated relative qoi error stays 30+...ridiculous estimated HF qoi all the way...does adj resid need to stay finer than mixed? or maybe evaluate residuals on HF (project psi and superadj)? ***
+      
+      we have:
+      -single iteration may or may not take longer than HF inv; have cases where MF inv consistently takes less time than HF inv
+        -coarsening LF mesh doesn't seem to help (either inv takes more time to solve, or reduction is insufficient (superadj still takes too long, HF problem probably insufficiently nonlinear to keep searching in this direction))
+        -having superadj be on coarser mesh than HF introduces additional error
+          -seems to be much less accurate (possibly theory needs tweaking...)
+          -MF inv seems to have more trouble solving...
+      if we stop inquiring to into the diff-mesh line, is table 3 adequate? or do we need to do comparison where final (or all?) MFs and HF get the same initial guess? (technically aux and superadj are linear and so shouldn't depend on init guess for convergence, but it might change the number of linear iters...) if so, do we need to use different data?
+      
+    -> replace scalar vs field with a 3D x2 case? (both show reduction of DOFs)
+      
+v1: checking that one step to HF matches invHF...it does in terms of iteration output...and also timing (850 vs 860)...so at least the inverse module and solver options match...is there something about mesh refinement that leaves dofs from previous iterations lying around? is there some housekeeping we've been forgetting that doesn't show up in EquationSystems::n_dofs()?
+  -> refining all in one step could potentially expose shenanigans? 
+    -2D HF64x128: 1-step total of LF+HF inverse problems < invHF (19 vs 30, superlu)
+      -if actually do adaptivity, then none of the inverse probs take longer either... (MF01 and MF02, superlu and gmres)...is there something wrong with refinement in 3D? looks like 2D can also have problems in x4 case...

@@ -342,7 +342,7 @@ We now present the results of solving the inference problem using \cref{alg:refS
 \hline
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
 & & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400845 & -521438 & -95.2534 & 160 \\
+LF   & 0    & 1068856 & -400845 & -521438 & -95.2534 & 580 \\
 MF01 & 16.7 & 577582  & -22143  & -30164  & -5.5098  & 1110 \\
 MF02 & 29.0 & 548904  & 1200    & -1486   & -0.2711  & 1800 \\
 MF03 & 42.3 & 547773  & 176     & -355    & -0.0645  & 2220 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
@@ -373,7 +373,7 @@ The domain divisions for the three adaptive iterations are shown in \cref{fig:di
 
 The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. Refining a larger region per iteration runs the risks of refining in the wrong areas due to linearization about a $\Psi_{MF}$ that is very different from $\Psi_{HF}$, but can also allow one to reach the chosen error tolerance in fewer iterations and less runtime. We compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose the $5\%$ of the basis functions with the largest error for model refinement. 
 
-\Cref{tab:ref3D_dainty} shows the runtime and error at the end of each of these iterations, and \cref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.
+\red{\Cref{tab:ref3D_dainty} shows the total runtime and error at the end of each of these iterations; the runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration. \Cref{tab:ref3D_dainty_timebreak} shows the runtimes of each individual adaptive iteration, and the times needed to obtain the necessary solutions. \Cref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.}
 %
 \begin{table}
 \caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $5\%$ of basis function marked for refinement per iteration; relative errors are with respect to true high-fidelity QoI.}
@@ -383,14 +383,37 @@ The amount of time required by the adaptive algorithm of course depends on the c
 \hline
 \multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
 & & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400845 & -521438 & -95.2534 & 160 \\
-MF01 & 9.27 & 613419  & -40789  & -66001  & -12.0564 & 1040 \\
-MF02 & 16.9 & 558523  & 1162    & -11105  & -2.0282  & 1860 \\
-MF03 & 23.7 & 550323  & 2510    & -2905   & -0.5303  & 2420 \\
-MF04 & 30.4 & 548225  & 1658    & -807    & -0.1471  & 2970 \\
-MF05 & 37.2 & 547744  & 655     & -326    & -0.0591  & 3309 \\
-MF06 & 44.6 & 547532  & 194     & -114    & -0.0205  & 3642 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
+LF   & 0    & 1068856 & -400937 & -521438 & -95.2534 & 570 \\
+MF01 & 9.27 & 613419  & -40667  & -66001  & -12.0564 & 1000 \\
+MF02 & 16.9 & 558523  & 1166    & -11105  & -2.0282  & 1780 \\
+MF03 & 23.7 & 550323  & 2504    & -2905   & -0.5303  & 2300 \\
+MF04 & 30.4 & 548225  & 1635    & -807    & -0.1471  & 2720 \\
+MF05 & 37.2 & 547744  & 655     & -326    & -0.0591  & 3060 \\
+MF06 & 44.6 & 547532  & 193     & -114    & -0.0205  & 3420 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
 HF   & 100  & 547418  & --      & 0       & 0        & 440 \\ \hline
+\end{tabular}
+\end{table}
+%
+\begin{table}
+\caption{Runtimes of each individual adaptive iteration}
+\label{tab:ref3D_dainty_timebreak}
+\centering
+\begin{tabular}{ccc|c|c|c}
+\cline{4-5} 
+ & & & \multicolumn{2}{|c|}{Error Estimation} & \\
+\cline{1-6}
+\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{$\%$HF}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Iteration}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
+\cline{1-6}
+\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{0}     & 160 & 160 & 245 & \multicolumn{1}{|c|}{570} \\ \hline
+\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{9.27}  & 195 & 90 & 140 & \multicolumn{1}{|c|}{430} \\ \hline
+\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{16.9}  & 520 & 95 & 160 & \multicolumn{1}{|c|}{780} \\ \hline
+\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{23.7}  & 280 & 45 & 190 & \multicolumn{1}{|c|}{520} \\ \hline
+\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{30.4}  & 206 & 55 & 100 & \multicolumn{1}{|c|}{420} \\ \hline
+\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{37.2}  & 190 & 45 & 100 & \multicolumn{1}{|c|}{340} \\ \hline
+\multicolumn{1}{|c|}{MF06}  & \multicolumn{1}{|c|}{44.6}  & 210 & 45 & 100 & \multicolumn{1}{|c|}{360} \\ \hline
+\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{100}   & 440 & -- & -- & \multicolumn{1}{|c|}{440} \\ \hline
 \end{tabular}
 \end{table}
 %
