@@ -1,6 +1,6 @@
 #include "libmesh/getpot.h"
 
-#include "convdiff_primary.h"
+#include "convdiff_sadj_primary.h"
 
 #include "libmesh/boundary_info.h"
 #include "libmesh/dirichlet_boundaries.h"
@@ -12,12 +12,13 @@
 #include "libmesh/quadrature.h"
 #include "libmesh/string_to_enum.h"
 #include "libmesh/zero_function.h"
+#include "libmesh/equation_systems.h"
 
 // Bring in everything from the libMesh namespace
 using namespace libMesh;
 
 // System initialization
-void ConvDiff_PrimarySys::init_data (){
+void ConvDiff_PrimarySadjSys::init_data (){
 	const unsigned int dim = this->get_mesh().mesh_dimension();
 
 	//polynomial order and finite element type
@@ -31,26 +32,9 @@ void ConvDiff_PrimarySys::init_data (){
 	//libmesh_assert((conc_p == 1) || (fe_family != "LAGRANGE"));
 
 	FEFamily fefamily = Utility::string_to_enum<FEFamily>(fe_family);
-	c_var = this->add_variable("c", static_cast<Order>(conc_p), fefamily); 
-	zc_var = this->add_variable("zc", static_cast<Order>(conc_p), fefamily); 
-	fc_var = this->add_variable("fc", static_cast<Order>(conc_p), fefamily); 
-
-	//subdomain ids
-	cd_subdomain_id = infile("cd_id", 0);
-	cdr_subdomain_id = infile("cdr_id", 1);
-
-	//indicate variables that change in time
-	this->time_evolving(c_var);
-	this->time_evolving(zc_var);
-	this->time_evolving(fc_var);
-
-	// Useful debugging options
-	// Set verify_analytic_jacobians to 1e-6 to use
-	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
-	this->print_jacobians = infile("print_jacobians", false);
-	this->print_element_jacobians = infile("print_element_jacobians", false);
-	this->print_residuals = infile("print_residuals", false);
-	this->print_solutions = infile("print_solutions", false);
+	c_var = this->add_variable("sadj_c", static_cast<Order>(conc_p), fefamily); 
+	zc_var = this->add_variable("sadj_zc", static_cast<Order>(conc_p), fefamily); 
+	fc_var = this->add_variable("sadj_fc", static_cast<Order>(conc_p), fefamily); 
 	
 	//set parameters
   vx = infile("vx", 2.415e-5); // m/s
@@ -69,6 +53,19 @@ void ConvDiff_PrimarySys::init_data (){
   //regularization
   beta = infile("beta", 0.1);
 
+	//indicate variables that change in time
+	this->time_evolving(c_var);
+	this->time_evolving(zc_var);
+	this->time_evolving(fc_var);
+
+	// Useful debugging options
+	// Set verify_analytic_jacobians to 1e-6 to use
+	this->verify_analytic_jacobians = infile("verify_analytic_jacobians", 0.);
+	this->print_jacobians = infile("print_jacobians", false);
+	this->print_element_jacobians = infile("print_element_jacobians", false);
+	this->print_residuals = infile("print_residuals", false);
+	this->print_solutions = infile("print_solutions", false);
+
 	//set Dirichlet boundary conditions
   std::set<boundary_id_type> all_bdys;
   all_bdys.insert(0); all_bdys.insert(1); all_bdys.insert(2); all_bdys.insert(3); 
@@ -81,7 +78,6 @@ void ConvDiff_PrimarySys::init_data (){
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(all_bdys, just_f, &zero)); //f=0 on boundary
   
   //influx side as Diri instead of flux BC
-  ConstFunction<Number> westIn(-bsource);
   std::vector<unsigned int> just_c; just_c.push_back(c_var);
   std::vector<unsigned int> just_z; just_z.push_back(zc_var);
   std::set<boundary_id_type> westside; 
@@ -89,16 +85,17 @@ void ConvDiff_PrimarySys::init_data (){
     westside.insert(3); 
   else if(dim == 3)
     westside.insert(4); 
-  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &westIn));
+  this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_c, &zero));
   this->get_dof_map().add_dirichlet_boundary(DirichletBoundary(westside, just_z, &zero));
 
+	  
 	// Do the parent's initialization after variables and boundary constraints are defined
 	FEMSystem::init_data();
 
 }
 
 // Context initialization
-void ConvDiff_PrimarySys::init_context(DiffContext &context){
+void ConvDiff_PrimarySadjSys::init_context(DiffContext &context){
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
   
 	//stuff for things of pressure's family
@@ -108,6 +105,7 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_elem_fe->get_JxW();
   c_elem_fe->get_phi();
   c_elem_fe->get_dphi();
+  c_elem_fe->get_xyz();
 
   FEBase* c_side_fe = NULL;
   ctxt.get_side_fe(c_var, c_side_fe);
@@ -115,19 +113,24 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_side_fe->get_JxW();
   c_side_fe->get_phi();
   c_side_fe->get_dphi();
+  c_side_fe->get_xyz();
+  
+  //add other solutions to the vectors that diff context should localize
+  const System & sys = ctxt.get_system();
+  NumericVector<Number> &primary_solution = 
+ 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+ 	ctxt.add_localized_vector(primary_solution, sys);
 }
 
 // Element residual and jacobian calculations
 // Time dependent parts
-bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffContext& context){
+bool ConvDiff_PrimarySadjSys::element_time_derivative (bool request_jacobian, DiffContext& context){
 	const unsigned int dim = this->get_mesh().mesh_dimension();
 	
 	FEMContext &ctxt = cast_ref<FEMContext&>(context);
 
   FEBase* c_elem_fe = NULL; 
   ctxt.get_element_fe( c_var, c_elem_fe );
-  
-  int subdomain = ctxt.get_elem().subdomain_id();
 
 	// Element Jacobian * quadrature weights for interior integration
 	const std::vector<Real> &JxW = c_elem_fe->get_JxW();
@@ -162,7 +165,27 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 	// solution degree-of-freedom values by the appropriate
 	// weight functions.
 	unsigned int n_qpoints = ctxt.get_element_qrule().n_points();
+	
+	const System & sys = ctxt.get_system();
+  NumericVector<Number> &primary_solution = 
+ 	 	*const_cast<System &>(sys).get_equation_systems().get_system("ConvDiff_PrimarySys").solution;
+  std::vector<Number> c_at_qp (n_qpoints, 0);
+  std::vector<Number> zc_at_qp (n_qpoints, 0);
+  std::vector<Number> fc_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_c_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_zc_at_qp (n_qpoints, 0);
+  std::vector<Gradient> grad_fc_at_qp (n_qpoints, 0);
+  unsigned int primal_c_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("c");
+  unsigned int primal_zc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("zc");
+  unsigned int primal_fc_var = sys.get_equation_systems().get_system("ConvDiff_PrimarySys").variable_number("fc");
 
+  ctxt.interior_values<Number>(primal_c_var, primary_solution, c_at_qp); 
+  ctxt.interior_values<Number>(primal_zc_var, primary_solution, zc_at_qp);
+  ctxt.interior_values<Number>(primal_fc_var, primary_solution, fc_at_qp);
+  ctxt.interior_gradients<Gradient>(primal_c_var, primary_solution, grad_c_at_qp); 
+  ctxt.interior_gradients<Gradient>(primal_zc_var, primary_solution, grad_zc_at_qp);
+  ctxt.interior_gradients<Gradient>(primal_fc_var, primary_solution, grad_fc_at_qp);
+  
 	for (unsigned int qp=0; qp != n_qpoints; qp++)
 	  {
 	    Number 
@@ -173,46 +196,43 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 	      grad_c = ctxt.interior_gradient(c_var, qp),
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
 	      grad_fc = ctxt.interior_gradient(fc_var, qp);
-			
+    
+	    Number primal_c = c_at_qp[qp];
+	    Number primal_zc = zc_at_qp[qp];
+	    Number primal_fc = fc_at_qp[qp];
+	    Gradient primal_grad_c = grad_c_at_qp[qp];
+	    Gradient primal_grad_zc = grad_zc_at_qp[qp];
+	    Gradient primal_grad_fc = grad_fc_at_qp[qp];
+
+			Real R = react_rate; 
+			NumberTensorValue k = porosity*dispTens;
 			NumberVectorValue U(porosity*vx, 0.0, 0.0);
-	    
-	    Real R; //reaction coefficient
-	    NumberTensorValue k;
-	    if(subdomain == cdr_subdomain_id){	
-				R = react_rate; 
-				k = porosity*dispTens;
-		  }
-			else if(subdomain == cd_subdomain_id){
-				R = 0.0;
-        if(solveInit)
-          k = porosity*dispTens;
-        else
-		      k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
-		                                     0., dispTens(0,0), 0.,
-		                                     0., 0., dispTens(0,0));
-		  }
-    	
+			
 			// First, an i-loop over the  degrees of freedom.
 			for (unsigned int i=0; i != n_c_dofs; i++){
 				
-				Rc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] - 2.*R*zc*c*phi[i][qp]);
-		    Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] - R*c*c*phi[i][qp] + fc*phi[i][qp]);
+				Rc(i) += JxW[qp]*(-k*grad_zc*dphi[i][qp] + U*grad_zc*phi[i][qp] - 2.*R*primal_zc*c*phi[i][qp] - 2.*R*primal_c*zc*phi[i][qp]);
+		    Rzc(i) += JxW[qp]*(-k*grad_c*dphi[i][qp] - U*grad_c*phi[i][qp] - 2.*R*primal_c*c*phi[i][qp] + fc*phi[i][qp]);
 	 			Rfc(i) += JxW[qp]*(beta*grad_fc*dphi[i][qp] + zc*phi[i][qp]); 
+	 			
+	 			//rhs of adjoint
+        Rc(i) -= JxW[qp]*(-k*primal_grad_zc*dphi[i][qp] + U*primal_grad_zc*phi[i][qp] - 2.*R*primal_zc*primal_c*phi[i][qp]);
+				Rzc(i) -= JxW[qp]*(-k*primal_grad_c*dphi[i][qp] - U*primal_grad_c*phi[i][qp] - R*primal_c*primal_c*phi[i][qp] + primal_fc*phi[i][qp]);
+				Rfc(i) -= JxW[qp]*(beta*primal_grad_fc*dphi[i][qp] + primal_zc*phi[i][qp]);
      		
 				if (request_jacobian){
 					for (unsigned int j=0; j != n_c_dofs; j++){
 						J_c_zc(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] + U*dphi[j][qp]*phi[i][qp] 
-															- 2.*R*phi[j][qp]*c*phi[i][qp]);
-						J_c_c(i,j) += JxW[qp]*(-2.*R*zc*phi[j][qp]*phi[i][qp]);
+															- 2.*R*phi[j][qp]*primal_c*phi[i][qp]);
+						J_c_c(i,j) += JxW[qp]*(-2.*R*primal_zc*phi[j][qp]*phi[i][qp]);
 
 						J_zc_c(i,j) += JxW[qp]*(-k*dphi[j][qp]*dphi[i][qp] - U*dphi[j][qp]*phi[i][qp] 
-																- 2.*R*c*phi[j][qp]*phi[i][qp]);
+																- 2.*R*primal_c*phi[j][qp]*phi[i][qp]);
 						J_zc_fc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
 
 	     			J_fc_zc(i,j) += JxW[qp]*(phi[j][qp]*phi[i][qp]);
      				J_fc_fc(i,j) += JxW[qp]*(beta*dphi[j][qp]*dphi[i][qp]);
-
-       			
+      			
 					} // end of the inner dof (j) loop
 			  } // end - if (compute_jacobian && context.get_elem_solution_derivative())
 
@@ -225,7 +245,8 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 	  	if(dataelems[dnum] == ctxt.get_elem().id()){
 	  		
 	  		Number cpred = ctxt.point_value(c_var, data_point);
-	  		Number cstar = datavals[dnum];
+        Number cstar = datavals[dnum];
+	  		Number primal_cpred = primal_c_vals[dnum];
 
 	  		unsigned int dim = ctxt.get_system().get_mesh().mesh_dimension();
 		    FEType fe_type = ctxt.get_element_fe(c_var)->get_fe_type();
@@ -240,7 +261,10 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
         }
         
         for (unsigned int i=0; i != n_c_dofs; i++){
-  	  		Rc(i) += (cpred - cstar)*point_phi[i];
+  	  		Rc(i) += cpred*point_phi[i];
+  	  		
+  	  		//rhs of adjoint
+  	  		Rc(i) -= (primal_cpred - cstar)*point_phi[i];
 	  
 					if (request_jacobian){
 						for (unsigned int j=0; j != n_c_dofs; j++)
@@ -255,7 +279,7 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 }
 
 //for non-Dirichlet boundary conditions and the bit from diffusion term
-bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContext & context)
+bool ConvDiff_PrimarySadjSys::side_time_derivative(bool request_jacobian, DiffContext & context)
 {
   const unsigned int dim = this->get_mesh().mesh_dimension();
 
@@ -325,26 +349,4 @@ bool ConvDiff_PrimarySys::side_time_derivative(bool request_jacobian, DiffContex
   }
 
   return request_jacobian;
-}
-
-// Postprocessed output
-void ConvDiff_PrimarySys::postprocess (){
-	/*
-	std::ofstream output("c_points.dat");
-	for(int i = 0; i<datavals.size(); i++){
-		Point pt = datapts[i];
-		Number c = point_value(c_var, pt);
-		if(output.is_open()){
-      output << c << "\n";
-    }
-	}
-	output.close();
-  */
-  for(int i = 0; i<datavals.size(); i++){
-		Point pt = datapts[i];
-		Number c = point_value(c_var, pt);
-		primal_c_vals.push_back(c);
-	}
-	
-	FEMSystem::postprocess();
 }

@@ -108,6 +108,7 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_elem_fe->get_JxW();
   c_elem_fe->get_phi();
   c_elem_fe->get_dphi();
+  c_elem_fe->get_xyz();
 
   FEBase* c_side_fe = NULL;
   ctxt.get_side_fe(c_var, c_side_fe);
@@ -115,6 +116,7 @@ void ConvDiff_PrimarySys::init_context(DiffContext &context){
   c_side_fe->get_JxW();
   c_side_fe->get_phi();
   c_side_fe->get_dphi();
+  c_side_fe->get_xyz();
 }
 
 // Element residual and jacobian calculations
@@ -174,22 +176,26 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 	      grad_zc = ctxt.interior_gradient(zc_var, qp),
 	      grad_fc = ctxt.interior_gradient(fc_var, qp);
 			
-			NumberVectorValue U(porosity*vx, 0.0, 0.0);
-	    
+			NumberVectorValue U;
 	    Real R; //reaction coefficient
 	    NumberTensorValue k;
 	    if(subdomain == cdr_subdomain_id){	
+	      U = NumberVectorValue(porosity*vx, 0.0, 0.0);
 				R = react_rate; 
 				k = porosity*dispTens;
 		  }
 			else if(subdomain == cd_subdomain_id){
-				R = 0.0;
-        if(solveInit)
+			  if(solveInit){
+          U = NumberVectorValue(porosity*vx, 0.0, 0.0);
+          R = 0.0;
           k = porosity*dispTens;
-        else
+        }else{
+          U = NumberVectorValue(0.0, 0.0, 0.0);
+			  	R = 0.0;
 		      k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
-		                                     0., dispTens(0,0), 0.,
-		                                     0., 0., dispTens(0,0));
+	  	                                   0., dispTens(0,0), 0.,
+  		                                   0., 0., dispTens(0,0));
+        }
 		  }
     	
 			// First, an i-loop over the  degrees of freedom.

@@ -5,36 +5,41 @@
 
 using namespace libMesh;
 
-class ConvDiff_PrimarySys : public FEMSystem
+class ConvDiff_MprimeSys : public FEMSystem
 {
 public:
 
   // Constructor
-  ConvDiff_PrimarySys(EquationSystems& es,
+  ConvDiff_MprimeSys(EquationSystems& es,
                const std::string& name_in,
                const unsigned int number_in)
     : FEMSystem(es, name_in, number_in){
     
+    qoi.resize(1);
+    
     GetPot infile("contamTrans.in");
 		std::string find_data_here = infile("data_file","Measurements0.dat");
 		qoi_option = infile("QoI_option",1);
-    solveInit = (!(infile("solveMF",true)) && !infile("solveHF",false));
-    
+    const unsigned int dim = this->get_mesh().mesh_dimension();
+
     //read in data
-		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
-			Real x, y, z, value;
-			int flag = 1;
-			while(flag != -1){
-				flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
-				if(flag != -1){
-					datapts.push_back(Point(x,y,z));
-					datavals.push_back(value);
-				}
-			}
-			fclose(fp);
-	  }else{
-	    std::cout << "\n\nAAAAAHHHHH NO DATA FOUND?!?!\n\n" << std::endl;
-	  }
+    if(FILE *fp=fopen(find_data_here.c_str(),"r")){
+      Real x, y, z, value;
+      int flag = 1;
+      while(flag != -1){
+        flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
+        if(flag != -1){
+          if(dim == 3)
+            datapts.push_back(Point(x,y,z));
+          else if(dim == 2)
+            datapts.push_back(Point(x,y,0.));
+          datavals.push_back(value);
+        }
+      }
+      fclose(fp);
+    }else{
+      std::cout << "\n\nAAAAAHHHHH NO DATA FOUND?!?!\n\n" << std::endl;
+    }
 	  
 	  //find elements in which data points reside
 	  PointLocatorTree point_locator(this->get_mesh());
@@ -55,16 +60,20 @@ public:
   // Time dependent parts
   virtual bool element_time_derivative (bool request_jacobian,
                                         DiffContext& context);
-                                        
+  
   //boundary residual and jacobian calculations
   virtual bool side_time_derivative (bool request_jacobian,
                                         DiffContext& context);
-                                                                              
-  //to calculate QoI
-  virtual void element_postprocess(DiffContext &context);
+                                        
+  // Postprocessed output
+  virtual void postprocess();
+  
+  //for adjoint
+  virtual void element_qoi_derivative(DiffContext &context, const QoISet & qois);
+  virtual void side_qoi_derivative(DiffContext &context, const QoISet & qois);
 
   // Indices for each variable;
-  unsigned int c_var, zc_var, fc_var;
+  unsigned int c_var, zc_var, fc_var, aux_c_var, aux_zc_var, aux_fc_var;
   
   Real beta; //regularization parameter
   Real vx; //west-east velocity (along x-axis, for now); m/s
@@ -77,18 +86,8 @@ public:
   std::vector<Point> datapts; 
   std::vector<Real> datavals;
   std::vector<dof_id_type> dataelems;
-	
-	int cd_subdomain_id, cdr_subdomain_id;
-  bool solveInit;
-	
+
   //options for QoI location and nature
   int qoi_option;
-  Real qoi;
-  double getQoI(){ return qoi; }
-  void clearQoI(){ qoi = 0.; }
- 
-  virtual void postprocess();
-  std::vector<Real> primal_c_vals;
-  std::vector<Real> get_c_vals(){ return primal_c_vals; }
-  
+
 };

@@ -2,12 +2,12 @@
 
 # The location of the mesh library
 #LIBMESH_DIR = ~/software/libmesh_build_petsc_mpi_superlu
-LIBMESH_DIR = ~/software/libmesh-0.9.5_build_petsc
+LIBMESH_DIR = ~/software/libmesh-07_28_16_build_petsc
 
 # include the library options determined by configure
 include $(LIBMESH_DIR)/Make.common
 
-target			:= ./monty_simple_pde_fwd-$(METHOD)
+target			:= ./diff_convdiff_mprime-$(METHOD)
 
 # include my common application options
 include Make_template

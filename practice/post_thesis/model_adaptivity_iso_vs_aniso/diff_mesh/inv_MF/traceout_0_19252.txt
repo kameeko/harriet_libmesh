@@ -1,0 +1,14 @@
+Stack frames: 13
+0: libMesh::print_trace(std::ostream&)
+1: libMesh::write_traceout()
+2: libMesh::libmesh_terminate_handler()
+3: /usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x5e6d6) [0x7fe7dc5876d6]
+4: /usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x5e703) [0x7fe7dc587703]
+5: /usr/lib/x86_64-linux-gnu/libstdc++.so.6(+0x5e922) [0x7fe7dc587922]
+6: libMesh::PetscMatrix<double>::zero()
+7: libMesh::FEMSystem::assembly(bool, bool, bool)
+8: libMesh::NewtonSolver::solve()
+9: libMesh::FEMSystem::solve()
+10: ./monty_simple_pde_fwd-opt() [0x41bec0]
+11: __libc_start_main
+12: ./monty_simple_pde_fwd-opt() [0x41e068]

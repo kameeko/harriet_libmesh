@@ -97,6 +97,8 @@ public:
         Point data_point = datapts[ind];
         Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
         dataelems[ind] = this_elem->id();
+        //if(!(this_elem->active()))
+        //   std::cout << "\nAAAAHHH DATA POINT LOCATION STILL POINTS TO INACTIVE ELEMENT??\n" << std::endl; //DEBUG
       }
     }
   }

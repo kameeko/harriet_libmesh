@@ -1,0 +1,219 @@
+
+
+Aaaahhhh are you having LF be iso or aniso?
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=70785
+    n_local_nodes()=70785
+  n_elem()=8192
+    n_local_elem()=8192
+    n_active_elem()=8192
+  n_subdomains()=1
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+ EquationSystems
+  n_systems()=2
+   System #1, "ConvDiff_AuxSys"
+    Type "Implicit"
+    Variables={ "aux_c" "aux_zc" "aux_fc" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=28611
+    n_local_dofs()=28611
+    n_constrained_dofs()=3684
+    n_local_constrained_dofs()=3684
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 73.2611
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 81
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 3684
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+   System #0, "ConvDiff_PrimarySys"
+    Type "Implicit"
+    Variables={ "c" "zc" "fc" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=28611
+    n_local_dofs()=28611
+    n_constrained_dofs()=3684
+    n_local_constrained_dofs()=3684
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 73.2611
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 81
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 3684
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+Assembling the System
+Nonlinear Residual: 1.53717
+Linear solve starting, tolerance 6.50547e-12
+  0 KSP Residual norm 7.646778628576e+01 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 1.643425621176e+01 % max 1.576762249796e+00 min 1.576762249796e+00 max/min 1.000000000000e+00
+  2 KSP Residual norm 5.456407711556e+00 % max 1.820713555940e+00 min 4.867192455439e-01 max/min 3.740788088018e+00
+  3 KSP Residual norm 1.355637758793e+00 % max 1.820713825600e+00 min 4.376265506898e-01 max/min 4.160428161248e+00
+  4 KSP Residual norm 2.158180206597e-01 % max 1.831109812574e+00 min 3.893924678395e-01 max/min 4.702478768358e+00
+  5 KSP Residual norm 6.890251185219e-02 % max 1.874163054864e+00 min 3.887759987801e-01 max/min 4.820675815237e+00
+  6 KSP Residual norm 1.210905408743e-02 % max 1.874262700979e+00 min 3.859690341730e-01 max/min 4.855992411399e+00
+  7 KSP Residual norm 2.991188467146e-03 % max 1.923639492955e+00 min 3.683295031947e-01 max/min 5.222604967211e+00
+  8 KSP Residual norm 6.156118159520e-04 % max 1.964167348841e+00 min 3.574668003571e-01 max/min 5.494684672476e+00
+  9 KSP Residual norm 9.942533685718e-05 % max 1.969655423396e+00 min 3.573912681083e-01 max/min 5.511201865175e+00
+ 10 KSP Residual norm 1.167059109063e-05 % max 1.986952490342e+00 min 3.563076323930e-01 max/min 5.576508358794e+00
+ 11 KSP Residual norm 2.102399733761e-06 % max 1.987860157163e+00 min 3.554238631848e-01 max/min 5.592928227584e+00
+ 12 KSP Residual norm 2.826798902238e-07 % max 1.988323524658e+00 min 3.545942178306e-01 max/min 5.607320775907e+00
+ 13 KSP Residual norm 4.102029384977e-08 % max 1.991828666803e+00 min 3.532817595156e-01 max/min 5.638073897544e+00
+ 14 KSP Residual norm 5.770053785361e-09 % max 1.992013277766e+00 min 3.513519393802e-01 max/min 5.669566763400e+00
+ 15 KSP Residual norm 6.932693540227e-10 % max 2.074760736738e+00 min 3.424342438654e-01 max/min 6.058858814231e+00
+ 16 KSP Residual norm 6.575688552757e-11 % max 2.095283277029e+00 min 3.392218270426e-01 max/min 6.176734838367e+00
+Linear solve finished, step 16, residual 6.57569e-11
+Trying full Newton step
+  Current Residual: 1.85714e-06
+  Nonlinear step: |du|/|u| = 1, |du| = 44.1589
+Assembling the System
+Nonlinear Residual: 1.85714e-06
+Linear solve starting, tolerance 5.38463e-06
+  0 KSP Residual norm 3.023061958991e-10 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 9.230959869496e-11 % max 8.177285820476e-01 min 8.177285820476e-01 max/min 1.000000000000e+00
+  2 KSP Residual norm 1.483506910163e-11 % max 1.036195909018e+00 min 6.903181080665e-01 max/min 1.501041182188e+00
+  3 KSP Residual norm 2.829194830933e-12 % max 1.082552673361e+00 min 6.671993035976e-01 max/min 1.622532678802e+00
+  4 KSP Residual norm 7.942900794323e-13 % max 1.091151718324e+00 min 5.402691348878e-01 max/min 2.019644743450e+00
+  5 KSP Residual norm 1.599408056784e-13 % max 1.103726082258e+00 min 4.937605537222e-01 max/min 2.235346817274e+00
+  6 KSP Residual norm 3.036233519674e-14 % max 1.154721243719e+00 min 4.836632029979e-01 max/min 2.387449027675e+00
+  7 KSP Residual norm 4.646211968992e-15 % max 1.156224671546e+00 min 4.811754712334e-01 max/min 2.402916899695e+00
+  8 KSP Residual norm 1.132625643645e-15 % max 1.292543701058e+00 min 4.511183784589e-01 max/min 2.865198499500e+00
+Linear solve finished, step 8, residual 1.13263e-15
+Trying full Newton step
+  Current Residual: 8.17322e-11
+  Nonlinear solver converged, step 1, residual 8.17322e-11
+  Nonlinear solver converged, step 1, relative step size 9.33632e-12 < 1e-10
+
+QoI: 170632.22587129171
+Time for inverse problem: 34.421022999999998 seconds...
+Time to project psi: 0 seconds...
+Time for extra error estimate bits: 0.19189200000000001 seconds...
+    Time to get auxiliary problems: 9.9999999999999995e-07 seconds...
+    Time to get superadjoint: 9.9999999999999995e-07 seconds...
+
+Primary and auxiliary system dofs (each): 28611
+Primary and auxiliary superadjoint system dofs (each): 28611
+
+
+ --------------------------------------------------------------------------
+| Time:           Fri Aug 12 09:39:11 2016                                 |
+| OS:             Linux                                                    |
+| HostName:       bassi                                                    |
+| OS Release:     3.19.0-64-generic                                        |
+| OS Version:     #72~14.04.1-Ubuntu SMP Fri Jun 24 17:59:48 UTC 2016      |
+| Machine:        x86_64                                                   |
+| Username:       kameeko                                                  |
+| Configuration:  ./configure  'prefix=/home/kameeko/software/libmesh-07_28_16_build_petsc'|
+|  'PETSC_DIR=/home/kameeko/software/petsc_build_superlu'                  |
+|  'PETSC_ARCH=arch-linux2-c-debug'                                        |
+|  '--enable-everything'                                                   |
+ --------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=57.3969, Active time=57.126                                                     |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     7          0.0493      0.007040    0.0493      0.007040    0.09     0.09     |
+|   build_constraint_matrix()        32768      0.0537      0.000002    0.0537      0.000002    0.09     0.09     |
+|   build_sparsity()                 7          0.7254      0.103631    0.8175      0.116792    1.27     1.43     |
+|   cnstrn_elem_mat_vec()            16384      0.0516      0.000003    0.0516      0.000003    0.09     0.09     |
+|   constrain_elem_vector()          16384      0.0092      0.000001    0.0092      0.000001    0.02     0.02     |
+|   create_dof_constraints()         7          0.3620      0.051715    0.4863      0.069467    0.63     0.85     |
+|   distribute_dofs()                7          0.0656      0.009373    0.2827      0.040383    0.11     0.49     |
+|   dof_indices()                    450578     0.3651      0.000001    0.3651      0.000001    0.64     0.64     |
+|   enforce_constraints_exactly()    5          0.0075      0.001505    0.0075      0.001505    0.01     0.01     |
+|   prepare_send_list()              14         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         7          0.1678      0.023968    0.1678      0.023968    0.29     0.29     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   write()                          1          0.1714      0.171418    0.1731      0.173090    0.30     0.30     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        53850      0.1153      0.000002    0.1153      0.000002    0.20     0.20     |
+|   init_shape_functions()           12895      0.0338      0.000003    0.0338      0.000003    0.06     0.06     |
+|   inverse_map()                    2482       0.0110      0.000004    0.0110      0.000004    0.02     0.02     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       2          0.7563      0.378145    1.0353      0.517670    1.32     1.81     |
+|   assembly(get_residual)           2          0.1536      0.076807    0.3787      0.189367    0.27     0.66     |
+|   postprocess()                    1          0.0403      0.040265    0.1310      0.130978    0.07     0.23     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             53850      0.0645      0.000001    0.0645      0.000001    0.11     0.11     |
+|   compute_face_map()               12800      0.0130      0.000001    0.0130      0.000001    0.02     0.02     |
+|   init_face_shape_functions()      5          0.0000      0.000007    0.0000      0.000007    0.00     0.00     |
+|   init_reference_to_physical_map() 12895      0.1036      0.000008    0.1036      0.000008    0.18     0.18     |
+|                                                                                                                 |
+| GenericProjector                                                                                                |
+|   operator()                       1          0.1964      0.196400    19.5687     19.568710   0.34     34.26    |
+|   project_edges                    24576      0.0040      0.000000    0.0040      0.000000    0.01     0.01     |
+|   project_interior                 24576      0.0045      0.000000    0.0045      0.000000    0.01     0.01     |
+|   project_nodes                    24576      19.3239     0.000786    19.3239     0.000786    33.83    33.83    |
+|   project_sides                    24576      0.0034      0.000000    0.0034      0.000000    0.01     0.01     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 2          0.0435      0.021734    0.0435      0.021734    0.08     0.08     |
+|   renumber_nodes_and_elem()        4          0.0067      0.001679    0.0067      0.001679    0.01     0.01     |
+|   write()                          1          0.0021      0.002137    0.2564      0.256366    0.00     0.45     |
+|                                                                                                                 |
+| MeshCommunication                                                                                               |
+|   assign_global_indices()          1          0.3535      0.353451    0.3536      0.353647    0.62     0.62     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     2          0.0365      0.018229    0.0365      0.018229    0.06     0.06     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0015      0.001508    34.4053     34.405281   0.00     60.23    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      11         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   probe()                          32         0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|   receive()                        16         0.0015      0.000093    0.0015      0.000094    0.00     0.00     |
+|   send()                           16         0.0001      0.000005    0.0001      0.000005    0.00     0.00     |
+|   send_receive()                   4          0.0002      0.000048    0.0002      0.000048    0.00     0.00     |
+|                                                                                                                 |
+| Parallel::Request                                                                                               |
+|   wait()                           16         0.0000      0.000002    0.0000      0.000002    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   single_partition()               2          0.0030      0.001507    0.0030      0.001507    0.01     0.01     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          2          32.9837     16.491839   32.9837     16.491839   57.74    57.74    |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  8          0.5857      0.073212    0.5857      0.073212    1.03     1.03     |
+|   operator()                       144        0.0009      0.000006    0.0111      0.000077    0.00     0.02     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   project_fem_vector()             1          0.0006      0.000613    19.5708     19.570829   0.00     34.26    |
+|   project_vector(FunctionBase)     1          0.0000      0.000005    19.5708     19.570835   0.00     34.26    |
+|                                                                                                                 |
+| XdrIO                                                                                                           |
+|   write()                          1          0.2542      0.254228    0.2542      0.254228    0.45     0.45     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            763521     57.1260                                         100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+

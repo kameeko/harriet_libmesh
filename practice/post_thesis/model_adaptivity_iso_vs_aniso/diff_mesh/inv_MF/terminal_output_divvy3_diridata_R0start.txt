@@ -1,0 +1,470 @@
+ Mesh Information:
+  elem_dimensions()={3}
+  spatial_dimension()=3
+  n_nodes()=269673
+    n_local_nodes()=269673
+  n_elem()=31544
+    n_local_elem()=31544
+    n_active_elem()=31544
+  n_subdomains()=2
+  n_partitions()=1
+  n_processors()=1
+  n_threads()=1
+  processor_id()=0
+
+Looking for psiLF at: psiR0_diridata_fullmesh.xda
+Looking for psiLF mesh at: psiR0_fullmesh.xda
+
+ EquationSystems
+  n_systems()=2
+   System #1, "ConvDiff_AuxSys"
+    Type "Implicit"
+    Variables={ "aux_c" "aux_zc" "aux_fc" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=107802
+    n_local_dofs()=107802
+    n_constrained_dofs()=7448
+    n_local_constrained_dofs()=7448
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 75.2212
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 123
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 7448
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+   System #0, "ConvDiff_PrimarySys"
+    Type "Implicit"
+    Variables={ "c" "zc" "fc" } 
+    Finite Element Types="LAGRANGE", "JACOBI_20_00" 
+    Infinite Element Mapping="CARTESIAN" 
+    Approximation Orders="FIRST", "THIRD" 
+    n_dofs()=107802
+    n_local_dofs()=107802
+    n_constrained_dofs()=7448
+    n_local_constrained_dofs()=7448
+    n_vectors()=1
+    n_matrices()=1
+    DofMap Sparsity
+      Average  On-Processor Bandwidth <= 75.2212
+      Average Off-Processor Bandwidth <= 0
+      Maximum  On-Processor Bandwidth <= 123
+      Maximum Off-Processor Bandwidth <= 0
+    DofMap Constraints
+      Number of DoF Constraints = 7448
+      Average DoF Constraint Length= 0
+      Number of Node Constraints = 0
+
+
+Init norm: 9376.65
+
+Assembling the System
+Nonlinear Residual: 2254.61
+Linear solve starting, tolerance 1e-13
+  0 KSP Residual norm 1.372719681434e+01 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 7.650585283948e+00 % max 1.069659830820e+00 min 1.069659830820e+00 max/min 1.000000000000e+00
+  2 KSP Residual norm 6.372184276709e+00 % max 2.702903450082e+00 min 7.853869996446e-01 max/min 3.441492476073e+00
+  3 KSP Residual norm 5.414938999011e+00 % max 8.159595276946e+00 min 2.966732914815e-01 max/min 2.750363956323e+01
+  4 KSP Residual norm 4.120690369813e+00 % max 2.042844997676e+01 min 2.857298854840e-01 max/min 7.149567131262e+01
+  5 KSP Residual norm 3.167824676422e+00 % max 2.327064228476e+01 min 2.794514218221e-01 max/min 8.327258502758e+01
+  6 KSP Residual norm 2.669246363841e+00 % max 2.453679406715e+01 min 2.601726101503e-01 max/min 9.430967407742e+01
+  7 KSP Residual norm 1.364627462724e+00 % max 2.456534759325e+01 min 1.886143047991e-01 max/min 1.302411692444e+02
+  8 KSP Residual norm 9.413083331308e-01 % max 2.474080851908e+01 min 1.640627042026e-01 max/min 1.508009308961e+02
+  9 KSP Residual norm 4.445675528445e-01 % max 2.477298666997e+01 min 1.637258498091e-01 max/min 1.513077299575e+02
+ 10 KSP Residual norm 2.364012597474e-01 % max 2.477500757269e+01 min 1.636051637088e-01 max/min 1.514316969652e+02
+ 11 KSP Residual norm 1.121977555088e-01 % max 2.481326309695e+01 min 1.591366615237e-01 max/min 1.559242405828e+02
+ 12 KSP Residual norm 5.073780735228e-02 % max 2.496077896485e+01 min 1.550306277185e-01 max/min 1.610054692558e+02
+ 13 KSP Residual norm 3.368366205386e-02 % max 2.498771708697e+01 min 1.475879497165e-01 max/min 1.693072986986e+02
+ 14 KSP Residual norm 1.900202643981e-02 % max 2.499557908693e+01 min 1.335225558716e-01 max/min 1.872011730435e+02
+ 15 KSP Residual norm 1.572490216256e-02 % max 2.550022722562e+01 min 1.121437520707e-01 max/min 2.273887466290e+02
+ 16 KSP Residual norm 1.034014195971e-02 % max 2.586813712059e+01 min 1.119835584372e-01 max/min 2.309994206435e+02
+ 17 KSP Residual norm 5.157524074768e-03 % max 2.590569996826e+01 min 1.119439433294e-01 max/min 2.314167180268e+02
+ 18 KSP Residual norm 2.742038218656e-03 % max 2.591206220544e+01 min 1.111688923823e-01 max/min 2.330873471001e+02
+ 19 KSP Residual norm 1.074338444535e-03 % max 2.762108014661e+01 min 1.103284272164e-01 max/min 2.503532484192e+02
+ 20 KSP Residual norm 4.703800948697e-04 % max 2.793467172543e+01 min 1.090893820071e-01 max/min 2.560714087060e+02
+ 21 KSP Residual norm 2.173642610027e-04 % max 2.811084492026e+01 min 1.083636073162e-01 max/min 2.594122290359e+02
+ 22 KSP Residual norm 9.905407376451e-05 % max 2.938497837829e+01 min 1.083278124048e-01 max/min 2.712597783152e+02
+ 23 KSP Residual norm 4.013561052076e-05 % max 2.984427992847e+01 min 1.071106029395e-01 max/min 2.786304913748e+02
+ 24 KSP Residual norm 2.535079704582e-05 % max 3.143510866434e+01 min 1.052331996060e-01 max/min 2.987185487284e+02
+ 25 KSP Residual norm 1.511768174606e-05 % max 3.410256280453e+01 min 9.476116119812e-02 max/min 3.598791147486e+02
+ 26 KSP Residual norm 8.450225424500e-06 % max 3.561459919061e+01 min 8.080826121772e-02 max/min 4.407296810243e+02
+ 27 KSP Residual norm 3.992527672169e-06 % max 3.787577715313e+01 min 8.026555842165e-02 max/min 4.718808153575e+02
+ 28 KSP Residual norm 1.611629671414e-06 % max 3.826560734654e+01 min 7.875380919858e-02 max/min 4.858889714153e+02
+ 29 KSP Residual norm 7.194623034841e-07 % max 4.166009930529e+01 min 7.788203573899e-02 max/min 5.349128192400e+02
+ 30 KSP Residual norm 3.491161206687e-07 % max 4.323604678059e+01 min 7.589772072584e-02 max/min 5.696619920481e+02
+ 31 KSP Residual norm 1.390889899639e-07 % max 4.561560618082e+01 min 7.411114814500e-02 max/min 6.155026244038e+02
+ 32 KSP Residual norm 5.888876824293e-08 % max 4.562967707982e+01 min 7.196674754311e-02 max/min 6.340383390606e+02
+ 33 KSP Residual norm 2.560372202125e-08 % max 4.595887097594e+01 min 7.108717070569e-02 max/min 6.465142798581e+02
+ 34 KSP Residual norm 1.084586047516e-08 % max 4.744325568256e+01 min 6.753447229105e-02 max/min 7.025042777871e+02
+ 35 KSP Residual norm 3.324980668138e-09 % max 4.762076835147e+01 min 6.482226510402e-02 max/min 7.346359815575e+02
+ 36 KSP Residual norm 1.670857123061e-09 % max 4.816819921351e+01 min 6.444957590498e-02 max/min 7.473780631936e+02
+ 37 KSP Residual norm 9.231455805104e-10 % max 4.818073139086e+01 min 6.442527444088e-02 max/min 7.478544997906e+02
+ 38 KSP Residual norm 3.715256869399e-10 % max 4.827027294640e+01 min 6.311106881473e-02 max/min 7.648463867425e+02
+ 39 KSP Residual norm 1.361638910190e-10 % max 4.837759967043e+01 min 5.923650711677e-02 max/min 8.166855546541e+02
+ 40 KSP Residual norm 5.906916604485e-11 % max 4.898466949225e+01 min 5.910003476992e-02 max/min 8.288433278077e+02
+ 41 KSP Residual norm 2.644019991615e-11 % max 4.977914555369e+01 min 5.624528174474e-02 max/min 8.850368245927e+02
+ 42 KSP Residual norm 1.151359658300e-11 % max 5.055146967527e+01 min 5.315302123263e-02 max/min 9.510554339712e+02
+ 43 KSP Residual norm 5.499940060335e-12 % max 5.055149682564e+01 min 5.153345742785e-02 max/min 9.809451829700e+02
+ 44 KSP Residual norm 3.910415381192e-12 % max 5.056397581025e+01 min 5.148385326077e-02 max/min 9.821327000164e+02
+ 45 KSP Residual norm 3.475169059743e-12 % max 5.113590964225e+01 min 4.973897594636e-02 max/min 1.028085292657e+03
+ 46 KSP Residual norm 3.381021250378e-12 % max 5.218934645486e+01 min 4.757000167164e-02 max/min 1.097106256483e+03
+ 47 KSP Residual norm 3.369950496608e-12 % max 5.334121365724e+01 min 3.830620166714e-02 max/min 1.392495505577e+03
+ 48 KSP Residual norm 3.368555575159e-12 % max 5.352681343805e+01 min 1.579446145751e-02 max/min 3.388960971036e+03
+ 49 KSP Residual norm 3.368264184122e-12 % max 5.456323714890e+01 min 6.397643577688e-03 max/min 8.528645975089e+03
+ 50 KSP Residual norm 3.368223846912e-12 % max 5.476663272837e+01 min 2.512045694208e-03 max/min 2.180160689538e+04
+ 51 KSP Residual norm 3.368218276255e-12 % max 5.478013223967e+01 min 1.047657983651e-03 max/min 5.228818287509e+04
+ 52 KSP Residual norm 3.368217621169e-12 % max 5.526159729898e+01 min 4.056039716309e-04 max/min 1.362452075525e+05
+ 53 KSP Residual norm 3.368217490272e-12 % max 5.592290024333e+01 min 1.469973211884e-04 max/min 3.804348255548e+05
+ 54 KSP Residual norm 3.368217464222e-12 % max 5.654141767278e+01 min 4.928436776775e-05 max/min 1.147248513752e+06
+ 55 KSP Residual norm 3.368217458263e-12 % max 5.701707612840e+01 min 2.539321872419e-05 max/min 2.245366243157e+06
+ 56 KSP Residual norm 3.368217457542e-12 % max 5.704186922451e+01 min 1.101472538778e-05 max/min 5.178691907088e+06
+ 57 KSP Residual norm 3.368217457439e-12 % max 5.819346589770e+01 min 4.009490216730e-06 max/min 1.451393138581e+07
+ 58 KSP Residual norm 3.368217457417e-12 % max 5.833032058510e+01 min 1.676989416090e-06 max/min 3.478276012088e+07
+ 59 KSP Residual norm 3.368217457415e-12 % max 5.860663614178e+01 min 5.943203175732e-07 max/min 9.861119401249e+07
+ 60 KSP Residual norm 3.368217457415e-12 % max 5.902822640742e+01 min 2.212066132722e-07 max/min 2.668465717830e+08
+ 61 KSP Residual norm 3.368217457415e-12 % max 5.921149849516e+01 min 9.701110489066e-08 max/min 6.103579436797e+08
+ 62 KSP Residual norm 3.368217457413e-12 % max 5.940372986462e+01 min 3.930287627562e-08 max/min 1.511434670787e+09
+ 63 KSP Residual norm 3.368217457402e-12 % max 5.943957811753e+01 min 1.775123809406e-08 max/min 3.348475064250e+09
+ 64 KSP Residual norm 3.368217457340e-12 % max 5.956757720562e+01 min 7.605169595607e-09 max/min 7.832511353860e+09
+ 65 KSP Residual norm 3.368217456759e-12 % max 6.042435197769e+01 min 2.583432869211e-09 max/min 2.338917054816e+10
+ 66 KSP Residual norm 3.368217453565e-12 % max 6.074029256969e+01 min 1.067213915214e-09 max/min 5.691482438879e+10
+ 67 KSP Residual norm 3.368217435648e-12 % max 6.086400353757e+01 min 4.489353316643e-10 max/min 1.355740999755e+11
+ 68 KSP Residual norm 3.368217306167e-12 % max 6.100085754796e+01 min 1.703178007042e-10 max/min 3.581590256318e+11
+ 69 KSP Residual norm 3.368216258855e-12 % max 6.104167636791e+01 min 6.050324385418e-11 max/min 1.008899233817e+12
+ 70 KSP Residual norm 3.368209282500e-12 % max 6.123370802262e+01 min 2.316683701424e-11 max/min 2.643162205741e+12
+ 71 KSP Residual norm 3.368123397611e-12 % max 6.140602917262e+01 min 6.829890973283e-12 max/min 8.990777365675e+12
+ 72 KSP Residual norm 3.367468999170e-12 % max 6.191852301639e+01 min 2.421215574831e-12 max/min 2.557332096325e+13
+ 73 KSP Residual norm 3.363924206192e-12 % max 6.192103286187e+01 min 1.011271926629e-12 max/min 6.123084328889e+13
+ 74 KSP Residual norm 3.341494112711e-12 % max 6.196220290082e+01 min 4.059779793941e-13 max/min 1.526245413441e+14
+ 75 KSP Residual norm 3.149706323163e-12 % max 6.197212339960e+01 min 1.441084412101e-13 max/min 4.300381218422e+14
+ 76 KSP Residual norm 2.560462122489e-12 % max 6.198257201660e+01 min 7.852466680538e-14 max/min 7.893388732260e+14
+ 77 KSP Residual norm 1.986187558592e-12 % max 6.200228760641e+01 min 6.329271153392e-14 max/min 9.796118084336e+14
+ 78 KSP Residual norm 1.859639796470e-12 % max 6.244006967582e+01 min 6.117521375859e-14 max/min 1.020675954190e+15
+ 79 KSP Residual norm 1.851335737277e-12 % max 6.262744840880e+01 min 6.093130700311e-14 max/min 1.027836944407e+15
+ 80 KSP Residual norm 1.849541361021e-12 % max 6.267936409216e+01 min 6.084924955169e-14 max/min 1.030076205606e+15
+ 81 KSP Residual norm 1.849213834203e-12 % max 6.315809807639e+01 min 6.103411126984e-14 max/min 1.034799995648e+15
+ 82 KSP Residual norm 1.849180577347e-12 % max 6.322286222868e+01 min 6.097084184487e-14 max/min 1.036936022460e+15
+ 83 KSP Residual norm 1.849177254412e-12 % max 6.323908858849e+01 min 6.113432175784e-14 max/min 1.034428562714e+15
+ 84 KSP Residual norm 1.849176747854e-12 % max 6.324044630907e+01 min 6.097167842578e-14 max/min 1.037210192369e+15
+ 85 KSP Residual norm 1.849176660479e-12 % max 6.342695379277e+01 min 6.107808489999e-14 max/min 1.038456819605e+15
+ 86 KSP Residual norm 1.849176647107e-12 % max 6.374836744964e+01 min 6.106904888503e-14 max/min 1.043873592491e+15
+ 87 KSP Residual norm 1.849176645453e-12 % max 6.391800754512e+01 min 6.108062841142e-14 max/min 1.046453011495e+15
+ 88 KSP Residual norm 1.849176645213e-12 % max 6.401471231324e+01 min 6.105249388512e-14 max/min 1.048519204370e+15
+ 89 KSP Residual norm 1.849176645187e-12 % max 6.406906105756e+01 min 6.094709787409e-14 max/min 1.051224148358e+15
+ 90 KSP Residual norm 1.849176645185e-12 % max 6.409245884210e+01 min 6.085130994482e-14 max/min 1.053263420298e+15
+ 91 KSP Residual norm 1.849176645184e-12 % max 6.409249614292e+01 min 6.125317318503e-14 max/min 1.046353891729e+15
+ 92 KSP Residual norm 1.849176645184e-12 % max 6.419491186507e+01 min 6.105078171238e-14 max/min 1.051500243969e+15
+ 93 KSP Residual norm 1.849176645184e-12 % max 6.437677554095e+01 min 6.130120671818e-14 max/min 1.050171423817e+15
+ 94 KSP Residual norm 1.849176645184e-12 % max 6.456790627850e+01 min 6.115834035751e-14 max/min 1.055749811082e+15
+ 95 KSP Residual norm 1.849176645182e-12 % max 6.491998257725e+01 min 6.101866611642e-14 max/min 1.063936442881e+15
+ 96 KSP Residual norm 1.849176645167e-12 % max 6.573916911480e+01 min 6.103127741782e-14 max/min 1.077138999807e+15
+ 97 KSP Residual norm 1.849176645073e-12 % max 6.580129875784e+01 min 6.115514272683e-14 max/min 1.075973267723e+15
+ 98 KSP Residual norm 1.849176644153e-12 % max 6.580943065790e+01 min 6.102700170183e-14 max/min 1.078365786008e+15
+ 99 KSP Residual norm 1.849176637460e-12 % max 6.603553649925e+01 min 6.110133302042e-14 max/min 1.080754432595e+15
+100 KSP Residual norm 1.849176573975e-12 % max 6.604112002017e+01 min 6.086832677912e-14 max/min 1.084983332297e+15
+101 KSP Residual norm 1.849175864532e-12 % max 6.606656939254e+01 min 6.098342476773e-14 max/min 1.083352888825e+15
+102 KSP Residual norm 1.849170507762e-12 % max 6.612253100979e+01 min 6.102829520825e-14 max/min 1.083473342720e+15
+103 KSP Residual norm 1.849097174945e-12 % max 6.670507468262e+01 min 6.096197244423e-14 max/min 1.094207946497e+15
+104 KSP Residual norm 1.848476016869e-12 % max 6.716339219892e+01 min 6.085031081417e-14 max/min 1.103747726187e+15
+105 KSP Residual norm 1.842829801095e-12 % max 6.723921510722e+01 min 5.983401277721e-14 max/min 1.123762421845e+15
+106 KSP Residual norm 1.805328476214e-12 % max 6.741755790275e+01 min 3.120846099815e-14 max/min 2.160233338861e+15
+107 KSP Residual norm 1.736572279572e-12 % max 6.776956377314e+01 min 1.986790169018e-14 max/min 3.411007605632e+15
+108 KSP Residual norm 1.720029190954e-12 % max 6.788944784209e+01 min 1.849763583680e-14 max/min 3.670168903803e+15
+109 KSP Residual norm 1.717353395150e-12 % max 6.789209319429e+01 min 1.833283374488e-14 max/min 3.703305999447e+15
+110 KSP Residual norm 1.717073672924e-12 % max 6.795580803733e+01 min 1.842172173566e-14 max/min 3.688895588178e+15
+111 KSP Residual norm 1.717042871720e-12 % max 6.847801911951e+01 min 1.828475248096e-14 max/min 3.745088657384e+15
+112 KSP Residual norm 1.717039884500e-12 % max 6.847826914047e+01 min 1.833992801903e-14 max/min 3.733835218406e+15
+113 KSP Residual norm 1.717039462803e-12 % max 6.912697995546e+01 min 1.829603855869e-14 max/min 3.778248484431e+15
+114 KSP Residual norm 1.717039414649e-12 % max 6.914999742458e+01 min 1.831217653043e-14 max/min 3.776175776247e+15
+115 KSP Residual norm 1.717039411438e-12 % max 6.954718258911e+01 min 1.828691365350e-14 max/min 3.803112100101e+15
+116 KSP Residual norm 1.717039411061e-12 % max 7.072924618393e+01 min 1.839190162792e-14 max/min 3.845673362920e+15
+117 KSP Residual norm 1.717039411016e-12 % max 7.088067606560e+01 min 1.842051634472e-14 max/min 3.847920152678e+15
+118 KSP Residual norm 1.717039411010e-12 % max 7.088965729343e+01 min 1.842189032706e-14 max/min 3.848120688750e+15
+119 KSP Residual norm 1.717039411009e-12 % max 7.089556575690e+01 min 1.827884558324e-14 max/min 3.878558163537e+15
+120 KSP Residual norm 1.717039411009e-12 % max 7.093678376469e+01 min 1.823354634689e-14 max/min 3.890454572859e+15
+121 KSP Residual norm 1.717039411009e-12 % max 7.096107439681e+01 min 1.829617259994e-14 max/min 3.878465510161e+15
+122 KSP Residual norm 1.717039411008e-12 % max 7.106281718343e+01 min 1.820699058172e-14 max/min 3.903051240922e+15
+123 KSP Residual norm 1.717039410987e-12 % max 7.106874962505e+01 min 1.832444075042e-14 max/min 3.878358449952e+15
+124 KSP Residual norm 1.717039410802e-12 % max 7.132928947428e+01 min 1.824429643984e-14 max/min 3.909676084769e+15
+125 KSP Residual norm 1.717039409110e-12 % max 7.144353257555e+01 min 1.836603341879e-14 max/min 3.889981627849e+15
+126 KSP Residual norm 1.717039388025e-12 % max 7.151086908815e+01 min 1.824665607607e-14 max/min 3.919121881293e+15
+127 KSP Residual norm 1.717039126990e-12 % max 7.154636300012e+01 min 1.839907109178e-14 max/min 3.888585605394e+15
+128 KSP Residual norm 1.717036264708e-12 % max 7.154677234882e+01 min 1.836547860607e-14 max/min 3.895720546327e+15
+129 KSP Residual norm 1.717011565225e-12 % max 7.154735392979e+01 min 1.822348627096e-14 max/min 3.926106830821e+15
+130 KSP Residual norm 1.716787618387e-12 % max 7.154816390765e+01 min 1.829225337122e-14 max/min 3.911391475706e+15
+131 KSP Residual norm 1.712627087202e-12 % max 7.220834775003e+01 min 1.836776667323e-14 max/min 3.931253539673e+15
+132 KSP Residual norm 1.673851758022e-12 % max 7.221333322509e+01 min 1.827486633378e-14 max/min 3.951510884191e+15
+133 KSP Residual norm 1.378589790491e-12 % max 7.228083646407e+01 min 1.793841433731e-14 max/min 4.029388278414e+15
+134 KSP Residual norm 7.408591266793e-13 % max 7.232493988224e+01 min 1.758803079968e-14 max/min 4.112168139004e+15
+Linear solve finished, step 134, residual 7.40859e-13
+Trying full Newton step
+  Current Residual: 18.7593
+  Nonlinear step: |du|/|u| = 0.296449, |du| = 34.4607
+Assembling the System
+Nonlinear Residual: 18.7593
+Linear solve starting, tolerance 5.33069e-13
+  0 KSP Residual norm 1.287745322967e+00 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 9.555242041022e-01 % max 7.644688169989e-01 min 7.644688169989e-01 max/min 1.000000000000e+00
+  2 KSP Residual norm 4.576945911837e-01 % max 1.434318913483e+00 min 2.756854512169e-01 max/min 5.202737058308e+00
+  3 KSP Residual norm 4.400576875119e-01 % max 1.702704454497e+00 min 2.753839208912e-01 max/min 6.183020595344e+00
+  4 KSP Residual norm 1.334462505308e-01 % max 3.887380962655e+00 min 2.491763216283e-01 max/min 1.560092442674e+01
+  5 KSP Residual norm 1.276133380068e-01 % max 2.442026847824e+01 min 2.117101830332e-01 max/min 1.153476329214e+02
+  6 KSP Residual norm 8.477380690289e-02 % max 3.257655624250e+01 min 2.042416975602e-01 max/min 1.595000268391e+02
+  7 KSP Residual norm 4.954770439988e-02 % max 3.314803940047e+01 min 1.920982401765e-01 max/min 1.725577463386e+02
+  8 KSP Residual norm 3.519026636464e-02 % max 3.328155838417e+01 min 1.920912922664e-01 max/min 1.732590685996e+02
+  9 KSP Residual norm 2.053448532032e-02 % max 3.349121102564e+01 min 1.806112876153e-01 max/min 1.854325467020e+02
+ 10 KSP Residual norm 1.759693798123e-02 % max 3.380568062720e+01 min 1.800970120193e-01 max/min 1.877081704364e+02
+ 11 KSP Residual norm 9.415033787043e-03 % max 3.437932582948e+01 min 1.702260868235e-01 max/min 2.019627336269e+02
+ 12 KSP Residual norm 3.527670100017e-03 % max 3.477925304801e+01 min 1.610979794456e-01 max/min 2.158888222416e+02
+ 13 KSP Residual norm 1.475342118632e-03 % max 3.478391121586e+01 min 1.592738539297e-01 max/min 2.183905917867e+02
+ 14 KSP Residual norm 6.027874561124e-04 % max 3.479813053263e+01 min 1.586112551806e-01 max/min 2.193925676523e+02
+ 15 KSP Residual norm 2.922823360035e-04 % max 3.483973466905e+01 min 1.388028314480e-01 max/min 2.510016136243e+02
+ 16 KSP Residual norm 1.451960843340e-04 % max 3.487067711244e+01 min 1.347246570136e-01 max/min 2.588292142316e+02
+ 17 KSP Residual norm 7.493614078711e-05 % max 3.489460001477e+01 min 1.347020324980e-01 max/min 2.590502857875e+02
+ 18 KSP Residual norm 4.495456278270e-05 % max 3.489566468165e+01 min 1.302756147273e-01 max/min 2.678602956869e+02
+ 19 KSP Residual norm 2.197421071413e-05 % max 3.508486194010e+01 min 1.302472550707e-01 max/min 2.693712195398e+02
+ 20 KSP Residual norm 8.382350247863e-06 % max 3.508509279845e+01 min 1.288685893989e-01 max/min 2.722548059392e+02
+ 21 KSP Residual norm 4.181011640101e-06 % max 3.508513944961e+01 min 1.168734355957e-01 max/min 3.001977247506e+02
+ 22 KSP Residual norm 1.493313460930e-06 % max 3.548734816707e+01 min 1.131629482410e-01 max/min 3.135951185321e+02
+ 23 KSP Residual norm 8.180768932134e-07 % max 3.549163232056e+01 min 1.068966226880e-01 max/min 3.320182754899e+02
+ 24 KSP Residual norm 3.923715841326e-07 % max 3.568775600293e+01 min 1.033498830783e-01 max/min 3.453100762183e+02
+ 25 KSP Residual norm 1.644096539153e-07 % max 3.588427239073e+01 min 1.007198854464e-01 max/min 3.562779309337e+02
+ 26 KSP Residual norm 6.995488526519e-08 % max 3.599809565648e+01 min 1.000211514758e-01 max/min 3.599048313817e+02
+ 27 KSP Residual norm 2.638662535371e-08 % max 3.605033330511e+01 min 9.878895050890e-02 max/min 3.649227278901e+02
+ 28 KSP Residual norm 9.925771805986e-09 % max 3.624289647929e+01 min 9.848671178982e-02 max/min 3.679978326074e+02
+ 29 KSP Residual norm 5.056847382964e-09 % max 3.631919340629e+01 min 9.663362759055e-02 max/min 3.758442512391e+02
+ 30 KSP Residual norm 1.959091387747e-09 % max 3.642451564309e+01 min 9.507063202565e-02 max/min 3.831310980795e+02
+ 31 KSP Residual norm 8.157929999218e-10 % max 3.656537144094e+01 min 9.473015695108e-02 max/min 3.859950475942e+02
+ 32 KSP Residual norm 3.845655728124e-10 % max 3.905320796667e+01 min 9.473011973544e-02 max/min 4.122575594303e+02
+ 33 KSP Residual norm 1.692586064646e-10 % max 3.954278400104e+01 min 9.405586584807e-02 max/min 4.204180530846e+02
+ 34 KSP Residual norm 8.092537638982e-11 % max 4.258959156046e+01 min 9.347783459132e-02 max/min 4.556116618090e+02
+ 35 KSP Residual norm 3.753222016239e-11 % max 4.263908426858e+01 min 9.266125949863e-02 max/min 4.601608536220e+02
+ 36 KSP Residual norm 2.083832163835e-11 % max 4.688355221878e+01 min 9.101000934850e-02 max/min 5.151472080313e+02
+ 37 KSP Residual norm 8.087436919635e-12 % max 4.778863642038e+01 min 9.100899039785e-02 max/min 5.250979734141e+02
+ 38 KSP Residual norm 2.766145816358e-12 % max 5.070082182410e+01 min 9.090433427790e-02 max/min 5.577382225704e+02
+ 39 KSP Residual norm 9.401225621062e-13 % max 5.113957971758e+01 min 9.057062684414e-02 max/min 5.646375817359e+02
+ 40 KSP Residual norm 4.633600476641e-13 % max 5.431985227605e+01 min 8.482687789908e-02 max/min 6.403613291140e+02
+Linear solve finished, step 40, residual 4.6336e-13
+Trying full Newton step
+  Current Residual: 0.546483
+  Nonlinear step: |du|/|u| = 0.0390063, |du| = 4.46391
+Assembling the System
+Nonlinear Residual: 0.546483
+Linear solve starting, tolerance 1.82988e-11
+  0 KSP Residual norm 3.512459871213e-02 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 2.185315960225e-02 % max 7.714177536395e-01 min 7.714177536395e-01 max/min 1.000000000000e+00
+  2 KSP Residual norm 7.897784374055e-03 % max 1.386835864823e+00 min 3.353166236576e-01 max/min 4.135899525935e+00
+  3 KSP Residual norm 7.314111835965e-03 % max 1.386967907960e+00 min 3.339836788612e-01 max/min 4.152801456314e+00
+  4 KSP Residual norm 1.863911464515e-03 % max 6.035665930904e+00 min 2.972697948514e-01 max/min 2.030366365988e+01
+  5 KSP Residual norm 1.745051496467e-03 % max 2.623461459832e+01 min 2.198171688103e-01 max/min 1.193474319604e+02
+  6 KSP Residual norm 8.716959570643e-04 % max 3.443823529530e+01 min 2.004920757609e-01 max/min 1.717685607504e+02
+  7 KSP Residual norm 5.322641576262e-04 % max 3.450295982887e+01 min 1.961328572276e-01 max/min 1.759162657220e+02
+  8 KSP Residual norm 3.598475348711e-04 % max 3.503981422587e+01 min 1.948143103261e-01 max/min 1.798626300461e+02
+  9 KSP Residual norm 1.803104163908e-04 % max 3.505621538593e+01 min 1.856689703090e-01 max/min 1.888103075467e+02
+ 10 KSP Residual norm 1.203669881429e-04 % max 3.505626114894e+01 min 1.841058895029e-01 max/min 1.904135779881e+02
+ 11 KSP Residual norm 4.869198910944e-05 % max 3.510466790178e+01 min 1.704821063242e-01 max/min 2.059140906849e+02
+ 12 KSP Residual norm 1.604216543767e-05 % max 3.510545472030e+01 min 1.567029610732e-01 max/min 2.240254713751e+02
+ 13 KSP Residual norm 8.526371694194e-06 % max 3.512876124484e+01 min 1.411686144974e-01 max/min 2.488425729041e+02
+ 14 KSP Residual norm 4.380265808641e-06 % max 3.516133699142e+01 min 1.262070973800e-01 max/min 2.786003142561e+02
+ 15 KSP Residual norm 3.354886472223e-06 % max 3.516469228307e+01 min 1.262039300181e-01 max/min 2.786338926057e+02
+ 16 KSP Residual norm 2.240388862533e-06 % max 3.517808479854e+01 min 1.257146354069e-01 max/min 2.798248961601e+02
+ 17 KSP Residual norm 1.092150415942e-06 % max 3.519334695411e+01 min 1.255831035629e-01 max/min 2.802395063956e+02
+ 18 KSP Residual norm 4.844722920026e-07 % max 3.544290541282e+01 min 1.218500309585e-01 max/min 2.908731752796e+02
+ 19 KSP Residual norm 2.138996288530e-07 % max 3.624274346656e+01 min 1.208338714669e-01 max/min 2.999386101478e+02
+ 20 KSP Residual norm 1.177101681309e-07 % max 3.634462962169e+01 min 1.208327212399e-01 max/min 3.007846653519e+02
+ 21 KSP Residual norm 5.513461658168e-08 % max 3.687120860685e+01 min 1.178084925605e-01 max/min 3.129758118917e+02
+ 22 KSP Residual norm 2.246865921536e-08 % max 3.709342562227e+01 min 1.157501750874e-01 max/min 3.204610757114e+02
+ 23 KSP Residual norm 1.148442472437e-08 % max 3.728186962765e+01 min 1.119419363147e-01 max/min 3.330464958446e+02
+ 24 KSP Residual norm 4.749671598725e-09 % max 3.733779902842e+01 min 1.113290751478e-01 max/min 3.353822797760e+02
+ 25 KSP Residual norm 2.029442005135e-09 % max 3.853648307578e+01 min 1.112374858932e-01 max/min 3.464343226239e+02
+ 26 KSP Residual norm 8.492553759803e-10 % max 3.856882390317e+01 min 1.057098006856e-01 max/min 3.648557054599e+02
+ 27 KSP Residual norm 4.133471518064e-10 % max 3.922942053358e+01 min 8.956094336618e-02 max/min 4.380192867463e+02
+ 28 KSP Residual norm 2.119865330169e-10 % max 3.923110902039e+01 min 8.513302781583e-02 max/min 4.608212585280e+02
+ 29 KSP Residual norm 8.354400707319e-11 % max 3.923912655987e+01 min 8.445319489435e-02 max/min 4.646257208974e+02
+ 30 KSP Residual norm 3.736514084620e-11 % max 4.057867011505e+01 min 7.982960840587e-02 max/min 5.083160361847e+02
+ 31 KSP Residual norm 1.690080404820e-11 % max 4.185616585418e+01 min 7.498672319029e-02 max/min 5.581810228987e+02
+ 32 KSP Residual norm 6.047561450246e-12 % max 4.481868860924e+01 min 7.477189708190e-02 max/min 5.994055301306e+02
+ 33 KSP Residual norm 2.382749101417e-12 % max 4.713168714763e+01 min 7.477182848664e-02 max/min 6.303401709115e+02
+ 34 KSP Residual norm 1.008521272532e-12 % max 4.716809882693e+01 min 7.419529296345e-02 max/min 6.357289922713e+02
+ 35 KSP Residual norm 5.202657732292e-13 % max 4.834666669272e+01 min 7.242813133799e-02 max/min 6.675122745761e+02
+Linear solve finished, step 35, residual 5.20266e-13
+Trying full Newton step
+  Current Residual: 0.000347837
+  Nonlinear step: |du|/|u| = 0.000863077, |du| = 0.098734
+Assembling the System
+Nonlinear Residual: 0.000347837
+Linear solve starting, tolerance 2.87491e-08
+  0 KSP Residual norm 2.009935510829e-05 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 9.525148937180e-06 % max 7.769187197751e-01 min 7.769187197751e-01 max/min 1.000000000000e+00
+  2 KSP Residual norm 2.961483012200e-06 % max 1.303045174047e+00 min 4.142746896007e-01 max/min 3.145365156878e+00
+  3 KSP Residual norm 9.966119905952e-07 % max 1.340767960611e+00 min 3.707983937874e-01 max/min 3.615894737074e+00
+  4 KSP Residual norm 6.775074952144e-07 % max 1.910393060315e+01 min 3.669412716172e-01 max/min 5.206263803184e+01
+  5 KSP Residual norm 6.132533299560e-07 % max 2.432574499640e+01 min 2.131510796644e-01 max/min 1.141244277754e+02
+  6 KSP Residual norm 2.508733797763e-07 % max 3.422515452561e+01 min 1.932779897990e-01 max/min 1.770773514418e+02
+  7 KSP Residual norm 1.222435462623e-07 % max 3.474392331919e+01 min 1.893815584586e-01 max/min 1.834599081451e+02
+  8 KSP Residual norm 8.323932272264e-08 % max 3.494952446450e+01 min 1.785095112948e-01 max/min 1.957852229329e+02
+  9 KSP Residual norm 4.219182465569e-08 % max 3.514175962485e+01 min 1.757456921884e-01 max/min 1.999580142607e+02
+ 10 KSP Residual norm 3.263526668194e-08 % max 3.524360611106e+01 min 1.754386532335e-01 max/min 2.008884898595e+02
+ 11 KSP Residual norm 1.259326159395e-08 % max 3.531233704530e+01 min 1.735117881689e-01 max/min 2.035154926242e+02
+ 12 KSP Residual norm 8.127786463933e-09 % max 3.587975813358e+01 min 1.733851344097e-01 max/min 2.069367610767e+02
+ 13 KSP Residual norm 3.775358355912e-09 % max 3.616204795048e+01 min 1.731369782913e-01 max/min 2.088638042974e+02
+ 14 KSP Residual norm 2.584825170516e-09 % max 3.656450333487e+01 min 1.666497029716e-01 max/min 2.194093519693e+02
+ 15 KSP Residual norm 1.076055382983e-09 % max 3.656595037699e+01 min 1.666153623080e-01 max/min 2.194632587924e+02
+ 16 KSP Residual norm 5.322492183599e-10 % max 3.656778340506e+01 min 1.648546379713e-01 max/min 2.218183476975e+02
+ 17 KSP Residual norm 2.992800487019e-10 % max 3.686162907775e+01 min 1.472614053783e-01 max/min 2.503142556806e+02
+ 18 KSP Residual norm 1.184266887437e-10 % max 3.698801650294e+01 min 1.337741462786e-01 max/min 2.764960011475e+02
+ 19 KSP Residual norm 5.534579394275e-11 % max 3.718460630240e+01 min 1.329266612062e-01 max/min 2.797377588888e+02
+ 20 KSP Residual norm 2.263449372590e-11 % max 3.718524482273e+01 min 1.187052863843e-01 max/min 3.132568561635e+02
+ 21 KSP Residual norm 1.188984496477e-11 % max 3.725160618251e+01 min 1.151003037416e-01 max/min 3.236447252662e+02
+ 22 KSP Residual norm 6.377926377902e-12 % max 3.736508668510e+01 min 1.147662604908e-01 max/min 3.255755352253e+02
+ 23 KSP Residual norm 2.299834368113e-12 % max 3.829065126786e+01 min 1.132265630669e-01 max/min 3.381772812908e+02
+ 24 KSP Residual norm 1.327180879462e-12 % max 3.829246961851e+01 min 1.130009537851e-01 max/min 3.388685523074e+02
+ 25 KSP Residual norm 6.407174313465e-13 % max 3.917481941156e+01 min 1.035616967274e-01 max/min 3.782751794294e+02
+ 26 KSP Residual norm 2.495984926142e-13 % max 3.925379961587e+01 min 1.034114080002e-01 max/min 3.795886776417e+02
+Linear solve finished, step 26, residual 2.49598e-13
+Trying full Newton step
+  Current Residual: 1.04676e-10
+  Nonlinear step: |du|/|u| = 3.87635e-07, |du| = 4.43446e-05
+Assembling the System
+Nonlinear Residual: 1.04676e-10
+Linear solve starting, tolerance 0.0955327
+  0 KSP Residual norm 4.549353635589e-12 % max 1.000000000000e+00 min 1.000000000000e+00 max/min 1.000000000000e+00
+  1 KSP Residual norm 2.035822899021e-12 % max 8.889130509569e-01 min 8.889130509569e-01 max/min 1.000000000000e+00
+  2 KSP Residual norm 1.012082875649e-12 % max 1.115034592169e+00 min 5.265626988557e-01 max/min 2.117572313027e+00
+  3 KSP Residual norm 4.937774285527e-13 % max 1.852564760161e+01 min 5.187952240363e-01 max/min 3.570897869390e+01
+  4 KSP Residual norm 3.717458860214e-13 % max 2.678470172672e+01 min 2.426482525662e-01 max/min 1.103848943623e+02
+Linear solve finished, step 4, residual 3.71746e-13
+Trying full Newton step
+  Current Residual: 6.63106e-11
+  Nonlinear solver converged, step 4, residual 6.63106e-11
+  Nonlinear solver converged, step 4, relative step size 5.8014e-14 < 1e-10
+
+QoI: 85785.612514364053
+
+Time for inverse problem: 843.15726299999994 seconds...
+Time to project psi: 0 seconds...
+Time for extra error estimate bits: 0.78370300000000004 seconds...
+    Time to get auxiliary problems: 0 seconds...
+    Time to get superadjoint: 0 seconds...
+
+Primary and auxiliary system dofs (each): 107802
+Primary and auxiliary superadjoint system dofs (each): 212355
+
+
+Final norm: 10326.01038642415
+
+
+ --------------------------------------------------------------------------
+| Time:           Fri Aug 12 17:30:52 2016                                 |
+| OS:             Linux                                                    |
+| HostName:       bassi                                                    |
+| OS Release:     3.19.0-64-generic                                        |
+| OS Version:     #72~14.04.1-Ubuntu SMP Fri Jun 24 17:59:48 UTC 2016      |
+| Machine:        x86_64                                                   |
+| Username:       kameeko                                                  |
+| Configuration:  ./configure  'prefix=/home/kameeko/software/libmesh-07_28_16_build_petsc'|
+|  'PETSC_DIR=/home/kameeko/software/petsc_build_superlu'                  |
+|  'PETSC_ARCH=arch-linux2-c-debug'                                        |
+|  '--enable-everything'                                                   |
+ --------------------------------------------------------------------------
+ -----------------------------------------------------------------------------------------------------------------
+| libMesh Performance: Alive time=937.466, Active time=934.891                                                    |
+ -----------------------------------------------------------------------------------------------------------------
+| Event                              nCalls     Total Time  Avg Time    Total Time  Avg Time    % of Active Time  |
+|                                               w/o Sub     w/o Sub     With Sub    With Sub    w/o S    With S   |
+|-----------------------------------------------------------------------------------------------------------------|
+|                                                                                                                 |
+|                                                                                                                 |
+| DofMap                                                                                                          |
+|   add_neighbors_to_send_list()     9          0.4769      0.052992    0.4769      0.052992    0.05     0.05     |
+|   build_constraint_matrix()        315440     0.4214      0.000001    0.4214      0.000001    0.05     0.05     |
+|   build_sparsity()                 9          6.6289      0.736540    7.5008      0.833425    0.71     0.80     |
+|   cnstrn_elem_mat_vec()            157720     0.2709      0.000002    0.2709      0.000002    0.03     0.03     |
+|   constrain_elem_vector()          157720     0.0618      0.000000    0.0618      0.000000    0.01     0.01     |
+|   create_dof_constraints()         9          3.0988      0.344316    4.2013      0.466807    0.33     0.45     |
+|   distribute_dofs()                9          0.5300      0.058884    2.4610      0.273443    0.06     0.26     |
+|   dof_indices()                    6258530    4.9078      0.000001    4.9078      0.000001    0.52     0.52     |
+|   enforce_constraints_exactly()    8          0.0284      0.003545    0.0284      0.003545    0.00     0.00     |
+|   prepare_send_list()              18         0.0000      0.000000    0.0000      0.000000    0.00     0.00     |
+|   reinit()                         9          1.4541      0.161565    1.4541      0.161565    0.16     0.16     |
+|                                                                                                                 |
+| EquationSystems                                                                                                 |
+|   read()                           1          1.8962      1.896197    7.6955      7.695500    0.20     0.82     |
+|   update()                         1          0.0008      0.000830    0.0008      0.000830    0.00     0.00     |
+|                                                                                                                 |
+| FE                                                                                                              |
+|   compute_shape_functions()        658832     1.3446      0.000002    1.3446      0.000002    0.14     0.14     |
+|   init_shape_functions()           122601     0.3181      0.000003    0.3181      0.000003    0.03     0.03     |
+|   inverse_map()                    14531057   56.3158     0.000004    56.3158     0.000004    6.02     6.02     |
+|                                                                                                                 |
+| FEMSystem                                                                                                       |
+|   assembly()                       5          8.1851      1.637011    10.6669     2.133387    0.88     1.14     |
+|   assembly(get_residual)           5          1.4755      0.295101    3.6861      0.737222    0.16     0.39     |
+|   postprocess()                    1          0.1414      0.141427    0.4993      0.499307    0.02     0.05     |
+|                                                                                                                 |
+| FEMap                                                                                                           |
+|   compute_affine_map()             658832     0.7000      0.000001    0.7000      0.000001    0.07     0.07     |
+|   compute_face_map()               122386     0.1281      0.000001    0.1281      0.000001    0.01     0.01     |
+|   init_face_shape_functions()      11         0.0001      0.000008    0.0001      0.000008    0.00     0.00     |
+|   init_reference_to_physical_map() 122601     0.9791      0.000008    0.9791      0.000008    0.10     0.10     |
+|                                                                                                                 |
+| GenericProjector                                                                                                |
+|   operator()                       1          0.5805      0.580489    65.7111     65.711096   0.06     7.03     |
+|   project_edges                    94632      0.0158      0.000000    0.0158      0.000000    0.00     0.00     |
+|   project_interior                 94632      0.0155      0.000000    0.0155      0.000000    0.00     0.00     |
+|   project_nodes                    94632      2.4282      0.000026    64.9630     0.000686    0.26     6.95     |
+|   project_sides                    94632      0.0152      0.000000    0.0152      0.000000    0.00     0.00     |
+|                                                                                                                 |
+| Mesh                                                                                                            |
+|   find_neighbors()                 3          0.3473      0.115777    0.3473      0.115777    0.04     0.04     |
+|   renumber_nodes_and_elem()        6          0.0503      0.008380    0.0503      0.008380    0.01     0.01     |
+|                                                                                                                 |
+| MeshCommunication                                                                                               |
+|   assign_global_indices()          1          2.7356      2.735644    2.7384      2.738378    0.29     0.29     |
+|                                                                                                                 |
+| MeshTools::Generation                                                                                           |
+|   build_cube()                     1          0.0864      0.086354    0.0864      0.086354    0.01     0.01     |
+|                                                                                                                 |
+| NameBasedIO                                                                                                     |
+|   read()                           1          0.0633      0.063294    0.0633      0.063294    0.01     0.01     |
+|                                                                                                                 |
+| NewtonSolver                                                                                                    |
+|   solve()                          1          0.0070      0.006961    842.1917    842.191727  0.00     90.08    |
+|                                                                                                                 |
+| Parallel                                                                                                        |
+|   allgather()                      13         0.0000      0.000001    0.0000      0.000001    0.00     0.00     |
+|   probe()                          32         0.0001      0.000003    0.0001      0.000003    0.00     0.00     |
+|   receive()                        32         0.0034      0.000105    0.0034      0.000105    0.00     0.00     |
+|   send()                           32         0.0012      0.000037    0.0012      0.000037    0.00     0.00     |
+|   send_receive()                   4          0.0027      0.000682    0.0027      0.000682    0.00     0.00     |
+|                                                                                                                 |
+| Parallel::Request                                                                                               |
+|   wait()                           32         0.0001      0.000002    0.0001      0.000002    0.00     0.00     |
+|                                                                                                                 |
+| Partitioner                                                                                                     |
+|   set_node_processor_ids()         1          0.0331      0.033080    0.0331      0.033080    0.00     0.00     |
+|   single_partition()               3          0.0202      0.006747    0.0202      0.006747    0.00     0.00     |
+|                                                                                                                 |
+| PetscLinearSolver                                                                                               |
+|   solve()                          5          827.8070    165.561395  827.8070    165.561395  88.55    88.55    |
+|                                                                                                                 |
+| PointLocatorTree                                                                                                |
+|   init(no master)                  11         6.0680      0.551634    6.0680      0.551634    0.65     0.65     |
+|   operator()                       757236     3.7041      0.000005    57.7341     0.000076    0.40     6.18     |
+|                                                                                                                 |
+| System                                                                                                          |
+|   calculate_norm()                 2          0.5428      0.271405    1.1401      0.570068    0.06     0.12     |
+|   project_fem_vector()             1          0.0020      0.001958    65.7167     65.716668   0.00     7.03     |
+|   project_vector(FunctionBase)     1          0.0000      0.000005    65.7167     65.716674   0.00     7.03     |
+|                                                                                                                 |
+| XdrIO                                                                                                           |
+|   read()                           1          0.9977      0.997726    0.9977      0.997726    0.11     0.11     |
+ -----------------------------------------------------------------------------------------------------------------
+| Totals:                            2.424e+07  934.8911                                        100.00            |
+ -----------------------------------------------------------------------------------------------------------------
+

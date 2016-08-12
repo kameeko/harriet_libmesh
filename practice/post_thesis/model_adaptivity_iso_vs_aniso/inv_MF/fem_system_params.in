@@ -16,22 +16,16 @@ solver_verbose = true
 
 # Nonlinear solver tolerance
 relative_step_tolerance = 1e-10
-relative_residual_tolerance = 0
-absolute_residual_tolerance = 1.e-10
+relative_residual_tolerance = 0 #1.e-10
+absolute_residual_tolerance = 1.e-11
 max_nonlinear_iterations = 100
-
-require_residual_reduction = false
 
 initial_linear_tolerance = 1.e-13
 minimum_linear_tolerance = 1.e-20
 max_linear_iterations = 10000
 
-direct_transfer_if_possible = true; #DEBUG
-use_buffer_zone = true; #setting to false appears to cause problems for reinit if nx_ratio >= 4
-
 #discretization
-nx_LF = 16 #16 #25 for HF
-ny_LF = 32 #32 #45 for HF
-nz_LF = 16 #16 #30 for HF
-ratio_sadj = 2
-ratio_HF = 2
+nx = 4 #25 #92
+ny = 4 #45 #66
+nz = 4 #30
+

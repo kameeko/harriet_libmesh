@@ -33,6 +33,7 @@
 #include "initial.h"
 
 #include "libmesh/sparse_matrix.h" //DEBUG
+#include "libmesh/mesh_function.h"
 
 int main(int argc, char** argv){
 
@@ -49,6 +50,9 @@ int main(int argc, char** argv){
   bool solveMF = infileForMesh("solveMF",true); //if false, then solving for LF to read in later...
   bool solveHF = infileForMesh("solveHF",false); 
   bool estErr = infileForMesh("estimate_error",false);
+
+  if((!solveMF && !solveHF) && estErr)
+    std::cout << "\nAAAAHHHH NOT MEANT TO DO ERROR ESTIMATE DURING INITIAL GUESS RUN\n" << std::endl;
 
   // Create a mesh, with dimension to be overridden later, distributed
   // across the default MPI communicator.
@@ -69,7 +73,7 @@ int main(int argc, char** argv){
         Elem* elem = *elem_it;
         elem->subdomain_id() = 1;
       }
-    }
+    } //else LF case
     MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
     std::cout << "\n\nAaaahhhh are you having LF be iso or aniso?" << std::endl;
   }
@@ -80,29 +84,40 @@ int main(int argc, char** argv){
   EquationSystems equation_systems (mesh);
   EquationSystems equation_systems_mix(mesh2);
   
-  //name system
+  //systems on MF mesh
   ConvDiff_PrimarySys & system_primary = 
     equation_systems.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
   ConvDiff_AuxSys & system_aux = 
     equation_systems.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
-  ConvDiff_MprimeSys & system_mix = 
-    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for superadj
-  ConvDiff_PrimarySadjSys & system_sadj_primary = 
-    equation_systems.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
-  ConvDiff_AuxSadjSys & system_sadj_aux = 
-    equation_systems.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
+
+  //systems on fine mesh
+  ConvDiff_MprimeSys & system_mix =
+    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi and superadj
+  ConvDiff_PrimarySys & system_primary_proj =
+    equation_systems_mix.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+  ConvDiff_AuxSys & system_aux_proj =
+    equation_systems_mix.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+  ConvDiff_PrimarySadjSys & system_sadj_primary =
+    equation_systems_mix.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
+  ConvDiff_AuxSadjSys & system_sadj_aux =
+    equation_systems_mix.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
+
   
   //steady-state problem	
  	system_primary.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_primary));
+    UniquePtr<TimeSolver>(new SteadySolver(system_primary));
   system_aux.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_aux));
+    UniquePtr<TimeSolver>(new SteadySolver(system_aux));
+  system_primary_proj.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_primary_proj));
+  system_aux_proj.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_aux_proj));
   system_mix.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_mix));
+    UniquePtr<TimeSolver>(new SteadySolver(system_mix));
   system_sadj_primary.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_sadj_primary));
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary));
   system_sadj_aux.time_solver =
-    AutoPtr<TimeSolver>(new SteadySolver(system_sadj_aux));
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux));
   
   // Initialize the system
   //equation_systems.init ();
@@ -111,22 +126,51 @@ int main(int argc, char** argv){
   //initial guess  
   if(solveMF || solveHF){
     std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
-    std::cout << "Looking for psiLF at: " << find_psiLF_here << "\n\n";
-    equation_systems.read(find_psiLF_here, READ,
+    std::string find_mesh_here = infileForMesh("psiLF_mesh_file","psiLF_mesh.xda");
+    std::cout << "Looking for psiLF at: " << find_psiLF_here << std::endl;;
+    std::cout << "Looking for psiLF mesh at: " << find_mesh_here << "\n" << std::endl;;
+    Mesh meshtmp(init.comm());
+    meshtmp.read(find_mesh_here);
+    EquationSystems es_tmp(meshtmp);
+    ConvDiff_PrimarySys & system_primary_tmp =
+      es_tmp.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+    ConvDiff_AuxSys & system_aux_tmp =
+      es_tmp.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+    system_primary_tmp.time_solver =
+      UniquePtr<TimeSolver>(new SteadySolver(system_primary_tmp));
+    system_aux_tmp.time_solver =
+      UniquePtr<TimeSolver>(new SteadySolver(system_aux_tmp));
+    es_tmp.read(find_psiLF_here, READ,
 			  EquationSystems::READ_HEADER |
 			  EquationSystems::READ_DATA |
 			  EquationSystems::READ_ADDITIONAL_DATA);
-  }else{
+    std::vector<dof_id_type> primary_vars;
+    primary_vars.push_back(0); primary_vars.push_back(1); primary_vars.push_back(2);
+    MeshFunction* primary_meshfx =
+      new libMesh::MeshFunction(es_tmp,
+                                *system_primary_tmp.solution,
+                                system_primary_tmp.get_dof_map(),
+                                primary_vars);
+    primary_meshfx->init();
+    equation_systems.init();
+    system_primary.project_solution(primary_meshfx);
+    delete primary_meshfx;
+  }else{ 
     equation_systems.init ();
 	  read_initial_parameters();
     system_primary.project_solution(initial_value, initial_grad,
                             equation_systems.parameters);
     finish_initialization();
   }
+  //DEBUG
+  //equation_systems.init();
+  //system_primary.solution->zero();
+  //system_primary.updateDataLoc();
+  //equation_systems.reinit();
   
   // And the nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
-  system_sadj_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_primary); 
+  system_sadj_primary.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_sadj_primary); 
   solver_sadj_primary->quiet = infile("solver_quiet", true);
   solver_sadj_primary->verbose = !solver_sadj_primary->quiet;
   solver_sadj_primary->max_nonlinear_iterations =
@@ -138,7 +182,7 @@ int main(int argc, char** argv){
   solver_sadj_primary->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_sadj_aux = new NewtonSolver(system_sadj_aux); 
-  system_sadj_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_sadj_aux); 
+  system_sadj_aux.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_sadj_aux); 
   solver_sadj_aux->quiet = infile("solver_quiet", true);
   solver_sadj_aux->verbose = !solver_sadj_aux->quiet;
   solver_sadj_aux->max_nonlinear_iterations =
@@ -150,7 +194,7 @@ int main(int argc, char** argv){
   solver_sadj_aux->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_primary = new NewtonSolver(system_primary); 
-  system_primary.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_primary); 
+  system_primary.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_primary); 
   solver_primary->quiet = infile("solver_quiet", true);
   solver_primary->verbose = !solver_primary->quiet;
   solver_primary->max_nonlinear_iterations =
@@ -162,7 +206,7 @@ int main(int argc, char** argv){
   solver_primary->absolute_residual_tolerance =
     infile("absolute_residual_tolerance", 0.0);
   NewtonSolver *solver_aux = new NewtonSolver(system_aux); 
-  system_aux.time_solver->diff_solver() = AutoPtr<DiffSolver>(solver_aux); 
+  system_aux.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_aux); 
   solver_aux->quiet = infile("solver_quiet", true);
   solver_aux->verbose = !solver_aux->quiet;
   solver_aux->max_nonlinear_iterations =
@@ -196,6 +240,8 @@ int main(int argc, char** argv){
   equation_systems.print_info(); //DEBUG
   
   clock_t begin_inv = std::clock();
+//system_primary.assemble(); //DEBUG
+std::cout << "\nInit norm: " << system_primary.calculate_norm(*system_primary.solution,L2) << "\n" << std::endl; //DEBUG
   system_primary.solve();
   system_primary.clearQoI();
   clock_t end_inv = std::clock();
@@ -209,10 +255,12 @@ int main(int argc, char** argv){
   clock_t end_aux = std::clock();
 
   system_primary.postprocess();
-  std::cout << "QoI: " << std::setprecision(17) << system_primary.getQoI() << std::endl;
+  std::cout << "\nQoI: " << std::setprecision(17) << system_primary.getQoI() << "\n" << std::endl;
 
   clock_t begin_sadj = std::clock();
   clock_t end_sadj = std::clock();
+  clock_t begin_proj = std::clock();
+  clock_t end_proj = std::clock();
   if(estErr){
     system_aux.postprocess();
     
@@ -220,20 +268,46 @@ int main(int argc, char** argv){
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
     equation_systems_mix.reinit();
+
+    //project psi variables
+    std::cout << "Begin projecting psi...\n" << std::endl;
+    begin_proj = std::clock();
+    std::vector<dof_id_type> primary_vars;
+    std::vector<dof_id_type> aux_vars;
+    primary_vars.push_back(0); primary_vars.push_back(1); primary_vars.push_back(2);
+    aux_vars.push_back(0); aux_vars.push_back(1); aux_vars.push_back(2);
+    MeshFunction* primary_MF_meshfx =
+      new libMesh::MeshFunction(equation_systems,
+                                *system_primary.solution,
+                                system_primary.get_dof_map(),
+                                primary_vars);
+    MeshFunction* aux_MF_meshfx =
+      new libMesh::MeshFunction(equation_systems,
+                                *system_aux.solution,
+                                system_aux.get_dof_map(),
+                                aux_vars);
+    primary_MF_meshfx->init();
+    aux_MF_meshfx->init();
+    system_primary_proj.project_solution(primary_MF_meshfx);
+    system_aux_proj.project_solution(aux_MF_meshfx);
+    delete primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+    delete aux_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+    end_proj = std::clock();
+
     //combine primary and auxiliary variables into psi
-    DirectSolutionTransfer sol_transfer(init.comm()); 
-    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
+    DirectSolutionTransfer sol_transfer(init.comm());
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_c")),
       system_mix.variable(system_mix.variable_number("aux_c")));
-    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_zc")),
       system_mix.variable(system_mix.variable_number("aux_zc")));
-    sol_transfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
+    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_fc")),
       system_mix.variable(system_mix.variable_number("aux_fc")));
-    AutoPtr<NumericVector<Number> > just_aux = system_mix.solution->clone();
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("c")),
+    UniquePtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("c")),
       system_mix.variable(system_mix.variable_number("c")));
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("zc")),
       system_mix.variable(system_mix.variable_number("zc")));
-    sol_transfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
+    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("fc")),
       system_mix.variable(system_mix.variable_number("fc")));
       
     system_mix.assemble(); //calculate residual to correspond to solution
@@ -269,13 +343,13 @@ int main(int argc, char** argv){
     dual_sol.swap(primal_sol);
     NumericVector<Number> &dual_solution = system_mix.get_adjoint_solution(0);
   
-    AutoPtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
+    UniquePtr<NumericVector<Number> > adjresid = system_mix.solution->zero_clone();
     adjresid->pointwise_mult(*system_mix.rhs,dual_solution); 
     adjresid->scale(-0.5);
     std::cout << "\n -0.5*M'_HF(psiLF)(superadj): " << adjresid->sum() << std::endl; //DEBUG
   
     //LprimeHF(psiLF)
-    AutoPtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
+    UniquePtr<NumericVector<Number> > LprimeHF_psiLF = system_mix.solution->zero_clone();
     LprimeHF_psiLF->pointwise_mult(*system_mix.rhs,*just_aux);
     std::cout << " L'_HF(psiLF): " << LprimeHF_psiLF->sum() << std::endl; //DEBUG
   
@@ -292,13 +366,22 @@ int main(int argc, char** argv){
   }
   clock_t end = clock();
   std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+  std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
   std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
   std::cout << "    Time to get auxiliary problems: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
   std::cout << "    Time to get superadjoint: " << double(end_sadj-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
-  
-  if(!solveMF && !solveHF)
-    equation_systems.write("psiLF.xda", WRITE, EquationSystems::WRITE_DATA | 
+  std::cout << "Primary and auxiliary system dofs (each): " << system_primary.solution->size() << std::endl;
+  std::cout << "Primary and auxiliary superadjoint system dofs (each): " << system_sadj_primary.solution->size() << "\n" << std::endl;
+ 
+std::cout << "\nFinal norm: " << system_primary.calculate_norm(*system_primary.solution,L2) << "\n" << std::endl; //DEBUG
+ 
+  if(!solveMF && !solveHF){
+    std::string write_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
+    std::string write_mesh_here = infileForMesh("psiLF_mesh_file","psiLF_mesh.xda");
+    equation_systems.write(write_psiLF_here, WRITE, EquationSystems::WRITE_DATA | 
                EquationSystems::WRITE_ADDITIONAL_DATA);
+    mesh.write(write_mesh_here);
+  }
 
   // All done.
   return 0;

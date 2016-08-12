@@ -19,6 +19,7 @@ public:
 		std::string find_data_here = infile("data_file","Measurements0.dat");
 		qoi_option = infile("QoI_option",1);
     solveInit = (!(infile("solveMF",true)) && !infile("solveHF",false));
+    const unsigned int dim = this->get_mesh().mesh_dimension();
     
     //read in data
 		if(FILE *fp=fopen(find_data_here.c_str(),"r")){
@@ -27,7 +28,10 @@ public:
 			while(flag != -1){
 				flag = fscanf(fp,"%lf %lf %lf %lf",&x,&y,&z,&value);
 				if(flag != -1){
-					datapts.push_back(Point(x,y,z));
+          if(dim == 3)
+					  datapts.push_back(Point(x,y,z));
+          else if(dim == 2)
+            datapts.push_back(Point(x,y,0.));
 					datavals.push_back(value);
 				}
 			}
@@ -86,6 +90,18 @@ public:
   Real qoi;
   double getQoI(){ return qoi; }
   void clearQoI(){ qoi = 0.; }
+
+  //update elements where data points reside when mesh is changed
+  void updateDataLoc(){
+    PointLocatorTree point_locator(this->get_mesh());
+    for(unsigned int ind=0; ind<dataelems.size(); ind++){
+      if(!(this->get_mesh().elem(dataelems[ind])->active())){ //element has been refined
+        Point data_point = datapts[ind];
+        Elem *this_elem = const_cast<Elem *>(point_locator(data_point));
+        dataelems[ind] = this_elem->id();
+      }
+    }
+  }
  
   virtual void postprocess();
   std::vector<Real> primal_c_vals;
