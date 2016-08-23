@@ -612,9 +612,17 @@ interpretations:
       -letting 0.03 step, with buffer, qoi2 run for a while in _v2 -> has trouble solving MF02 inv...
       -terminal_output_4p2em4_adapt_0p05step_0p05tol_flat_HF4x_sadj2x_buffer.txt: -> has trouble solving MF01 inv...
       -2D, HF128x256 : you get all the way to 100% refinement and the estimated relative qoi error stays 30+...ridiculous estimated HF qoi all the way...does adj resid need to stay finer than mixed? 
-        -> evaluate residuals on HF (project psi and superadj)? projecting psi down to coarser areas messes up orthogonality***
         -shouldn't the weighted residual still go to zero at 100% refinement, regardless of where sadj is (as long as it's in a subspace of HF)?
-          -1-step?
+        -> evaluate residuals on HF (project psi and superadj)? projecting psi down to coarser areas messes up orthogonality
+          -rerun: now 100% refinement gives no error, and estimated relative qoi error stays reasonable...
+        -doesn't take much %HF for MF mesh nodes to exceed sadj mesh nodes (~20%)
+        -when linearizing sadj about primary and aux, if primary and aux are projected down to coarser sadj mesh, then some info is lost...so even more error, but this time due to implementation...each EquationSystems is built from one mesh and it doesn't seem possible to communicate with systems in other EquationSystems objects...
+          -inv and aux seems to have hard time solving...many more GMRES iters and much more overall solve time than HF...
+            -what if strong pc flags?
+              -stashed, ANALYZE ME
+              3D running in v1: terminal_output_4p2em4_adapt_0p05step_1em10tol_sadj2x_HF4x_buffer_qoi2.txt
+            -what if LF diff also aniso?
+              -stashed, ANALYZE ME
       
       we have:
       -single iteration may or may not take longer than HF inv; have cases where MF inv consistently takes less time than HF inv
@@ -643,26 +651,30 @@ v1: checking that one step to HF matches invHF...it does in terms of iteration o
     -MF01 has different initial residual than during adaptivity, even though both have LF solution as init guess...(init resid 592 vs 676)
       -LF qoi matches...MF01 QoI doesn't quite match...in same-mesh case, QoI's agreed to 5+ sig figs...  
       -error estimates are way off...
-        -looks like there was a bug in variable transfer of psi to mprime system? rerunning divvy1
+        -looks like there was a bug in variable transfer of psi to mprime system?
           -error estimates more reasonable now, but still not what they were before...
       -zero init guess - should still be able to solve primary correctly...and thus all the other vars...
         -compared with adaptive run with no continuation...init resid is same for MF01, but jacobian seems different, cuz ksp residual starts out different...(*** WTF?? ***)
         -no difference in any of the physics modules (only difference is extra solveInit if-else, but even when that's commented out), same run flags, same data
           -calling for update of data locations and reinit() makes no difference
         -> perhaps, in the way that the mesh written to exo keeps no inactive elements, the adapted and read-in systems have their DOFs in a different order (so jacobian has swapped rows and columns) and that affects how the preconditioner performs...in HF case, the much better match is perhaps due to the meshes being formed the same way (LF, then refine all, then reinit)...
-          -swapping order of z and f changes init KSP residual very slightly...
+          -swapping order of z and f (order of add_variable call) changes init KSP residual very slightly...
           -test by print out matrices in 2D, see if they're permutations of one another?
-            -wait no init resids aren't agreeing...1-step and HF init resids match to 12 sig figs, but init KSP resid deviates...
-              -compare the eep.mat in diff_mesh/inv_MF and diff_mesh/psi_and_superadj_libmesh_1_0_0 -> matlab on athena?**
+            -wait now init resids aren't agreeing (wait which ones?)...1-step and HF init resids match to 12 sig figs, but init KSP resid deviates...
+              -compare the eep.mat in diff_mesh/inv_MF and diff_mesh/psi_and_superadj_libmesh_1_0_0 -> matlab on athena?
+                -they appear to be permutations of each other (same sums and sum of absolutes; also found moved rows (ex: 20 appears swapped with one of 56, 83, 116, 137, 164)), though their relative difference in condition number is O(e-7)
+                -moving around more rows/columns changes the condition number more
       -inv timing increases with dofs, but now HF timing more than the rest...
         terminal_output_divvy1_diridata.txt:Time for inverse problem: 536.240093 seconds...
         terminal_output_divvy2_diridata.txt:Time for inverse problem: 804.75221299999998 seconds...
         terminal_output_divvy3_diridata.txt:Time for inverse problem: 979.02992500000005 seconds...
         terminal_output_HF_diridata.txt:Time for inverse problem: 2153.7936540000001 seconds...
+          ->** can we just start at LF and let this represent a situation where you don't have a 'better' init guess for HF?
           -> try R=0 init? init resid agree (vs HF R=0), and KSP residuals are very similar (to 8+ sig figs, though not the same...)
             -init residuals and KSP residuals for subsequent HF run match to 8+ sig figs; total timing similar to inv_HF run
             -divvy1 QoI with LF and R0 init guess match, but don't match adaptive (169877 vs 169877 vs 170370)
               -same for divvy2 and divvy3; not HF though...R0-start HF QoI agree in both implementations, but not with LF-start HF, which happens to be the one that took much longer than usual...since physics modules are copied, maybe it really is dependent on init guess?
+                -final residuals both O(e-11), though LF-start's is slightly smaller (3e-11 vs 5e-11)
                 -1-step adaptivity (equivalent to LF init guess) has same residual when starting HF iteration (to 10+ sig figs), but KSP residuals start out slightly different and diverged from there...run without required residual reduction took ridiculously long and was cut off after 15+ hours; rerunning with required residual reduction correctly had no effect on first linear solve, but also took forever to converge (was cut off)
                 -1-step adaptivity replication of HF_inv, even when using project_solution instead of DirectTransfer, matches inv_HF to every printed digit...something about refinement?
                   -using uniformly_refine instead of marking each element and calling refine_elements doesn't change anything
@@ -704,9 +716,7 @@ does it die during coarse LF run? yes...wtf? fails at convdiff_mprime.C:93 comme
       -tightening linear solver tolerances didn't help with err est craziness, so not likely due to aux/sadj being insufficiently resolved...
       -from MF02 to MF04, the QoI got further from the HF QoI, so maybe it so happened that for these the psiMF was very different from the psiHF...?
 
-
-
--reverse same-mesh case? do inverse-crime data first, then different data? (2718 is psi_and_superadj)
+-reverse same-mesh case? do inverse-crime data first, then different data?
   -what if you did the adaptivity on Table 5's data? how sensitive is the adaptivity to the actual data value?
     -adapt on Table 5's data (diri0), then give it new weird data?
       -> MF02 inverse fails newton ...for both 0.03 and 0.05 steps...
@@ -724,15 +734,42 @@ does it die during coarse LF run? yes...wtf? fails at convdiff_mprime.C:93 comme
   -what happens if you do weaker precond on the same-mesh? is that making the weird MF02 hiccup?
     -seems to generally make things faster, though doesn't change the ordering of timing (things that took the most time still take the most time)
     -timing might still be related to condition number; didn't see much condition number difference at first NL iteration, but might diverge more later...not sure how to check later condition numbers though...
-  -if it continues to have time blips, what happens if you avoid refining boundary? something screwy at boundary?
-    -or alternatively, keep everything on boundary at HF?
-  -is it necessarily true that a greater %HF should take more time? what about in the stokes-NS paper? did they even do timing? 
+  -if it continues to have time blips, what happens if you avoid refining boundary? something screwy at boundary? or alternatively, keep everything on boundary at HF?
+    -if you avoid refining boundary elements, then starting at MF07, where %HF=36.8%, the MF inv problems take significantly longer than HF inv problem...perhaps do to something like a 'boundary layer' between the HF and LF parts...
+  -is it necessarily true that a greater %HF should take more time? what about in the stokes-NS paper? did they even do timing?
+    -stokes-NS only notes that mixed problems converged in a few Newton iterations to a small residual; no comparison between different mixtures
     -does it make more sense to think of greater nonlinearity as requiring more nonlinear steps? instead of increasing the difficulty of intermediate linear solves?
-  -what if you started with LF instead of R=0? (since LF includes isotropy in diff; what if MF didn't have inhomogeneity in diff?)
+  -what if you started with LF instead of R=0? (since LF includes isotropy in diff)
+    -more refined ones take longer than with R=0 init guess, but then later refinements and HF come very close together in inv timing
+  -what if MF didn't have inhomogeneity in diff?)
     -does anisotropy even show up in the jacobian like it would for FD? the dphi*D*dphi becomes a single number? it must show up somehow if it's able to mess with stability...
   -> tell karen the results, even if they don't show anything...
+  
 -if we can fix the 1:2 with LF init guess, might have a case for HF > adapt
   -what if you do 1-step with uniform refinement? if that works, then you missed some housekeeping...
     -> 2993 nope that didn't change anything...
     
     -breaking apart iterations with diff init guess is unfair...what if two refinements are "closer", like smaller continuation step?
+    
+-----------------------------------
+ 
+-same mesh cases
+  -any adaptivity iteration takes longer than HF inv, but given MF models and same initial guess, solving MF-inv takes less time (more if error estimate needed)
+    -inv timing does not increase monotonically with %HF given same initial guess
+      -should it?
+      -# NL iters increases monotonically (not strictly) with %HF given same initial guess
+-diff mesh cases
+  -1:2
+    -MF<HF, using same data as from adaptivity, but...
+      -LF-init-MF01 timings/KSP iters do not agree between adaptivity code and inv_MF code
+      -QoIs don't agree between adaptivity codes and inv_MF codes
+        -since LF-init and R0-init HF QoIs also disagree, possible that the different initial guesses led to different local minima, though not in LF-init-MF01 case...
+        -since doing HF by making the mesh straight-out vs using uniform refinement changes the KSP iters, possible that nothing is wrong, and during adaptivity the DOFs are arranged differently and that changes the timing/KSP iters...
+      -in inv_MF code, HF takes a lot longer only if LF-init, not if R0-init
+  -1:2:4 LF:sadj:HF
+    -ridiculous error estimates; error estimates don't become zero at full-refinement, possible incorrect implementation of weighted residuals (wrong meshes)
+
+
+Aug 23 16:09 - pointpush -> you forgot to clear cvals after each iteration...error estimates and such are probably off...
+  -pre-fix data stashes in pink
+  -terminal_output_4p2em4_adapt_0p05step_1em10tol_sadj2x_HF4x_buffer_HF128x256_qoi2_weakpc.txt : difference is almost imperceptible
