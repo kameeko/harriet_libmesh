@@ -17,11 +17,13 @@ dispersivity_transverse_vertical = 4.0
 bsource = -0.0
 
 data_file = Measurements_diri0_r4p2em3_bigdom.dat #Measurements_shifted.dat
+#data_file = Measurements_diri0_r4p2em3_bigdom_flat.dat
 beta = 1.e-3
 
 divided_mesh = divvy3.exo
-solveMF = true
-solveHF = false
+solveMF = false
+solveHF = true
 estimate_error = false
-psiLF_file = psiR0_diridata_fullmesh.xda
-psiLF_mesh_file = psiR0_fullmesh.xda
+zeroInit = false
+psiLF_file = psiLF_diridata.xda
+psiLF_mesh_file = psiLF_mesh.xda

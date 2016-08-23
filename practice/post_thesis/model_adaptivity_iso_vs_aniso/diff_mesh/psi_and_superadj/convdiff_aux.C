@@ -368,6 +368,7 @@ void ConvDiff_AuxSys::postprocess (){
 	}
 	output.close();
 */
+  primal_auxc_vals.clear();
   for(int i = 0; i<datavals.size(); i++){
 		Point pt = datapts[i];
 		Number c = point_value(aux_c_var, pt);

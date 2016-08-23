@@ -187,9 +187,12 @@ bool ConvDiff_PrimarySys::element_time_derivative (bool request_jacobian, DiffCo
 			else if(subdomain == cd_subdomain_id){
 			  U = NumberVectorValue(0.0, 0.0, 0.0);
 				R = 0.0;
-		    k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
-		                                   0., dispTens(0,0), 0.,
-		                                   0., 0., dispTens(0,0));
+        if(anisoLF)
+          k = porosity*dispTens;
+        else
+		      k = porosity*NumberTensorValue(dispTens(0,0), 0., 0.,
+		                                     0., dispTens(0,0), 0.,
+		                                     0., 0., dispTens(0,0));
 		  }
     	
 			// First, an i-loop over the  degrees of freedom.
@@ -340,6 +343,7 @@ void ConvDiff_PrimarySys::postprocess (){
 	}
 	output.close();
   */
+  primal_c_vals.clear();
   for(int i = 0; i<datavals.size(); i++){
 		Point pt = datapts[i];
 		Number c = point_value(c_var, pt);

@@ -15,7 +15,7 @@ Number initial_value(const Point& p, const Parameters& parameters,
   Number init_val = 0.0;  
   if(unknown_name == "c")
     init_val = -1.*(infile("bsource", -5.0));
-  
+
   return init_val;
 }
 

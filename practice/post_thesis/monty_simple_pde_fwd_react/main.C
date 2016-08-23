@@ -67,18 +67,18 @@ int main(int argc, char** argv){
     MeshTools::Generation::build_square(mesh, nx, ny, 497150.0, 501750.0, 537350.0, 540650.0, QUAD9);
   }else{
     dim = 3;
-    MeshTools::Generation::build_cube(mesh, 
+/*    MeshTools::Generation::build_cube(mesh, 
                                       nx, ny, nz, 
                                       497150.0, 501750.0, 
                                       537350.0, 540650.0, 
                                       0.0, 100.0, 
-                                      HEX27); 
-/*    MeshTools::Generation::build_cube(mesh, 
+                                      HEX27); */
+    MeshTools::Generation::build_cube(mesh, 
                                       nx, ny, nz, 
                                       498300.0, 500600.0, 
                                       538175.0, 539825.0, 
                                       0.0, 100.0, 
-                                      HEX27); *///"halved" domain
+                                      HEX27); //"halved" domain
   }
   
   // Print information about the mesh to the screen.

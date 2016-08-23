@@ -16,7 +16,9 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
 bsource = -5.0
 
-data_file = Measurements_shifted.dat
+#data_file = Measurements_shifted.dat
+#data_file = Measurements_diri5_r4p2em3_halfdom.dat
+data_file = Measurements_diri0_r4p2em3_bigdom.dat
 beta = 1.e-3
 
 max_model_refinements = 10
@@ -24,3 +26,4 @@ refinement_step = 0.05
 relative_error_tolerance = 1.e-10
 do_divvy_in_Matlab = false
 do_continuation = true
+avoid_sides = false

@@ -77,6 +77,7 @@ int main(int argc, char** argv)
 
   Mesh mesh(init.comm()); //low/mixed-fidelity mesh
   Mesh mesh_sadj(init.comm()); //high(er)-fidelity mesh, for super-adj
+  Mesh mesh_HF(init.comm());
   //Mesh mesh_HF_dbg(init.comm());
   
   MeshRefinement mesh_refinement(mesh);
@@ -101,31 +102,34 @@ int main(int argc, char** argv)
   const int nx_sadj = ratio_sadj*nx_LF;
   const int ny_sadj = ratio_sadj*ny_LF;
   const int nz_sadj = ratio_sadj*nz_LF;
+  const int nx_HF = ratio_HF*nx_LF;
+  const int ny_HF = ratio_HF*ny_LF;
+  const int nz_HF = ratio_HF*nz_LF;
   if(nz_LF == 0){ //easier to debug
     dim = 2;
     MeshTools::Generation::build_square(mesh, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
     MeshTools::Generation::build_square(mesh_sadj, nx_sadj, ny_sadj, 0., Lx, 0., Ly, QUAD9);
+    MeshTools::Generation::build_square(mesh_HF, nx_HF, ny_HF, 0., Lx, 0., Ly, QUAD9);
     //MeshTools::Generation::build_square(mesh_LF, nx_LF, ny_LF, 0., Lx, 0., Ly, QUAD9);
   }else{
     dim = 3;
     MeshTools::Generation::build_cube(mesh, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     MeshTools::Generation::build_cube(mesh_sadj, nx_sadj, ny_sadj, nz_sadj, 0., Lx, 0., Ly, 0., Lz, HEX27);
+    MeshTools::Generation::build_cube(mesh_HF, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); 
     //MeshTools::Generation::build_cube(mesh_LF, nx_LF, ny_LF, nz_LF, 0., Lx, 0., Ly, 0., Lz, HEX27);
     //MeshTools::Generation::build_cube(mesh_HF_dbg, nx_HF, ny_HF, nz_HF, 0., Lx, 0., Ly, 0., Lz, HEX27); //DEBUG
   }
-  double dx = Lx/nx_sadj;
-  double dy = Ly/ny_sadj;
-  double dz = 0.;
-  if(dim == 3){dz = Lz/nz_sadj; }
 
   int n_LF_elems = mesh.n_elem();
 
   mesh.print_info(); //DEBUG
   mesh_sadj.print_info(); //DEBUG
-  
+  mesh_HF.print_info();
+
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
-  EquationSystems equation_systems_mix(mesh_sadj);
+  EquationSystems equation_systems_sadj(mesh_sadj);
+  EquationSystems equation_systems_HF(mesh_HF);
   //EquationSystems equation_systems_dbg(mesh_HF_dbg); //DEBUG
 
   //systems - coarser mesh
@@ -142,18 +146,28 @@ int main(int argc, char** argv)
   //ConvDiff_AuxSys & system_aux_dbg = 
   //  equation_systems_dbg.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
     
-  //systems - fine mesh
-  ConvDiff_MprimeSys & system_mix = 
-    equation_systems_mix.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for psi and superadj
+  //systems - superadj mesh
   ConvDiff_PrimarySys & system_primary_proj = 
-    equation_systems_mix.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
+    equation_systems_sadj.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for primary variables
   ConvDiff_AuxSys & system_aux_proj = 
-    equation_systems_mix.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
+    equation_systems_sadj.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for auxiliary variables
   ConvDiff_PrimarySadjSys & system_sadj_primary = 
-    equation_systems_mix.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
+    equation_systems_sadj.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
   ConvDiff_AuxSadjSys & system_sadj_aux = 
-    equation_systems_mix.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
-    
+    equation_systems_sadj.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
+  
+  //systems - fine mesh
+  ConvDiff_PrimarySys & system_primary_proj_HF =
+    equation_systems_HF.add_system<ConvDiff_PrimarySys>("ConvDiff_PrimarySys"); //for intermediate projection step
+  ConvDiff_AuxSys & system_aux_proj_HF =
+    equation_systems_HF.add_system<ConvDiff_AuxSys>("ConvDiff_AuxSys"); //for intermediate projection step
+  ConvDiff_PrimarySadjSys & system_sadj_primary_proj_HF =
+    equation_systems_HF.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for intermediate projection step
+  ConvDiff_AuxSadjSys & system_sadj_aux_proj_HF =
+    equation_systems_HF.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for intermediate projection step
+  ConvDiff_MprimeSys & system_mix = 
+    equation_systems_HF.add_system<ConvDiff_MprimeSys>("Diff_ConvDiff_MprimeSys"); //for sadj weighted residual
+  
   //keep solution at previous refinement iteration as init guess
   system_primary.project_solution_on_reinit() = true;
   system_aux.project_solution_on_reinit() = true;
@@ -178,6 +192,14 @@ int main(int argc, char** argv)
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary));
   system_sadj_aux.time_solver =
     UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux));
+  system_primary_proj_HF.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_primary_proj_HF));
+  system_aux_proj_HF.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_aux_proj_HF));
+  system_sadj_primary_proj_HF.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_primary_proj_HF));
+  system_sadj_aux_proj_HF.time_solver =
+    UniquePtr<TimeSolver>(new SteadySolver(system_sadj_aux_proj_HF));
   //system_primary_dbg.time_solver =
   //  UniquePtr<TimeSolver>(new SteadySolver(system_primary_dbg)); //DEBUG
   //system_aux_dbg.time_solver =
@@ -186,7 +208,8 @@ int main(int argc, char** argv)
   
   // Initialize the system
   equation_systems.init();
-  equation_systems_mix.init();
+  equation_systems_sadj.init();
+  equation_systems_HF.init();
   //equation_systems_dbg.init();
   
   if(!useBuffer && (ratio_HF > 2))
@@ -284,22 +307,27 @@ int main(int argc, char** argv)
   std::set<dof_id_type> fullyRefined;
   
   //find fine elements contained by coarse elements
-  int elem_ratio = ratio_sadj*ratio_sadj;
+  double dx = Lx/nx_HF;
+  double dy = Ly/ny_HF;
+  double dz = 0.;
+  if(dim == 3)
+    dz = Lz/nz_HF; 
+  int elem_ratio = ratio_HF*ratio_HF;
   if(dim > 2)
-    elem_ratio *= ratio_sadj;
+    elem_ratio *= ratio_HF;
   MeshBase::element_iterator       elem_it_LF  = mesh.elements_begin();
   const MeshBase::element_iterator elem_end_LF = mesh.elements_end();
-  MeshBase::element_iterator       elem_it_HF  = mesh_sadj.elements_begin();
-  const MeshBase::element_iterator elem_end_HF = mesh_sadj.elements_end();
+  MeshBase::element_iterator       elem_it_HF  = mesh_HF.elements_begin();
+  const MeshBase::element_iterator elem_end_HF = mesh_HF.elements_end();
   std::vector<std::set<dof_id_type> > elem_mapping;
-  if(ratio_sadj > 1){
+  if(ratio_HF > 1){
     elem_mapping.resize(mesh.n_elem());
     int n_babies_found = 0;
     for (; elem_it_LF != elem_end_LF; ++elem_it_LF){
       Elem* elem = *elem_it_LF;
       Point elem_cent = elem->centroid();
       n_babies_found = 0;
-      elem_it_HF = mesh_sadj.elements_begin();
+      elem_it_HF = mesh_HF.elements_begin();
       for (; elem_it_HF != elem_end_HF; ++elem_it_HF){
         if(n_babies_found >= elem_ratio)
           break;
@@ -308,12 +336,12 @@ int main(int argc, char** argv)
         elem_cent_diff.subtract(elem_cent);
         bool isBaby = false;
         if(dim == 2)
-          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_sadj-1) &&
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_sadj-1));
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_HF-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_HF-1));
         else if(dim == 3)
-          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_sadj-1) &&
-            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_sadj-1) &&
-            std::abs(elem_cent_diff(2)) < 0.51*dz*(ratio_sadj-1));
+          isBaby = (std::abs(elem_cent_diff(0)) < 0.51*dx*(ratio_HF-1) &&
+            std::abs(elem_cent_diff(1)) < 0.51*dy*(ratio_HF-1) &&
+            std::abs(elem_cent_diff(2)) < 0.51*dz*(ratio_HF-1));
         if(isBaby){
           elem_mapping[elem->id()].insert(elem_HF->id());
           n_babies_found += 1;   
@@ -326,8 +354,8 @@ int main(int argc, char** argv)
   
   //mapping fine basis functions to coarse basis functions that they overlap
   std::vector<std::set<dof_id_type> > fine_to_coarse_nodes;
-  if(ratio_sadj > 1){
-    fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/3.));
+  if(ratio_HF > 1){
+    fine_to_coarse_nodes.resize(round(system_mix.n_dofs()/6.));
     elem_it_LF = mesh.elements_begin();
     for (; elem_it_LF != elem_end_LF; ++elem_it_LF){ //for each coarse element
       Elem* elem = *elem_it_LF;
@@ -335,11 +363,11 @@ int main(int argc, char** argv)
       system_aux.get_dof_map().dof_indices(elem, di_LF);
       for (dof_id_type baby_id : elem_mapping[elem->id()]){ //for each fine element in the coarse element
         std::vector< dof_id_type > di_HF;
-        system_sadj_primary.get_dof_map().dof_indices(system_sadj_primary.get_mesh().elem(baby_id), di_HF);
+        system_mix.get_dof_map().dof_indices(system_mix.get_mesh().elem(baby_id), di_HF);
         for(unsigned int j = 0; j < di_LF.size(); j++){ //for each coarse node in elem
           dof_id_type node_LF = round(floor(di_LF[j]/3.));
           for(unsigned int k = 0; k < di_LF.size(); k++){ //for each fine node in elem
-            dof_id_type node_HF = round(floor(di_HF[k]/3.));
+            dof_id_type node_HF = round(floor(di_HF[k]/6.));
             fine_to_coarse_nodes[node_HF].insert(node_LF);
           }
         }
@@ -353,7 +381,7 @@ int main(int argc, char** argv)
   double relError = 2.*qoiErrorTol;
   while(refIter <= maxIter && relError > qoiErrorTol){
     //equation_systems.reinit(); //project previous solution onto new mesh
-    //equation_systems_mix_MF.reinit(); 
+    //equation_systems_sadj_MF.reinit(); 
     
     if(!doContinuation){ //clear out previous solutions
       system_primary.solution->zero();
@@ -367,6 +395,7 @@ int main(int argc, char** argv)
     std::cout << "\n Begin primary solve..." << std::endl;
     clock_t begin_inv = std::clock();
     system_primary.solve();
+//system_primary.matrix->print_matlab("eep.m"); //DEBUG
     system_primary.clearQoI();
     clock_t end_inv = std::clock();
     clock_t begin_err_est = std::clock();
@@ -392,8 +421,9 @@ outputJ2.close();
     system_sadj_primary.set_c_vals(system_primary.get_c_vals());
     system_sadj_aux.set_auxc_vals(system_aux.get_auxc_vals());
 
-    equation_systems_mix.reinit();
-    
+    equation_systems_sadj.reinit();
+    equation_systems_HF.reinit();
+
     //bug (?) with FEMContext::interior_values means we can't transfer over psi as a whole
 /*    
     //combine primary and auxiliary variables into psi
@@ -431,7 +461,7 @@ outputJ2.close();
     //project variables
     std::cout << "Begin projecting psi...\n" << std::endl;
     clock_t begin_proj = std::clock();
-    if((ratio_sadj > 1) || !xfer_if_possible){
+    if((ratio_sadj > 1 || ratio_HF > 1) || !xfer_if_possible){
       std::cout << "...actually projecting..." << std::endl;
       std::vector<dof_id_type> primary_vars;
       std::vector<dof_id_type> aux_vars;
@@ -451,8 +481,14 @@ outputJ2.close();
                                   aux_vars);
       primary_MF_meshfx->init();
       aux_MF_meshfx->init();
+
+      //for superadjoint calculations
       system_primary_proj.project_solution(primary_MF_meshfx);
       system_aux_proj.project_solution(aux_MF_meshfx);
+
+      //for superadjoint weighted residual calculation
+      system_primary_proj_HF.project_solution(primary_MF_meshfx);
+      system_aux_proj_HF.project_solution(aux_MF_meshfx);
 
       //DEBUG
       //system_primary_dbg.project_solution(primary_MF_meshfx);
@@ -468,6 +504,8 @@ outputJ2.close();
     }else{
       std::cout << "...actually doing direct transfer..." << std::endl;
       DirectSolutionTransfer sol_xfer(init.comm());
+
+      //for superadjoint calculations
       sol_xfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
         system_aux_proj.variable(system_aux_proj.variable_number("aux_c")));
       sol_xfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
@@ -480,6 +518,20 @@ outputJ2.close();
         system_primary_proj.variable(system_primary_proj.variable_number("zc")));
       sol_xfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
         system_primary_proj.variable(system_primary_proj.variable_number("fc")));
+
+      //for superadjoint weighted residual calculation
+      sol_xfer.transfer(system_aux.variable(system_aux.variable_number("aux_c")),
+        system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_c")));
+      sol_xfer.transfer(system_aux.variable(system_aux.variable_number("aux_zc")),
+        system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_zc")));
+      sol_xfer.transfer(system_aux.variable(system_aux.variable_number("aux_fc")),
+        system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_fc")));
+      sol_xfer.transfer(system_primary.variable(system_primary.variable_number("c")),
+        system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("c")));
+      sol_xfer.transfer(system_primary.variable(system_primary.variable_number("zc")),
+        system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("zc")));
+      sol_xfer.transfer(system_primary.variable(system_primary.variable_number("fc")),
+        system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("fc")));
     } 
     std::cout << "\nFinished projecting psi...\n" << std::endl;
     clock_t end_proj = std::clock();
@@ -494,18 +546,18 @@ outputJ2.close();
 
     //combine into one psi
     DirectSolutionTransfer sol_transfer(init.comm()); 
-    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_c")),
+    sol_transfer.transfer(system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_c")),
       system_mix.variable(system_mix.variable_number("aux_c")));
-    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_zc")),
+    sol_transfer.transfer(system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_zc")),
       system_mix.variable(system_mix.variable_number("aux_zc")));
-    sol_transfer.transfer(system_aux_proj.variable(system_aux_proj.variable_number("aux_fc")),
+    sol_transfer.transfer(system_aux_proj_HF.variable(system_aux_proj_HF.variable_number("aux_fc")),
       system_mix.variable(system_mix.variable_number("aux_fc")));
     UniquePtr<NumericVector<Number> > just_aux = system_mix.solution->clone(); //project just aux vars first
-    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("c")),
+    sol_transfer.transfer(system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("c")),
       system_mix.variable(system_mix.variable_number("c")));
-    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("zc")),
+    sol_transfer.transfer(system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("zc")),
       system_mix.variable(system_mix.variable_number("zc")));
-    sol_transfer.transfer(system_primary_proj.variable(system_primary_proj.variable_number("fc")),
+    sol_transfer.transfer(system_primary_proj_HF.variable(system_primary_proj_HF.variable_number("fc")),
       system_mix.variable(system_mix.variable_number("fc")));
 
     system_mix.assemble(); //calculate residual to correspond to solution
@@ -523,6 +575,7 @@ system_sadj_primary.matrix->print(outputJ);
 outputJ.close();
 */
     system_sadj_aux.solve();
+    clock_t end_sadj = std::clock();
     std::cout << "\n End super-adjoint solves...\n" << std::endl;
     
     //combine super adjoint parts into one
@@ -534,18 +587,66 @@ outputJ.close();
     NumericVector<Number> &dual_sol = system_mix.get_adjoint_solution(0);
     NumericVector<Number> &primal_sol = *system_mix.solution;
     dual_sol.swap(primal_sol);
-    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_c")),
-      system_mix.variable(system_mix.variable_number("aux_c")));
-    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
-      system_mix.variable(system_mix.variable_number("aux_zc")));
-    sol_transfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
-      system_mix.variable(system_mix.variable_number("aux_fc")));
-    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
-      system_mix.variable(system_mix.variable_number("c")));
-    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
-      system_mix.variable(system_mix.variable_number("zc")));
-    sol_transfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
-      system_mix.variable(system_mix.variable_number("fc")));
+    std::cout << "Begin projecting superadj...\n" << std::endl;
+    clock_t begin_proj_sadj = std::clock();
+    if((ratio_HF > ratio_sadj) || !xfer_if_possible){
+      std::cout << "...actually projecting..." << std::endl;
+
+      //project sadj to HF mesh
+      std::vector<dof_id_type> sadj_primary_vars;
+      std::vector<dof_id_type> sadj_aux_vars;
+      sadj_primary_vars.push_back(0); sadj_primary_vars.push_back(1); sadj_primary_vars.push_back(2);
+      sadj_aux_vars.push_back(0); sadj_aux_vars.push_back(1); sadj_aux_vars.push_back(2);
+      MeshFunction* sadj_primary_MF_meshfx =
+        new libMesh::MeshFunction(equation_systems_sadj,
+                                  *system_sadj_primary.solution,
+                                  system_sadj_primary.get_dof_map(),
+                                  sadj_primary_vars);
+      MeshFunction* sadj_aux_MF_meshfx =
+        new libMesh::MeshFunction(equation_systems_sadj,
+                                  *system_sadj_aux.solution,
+                                  system_sadj_aux.get_dof_map(),
+                                  sadj_aux_vars);
+      sadj_primary_MF_meshfx->init();
+      sadj_aux_MF_meshfx->init();
+      system_sadj_primary_proj_HF.project_solution(sadj_primary_MF_meshfx);
+      system_sadj_aux_proj_HF.project_solution(sadj_aux_MF_meshfx);
+      delete sadj_primary_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+      delete sadj_aux_MF_meshfx; //avoid memory leakage, not sure why UniquePtr didn't help...
+
+      //combine components of superadjoint
+      DirectSolutionTransfer sol_xfer(init.comm());
+      sol_xfer.transfer(system_sadj_aux_proj_HF.variable(system_sadj_aux_proj_HF.variable_number("sadj_aux_c")),
+        system_mix.variable(system_mix.variable_number("aux_c")));
+      sol_xfer.transfer(system_sadj_aux_proj_HF.variable(system_sadj_aux_proj_HF.variable_number("sadj_aux_zc")),
+        system_mix.variable(system_mix.variable_number("aux_zc")));
+      sol_xfer.transfer(system_sadj_aux_proj_HF.variable(system_sadj_aux_proj_HF.variable_number("sadj_aux_fc")),
+        system_mix.variable(system_mix.variable_number("aux_fc")));
+      sol_xfer.transfer(system_sadj_primary_proj_HF.variable(system_sadj_primary_proj_HF.variable_number("sadj_c")),
+        system_mix.variable(system_mix.variable_number("c")));
+      sol_xfer.transfer(system_sadj_primary_proj_HF.variable(system_sadj_primary_proj_HF.variable_number("sadj_zc")),
+        system_mix.variable(system_mix.variable_number("zc")));
+      sol_xfer.transfer(system_sadj_primary_proj_HF.variable(system_sadj_primary_proj_HF.variable_number("sadj_fc")),
+        system_mix.variable(system_mix.variable_number("fc")));
+    }else{
+      std::cout << "...actually doing direct transfer..." << std::endl;
+      DirectSolutionTransfer sol_xfer(init.comm());
+
+      sol_xfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_c")),
+        system_mix.variable(system_mix.variable_number("aux_c")));
+      sol_xfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_zc")),
+        system_mix.variable(system_mix.variable_number("aux_zc")));
+      sol_xfer.transfer(system_sadj_aux.variable(system_sadj_aux.variable_number("sadj_aux_fc")),
+        system_mix.variable(system_mix.variable_number("aux_fc")));
+      sol_xfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_c")),
+        system_mix.variable(system_mix.variable_number("c")));
+      sol_xfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_zc")),
+        system_mix.variable(system_mix.variable_number("zc")));
+      sol_xfer.transfer(system_sadj_primary.variable(system_sadj_primary.variable_number("sadj_fc")),
+        system_mix.variable(system_mix.variable_number("fc")));
+    }
+    std::cout << "\nFinished projecting superadj...\n" << std::endl;
+    clock_t end_proj_sadj = std::clock();
     //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
     dual_sol.swap(primal_sol);
     //std::cout << "\n sadj norm: " << system_mix.calculate_norm(primal_sol, L2) << std::endl; //DEBUG
@@ -593,10 +694,12 @@ outputJ.close();
     std::cout << "Time for inverse problem: " << double(end_inv-begin_inv)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time to project psi: " << double(end_proj-begin_proj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
     std::cout << "Time for extra error estimate bits: " << double(end-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
-    std::cout << "    Time to get auxiliary variables: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
-    std::cout << "    Time to get superadjoint: " << double(end-begin_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
+    std::cout << "    Time to solve auxiliary variables: " << double(end_aux-begin_err_est)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to solve superadjoint: " << double(end_sadj-begin_sadj)/CLOCKS_PER_SEC << " seconds..." << std::endl;
+    std::cout << "    Time to project superadj: " << double(end_proj_sadj-begin_proj_sadj)/CLOCKS_PER_SEC << " seconds...\n" << std::endl;
     std::cout << "Primary and auxiliary system dofs (each): " << system_primary.solution->size() << std::endl;
-    std::cout << "Primary and auxiliary superadjoint system dofs (each): " << system_sadj_primary.solution->size() << "\n" << std::endl;
+    std::cout << "Primary and auxiliary superadjoint system dofs (each): " << system_sadj_primary.solution->size() << std::endl;
+    std::cout << "HF primary system dofs: " << system_primary_proj_HF.solution->size() << "\n" << std::endl;
     std::cout << "Refinement fraction: " << double(fullyRefined.size())/n_LF_elems << std::endl << std::endl;
 
     //output at each iteration
@@ -689,19 +792,7 @@ outputJ.close();
             fullyRefined.insert(markMe[i]);
           }
         }
-/*        
-        //DEBUG
-        std::cout << "----- marking debug ------\n" << std::endl;
-        std::cout << "elements to refine: " << std::endl;
-        for(dof_id_type eep : refineMe)
-          std::cout << eep << std::endl;
-        std::cout << "fullyRefined.size(): " << fullyRefined.size() << std::endl;
-        for(dof_id_type nani : fullyRefined) 
-          std::cout << nani << std::endl;
-        for(int i = 0; i < cutoffLoc; i++){
-          std::cout << node_errs_coarse[i].second << std::endl;
-        std::cout << "----- marking debug ------\n" << std::endl;        
-*/
+        
         for(int ref_iter = 0; ref_iter < elem_ref_iters; ref_iter++){
           
           mesh_refinement.clean_refinement_flags(); //remove all refinement flags
