@@ -338,6 +338,7 @@ void ConvDiff_PrimarySys::postprocess (){
 	}
 	output.close();
   */
+  primal_c_vals.clear();
   for(int i = 0; i<datavals.size(); i++){
 		Point pt = datapts[i];
 		Number c = point_value(c_var, pt);

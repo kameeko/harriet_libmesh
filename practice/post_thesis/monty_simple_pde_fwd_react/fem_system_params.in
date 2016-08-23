@@ -23,8 +23,8 @@ max_nonlinear_iterations = 300
 require_residual_reduction = true
 
 #discretization
-nx = 50
-ny = 90
+nx = 25 #50
+ny = 45 #90
 nz = 30
 
 #refinement

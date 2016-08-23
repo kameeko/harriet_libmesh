@@ -16,10 +16,12 @@ dispersivity_transverse_horizontal = 40.0
 dispersivity_transverse_vertical = 4.0
 bsource = -5.0
 
-data_file = Measurements_diri0_r4p2em3_bigdom.dat #Measurements_shifted.dat
+data_file = Measurements_diri0_r4p2em3_bigdom.dat 
+#data_file = Measurements_diri5_r4p2em3_halfdom.dat
+#data_file = Measurements_shifted.dat
 beta = 1.e-3
 
-divided_mesh = divvy2.exo
+divided_mesh = divvy6.exo
 solveMF = true
 solveHF = false
 estimate_error = true

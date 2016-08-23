@@ -63,9 +63,18 @@ int main(int argc, char** argv){
   if(solveMF){
     std::string find_mesh_here = infileForMesh("divided_mesh","divvy1.exo");
     mesh.read(find_mesh_here);
-    MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
+    if(nz == 0)
+      MeshTools::Generation::build_square(mesh2, nx, ny, 0., 2300., 0., 1650., QUAD9);
+    else
+      MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
   }else{
-    MeshTools::Generation::build_cube(mesh, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
+    if(nz == 0){
+      MeshTools::Generation::build_square(mesh, nx, ny, 0., 2300., 0., 1650., QUAD9);
+      MeshTools::Generation::build_square(mesh2, nx, ny,  0., 2300., 0., 1650., QUAD9);
+    }else{
+      MeshTools::Generation::build_cube(mesh, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
+      MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
+    }
     if(solveHF){
       MeshBase::element_iterator       elem_it  = mesh.elements_begin();
       const MeshBase::element_iterator elem_end = mesh.elements_end();
@@ -74,7 +83,7 @@ int main(int argc, char** argv){
         elem->subdomain_id() = 1;
       }
     } //else LF case
-    MeshTools::Generation::build_cube(mesh2, nx, ny, nz, 0., 2300., 0., 1650., 0., 100., HEX27);
+    
     std::cout << "\n\nAaaahhhh are you having LF be iso or aniso?" << std::endl;
   }
   
@@ -101,7 +110,6 @@ int main(int argc, char** argv){
     equation_systems_mix.add_system<ConvDiff_PrimarySadjSys>("ConvDiff_PrimarySadjSys"); //for split superadj
   ConvDiff_AuxSadjSys & system_sadj_aux =
     equation_systems_mix.add_system<ConvDiff_AuxSadjSys>("ConvDiff_AuxSadjSys"); //for split superadj
-
   
   //steady-state problem	
  	system_primary.time_solver =
@@ -123,8 +131,11 @@ int main(int argc, char** argv){
   //equation_systems.init ();
   equation_systems_mix.init();
   
+//  system_primary.project_solution_on_reinit() = true; //DEBUG
+//  system_aux.project_solution_on_reinit() = true; //DEBUG
+
   //initial guess  
-  if(solveMF || solveHF){
+  if(!infileForMesh("zeroInit",false) && (solveMF || solveHF)){
     std::string find_psiLF_here = infileForMesh("psiLF_file","psiLF.xda");
     std::string find_mesh_here = infileForMesh("psiLF_mesh_file","psiLF_mesh.xda");
     std::cout << "Looking for psiLF at: " << find_psiLF_here << std::endl;;
@@ -168,6 +179,16 @@ int main(int argc, char** argv){
   //system_primary.updateDataLoc();
   //equation_systems.reinit();
   
+  //DEBUG
+/*  MeshRefinement mesh_ref(mesh); //DEBUG
+  mesh_ref.uniformly_refine(1); //DEBUG
+  std::cout << "\nRefined..." << std::endl;
+  mesh.print_info();
+  system_primary.updateDataLoc();
+  system_aux.updateDataLoc();
+  equation_systems.reinit(); //DEBUG
+  std::cout << "Done with reinit...\n" << std::endl;
+*/
   // And the nonlinear solver options
   NewtonSolver *solver_sadj_primary = new NewtonSolver(system_sadj_primary); 
   system_sadj_primary.time_solver->diff_solver() = UniquePtr<DiffSolver>(solver_sadj_primary); 
@@ -240,12 +261,12 @@ int main(int argc, char** argv){
   equation_systems.print_info(); //DEBUG
   
   clock_t begin_inv = std::clock();
-//system_primary.assemble(); //DEBUG
+  std::cout << std::setprecision(17);
 std::cout << "\nInit norm: " << system_primary.calculate_norm(*system_primary.solution,L2) << "\n" << std::endl; //DEBUG
   system_primary.solve();
   system_primary.clearQoI();
   clock_t end_inv = std::clock();
-  //system_primary.matrix->print_matlab("eep.mat"); //DEBUG
+//system_primary.matrix->print_matlab("eep.mat"); //DEBUG
   clock_t begin_err_est = std::clock();
   if(estErr){
     std::cout << "\n End primary solve, begin auxiliary solve..." << std::endl;

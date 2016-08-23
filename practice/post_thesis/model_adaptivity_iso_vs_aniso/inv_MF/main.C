@@ -36,6 +36,12 @@
 
 int main(int argc, char** argv){
 
+  //for record-keeping
+  std::cout << "Running: " << argv[0];
+  for (int i=1; i<argc; i++)
+    std::cout << " " << argv[i];
+  std::cout << std::endl << std::endl;
+
 	//initialize libMesh
 	LibMeshInit init(argc, argv);
 	

@@ -25,7 +25,7 @@ minimum_linear_tolerance = 1.e-20
 max_linear_iterations = 10000
 
 #discretization
-nx = 4 #25 #92
-ny = 4 #45 #66
-nz = 4 #30
+nx = 25 #92
+ny = 45 #66
+nz = 30
 

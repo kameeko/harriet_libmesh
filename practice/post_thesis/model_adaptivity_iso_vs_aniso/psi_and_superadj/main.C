@@ -37,6 +37,12 @@
 // The main program
 int main(int argc, char** argv)
 {
+  //for record-keeping
+  std::cout << "Running: " << argv[0];
+  for (int i=1; i<argc; i++)
+    std::cout << " " << argv[i];
+  std::cout << std::endl << std::endl;
+
   clock_t begin = std::clock();
   
   // Initialize libMesh
@@ -58,6 +64,7 @@ int main(int argc, char** argv)
     //this refers to additional basis functions...number of elements will be more...
   double qoiErrorTol                    = infile("relative_error_tolerance",0.01); //stopping criterion
   //bool doDivvyMatlab                    = infile("do_divvy_in_Matlab",false); //output files to determine next refinement in Matlab
+  bool avoid_sides                      = infile("avoid_sides",false); //DEBUG, whether to avoid sides while refining
 
   if(refStep*maxIter > 1)
     maxIter = round(ceil(1./refStep));
@@ -167,7 +174,11 @@ int main(int argc, char** argv)
     solverInfile("relative_residual_tolerance", 0.0);
   solver_aux->absolute_residual_tolerance =
     solverInfile("absolute_residual_tolerance", 0.0);
-    
+  solver_primary->require_residual_reduction = solverInfile("require_residual_reduction",true);
+  solver_sadj_primary->require_residual_reduction = solverInfile("require_residual_reduction",true);
+  solver_aux->require_residual_reduction = solverInfile("require_residual_reduction",true);
+  solver_sadj_aux->require_residual_reduction = solverInfile("require_residual_reduction",true);  
+  
   //linear solver options
   solver_primary->max_linear_iterations       = solverInfile("max_linear_iterations",10000);
   solver_primary->initial_linear_tolerance    = solverInfile("initial_linear_tolerance",1.e-13);
@@ -413,7 +424,8 @@ int main(int argc, char** argv)
   
       //mark those elements for refinement.
       for(int i = 0; i < markMe.size(); i++){
-        mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
+        if(!avoid_sides || (avoid_sides && !mesh.elem(markMe[i])->on_boundary()))
+          mesh.elem(markMe[i])->subdomain_id() = 1; //assuming HF regions marked with 1
       }
   
       //to test whether assignment matches matlab's
