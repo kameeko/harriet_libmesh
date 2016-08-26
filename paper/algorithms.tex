@@ -4,7 +4,7 @@ Based on the theoretical developments in the last section, we present below a go
 %
 \subsection{Goal Oriented Inference Algorithm}
 %
-Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, the error estimate (\cref{eq:finErrExp}) can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\cref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem (\cref{eq:superAdjEq}) involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
+Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, the error estimate \cref{eq:finErrExp} can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\cref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem \cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]
@@ -141,7 +141,7 @@ If the low and multi-fidelity models are linear, or nonlinear in a very small re
 T < \frac{\sum\limits_{i=1}^{C}K_{i}}{4},
 \end{equation}
 % 
-for the adaptive algorithm to be less costly than solving the high-fidelity inverse problem.
+for the adaptive algorithm to be less costly than solving the high-fidelity inverse problem. \red{I'm not sure this section makes sense, since this doesn't seem to hold for any of the actual runs we've done...our mixed models take fewer nonlinear steps than the HF model, but not close enough to one...}
 %The bound on $T$ will be strictest if Gaussian elimination is used, with $\gamma = 3$, giving $T < \frac{\sum\limits_{i=1}^{C}K_{i}}{10}$.
 %
 

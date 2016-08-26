@@ -505,7 +505,7 @@ check on detailed-time runs
     -compare timing of single iteration (inv + aux + sadj) compare to HF?
       -HF: 85991.739688138085 (830)
       -LF: 170632.22587129171
-      -running in _v2: 5458 **
+      -running in _v2: 5458
   
   -original R, 32x64x32 HF, 4:1
     -3D version: LF mesh too coarse to register qoi 1 (LF = 8x16x8)
@@ -616,14 +616,24 @@ interpretations:
         -> evaluate residuals on HF (project psi and superadj)? projecting psi down to coarser areas messes up orthogonality
           -rerun: now 100% refinement gives no error, and estimated relative qoi error stays reasonable...
         -doesn't take much %HF for MF mesh nodes to exceed sadj mesh nodes (~20%)
-        -when linearizing sadj about primary and aux, if primary and aux are projected down to coarser sadj mesh, then some info is lost...so even more error, but this time due to implementation...each EquationSystems is built from one mesh and it doesn't seem possible to communicate with systems in other EquationSystems objects...
+        -when linearizing sadj about primary and aux, if primary and aux are projected down to coarser (in some parts) sadj mesh, then some info is lost...so even more error, but this time due to implementation...each EquationSystems is built from one mesh and it doesn't seem possible to communicate with systems in other EquationSystems objects...
           -inv and aux seems to have hard time solving...many more GMRES iters and much more overall solve time than HF...
             -what if strong pc flags?
-              -stashed, ANALYZE ME
-              3D running in v1: terminal_output_4p2em4_adapt_0p05step_1em10tol_sadj2x_HF4x_buffer_qoi2.txt
+              -funny, for once not all the runs take less time...now has inv timing increasing with %HF...
+              -if only count solve time, then can finish up to MF02 (inv and error est) while staying less than HF inv solve time (~28 vs 30); has <1% relative error (true and estimated) by end of MF02
+                -times for projections are considerable relative to solve times...probably only in 2D?
+              -what if greater h_LF/h_HF ratio, no buffer? **
             -what if LF diff also aniso?
-              -stashed, ANALYZE ME
-      
+              -with strong pc flags, doesn't make much of a difference
+        -running in 3D with fixed weighted residual - terminal_output_4p2em4_adapt_0p05step_1em10tol_sadj2x_HF4x_buffer_qoi2.txt
+          -MF01 inv dies in newton...
+          -0.03 step also dies
+            -not requiring residual reduction doesn't help...
+            -anisoLF running in v2 (aniso strongest in z-direction, so maybe heterogeneity is too much in 3D?)
+              -MF01 and MF02 solve, but take ridiculously long...
+              -if done with weakpc flags, then inv won't solve for even LF iteration...death by newton, hits max linear iters...
+              -what about strong pc flags, no cont? nope MF01 still takes ridiculously long to solve
+        
       we have:
       -single iteration may or may not take longer than HF inv; have cases where MF inv consistently takes less time than HF inv
         -coarsening LF mesh doesn't seem to help (either inv takes more time to solve, or reduction is insufficient (superadj still takes too long, HF problem probably insufficiently nonlinear to keep searching in this direction))
@@ -768,8 +778,53 @@ does it die during coarse LF run? yes...wtf? fails at convdiff_mprime.C:93 comme
       -in inv_MF code, HF takes a lot longer only if LF-init, not if R0-init
   -1:2:4 LF:sadj:HF
     -ridiculous error estimates; error estimates don't become zero at full-refinement, possible incorrect implementation of weighted residuals (wrong meshes)
+    	-> fixed
 
 
 Aug 23 16:09 - pointpush -> you forgot to clear cvals after each iteration...error estimates and such are probably off...
   -pre-fix data stashes in pink
   -terminal_output_4p2em4_adapt_0p05step_1em10tol_sadj2x_HF4x_buffer_HF128x256_qoi2_weakpc.txt : difference is almost imperceptible
+  
+--------------------------------------------------
+8/25
+
+-same-mesh
+  -almost inv-crime data (except with finer mesh) + normal noise (zero mean, 0.05 stddev), 10 datasets; adaptivity done with inverse crime data
+  	-increasing %HF does not necessarily reduce QoI error (true and estimated) even during adaptivity, although kinks appear confined to first few iterations...so far...
+  	-given same initial guess, increasing %HF does not necessarily increase the time (although it seems to never decrease the number of NL iters); HF inv still consistently takes the longest
+-1:2:2
+  -can make post-process argument, but only if HF starts at LF not R=0...LF is perhaps a more general initial guess? since in our case there so happens to be more linear aspects in the HF model compared to LF model, but that's not true in general?
+  	-> yes
+-1:2:4
+  -2D case where doing adaptivity takes less time than HF (if only counting solve time, since projection time is significant in comparison)
+  	-projection is necessary though, so you can't really count it out...
+  -3D case current having solver trouble (isoLF) or weird timing (anisoLF)
+  	-maybe we just mention the possibility in the conclusion, rather than fill with too many tricks?
+  
+-table 6: why is it even possible for increasing %HF to mess up the QoI so bad?
+	-are there little pockets of elements? because of discontinuous flux, maybe HF islands are not really HF? check if there are pockets? (1 basis fx's worth) **
+	-is MF02 worse + takes more time because of pockets? doesn't look like it has exceptional amount of pockets...
+-only adapt/inv with HF+finer+noise?
+	-you do this on the assumption that your HF model is correct...what are you doing with such wrong data? (note this in conclusion? we recommend not doing this method if HF not trusted)
+-replace 5 and 6 with noisy set
+
+-> strip out nonsense-adapted tables, make it clearer
+
+-what do you want the examples to show?
+	-2D convdiff vs cdr
+		-simple setup, easy to see progression of error estimate and breakdown
+		-vs QoI, vs data location - interpretation of error breakdown
+	-2D scalar vs field
+		-different kinds of models that can be mixed; MF model can also have reduced DoFs in addition to reduced nonlinearity
+		-alternatively : 3D diff-mesh, 1:2
+			-done with almost-inv-crime (diff BC) data
+			-QoI error estimate terrible at LF and MF01
+			-just-inv timing much better than HF when all started at LF
+	-3D convdiff vs cdr
+		-more "realistic" baseline; adapt using almost-inv-crime, solve online inv probs using noisy data; MF inv faster than HF inv, MF models continue to perform well with noisy data
+			-this also assumes that you guessed the inferred parameters correctly, though, in generating the data...
+-> if use multiple 3D examples, should keep BCs consistent between them...
+	-redo 3D 1:2 with diri5 and inv-crime data for adaptivity (RUNNING in v1), maybe also run with set of noisy data?
+		-init residual with LF init not matching between inv_MF and adaptive ; MF01 inv won't even solve with same data...
+			-rerunning adapt with printout of refined elems...rebuild refined meshse in inv_MF code, see if that makes a difference? what if you also solve invLF, reinit, refine mesh...? **
+				-written in diff_mesh/inv_MF, not yet run
