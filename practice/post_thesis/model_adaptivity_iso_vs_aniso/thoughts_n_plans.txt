@@ -555,7 +555,6 @@ check on detailed-time runs
       -for 16x32x16 diff-mesh
         -primary solve for MF01 also almost 0...very sketchy...LF solved fine though...
       -for 16x32 diff-mesh, ridiculous estimated error (appears to mostly be from aux solve, which has large absolute residual, but stops because of rel step size tol...)
-        -primary solve for MF01 also almost 0...very sketchy...LF solved fine though...
         -if no continuation, then primary solve for MF01 is completely 0...
         -> when you refine the mesh, you no longer know which element the data points belong in... (8/3/16)
           -> 16x32x16 case - gets below 5% tol in one step (MF01 solves fully, successfully)
@@ -826,5 +825,56 @@ Aug 23 16:09 - pointpush -> you forgot to clear cvals after each iteration...err
 -> if use multiple 3D examples, should keep BCs consistent between them...
 	-redo 3D 1:2 with diri5 and inv-crime data for adaptivity (RUNNING in v1), maybe also run with set of noisy data?
 		-init residual with LF init not matching between inv_MF and adaptive ; MF01 inv won't even solve with same data...
-			-rerunning adapt with printout of refined elems...rebuild refined meshse in inv_MF code, see if that makes a difference? what if you also solve invLF, reinit, refine mesh...? **
-				-written in diff_mesh/inv_MF, not yet run
+			-rerunning adapt with printout of refined elems...rebuild refined meshes in inv_MF code, see if that makes a difference? what if you also solve invLF, reinit, refine mesh...? **
+				-written in diff_mesh/inv_MF; can't solve own LF without making own divvy (other way is fine)
+		-jacobian/residual (in)consistencies
+			-diri5 LF, weakpc - same init residual and KSP iters, same QoI to all displayed digits
+			-diri0 R0 - same residuals and # of lin iters
+			-diri5 divvy1, init with weakpcLF, solved with weakpc - different init residuals, different final QoIs (98983 vs 99177)
+			-diri5 divvy1 (self-generated), init with weakpcLF, solved with weakpc - init resid, KSP iters, QoI match to all displayed digits
+				-maybe there was something about the ways boundaries are saved in exo? that interferes with the way we define them in phys module? nothing different shows up in paraview though...
+				-takes significantly longer with self-generated divvy (270 vs 170)
+			-diri5 divvy1 (self-generated), solve on initLF, solved with weakpc - init resid, KSP iters, QoI match to all displayed digits
+
+-> apparently something is changed/lost in the writing and/or reading of exo mesh files...will need to redo anything that uses the inv_MF runs (including same-mesh runs, where the effects were more slight...)
+	-redo diff-mesh and same-mesh with diri0?
+	--generate diri0, slightly-finer, no-noise data to adapt with (same-mesh and diff-mesh)
+	-same mesh
+		-adapt and write divvy text files (this needs to be added) 
+		-generate diri0, some noise data to do inversions with
+		-do inversion with noisy datasets
+			-timings for MF vs HF seem very close now...not sure if new dataset, new BC, or fact that mesh now includes inactive elements...
+			-TRY AGAIN WITH LF INIT?
+			-what if you redid old runs, but instead of reading in the exo to mesh, make your own mesh and copy the subdomain ids? put in run2?
+				-making own mesh and just copying over subdomain ids doesn't change anything...
+	-diff mesh
+		-adapt and write divvy text files
+		-generate diri0, some noise data to do inversions with
+		-do inversion with noisy datasets
+			-generate LF for initial guesses
+			
+			running:
+				LF-begin same-mesh divvy (DONE, PROCESS ME ...or not...)
+				LF-begin same-mesh HF (running, inv_MF, seems to get stuck on some datasets...?)
+				LF-begin diff-mesh divvy (rerunning with strong pc; killed, doesn't seem to help)
+				LF-begin diff-mesh HF 
+				  -for some datasets, dies via Newton...
+				  -what if you just test it for the no-noise dataset? or just use noisy1, since that solved fine?
+	        -> rerunning with strong pc flags; KILLED due to memory allocation error
+	        
+-> keep previous same-mesh results, redo LF results
+  -why does the new LF adaptivty suck so much more than with the bigdom data?
+    -big dip in error at MF01
+    -performs poorly with noisy dat
+      -too noisy? was okay for same-mesh, but now that the models are more different it matters less?
+    -rerunning adaptivity with smaller steps...
+      -> you forgot to change the BCsource...
+        -> RERUNNING noisy1 with fixed bc...(HF and divvy's)
+          -LF for noisy5 and noisy6 failed to converge, but had small O(e-10) final residual...redoing with slightly weaker abs res tol
+          -noisy8 and noisy6 HF weirdly took almost no time at all...when noisy8 run again it still takes very little time, so likely not due to memory coincidence from other running programs...
+            -these two have smaller initial residuals, and take fewer NL and KSP iters (nice consistent decrease in residual norm rather than hitting O(e-10) or O(e-11) and slowing down...)
+              -should we really expect larger systems to take longer? cost of gmres iter depends on iter number, not size of system...preconditioning cost might though...
+           -> besides noisy1, you were solving LF on fine mesh...RERUNNING ** CHECK THAT SOLVES AGREE WITH inv_MF's own-init-LF...yes they match
+          -error estimates for noisy8 appear way off
+            -error estimate for MF01 for no-noise was slightly off...needed to call updateDataLoc on aux system too? retrying with no-noise...
+              -sometimes error estimates are still way off, like for 

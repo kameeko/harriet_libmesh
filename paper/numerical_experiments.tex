@@ -174,7 +174,7 @@ The error decomposition for three increasing, nested sets of observations and th
   \caption{Compare the error estimate decomposition (\protect\subref{subfig:obsLF2}-\protect\subref{subfig:obsMFlast2}), given the same QoI region (purple box in (\protect\subref{subfig:obsSetup2})) and varying observations (teal points in (\protect\subref{subfig:obsSetup2})).}
   \label{fig:dataStudy}
 \end{figure}
-\if{0} %--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--
+\if{false} %--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--*--
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Constant vs Field Parameters} \label{sec:constvfield}
 %------------------------------------------------------------------------------------------------------------------------%
@@ -332,7 +332,7 @@ We continue to use the FEM with a continuous Galerkin formulation and Lagrange e
 \subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D}
 %------------------------------------------------------------%
 
-We now present the results of solving the inference problem using \cref{alg:refSeries}, with a relative error tolerance of $1\%$. At each iteration, we choose the $5\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration may be larger. All simulations are run on a single processor; we use the default nonlinear solver in \texttt{libMesh} (Newton's method with Brent line-search), and linear solves are performed using PETSC's GMRES solver, preconditioned by incomplete factorization. \Cref{tab:ref3D} shows the runtime and error at the end of each adaptive iteration; the high-fidelity QoI is given for reference. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. 
+We now present the results of solving the inference problem using \cref{alg:refSeries}, with a relative error tolerance of $1\%$. At each iteration, we choose the $5\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration may be greater. All simulations are run on a single processor; we use the default nonlinear solver in \texttt{libMesh} (Newton's method with Brent line-search), and linear solves are performed using PETSC's GMRES solver, preconditioned by incomplete factorization. \Cref{tab:ref3D} shows the runtime and error at the end of each adaptive iteration. The high-fidelity inverse problem is solved by using natural continuation on the reaction parameter to avoid stalling the Newton iterations; only two steps are required: $k_r=0$, then $k_r=4.2\cdot10^{-4}$. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. 
 %
 \begin{table}[htbp]
 \caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $1\%$; relative errors are given with respect to the true high-fidelity QoI.}
@@ -340,23 +340,23 @@ We now present the results of solving the inference problem using \cref{alg:refS
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|}
 \hline
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Iteration \\ 
 & & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 133730 & -4024 & -6020 & -4.71 & 620 \\
-MF01 & 10   & 125073 & 4404  & 2637  & 2.06  & 420 \\
-MF02 & 17.7 & 123093 & 6761  & 4617  & 3.62  & 380 \\
-MF03 & 25   & 123460 & 6354  & 4250  & 3.33  & 370 \\
-MF04 & 32.9 & 125291 & 2242  & 2419  & 1.89  & 450 \\
-MF05 & 39.7 & 126314 & 2445  & 1396  & 1.09  & 325 \\
-MF06 & 47.2 & 126927 & 1070  & 783   & 0.61  & 350 \\
-HF   & 100  & 127710 & --    & --     & --     & -- \\ \hline
+LF   & 0    & 133730 & -4024 & -6020 & -4.71 & 622 \\
+MF01 & 10.0 & 125073 & 4404  & 2637  & 2.06  & 419 \\
+MF02 & 17.7 & 123093 & 6761  & 4617  & 3.62  & 378 \\
+MF03 & 25.0 & 123460 & 6354  & 4250  & 3.33  & 369 \\
+MF04 & 32.9 & 125291 & 2242  & 2419  & 1.89  & 454 \\
+MF05 & 39.7 & 126314 & 2445  & 1396  & 1.09  & 324 \\
+MF06 & 47.2 & 126927 & 1070  & 783   & 0.61  & 348 \\
+HF   & 100  & 127710 & --    & --     & --   & 427 \\ \hline
 \end{tabular}
 \end{table}
 %
 
 Compared to the previous examples in \cref{sec:cdvcdr} with similar physics in the pair of models, we observe that the error in the QoI (both true and estimated) does not decrease monotonically as the percentage of the domain in which the high-fidelity model is used increases. We also observe that any oscillations tend to occur within the first few iterations; continuing the adaptive algorithm beyond those iterations shown in \cref{tab:ref3D} monotonically decreases the QoI errors with increased refinement, until the high-fidelity model is used in the entire domain.
 
-The domain divisions for the six adaptive iterations are shown in \cref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations. \red{Around the QoI region, the first iteration refines the domain completely in the $x_3$ direction, possibly reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.}
+The domain divisions for the six adaptive iterations are shown in \cref{fig:divvy3D}. We see that the error decomposition causes the first refinement iteration to target the QoI region and observations; similarly to the behavior seen in \cref{sec:cdvcdrBaseRef}, those measurement points furthest downstream of the QoI region are refined later. Around the QoI region, the first iteration refines the domain completely in the $x_3$ direction, possibly reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.
 %
 \begin{figure}[htbp]
 \centering
@@ -382,151 +382,156 @@ The domain divisions for the six adaptive iterations are shown in \cref{fig:divv
 \label{fig:divvy3D}
 \end{figure} 
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% CONTINUE HERE
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-The amount of time required by the adaptive algorithm of course depends on the chosen error tolerance as well as the amount of additional model refinement between successive iterations. Refining a larger region per iteration runs the risks of refining in the wrong areas due to linearization about a $\Psi_{MF}$ that is very different from $\Psi_{HF}$, but can also allow one to reach the chosen error tolerance in fewer iterations and less runtime. We compare the runtimes for a more conservative choice of refinement rate; given the same error tolerance, we instead choose the $5\%$ of the basis functions with the largest error for model refinement. 
 
-\red{\Cref{tab:ref3D_dainty} shows the total runtime and error at the end of each of these iterations; the runtime for each iteration of the adaptive algorithm is the total runtime, from the beginning of the adaptivity to the calculation of the error estimate for that iteration. \Cref{tab:ref3D_dainty_timebreak} shows the runtimes of each individual adaptive iteration, and the times needed to obtain the necessary solutions. \Cref{fig:divvy3D_dainty} shows the domain divisions for the six corresponding mixed-fidelity models.}
+In this case, the high-fidelity inverse problem is only mildly nonlinear and requires few continuation steps and Newton iterations to converge; there are no savings in computational time from using the adaptive algorithm instead of solving the high-fidelity inverse problem. However, one would expect solving the high-fidelity inverse problem to require more time relative to using the adaptive algorithm as the nonlinearity of the high-fidelity model increases. 
+
+\Cref{alg:refSeries} is also ammenable to an offline-online decomposition, analagous to that proposed in \cite{LiebWill13}. The offline phase would consist of adaptively creating a mixed-fidelity model with an appropriate error tolerance given some expected observations $d^*$. When new data is received, one can then solve the inverse problem with the chosen mixed-fidelity model and the new data, and, if desired, compute an error estimate for the QoI. The mixed-fidelity inverse problems can be expected to require less time to solve than the high-fidelity inverse problems.
+
+To illustrate the offline-online application, we generate ten sets of noisy observations to represent the new data gained during the online phase; the noisy observations are generated by taking the observations used in the adaptive algorithm and adding Gaussian white noise with standard deviation of $\sigma=0.05$ (equivalent to anywhere from $1.7\%$ to $17\%$ of the observed values). We then solve the inverse problem using each of the mixed-fidelity models depicted in \cref{tab:ref3D,fig:divvy3D} as well as the high-fidelity model. The high-fidelity inverse problem is solved using the same two continuation steps; the first continuation step is also used as an initial guess for the mixed-fidelity inverse problems. The auxiliary and supplementary adjoint variables simply have a zero initial guess. \Cref{tab:ref3D_newdata_QoI,tab:ref3D_newdata_times} shows the average QoI values and error estimates and solution times over the ten datasets.
 %
 \begin{table}
-\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.001$ and $5\%$ of basis function marked for refinement per iteration; relative errors are with respect to true high-fidelity QoI.}
-\label{tab:ref3D_dainty}
+\caption{Average QoI values and errors from solving inverse problem with mixed- and high-fidelity models and noisy data; relative errors are with respect to true high-fidelity QoI.}
+\label{tab:ref3D_newdata_QoI}
 \centering
-\begin{tabular}{|c|c|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|c|}
 \hline
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Total \\ 
-& & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
-LF   & 0    & 1068856 & -400937 & -521438 & -95.2534 & 570 \\
-MF01 & 9.27 & 613419  & -40667  & -66001  & -12.0564 & 1000 \\
-MF02 & 16.9 & 558523  & 1166    & -11105  & -2.0282  & 1780 \\
-MF03 & 23.7 & 550323  & 2504    & -2905   & -0.5303  & 2300 \\
-MF04 & 30.4 & 548225  & 1635    & -807    & -0.1471  & 2720 \\
-MF05 & 37.2 & 547744  & 655     & -326    & -0.0591  & 3060 \\
-MF06 & 44.6 & 547532  & 193     & -114    & -0.0205  & 3420 \\ %even if rel err is vs predicted I_HF, goes below 0.1% here first
-HF   & 100  & 547418  & --      & 0       & 0        & 440 \\ \hline
-\end{tabular}
-\end{table}
-%
-\begin{table}
-\caption{Runtimes of each individual adaptive iteration}
-\label{tab:ref3D_dainty_timebreak}
-\centering
-\begin{tabular}{ccc|c|c|c}
-\cline{4-5} 
- & & & \multicolumn{2}{|c|}{Error Estimation} & \\
-\cline{1-6}
-\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{$\%$HF}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Iteration}\\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
-\cline{1-6}
-\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{0}     & 160 & 160 & 245 & \multicolumn{1}{|c|}{570} \\ \hline
-\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{9.27}  & 195 & 90 & 140 & \multicolumn{1}{|c|}{430} \\ \hline
-\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{16.9}  & 520 & 95 & 160 & \multicolumn{1}{|c|}{780} \\ \hline
-\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{23.7}  & 280 & 45 & 190 & \multicolumn{1}{|c|}{520} \\ \hline
-\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{30.4}  & 206 & 55 & 100 & \multicolumn{1}{|c|}{420} \\ \hline
-\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{37.2}  & 190 & 45 & 100 & \multicolumn{1}{|c|}{340} \\ \hline
-\multicolumn{1}{|c|}{MF06}  & \multicolumn{1}{|c|}{44.6}  & 210 & 45 & 100 & \multicolumn{1}{|c|}{360} \\ \hline
-\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{100}   & 440 & -- & -- & \multicolumn{1}{|c|}{440} \\ \hline
-\end{tabular}
-\end{table}
-%
-\begin{table}
-\caption{Runtimes of each individual adaptive iteration, given same initial guess (for the mixed- and high-fidelity iterations, the low-fidelity solution is used as the initial guess for the primary variables, and a zero initial guess is used for the auxiliary and supplementary adjoint variables); here the time for the high-fidelity iteration does not include the time required to solve for the initial guess}
-\label{tab:ref3D_dainty_timebreak_sameinit}
-\centering
-\begin{tabular}{ccc|c|c|c}
-\cline{4-5} 
- & & & \multicolumn{2}{|c|}{Error Estimation} & \\
-\cline{1-6}
-\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{$\%$HF}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Iteration}\\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
-\cline{1-6}
-\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{0}     & 160 & -- & -- & \multicolumn{1}{|c|}{170} \\ \hline
-\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{9.27}  & 260 & 160 & 285 & \multicolumn{1}{|c|}{710} \\ \hline
-\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{16.9}  & 365 & 260 & 290 & \multicolumn{1}{|c|}{930} \\ \hline
-\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{23.7}  & 250 & 160 & 315 & \multicolumn{1}{|c|}{745} \\ \hline
-\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{30.4}  & 275 & 180 & 225 & \multicolumn{1}{|c|}{700} \\ \hline
-\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{37.2}  & 245 & 160 & 225 & \multicolumn{1}{|c|}{650} \\ \hline
-\multicolumn{1}{|c|}{MF06}  & \multicolumn{1}{|c|}{44.6}  & 285 & 155 & 225 & \multicolumn{1}{|c|}{690} \\ \hline
-\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{100}   & 350 & -- & -- & \multicolumn{1}{|c|}{360} \\ \hline
-\end{tabular}
-\end{table}
-%
-\begin{table}
-\caption{Runtimes for inverse problem and error estimate, given same initial guess (for the mixed- and high-fidelity iterations, the low-fidelity solution is used as the initial guess for the primary variables, and a zero initial guess is used for the auxiliary and supplementary adjoint variables); here we solve the inverse problems using a different set of data than that which was used to adaptively construct the mixed-fidelity models (offline-online approach) and the low-fidelity problem is only solved to be used as an initial guess}
-\label{tab:ref3D_dainty_timebreak_sameinit_newdata}
-\centering
-\begin{tabular}{ccc|c|c|c}
-\cline{4-5} 
- & & & \multicolumn{2}{|c|}{Error Estimation} & \\
-\cline{1-6}
-\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{$\%$HF}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Iteration}\\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
-\cline{1-6}
-\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{0}     & 160 & -- & -- & \multicolumn{1}{|c|}{170} \\ \hline
-\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{9.27}  & 205 & 160 & 330 & \multicolumn{1}{|c|}{720} \\ \hline
-\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{16.9}  & 250 & 160 & 270 & \multicolumn{1}{|c|}{710} \\ \hline
-\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{23.7}  & 350 & 230 & 240 & \multicolumn{1}{|c|}{850} \\ \hline
-\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{30.4}  & 330 & 180 & 245 & \multicolumn{1}{|c|}{775} \\ \hline
-\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{37.2}  & 350 & 170 & 270 & \multicolumn{1}{|c|}{810} \\ \hline
-\multicolumn{1}{|c|}{MF06}  & \multicolumn{1}{|c|}{44.6}  & 355 & 180 & 285 & \multicolumn{1}{|c|}{840} \\ \hline
-\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{100}   & 460 & -- & -- & \multicolumn{1}{|c|}{470} \\ \hline
-\end{tabular}
-\end{table}
-%
-\begin{table}
-\caption{QoIs and error estimates corresponding to \cref{tab:ref3D_dainty_timebreak_sameinit_newdata}}
-\label{tab:ref3D_dainty_newdata}
-\centering
-\begin{tabular}{|c|c|c|c|c|c|c|}
-\hline
-\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative \\ 
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative  \\ 
 & & & (Estimated) & (Actual) & Error (Actual) \\ \hline
-LF   & 0    & 122663 & --       & -11245 & -10.9  \\
-MF01 & 9.27 & 104593 & 24087    & 6825   & 6.1  \\
-MF02 & 16.9 & 97432  & -80074   & 13986  & 12.6   \\
-MF03 & 23.7 & 93044  & -762774  & 18374  & 16.5   \\
-MF04 & 30.4 & 84789  & -1059225 & 26629  & 23.9   \\
-MF05 & 37.2 & 100288 & 14626    & 11130  & 10.0   \\
-MF06 & 44.6 & 105593 & 8984     & 5825   & 5.2   \\ 
-HF   & 100  & 111418 & --      & 0       & 0         \\ \hline
+MF01 & 10.0 & 123672 & 4328 & 2599 & 2.08  \\
+MF02 & 17.7 & 122073 & 6331 & 4197 & 3.34  \\
+MF03 & 25.0 & 122409 & 5972 & 3861 & 3.06  \\
+MF04 & 32.9 & 124011 & 3449 & 2260 & 1.79  \\
+MF05 & 39.7 & 124852 & 2481 & 1418 & 1.12  \\
+MF06 & 47.2 & 125440 & 1123 & 830  & 0.66  \\ 
+HF   & 100  & 126270 & --   & --   & --     \\ \hline
 \end{tabular}
 \end{table}
+%
+\begin{table}
+\caption{Average times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy data.}
+\label{tab:ref3D_newdata_times}
+\centering
+\begin{tabular}{ccc|c|c|c}
+\cline{4-5} 
+ & & & \multicolumn{2}{|c|}{Error Estimation} & \\
+\cline{1-6}
+\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{$\%$HF}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Solution}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
+\cline{1-6}
+\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{10.0}  & 173 & 48 & 103 & \multicolumn{1}{|c|}{323} \\ \hline
+\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{17.7}  & 191 & 49 & 104 & \multicolumn{1}{|c|}{343} \\ \hline
+\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{25.0}  & 192 & 51 & 109 & \multicolumn{1}{|c|}{352} \\ \hline
+\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{32.9}  & 190 & 49 & 96  & \multicolumn{1}{|c|}{334} \\ \hline
+\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{39.7}  & 188 & 49 & 92  & \multicolumn{1}{|c|}{329} \\ \hline
+\multicolumn{1}{|c|}{MF06}  & \multicolumn{1}{|c|}{47.2}  & 189 & 50 & 89  & \multicolumn{1}{|c|}{327} \\ \hline
+\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{100}   & 214 & -- & --  & \multicolumn{1}{|c|}{214} \\ \hline
+\end{tabular}
+\end{table}
+%
+
+We see that in this case, when the mixed-fidelity models are used to infer from observations different from those they were generated with, they continue to give similar relative accuracy in their QoI. We also note that the mixed-fidelity inverse problems consistently take less time to solve than the high-fidelity inverse problems; however, the high-fidelity inverse problem is still only mildly nonlinear and requires few nonlinear steps to converge, so the difference in their solution times is not large enough to justify estimating the mixed-fidelity QoI errors as well.
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Combining Meshes and Physics} \label{sec:diffvcdr3D}
+%------------------------------------------------------------------------------------------------------------------------%
+
+Here we consider two models which differ in both their mesh resolution and the physics included. 
+
+%------------------------------------------------------------%
+\subsubsection{Problem Setup}
+%------------------------------------------------------------%
+
+The high-fidelity model remains the same as that described in \cref{sec:setup3D}, with the exception of the boundary condition $u=0$ on $\partial\Omega_{west}$. The low-fidelity model shares the domain and boundary condition of the high-fidelity model, but again lacks a reaction term and has a scalar dispersion coefficient; the low-fidelity model also lacks a convection term. The lack of a convection term allows the low-fidelity model to be solved on a coarser mesh. For the high-fidelity model, the domain is descretized by 32, 64, and 32 elements along the $x_1$, $x_2$, and $x_3$ directions, respectively; for the low-fidelity model, the domain is descretized by 16, 32, and 16 elements along the $x_1$, $x_2$, and $x_3$ directions, respectively. The regularization term, QoI region, and measurements remain the same as described in \cref{sec:setup3D}.
+
+%------------------------------------------------------------%
+\subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D_diffmesh}
+%------------------------------------------------------------%
+
+We now present the results of solving the inference problem using \cref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the $2\%$ of the basis functions with the largest error for model refinement; again, since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration is usually greater. \Cref{tab:ref3D_diffmesh} shows the runtime and true and estimated QoI errors for each adaptive iteration; the high-fidelity inverse problem is solved in the same way as described in \cref{sec:ref3D}. The number of degrees of freedom of each of the primary (and, if applicable, auxiliary) variables at each iteration is also given; the supplementary adjoint is solved on the high-fidelity mesh and thus each of its variables has the same number of degrees of freedom as each of the primary variables in the high-fidelity inverse problem.
+%
+\begin{table}[htbp]
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.1\%$; relative errors are given with respect to the true high-fidelity QoI.}
+\label{tab:ref3D_diffmesh}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{DOFs} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative & Iteration \\ 
+& & & (Estimated) & (Actual) & Error (Actual) & Time (s) \\ \hline
+LF   & 9537  & 168710 & -16463 & -85663 & -103   & 1023 \\
+MF01 & 13417 & 167366 & -7207  & -84319 & -102   & 814 \\
+MF02 & 17895 & 89777  & -6208  & -6730  & -8.10  & 858 \\
+MF03 & 21001 & 85880  & -2473  & -2833  & -3.41  & 922 \\
+MF04 & 24528 & 83902  & -711   & -855   & -1.03  & 973 \\
+MF05 & 27984 & 83119  & 32     & -72    & -0.087 & 1187 \\
+HF   & 70785 & 83047  & --    & --     & --   & 457 \\ \hline
+\end{tabular}
+\end{table}
+%
+We notice that, compared to the results in \cref{sec:ref3D}, the error estimates for the low-fidelity and first mixed-fidelity models are very far from the true errors. This can be attributed to the linearization about $\Psi_{LF}$ and $\Psi_{MF_{1}}$ instead of $\Psi_{HF}$ in solving the supplementary adjoints; the large differences in the QoI for the LF and MF01 models compared to the high-fidelity QoI indicate that $\Psi_{LF}$ and $\Psi_{MF_{1}}$ are very different from $\Psi_{HF}$. This suggests that one should use more than just the error estimate to decide when to stop the adaptive algorithm; a possible additional criterion could be to require that the predicted high-fidelity QoI $I(q_{MF},u_{MF})+\epsilon_i$ for two consecutive iterations agree to within some tolerance.
+
+The domain divisions for the five adaptive iterations are shown in \cref{fig:divvy3D_diffmesh}. We note some similarities with the series of mixed-fidelity models in \cref{fig:divvy3D}, namely that in both, the QoI region has been refined after $10\%$ refinement, and those measurement points furthest downstream of the QoI are the last to be refined around. We also see that the domain is refined completely in the $x_3$ direction first around the QoI region, again possibly reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.
 %
 \begin{figure}[htbp]
 \centering
-\subfloat[MF$_1$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy1_whitebg_puff.png} 
-\label{fig:ref3d_dainty1}
+\subfloat[MF$_1$ ($5.2\%$ HF)]{
+\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy1_whitebg_puff.png} 
 }
-\subfloat[MF$_2$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy2_whitebg_puff.png} 
-\label{fig:ref3d_dainty2}
+\subfloat[MF$_2$ ($11.4\%$ HF)]{
+\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy2_whitebg_puff.png} 
 }
-\subfloat[MF$_3$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy3_whitebg_puff.png} 
+\subfloat[MF$_3$ ($16.3\%$ HF)]{
+\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy3_whitebg_puff.png} 
 } \\
-\subfloat[MF$_4$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy4_whitebg_puff.png} 
+\subfloat[MF$_4$ ($22.0\%$ HF)]{
+\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy4_whitebg_puff.png} 
 }
-\subfloat[MF$_5$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy5_whitebg_puff.png} 
-}
-\subfloat[MF$_6$]{
-\includegraphics[width=0.31\textwidth]{series3D/run_0p05/divvy6_whitebg_puff.png} 
+\subfloat[MF$_5$ ($27.7\%$ HF)]{
+\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy5_whitebg_puff.png} 
 }
 \caption{Domain division for mixed-fidelity models: low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion (intermediate colors due to transparency indicate a mix of the two models along the line of sight); $x_3$ direction scaled for clarity.}
-\label{fig:divvy3D_dainty}
+\label{fig:divvy3D_diffmesh}
 \end{figure} 
 %
-We again observe that the estimated relative error in the later iterations is similar to the actual relative error in magnitude, but not in sign. It can also be seen in \cref{fig:ref3d_dainty1} that the largest error first comes from the QoI region and area below it, and the observations. Similarly to the examples in \cref{sec:cdvcdr}, of the observations, refinement is least necessary around the ones furthest downstream of the QoI region.
+We notice in \cref{tab:ref3D_diffmesh} that although the mixed-fidelity models have fewer degrees of freedom than the high-fidelity model, it is still faster to solve the high-fidelity inverse problem than to solve a mixed-fidelity inverse problem and obtain an error estimate. This can be attributed to the extra time needed to construct systems and project solutions when seeking an error estimate, as well as the mild nonlinearity of the high-fidelity problem and solving for the supplementary adjoint on the high-fidelity mesh. For larger problems, it is expected that the computational costs will be dominated by the linear solves. For comparison, we select one of the sets of noisy observations described in \cref{sec:ref3D} and solve the inverse problem using each of the mixed-fidelity models depicted in \cref{tab:ref3D_diffmesh,fig:divvy3D_diffmesh} as well as the high-fidelity model. The low-fidelity inverse problem is first solved and used as an initial guess for the higher-fidelity problems; we note that although there is a linear model that is more similar to the high-fidelity model than the low-fidelity model (i.e., convection-diffusion with anisotropic diffusivity on the high-fidelity mesh) and thus would serve as a better initial guess, its existence is specific to our particular choice of models. \Cref{tab:ref3D_newdata_QoI_diffmesh,tab:ref3D_newdata_times_diffmesh} shows the QoI values and error estimates and solution times for the (non)linear solves, not including the time needed to obtain the initial guess.
+%
+\begin{table}
+\caption{QoI values and errors from solving inverse problem with mixed- and high-fidelity models and noisy dataset; relative errors are with respect to true high-fidelity QoI.}
+\label{tab:ref3D_newdata_QoI_diffmesh}
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{DOFs} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative  \\ 
+& & & (Estimated) & (Actual) & Error (Actual) \\ \hline
+MF01 & 13417 & 153999 & 2786500 & -74228 & -93.05  \\
+MF02 & 17895 & 85705  & -6496   & -5934  & -7.44  \\
+MF03 & 21001 & 82544  & -3721   & -2773  & -3.48  \\
+MF04 & 24528 & 80684  & -2139   & -913   & -1.14  \\
+MF05 & 27984 & 80154  & -1688   & -383   & -0.48 \\
+HF   & 70785 & 79771  & -- & -- &   \\ \hline
+\end{tabular}
+\end{table}
+%
+\begin{table}
+\caption{Times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy dataset.}
+\label{tab:ref3D_newdata_times_diffmesh}
+\centering
+\begin{tabular}{ccc|c|c|c}
+\cline{4-5} 
+ & & & \multicolumn{2}{|c|}{Error Estimation} & \\
+\cline{1-6}
+\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{DOFs}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Solution}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
+\cline{1-6}
+\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{13147}  & 132  & 141 & 785 & \multicolumn{1}{|c|}{1058} \\ \hline
+\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{17895}  & 209  & 172 & 177 & \multicolumn{1}{|c|}{558} \\ \hline
+\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{21001}  & 312  & 169 & 188 & \multicolumn{1}{|c|}{669} \\ \hline
+\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{24528}  & 275  & 177 & 184 & \multicolumn{1}{|c|}{636} \\ \hline
+\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{27984}  & 403  & 283 & 189 & \multicolumn{1}{|c|}{875} \\ \hline
+\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{70785}  & 2364 & --  & --  & \multicolumn{1}{|c|}{2364} \\ \hline
+\end{tabular}
+\end{table}
+%
 
-We see that although the more conservative refinement rate requires more iterations and runtime to reach the desired error tolerance, both refinement rates result in similar final refinement proportions for our chosen error tolerance ($42.4\%$ versus $44.6\%$). They do not, however, necessarily produce the same refined regions (compare \cref{fig:ref3D_1,fig:ref3d_dainty2}) or relative error for a given refinement proportion. A slower refinement rate also does not necessarily produce a smaller (estimated or true) relative error, or a more accurate relative error estimate, for a given refinement proportion.
-
-In this case, the high-fidelity inverse problem is only mildly nonlinear and requires few continuation steps and Newton iterations to converge; there are no savings in computational time from using the adaptive algorithm instead of solving the high-fidelity inverse problem. However, as discussed in \cref{sect:alg_complexity}, one would expect solving the high-fidelity inverse problem to require more time relative to using the adaptive algorithm as the nonlinearity of the high-fidelity model increases. 
-
-\Cref{alg:refSeries} is also ammenable to an offline-online decomposition, analagous to that proposed in \cite{LiebWill13}. In the case where both the low-fidelity and high-fidelity inverse problems are linear in the data, and the QoI is linear in the state and parameters, one may first compute and store the supplementary adjoint $\Lambda_0$ for the low-fidelity model. As new data is received, one can compute the $\Psi_{LF}$ for this new data; evaluating \cref{eq:finErrExp} with the stored $\Lambda_0$ and the new $\Psi_{LF}$ gives an exact estimate of the error in the QoI, and thus effectively the high-fidelity QoI. When these linearities do not all hold, one cannot obtain an exact error estimate. The offline phase would consist of adaptively creating a mixed-fidelity model with an appropriate error tolerance given some expected observations $d^*$, and storing its suppementary adjoint $\Lambda_{MF}^*$. As new data is received, one can compute the $\Psi_{MF}$ for the mixed-fidelity model and the new data; evaluating \cref{eq:finErrExp} with the stored $\Lambda_{MF}^*$ and the new $\Psi_{MF}$ gives an estimate of the error in the QoI, and thus an effective estimate of the high-fidelity QoI. The mixed-fidelity inverse problems can be expected to require less time to solve than the high-fidelity inverse problems; in \cref{tab:ref3D,tab:ref3D_dainty}, the inverse problem using the final mixed-fidelity models took 250 and 290 seconds, respectively.
 
