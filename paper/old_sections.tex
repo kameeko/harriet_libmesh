@@ -360,3 +360,37 @@ HF   & 100  & 126270 & --   & --   & --     \\ \hline
 %
 
 We see that in this case, when the mixed-fidelity models are used to infer from observations different from those they were generated with, they continue to give similar relative accuracy in their QoI. We also note that the mixed-fidelity inverse problems consistently take less time to solve than the high-fidelity inverse problems; however, the high-fidelity inverse problem is still only mildly nonlinear and requires few nonlinear steps to converge, so the difference in their solution times is not large enough to justify estimating the mixed-fidelity QoI errors as well.
+
+%
+%
+%
+%
+%
+%
+%
+%
+%
+%
+
+\begin{table}
+\caption{Average times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy datasets; all averages only over those datasets for which the high-fidelity problem converged when given the low-fidelity problem as an intial guess.}
+%\label{tab:ref3D_newdata_times_diffmesh}
+\centering
+\begin{tabular}{ccc|c|c|c}
+\cline{4-5} 
+ & & & \multicolumn{2}{|c|}{Error Estimation} & \\
+\cline{1-6}
+\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{DOFs}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Solution}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
+\cline{1-6}
+\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{9537}   & 16   & --  & -- & \multicolumn{1}{|c|}{--} \\ \hline
+\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{13147}  & 156  & 101 & 261 & \multicolumn{1}{|c|}{517} \\ \hline
+\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{17895}  & 304  & 175 & 183 & \multicolumn{1}{|c|}{662} \\ \hline
+\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{21001}  & 385  & 228 & 187 & \multicolumn{1}{|c|}{801} \\ \hline
+\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{24528}  & 347  & 202 & 193 & \multicolumn{1}{|c|}{743} \\ \hline
+\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{27984}  & 470  & 275 & 212 & \multicolumn{1}{|c|}{957} \\ \hline
+\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{70785}  & 1185 & --  & --  & \multicolumn{1}{|c|}{1185} \\ \hline
+\end{tabular}
+\end{table}
+%

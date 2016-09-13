@@ -116,7 +116,7 @@ We see that the largest local error contribution is concentrated in the QoI regi
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.8\textwidth]{baseSeries/err_est.pdf}
-\caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used. \red{Does this even have enough points to warrant a plot? table instead?}}
+\caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used.}
 \label{fig:baseErr}
 \end{figure}
 %
@@ -298,7 +298,7 @@ MF02 & 11.4 & 88867  & -5921 & -6418  & -7.79  \\
 MF03 & 16.3 & 85237  & -2414 & -2789  & -3.38  \\
 MF04 & 22.0 & 83411  & -724  & -963   & -1.17  \\
 MF05 & 27.7 & 82664  & -18   & -216   & -0.26 \\
-HF   & 100 & 82500  & --    & --     & --  \\ \hline
+HF   & 100  & 82500  & --    & --     & --  \\ \hline
 \end{tabular}
 \end{table}
 
@@ -325,26 +325,6 @@ HF   & 100 & 82500  & --    & --     & --  \\ \hline
 \end{tabular}
 \end{table}
 %
-\begin{table}
-\caption{Average times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy datasets; all averages only over those datasets for which the high-fidelity problem converged when given the low-fidelity problem as an intial guess.}
-%\label{tab:ref3D_newdata_times_diffmesh}
-\centering
-\begin{tabular}{ccc|c|c|c}
-\cline{4-5} 
- & & & \multicolumn{2}{|c|}{Error Estimation} & \\
-\cline{1-6}
-\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{DOFs}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Solution}\\
-\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
-\cline{1-6}
-\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{9537}   & 16   & --  & -- & \multicolumn{1}{|c|}{--} \\ \hline
-\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{13147}  & 156  & 101 & 261 & \multicolumn{1}{|c|}{517} \\ \hline
-\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{17895}  & 304  & 175 & 183 & \multicolumn{1}{|c|}{662} \\ \hline
-\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{21001}  & 385  & 228 & 187 & \multicolumn{1}{|c|}{801} \\ \hline
-\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{24528}  & 347  & 202 & 193 & \multicolumn{1}{|c|}{743} \\ \hline
-\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{27984}  & 470  & 275 & 212 & \multicolumn{1}{|c|}{957} \\ \hline
-\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{70785}  & 1185 & --  & --  & \multicolumn{1}{|c|}{1185} \\ \hline
-\end{tabular}
-\end{table}
-%
+We see that the mixed-fidelity models, when applied to noisy datasets different from that with which they were generated, continue to perform well in achieving a small error in the QoI while limiting the use of the high-fidelity model to less than a third of the domain. Given the same initial guess, the mixed-fidelity inverse problems takes less time on average than the high-fidelity inverse problem to solve, and they converge consistently. 
 
+In testing this online-offline setting with a larger range of datasets, we would like to note some additional observations. Suppose one has two datasets $d_1$ and $d_2$, the latter of which one wishes to perform inference. For a fixed proportion of domain refinement, a mixed-fidelity model that was adaptively generated $d_2$ gives a smaller QoI error than a mixed-fidelity model that was generated based on $d_1$. The performance gap tends to widen as the two datasets become more different. Suppose one generated $d_1$ using the high-fidelity model $d_2$ using a model which differed from the high-fidelity model in its domain, boundary conditions, and reaction coefficient; then a mixed-fidelity model adaptively formed based on $d_1$ might not give a low QoI error when used to infer from $d_2$. However, when the adaptivity algorithm is directly applied to this $d_2$, it is still able to find a mixed-fidelity model with a low QoI error. This behavior suggest that, if resources allow, it is best to perform the adaptivity online with the true observations. If one is confident that one's high-fidelity model is a good approximation of reality, then the online-offline approach can potentially give a faster yet accurate QoI estimate.
