@@ -1,8 +1,8 @@
-\section{Goal Oriented Inference Algorithm}\label{sect:alg}
+\section{Goal-Oriented Inference Algorithm}\label{sect:alg}
 %
 Based on the theoretical developments in the last section, we now give a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
 
-Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, the error estimate \cref{eq:finErrExp} can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. Algorithm~\cref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem \cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
+Just as error estimates can be used to guide mesh-refinement~\cite{BecRann01}, the error estimate \cref{eq:finErrExp} can be localized to give elemental contributions and used to guide the division of the domain for a mixed-fidelity model. The error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some threshold is reached. \Cref{alg:refSeries} describes this approach. Note that the QoI error adjoint problem \cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]
@@ -53,7 +53,7 @@ Another variation occurs in the context of a quasi-incremental data assimilation
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Error Estimate Localization}\label{sec:errLocal}
 %------------------------------------------------------------------------------------------------------------------------%
-Algorithm~\cref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
+\Cref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
 
 We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subseteq Q$ and $U_{LF}=U$. Note that the error estimate in \cref{eq:finErrExp} can be equivalently written as,
 %
