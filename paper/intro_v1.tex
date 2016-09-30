@@ -1,0 +1,62 @@
+\section{Introduction}
+
+Parameter estimation/inference is an important component of mathematical modeling. The ability to infer parameters via an inverse problem allows practitioners to gain important information about systems, processes and the models that are used to describe them. Such inference also avoids intrusive experiments, which may otherwise be prohibitively expensive or impractical. Once parameters have been inferred via an inverse problem, they can be used for forward propagation of the model and, computing relevant quantities of interest for the modeling/decision making process.
+
+Data, constraints and prior information form the critical components of an inverse problem formulation. There is an extensive literature pertaining to all these components, including the filtering of noise in data~\cite{}, the choice of regularization or representation of prior information~\cite{}, the efficient incorporation of constraints in solving the problem~\cite{}, and so on. Specifically, the work on the constraints defined by `state equations' in the inverse problem focuses on reducing the computational expense of solving the models that represent them. Such work includes the use of reduced order models to represent constraints~\cite{} and adaptive mesh refinement to control the size of the state equation discretizations~\cite{BecVex05,}, among other strategies.
+
+Models that represent phenomena and processes can usually be organized in a hierarchy according to their fidelity and/or expense. The use of multiple models simultaneously for forward simulation is well established. Two main strategies exist for combining models: hierarchical and concurrent methods. Hierarchical methods (also known as information-passing or sequential methods) take the results of a simulation using the high-fidelity model and use them to inform a lower-fidelity model that is used globally (for example, modeling the molecular structure of a material to determine parameters for constitutive equations~\cite{Haoetal03}). In this work, we focus on multi-fidelity models formed using concurrent methods, which simultaneously solve the higher- and lower-fidelity models in different parts of the domain. For example, in~\cite{Khareetal08} atomistic models capable of describing bond-breaking behaviors are applied to small clusters of atoms in regions relevant to the formation of fractures, while a continuum model is applied in the rest of the domain. Concurrent methods are also applied in \cite{vanOpstaletal15} to combine the linear Stokes equation (low-fidelity) and the nonlinear Navier-Stokes equation (high-fidelity) based on an a posteriori estimate of the error in a QoI, and in \cite{LucKinBer02} to combine different reduced-order models, depending on the presence of shocks.
+
+%in \cite{AntHein10}, balanced truncation model reduction is applied to the part of the domain outside of where the optimization variables are located in order to reduce the overall cost of a forward solve. 
+%The manner in which the different models are interfaced is problem-dependent; in \cite{Abra98, AlexGarTar02}, a ``handshake'' region is used to couple concurrent particle and continuum models, and in \cite{AlexGarTar02}, interface coupling models are introduced to reconcile uncertainties in the different models.
+
+In this work, we extend the use of multi-fidelity models to inverse problems. Specifically, we consider the case where there is a target quantity of interest to be computed from the inferred parameters. The use of concurrent multi-fidelity models for the goal-oriented forward problem is described in \cite{OdenPrudetal06}, a method using adjoints for the goal-oriented forward problem is described; an extension to inverse problems is described in \cite{OdenPrudetal10}.\red{\footnote{Vikram, this was known at the time of the thesis, but not not cited in the thesis. I'm not actually sure how to handle this, since this tries to solve the same problem we do, but I don't understand it well enough to do a detailed analysis. I did manage to find the book, if you'd like me to scan the pages to you...}} We present a systematic method to use different constraints in different regions of the domain, while controlling the error due to the use of lower fidelity models, in a target quantity of interest. Our approach is based on a novel use of adjoint error estimation, which enables the computation of third-order QoI error estimates, at the cost of solving an additional adjoint problem.
+
+The rest of the paper is organized as follows, \cref{sect:form} presents the mathematical formulation and error analysis for the multi-model inverse problem. Then, in \cref{sect:alg} we discuss the goal oriented inference algorithm and present a computational complexity analysis. \cref{sect:numexp} shows the application of this algorithm to a model problem and a contaminant flow problem. Finally, we present conclusions and directions for future work in \cref{sect:conc}.
+
+%% \subsection{draft outline}
+%% \bit
+%% \item background/previous work? to put this work in context?
+%%   %this is probably enough? at least for previous work...
+%%   %what context though? is this another way to approach inverse problems?
+%% \item mathematical formulation
+%%   \bit
+%%   \item define inverse problem and qoi
+%%   \item derive error estimate
+%%   \item caveats (models to which this can be applied, no guarantee that mixed model will be worth the cost to obtain, no bounds on accuracy of estimate in nonlinear case)
+%%   \item relation to mesh refinement
+%%   \item How does this compare to just using Oden et al's method (multimodel, foward with QoI) and replacing forward PDEs with optimality system of inverse problem? (Oden's gets you second-order in error psiHF-psiLF, but this one gets third, though you have to compute the super-adjoint...linear solve, though...big system, but linear...)
+%%     %solving for adjoint and forward simultaneously (KKT) might cause you to lose an order of accuracy?
+%%     %where was that book that Oden might have mentioned inverse application of his method?
+%%       %Multiscale methods : bridging the scales in science and engineering / edited by Jacob Fish. (TA335.M85 2010 in barker)
+%%   \eit
+%% \item numerical results (perhaps not include all of these...)
+%%   \bit
+%%   \item convection-diffusion(-reaction)
+%%     \bit
+%%     \item interpretation of error estimate breakdown (interaction of QoI with observations)
+%%     \item large reaction term: MF model more cooperative with nonlinear solver
+%%     \eit
+%%   \item convection-diffusion-reaction, field vs scalar description of parameters
+%%     \bit
+%%     \item interface question: do we enforce continuity between the two models' parameters?
+%%       %-navierstokes+stokes seems to require continuity of flux and velocity across boundary...?
+%%       %-is it okay to mix diff and convdiff for the forward like we did? does the discontinuous velocity break any intergration-by-parts   assumptions? (no that's only if discontinuity in diffusion bit...)
+%%     \item chose to have one 'scalar' parameter, so all sections where the LF used shared same single parameter; is this necessarily the best choice?
+%%     %alternative way to describe 'scalar' case? but here we say there is one scalar, so this would be how to combine them...if you wanted plateaus to be different, can let LF model be two-scalars...
+%%     %fig 3.10 -> what does the inferred field look like? does it look like two different plateaus?
+%%       % practice/T_channel/diff_param_res/with_reaction/long_channel_stash/qoi3_setup02_r4p2_deref/ (pushed 10/3/15)
+%%         %at the very last refinement, most of refined region seems to be two large humps...and a section that looks pretty much like the surrounding scalar...so maybe 3 patches...
+%%     \item chose to enforce continuity (easier to implement; field representation required to be continuous); algorithm wanted 60/40 HF/LF mix
+%%     \eit
+%%   \item alternate/additional example: use setup from B+V? navier-stokes and another model?
+%%     \bit
+%%     \item potential flow? model flow as sum of elementary flows; but then parameters would be magnitudes of elementary flows, which has no spatial location...is that a problem for the algorithm or just for interpreting error breakdown?
+%%     \item there would still be the question of how to interface the models...(in stokes vs navier-stokes foward paper, they just required continuity of state variables (velocity field and presssure))
+%%     %do scalar + field for infer BCs on BV NS thing? try for different QoIs? (can we have a variable live on a boundary while the rest are inside? vikram will poke roy about implementing)
+%%     %stokes is good in slow flows...not in boundary layer cuz gradient is high...
+%%     %what situation would it make sense to use the LF model in some place?
+%%     \eit
+%%   \item have a separate section to address questions of how to mix models? (interfaces, whether 'scalar' parameter should be the same everywhere)
+%%   \eit
+%% \item conclusion...what goes in this section usually? summary and directions for future work?
+%% \eit
