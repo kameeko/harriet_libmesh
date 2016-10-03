@@ -1,6 +1,6 @@
-\section{Numerical Experiments}\label{sect:numexp}
+\section{Numerical Experiments}\label{sec:numexp}
 %
-We now use \cref{alg:refSeries} to solve goal-oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in \cref{sec:errLocal}. We first consider simple two-dimensional models in order to explore the behavior of the algorithm as well as the effect of varying the placement of observations and QoI regions. In \cref{sec:cdvcdr}, the high fidelity model is a convection-diffusion-reaction nonlinear model, and the low fidelity model is a linear convection-diffusion model. We apply \cref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In \cref{sec:diffvcdr3D}, we consider a more realistic pair of three-dimensional models.
+We now use \cref{alg:refSeries} to solve goal-oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in \cref{sec:errLocal}. We first consider simple two-dimensional models in order to explore the behavior of the algorithm as well as the effect of varying the placement of observations and QoI regions. In \cref{sec:cdvcdr}, the high-fidelity model is a convection-diffusion-reaction nonlinear model, and the low-fidelity model is a linear convection-diffusion model. We apply \cref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In \cref{sec:constvfield}, both the high- and low-fidelity models are convection-diffusion-reaction nonlinear models, but they differ in how the parameter is represented. In \cref{sec:diffvcdr3D}, we consider a more realistic pair of three-dimensional models.
 
 %In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$. 
 
@@ -83,14 +83,14 @@ The domain is discretized by a regular mesh of quadrilaterals, with 250 and 50 e
 %------------------------------------------------------------%
 %
 
-We now present the results for solving the inference problem using \cref{alg:refSeries}. Once the QoI error estimate is calculated using \cref{eq:finErrExp}, the error estimate is then decomposed into local contributions, as described in \cref{eq:basisblame}. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))$, is less than $1\%$.
+We now present the results for solving the inference problem using \cref{alg:refSeries}. Once the QoI error estimate is calculated using \cref{eq:finErrExp}, the error estimate is then decomposed into local contributions. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))$, is less than $1\%$.
 
 \Cref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Lagrange basis function's contribution is plotted at its nonzero node.
 %
 \begin{figure}[htbp]
 %\captionsetup[subfloat]{captionskip=-5pt}
 \centering
-\subfloat[MF$_0$ ($0\%$ HF)]{
+\subfloat[LF $\equiv$ MF$_0$ ($0\%$ HF)]{
   \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_LF_divvy.png}
   \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_LF.png}
   \label{fig:baseRef0}
@@ -109,9 +109,9 @@ We now present the results for solving the inference problem using \cref{alg:ref
 %
 Note that the error contribution of each basis function whose support is entirely within the high-fidelity regions is zero.
 
-We see that the largest local error contribution is concentrated in the QoI region, and the data point closest to the QoI. In the first decomposition of the error (\cref{fig:baseRef0}), the region where the elemental error is maximum is the leftmost data point. Since the constraining model is an elliptic PDE, with a weak convection, information flow is localized, and is weakly convected from left to right. Therefore, for the calculation of the QoI, it is most important to refine the region near the leftmost data point, and the QoI region. After that, the error decomposition suggests refinement in regions upstream and around the middle data point, and then the rightmost data point.
+We see that the largest local error contribution is concentrated in the QoI region, and the data point closest to the QoI. In the first decomposition of the error (\cref{fig:baseRef0}), the region where the elemental error is maximum is the leftmost data point. Since the constraining model is an elliptic PDE, with weak convection, information flow is localized, and is weakly convected from left to right. Therefore, for the calculation of the QoI, it is most important to refine the region near the leftmost data point, and the QoI region. After that, the error decomposition suggests refinement in regions upstream and around the middle data point, and then the rightmost data point.
 
-\Cref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by \cref{alg:refSeries}; the true and estimated relative errors are calculated relative to the true and estimated high-fidelity QoI, respectively. In this case, we see that the QoI error of only $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain. We note that, in general, there is no guarantee that either the error in the QoI or the relative error in the error estimate will decrease monotonically as more of the domain is refined.
+\Cref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by \cref{alg:refSeries}; the true and estimated relative errors are calculated relative to the true and estimated high-fidelity QoI, respectively. In this case, we see that QoI error of $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain. We note that, in general, there is no guarantee that either the error in the QoI or the relative error in the error estimate will decrease monotonically as more of the domain is refined.
 %
 \begin{figure}[htbp]
 \centering
@@ -125,9 +125,9 @@ We see that the largest local error contribution is concentrated in the QoI regi
 \subsubsection{Interaction of Observations and QoI} \label{sec:qoivdata}
 %------------------------------------------------------------%
 %
-The error estimate decomposition \cref{eq:basisblame} suggests the use of the high-fidelity model in areas of the domain that are important to the interaction of the observations and QoI; the interaction of these two can be complex, and the areas suggested for refinement may be nonintuitive. To see this, we compare the error estimate decomposition for three sizes of the QoI region $\Omega_I$ given the same set of data points, and for three nested sets of data points given the same QoI region. For the sake of illustration, we make two refinement iterations for each combination of observations and QoI region, regardless of the magnitude of the relative error estimate. However, it was noticed that the number of iterations needed to achieve a given tolerance increased as the QoI region increased, but did not consistently increase or decrease with the number of data points.
+The error estimate decomposition suggests the use of the high-fidelity model in areas of the domain that are important to the interaction between the observations and QoI; the interaction between these two can be complex, and the areas suggested for refinement may be nonintuitive. To see this, we compare the error estimate decomposition for three sizes of the QoI region $\Omega_I$ given the same set of data points, and for three nested sets of data points given the same QoI region. For the sake of illustration, we make two refinement iterations for each combination of observations and QoI region, regardless of the magnitude of the relative error estimate. However, it was noticed that the number of iterations needed to achieve a given tolerance increased as the QoI region increased.
 
-The error decomposition for three increasingly large, nested QoI regions $\Omega_I$ given the same set of observations is shown in \cref{fig:qoiStudy}. The bottom row gives the baseline case presented in \cref{sec:cdvcdrBaseRef}, although here we choose the basis functions $i$ whose error $\varepsilon_i$ are among the largest $5\%$, so the proportion of additional refined elements in each iteration is slightly larger. Although refinement is still most important around the data point closest to $x_1=0$, as the QoI region expands the other two data points become more important in that the error decomposition suggests refinement around them earlier. As the QoI region expands, it is also more clearly noticeable that refinement is not equally important in all parts of the QoI region.
+The error decompositions for three increasingly large, nested QoI regions $\Omega_I$ given the same set of observations are shown in \cref{fig:qoiStudy}. The bottom row gives the baseline case presented in \cref{sec:cdvcdrBaseRef}, although here we choose the basis functions $i$ whose error $\varepsilon_i$ are among the largest $5\%$, so the proportion of additional refined elements in each iteration is slightly larger. Although refinement is still most important around the data point closest to $x_1=0$, as the QoI region expands the other two data points become more important in that the error decomposition suggests refinement around them earlier. As the QoI region expands, it is also more clearly noticeable that refinement is not equally important in all parts of the QoI region.
 
 \begin{figure}[htbp]
 \centering
@@ -146,7 +146,7 @@ The error decomposition for three increasingly large, nested QoI regions $\Omega
   \includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2.png}
   \label{subfig:obsMFlast}
 }
-  \caption{Compare the error estimate decomposition (\protect\subref{subfig:obsLF}-\protect\subref{subfig:obsMFlast}), given the same observations (teal points in (\protect\subref{subfig:obsSetup})) and varying QoI region (purple box in (\protect\subref{subfig:obsSetup})).}
+  \caption{With each row corresponding to the configuration of observations (teal points) and QoI region (purple box) shown in column \protect\subref{subfig:obsSetup}, compare the error estimate decompositions (columns \protect\subref{subfig:obsLF}-\protect\subref{subfig:obsMFlast}) given the same observations and different QoI regions.}
   \label{fig:qoiStudy}
 \end{figure}
 
@@ -169,9 +169,93 @@ The error decomposition for three increasing, nested sets of observations and th
   \includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2.png}
   \label{subfig:obsMFlast2}
 }
-  \caption{Compare the error estimate decomposition (\protect\subref{subfig:obsLF2}-\protect\subref{subfig:obsMFlast2}), given the same QoI region (purple box in (\protect\subref{subfig:obsSetup2})) and varying observations (teal points in (\protect\subref{subfig:obsSetup2})).}
+  \caption{With each row corresponding to the configuration of observations (teal points) and QoI region (purple box) shown in column \protect\subref{subfig:obsSetup2}, compare the error estimate decompositions (columns \protect\subref{subfig:obsLF2}-\protect\subref{subfig:obsMFlast2}) given different observations and the same QoI region.}
   \label{fig:dataStudy}
 \end{figure}
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Constant vs Field Parameters} \label{sec:constvfield}
+%------------------------------------------------------------------------------------------------------------------------%
+\red{THIS SUBSECTION IS OLD AND CURRENTLY A PLACEHOLDER TO GAUGE LENGTH}. It is not necessary for the low- and high-fidelity models to differ in the physics included. A low-fidelity model may be more computationally tractable due to a reduced number of degrees of freedom rather than reduced nonlinearity. In this section, we consider two models which differ in the space to which the parameter belongs, with the low-fidelity model having fewer degrees of freedom.
+%------------------------------------------------------------%
+\subsubsection{Problem Setup}
+%------------------------------------------------------------%
+We consider the same high-fidelity model as in \cref{sec:cdvcdr}:
+\begin{equation}
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U,
+\end{equation}
+with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r = -42$. The low-fidelity model
+\begin{equation}
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in\R
+\end{equation}
+differs from the high-fidelity model only in that the parameter $q$ is a constant instead of a field. Then the intermediate mixed-fidelity models have parameter fields which are non-constant in only portions of the domain. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. The domain, mesh, boundary conditions, and velocity field, as well as the observations, unknown parameters to be inferred, and QoI, remain the same as described in \cref{sec:cdvcdr}. As the inverse problem is ill-posed, except for perhaps in the case where the low-fidelity model is used throughout the domain, regularization is added; the Tikhonov regularization term is $\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient.
+
+Although using such a pair of models has similarities to the problem of adaptive mesh refinement, we note that in this example only the parameter field changes in its level of refinement, not the state. Should the two models differ in the resolution of the state variables instead of the parameters, it is more efficient to use the approach discussed in \cite{BecVex05}.
+%------------------------------------------------------------%
+\subsubsection{Adaptive Model Refinement Results}
+%------------------------------------------------------------%
+As with the previous examples in \cref{sec:cdvcdr}, the decomposition of the error estimate is used to select additional regions of the domain in which to use the high-fidelity model. The number of degrees of freedom in the inverse problem increases with the proportion of the domain in which the high-fidelity model is used and the unknown parameter allowed to be a field. With each iteration, an additional $10\%$ of the elements are marked for refinement. This is repeated until the estimated absolute relative error in the QoI, is less than $1\%$.
+
+\Cref{fig:svfRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the first two and last mixed-fidelity model thus generated. Each linear Langrange basis function's contribution is plotted at its nonzero node. 
+%
+\begin{figure}[htbp]
+\centering
+\subfloat[MF$_0$ ($0\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_LF_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_LF.png}
+} \\
+\subfloat[MF$_1$ ($10\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF01_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF01.png}
+} \\
+\subfloat[MF$_2$ ($20\%$ HF)]{
+  \includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF02_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF02.png}
+} \\
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF03_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF03.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_3$ ($30\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF04_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF04.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_4$ ($40\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF05_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF05.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_5$ ($50\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+\subfloat[MF$_6$ ($60\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF06_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF06.png}
+}
+\caption{Local error contributions (right) and domain division (left; low-fidelity constant-parameter model used in red portion, high-fidelity field-parameter model used in blue portion) for mixed-fidelity models. The (weighted) residual, and thus the local error contribution, tends to spike sharply at the interface between the low- and high-fidelity regions; the color range is truncated to make the error distribution visible elsewhere in the domain.}
+\label{fig:svfRef}
+\end{figure}
+%
+Comparing to \cref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest data point; here, all three data points and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models; the parameter field in all the low-fidelity regions is constant and equal. 
+
+The corresponding true and estimated absolute errors in the QoI are shown in \cref{fig:svfErr}.
+%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{svf/err_est.pdf}
+\caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity field-parameter model is used.}
+\label{fig:svfErr}
+\end{figure}
+%
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, compared to the example in \cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. 
 
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Combining Meshes and Physics in 3D} \label{sec:diffvcdr3D}
