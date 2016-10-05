@@ -1,0 +1,28 @@
+chad's: 35R15, 65M60, 62F30, 93B07, 15A18
+oden: 65G20, 74G10, 74H15
+becvex: none listed
+alessi: 15A29, 62F15, 68W25
+
+35 - PDEs
+65 - Numerical Analysis
+  65G20  	Algorithms with automatic result verification
+62 - Statistics
+  62F15  	Bayesian inference
+93 - Systems theory; control
+15 - linear and multilinear algebra; matrix theory
+  15A29  	Inverse problems
+74 - mechanics of deformable solids
+68 - computer science
+  68W25  	Approximation algorithms
+
+maybe applicable:
+35R15  	Partial differential equations on infinite-dimensional (e.g. function) spaces (= PDE in infinitely many variables)
+35R30  	Inverse problems
+65G20  	Algorithms with automatic result verification
+62F35  	Robustness and adaptive procedures (62Fxx is 'Parametric inference')
+
+keywords:
+chad: inference, observability, model reduction, balanced truncation, PDEs
+oden: multiscale modeling, goal-oriented adaptive modeling, a posteriori error estimation
+becvex: Parameter estimation; Adaptive mesh refinement; Sensitivity analysis
+alessio: inverse problems, goal–oriented, Bayesian inference, low-rank approximation, covariance approximation, Riemannian metric, geodesic distance, posterior mean approximation, Bayes risk, optimality
