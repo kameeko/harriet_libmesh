@@ -1,0 +1,121 @@
+\section{Mathematical Formulation}\label{sec:form}
+%
+We first introduce the goal-oriented inverse problem. Then we derive a rigorous a posteriori error estimate for the error induced in the QoI due to the use of mixed-fidelity and/or lower-fidelity models.
+
+%------------------------------------------------------------------------------%
+\subsection{Inverse Problem Formulation}  \label{sec:setup}
+%------------------------------------------------------------------------------%
+%
+Consider a model for which the Galerkin formulation of the weak form is written as
+\begin{equation}
+a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
+\label{eq:weakForm}
+\end{equation}
+where $u\in U$ is the state, $q\in Q$ are the unknown parameters, $\phi$ is a test function, and the state space $U$ and parameter space $Q$ are Hilbert spaces. The form $a$ and functional $\ell$ are linear with respect to the arguments in the second pair of parentheses (in \cref{eq:weakForm}, they are linear with respect to $\phi$). Further, we define an observation operator $C:U\to\Reals^{n_d}$ that maps the state to $n_d$ predicted observations. The actual observations (data) are denoted by $d\in\R^{n_d}$.
+
+The unknown parameter $q$ can be inferred by minimizing the difference between the predicted and actual observations, leading to an inverse problem. In our setting, such inverse problems are typically ill-posed, since the observations are sparse, and insufficiently informative to uniquely determine the parameters. To make the inverse problem well-posed, a regularization, denoted by $R(q)$, is used to inject prior information or beliefs about the parameters into the formulation. The regularized inverse problem can thus be written as a constrained optimization problem,
+%
+\begin{subequations}
+\label{eq:invOpt}
+\begin{align}
+\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q), \label{eq:invOpt_obj} \\
+\textrm{s.t. }& \quad a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U. \label{eq:invOpt_cons}
+\end{align}
+\end{subequations}
+%
+Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the model given by \cref{eq:weakForm}, which appears as a constraint in \cref{eq:invOpt_cons}. The constraints \cref{eq:invOpt_cons} are typically models of physical processes or systems. A given physical system can be described to varying degrees of fidelity using different models. This naturally introduces a hierarchy of models and a tradeoff between fidelity and computational expense; how one manages this tradeoff depends on what aspect of the solution is of interest.
+
+We consider the case of a {\em goal-oriented inverse problem}, where the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. We then consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use. In the following, we introduce the QoI functional $I$ into the inverse problem formulation by introducing auxiliary variables and additional adjoint equations. We then use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those due to the use of different multi-fidelity models in the constraint \cref{eq:invOpt_cons}.
+%
+%------------------------------------------------------------------------------%
+\subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
+%------------------------------------------------------------------------------%
+%
+For a given hierarchy of models, consider the QoI calculated from inferring the parameters with the highest-fidelity model; we take this QoI to be the value with which we compare other QoI estimates. In this section we derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model.
+%
+\begin{theorem}
+\label{thm:error_estimate}
+Consider the inverse problem described by the constrained optimization problem \cref{eq:invOpt}. Let the form $a:U \times U \to \Reals$ be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator $C:U\to\Reals^{n_d}$ be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator $R:Q\to\Reals$ be differentiable with respect to the parameter $q$, and the functional $I:Q\times U\to\Reals$ be differentiable with respect to the state $u$ and parameter $q$.
+
+Consider the Lagrangian equation induced by \cref{eq:invOpt},
+%
+\begin{equation}
+\label{eq:InvsOpt_lag}
+\mathcal{L}(q,u,z)= J(q,u)-(a(u,q)(z)-\ell(q)(z)),
+\end{equation}
+%
+where $z\in U$ is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, introduce corresponding auxiliary variables $\chi=(p,v,y)\in Q\times U\times U$. Let the augmented Lagrangian be defined as,
+%
+\begin{equation}
+\label{eq:InvsOpt_auglag}
+\mathcal{M}((q,u,z),(p,v,y)) = I(q,u) + \mathcal{L}_{quz}'(q,u,z)(p,v,y),
+\end{equation}
+%
+where $\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
+
+Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. Consider the adjoint problem
+%
+\begin{equation}
+\label{eq:superAdjEq}
+\mathcal{M}'_{HF,\Psi}(\Lambda;\Psi_{HF})(\Phi)=\mathcal{Q}(\Phi)=\mathcal M'_{HF}(\Psi_{LF})(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2,
+\end{equation}
+% KW: notation in the equation is \mathcal{M}'_{HF,\Psi}(\Lambda;\Psi_{HF})= M'_{HF}(\Psi_{LF})(\Phi)
+% I don't understand what the difference in notation means. Why drop the second subscript on the M'? and why the change in arguments? And neither instance is consistent with how the ' notation was defined above for the Lagrangian.
+% You can't just introduce new notation and hope that the reader guesses what you mean. Everything must be defined! Every time you change an argument form, every time you change the form of the subscript, every time you change anything, ...
+% KW: where is \mathcal{Q} defined?
+%
+for the supplementary adjoint $\Lambda$, where $\Phi$ is a test function. Then, the error in the Quantity of Interest $I$ is given by,
+%
+\begin{multline}
+\label{eq:finErrExp}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3).
+\end{multline}
+%
+where $\mathcal{R}$ is a remainder term that is third-order in the error $e=\Psi_{HF}-\Psi_{LF}$.
+\end{theorem}
+%
+\begin{proof}
+%
+Observe that
+%
+\begin{equation}
+\label{eq:MeqI}
+\mathcal{M}(\Psi)=I(q,u),
+\end{equation}
+%
+since taking variations of $\mathcal{M}$ with respect to the auxiliary variables gives that $\xi_\Psi$ is a stationary point of $\mathcal{L}$.
+
+Extending the property in \cref{eq:MeqI} to the augmented Lagrangians for the high- and low-fidelity models, we have,
+%
+\begin{multline}
+\label{eq:repIwithM}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.}
+\end{multline}
+%
+Applying Proposition 3 from~\cite{BecVex05} 
+% KW: what is Prop 3? is it something we need to state/summarize here for completeness? maybe okay as is, just seems a little mysterious.
+for the difference $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$,
+\begin{equation}
+\label{eq:beckvex}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{.}
+\end{equation}
+Combining \cref{eq:repIwithM} and \cref{eq:beckvex} we obtain
+\begin{multline}
+\label{eq:preadj}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}(e^3)\textrm{.}
+\end{multline}
+
+Further, the error in the output $\mathcal{Q}$ defined in \cref{eq:superAdjEq} can be expressed as a dual-weighted residual,
+\begin{equation}
+\label{eq:adjOutErr}
+\mathcal M'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})=-\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda).
+\end{equation}
+
+Combining \cref{eq:preadj} and \cref{eq:adjOutErr}, we have,
+\begin{multline}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3), \nonumber
+\end{multline}
+%
+which completes the proof.
+\end{proof}
+%
