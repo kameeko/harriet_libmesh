@@ -87,7 +87,7 @@ f_{true}(x_1,x_2)=
 
 We now present the results for solving the inference problem using \cref{alg:refSeries}. Once the QoI error estimate is calculated using \cref{eq:finErrExp}, the error estimate is then decomposed into local contributions. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))$, is less than $1\%$.
 
-\Cref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. Each linear Lagrange basis function's contribution is plotted at its nonzero node.
+\Cref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. %Each linear Lagrange basis function's contribution is plotted at its nonzero node.
 %
 \begin{figure}[htbp]
 %\captionsetup[subfloat]{captionskip=-5pt}
@@ -362,7 +362,10 @@ HF   & 100  & 70785 & 83047  & --     & --     & --    \\ \hline
 \end{table}
 %
 
-We notice that, compared to the results in \cref{fig:baseErr}, the error estimates for the low-fidelity and first mixed-fidelity models are far from the true errors. This can be attributed to the linearization about $\Psi_{LF}$ and $\Psi_{MF_{1}}$ instead of $\Psi_{HF}$ in solving the supplementary adjoints; the large differences in the QoI for the LF and MF01 models compared to the high-fidelity QoI indicate that $\Psi_{LF}$ and $\Psi_{MF_{1}}$ are significantly different from $\Psi_{HF}$. Compared to the pair of models in \cref{sec:cdvcdrSetup}, the low- and high-fidelity models in this case are more dissimilar, even though in both \cref{sec:cdvcdrSetup} and this case the nonlinear term in the high-fidelity model \cref{eq:cdvcdrHF} and \cref{eq:cdvcdrHF3D} is a quadratic reaction term. % KW: don't know what last part of this sentence means. what hi-fi models?
+We notice that, compared to the results in \cref{fig:baseErr}, the error estimates for the low-fidelity and first mixed-fidelity models are far from the true errors. This can be attributed to the 
+%linearization about $\Psi_{LF}$ and $\Psi_{MF_{1}}$ instead of $\Psi_{HF}$ in solving the supplementary adjoints; 
+third-order term that is ignored in the error estimate;
+the large differences in the QoI for the LF and MF01 models compared to the high-fidelity QoI indicate that $\Psi_{LF}$ and $\Psi_{MF_{1}}$ are significantly different from $\Psi_{HF}$. Compared to the pair of models in \cref{sec:cdvcdrSetup}, the low- and high-fidelity models in this case are more dissimilar, even though in both \cref{sec:cdvcdrSetup} and this case the nonlinear term in the high-fidelity model \cref{eq:cdvcdrHF} and \cref{eq:cdvcdrHF3D} is a quadratic reaction term. % KW: don't know what last part of this sentence means. what hi-fi models?
 The possibility of large inaccuracies in the error estimates of low-fidelity and mostly unrefined mixed-fidelity models suggests that one should use more than just the error estimate to decide when to stop the adaptive algorithm; a possible additional criterion could be to require that the estimated high-fidelity QoI ($I(q_{MF},u_{MF})+\epsilon_i$) for two consecutive iterations agree to within some tolerance. % KW: what behavior? this last sentence doesn't follow from the previous one. and what predicted hi-fi QOI? Do you mean mixed-fi? I'm not sure this is a good idea. I'd probably delete this last sentence.
 % or just let the reader decide how to deal with possibly inaccurate initial error estimates?
 
