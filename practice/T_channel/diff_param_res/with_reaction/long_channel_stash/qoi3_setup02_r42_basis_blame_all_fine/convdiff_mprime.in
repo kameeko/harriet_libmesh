@@ -20,7 +20,7 @@ QoI_option = 3
 
 #where to find files
 velocity_file = channel_long_vel.csv	#dummy_vel.txt #velsTtrim.txt
-data_file = long_channel_data3_r4p2_blip.dat #long_channel_data3_r4p2_blip.dat
+data_file = long_channel_data3_r42_blip.dat #long_channel_data3_r4p2_blip.dat
 
 #knobs for how hard to enfore pinning to constant
 prim_mag_screw = 1.0e6
