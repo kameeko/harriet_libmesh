@@ -137,7 +137,30 @@ void ScalarFieldSystem::element_postprocess(DiffContext &context)
 
       dQoI_1 += JxW[qp] * ( supp_adjoint_aux_fc*zc );
 
-      dQoI_1 += JxW[qp] * (
+      dQoI_2 += JxW[qp] * k_d* ( supp_adjoint_grad_aux_c*grad_zc );
+
+      dQoI_3 += JxW[qp] * ( supp_adjoint_aux_c*(grad_zc*U) );
+ 
+      dQoI_4 += JxW[qp] * 2*kr*( c*supp_adjoint_aux_c*zc );
+
+      dQoI_5 += JxW[qp] * ( -k_d*(grad_c*supp_adjoint_grad_aux_zc) + (c*(supp_adjoint_grad_aux_zc*U)) + kr*(c*c*supp_adjoint_aux_zc) ) - ( fc*supp_adjoint_aux_zc );
+
+      dQoI_6 += JxW[qp] * beta*( supp_adjoint_grad_fc*grad_aux_fc );
+
+      dQoI_7 += JxW[qp] * ( supp_adjoint_fc*aux_zc );
+
+      dQoI_8 += JxW[qp] * 2*kr*( supp_adjoint_c*aux_c*zc );
+
+      dQoI_9 += JxW[qp] * ( -k_d*(supp_adjoint_grad_c*grad_aux_zc) + (supp_adjoint_c*(grad_aux_zc*U)) + kr*(supp_adjoint_c*supp_adjoint_c*aux_zc) );
+
+      dQoI_10 += JxW[qp] * ( aux_fc*supp_adjoint_zc ) ;
+
+      dQoI_11 += JxW[qp] * k_d*(grad_aux_c*supp_adjoint_grad_zc);
+
+      dQoI_12 += JxW[qp] * (aux_c*(supp_adjoint_grad_zc*U));
+
+      dQoI_13 += JxW[qp] * 2*kr*(c*aux_c*supp_adjoint_zc);
+ 
 
 
     } // end of the quadrature point qp-loop
