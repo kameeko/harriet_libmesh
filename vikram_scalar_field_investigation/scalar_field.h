@@ -39,6 +39,8 @@ public:
     return computed_QoI[QoI_index];
   }
 
+virtual void postprocess(void);
+
 protected:
   // System initialization
   virtual void init_data ();

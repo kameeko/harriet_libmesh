@@ -19,7 +19,7 @@
 
 #include "libmesh/getpot.h"
 
-#include "scalarfieldsystem.h"
+#include "scalar_field.h"
 
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
@@ -64,7 +64,7 @@ void ScalarFieldSystem::init_context(DiffContext &context)
         const_cast<System &>(sys).get_adjoint_solution(0);
 
       // Add this adjoint solution to the vectors that diff context should localize
-      c.add_localized_vector(adjoint_solution0, sys);
+      c.add_localized_vector(adjoint_solution, sys);
     }
 
   FEMSystem::init_context(context);

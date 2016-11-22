@@ -1,4 +1,4 @@
-#include "scalarfieldsystem.h"
+#include "scalar_field.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/quadrature.h"
 #include "libmesh/elem.h"
@@ -30,7 +30,7 @@ void ScalarFieldSystem::element_postprocess(DiffContext &context)
 
   FEMContext &c = libmesh_cast_ref<FEMContext&>(context);
 
-  FEBase* u_elem_fe = NULL;
+  FEBase* u_elem_fe;
   c.get_element_fe( 0, u_elem_fe );
 
   // First we get some references to cell-specific data that
@@ -101,12 +101,12 @@ void ScalarFieldSystem::element_postprocess(DiffContext &context)
   std::vector<Gradient> supp_adjoint_grad_aux_zc (n_qpoints, 0);
   std::vector<Gradient> supp_adjoint_grad_aux_fc (n_qpoints, 0);
 
-  c.interior_gradient<Number>(0, adjoint_solution, supp_adjoint_grad_c);
-  c.interior_gradient<Number>(1, adjoint_solution, supp_adjoint_grad_zc);
-  c.interior_gradient<Number>(2, adjoint_solution, supp_adjoint_grad_fc);
-  c.interior_gradient<Number>(3, adjoint_solution, supp_adjoint_grad_aux_c);
-  c.interior_gradient<Number>(4, adjoint_solution, supp_adjoint_grad_aux_zc);
-  c.interior_gradient<Number>(5, adjoint_solution, supp_adjoint_grad_aux_fc);
+  c.interior_gradients<Gradient>(0, adjoint_solution, supp_adjoint_grad_c);
+  c.interior_gradients<Gradient>(1, adjoint_solution, supp_adjoint_grad_zc);
+  c.interior_gradients<Gradient>(2, adjoint_solution, supp_adjoint_grad_fc);
+  c.interior_gradients<Gradient>(3, adjoint_solution, supp_adjoint_grad_aux_c);
+  c.interior_gradients<Gradient>(4, adjoint_solution, supp_adjoint_grad_aux_zc);
+  c.interior_gradients<Gradient>(5, adjoint_solution, supp_adjoint_grad_aux_fc);
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
@@ -115,52 +115,52 @@ void ScalarFieldSystem::element_postprocess(DiffContext &context)
       //Real f_r = 0.0;
 
       // Get the value of solution at this point
-      Number c = c.interior_value(0, qp);
-      Number zc = c.interior_value(1, qp);
-      Number fc = c.interior_value(2, qp);
-      Number aux_c = c.interior_value(3, qp);
-      Number aux_zc = c.interior_value(4, qp);
-      Number aux_fc = c.interior_value(5, qp);
+      // Number c = c.interior_value(0, qp);
+      // Number zc = c.interior_value(1, qp);
+      // Number fc = c.interior_value(2, qp);
+      // Number aux_c = c.interior_value(3, qp);
+      // Number aux_zc = c.interior_value(4, qp);
+      // Number aux_fc = c.interior_value(5, qp);
 
-      Gradient grad_c = c.interior_gradient(0, qp);
-      Gradient grad_zc = c.interior_gradient(1, qp);
-      Gradient grad_fc = c.interior_gradient(2, qp);
-      Gradient grad_aux_c = c.interior_gradient(3, qp);
-      Gradient grad_aux_zc = c.interior_gradient(4, qp);
-      Gradient grad_aux_fc = c.interior_gradient(5, qp);
+      // Gradient grad_c = c.interior_gradient(0, qp);
+      // Gradient grad_zc = c.interior_gradient(1, qp);
+      // Gradient grad_fc = c.interior_gradient(2, qp);
+      // Gradient grad_aux_c = c.interior_gradient(3, qp);
+      // Gradient grad_aux_zc = c.interior_gradient(4, qp);
+      // Gradient grad_aux_fc = c.interior_gradient(5, qp);
 
-      const Number u_x = grad_u(0);
-      RealTensor hess_u = c.interior_hessian(0, qp);
-      const Number u_xx = hess_u(0,0);
+      // //const Number u_x = grad_u(0);
+      // RealTensor hess_u = c.interior_hessian(0, qp);
+      //const Number u_xx = hess_u(0,0);
 
-      dQoI_0 += JxW[qp] * beta*( grad_fc* supp_adjoint_aux_fc );
+      // dQoI_0 += JxW[qp] * beta*( grad_fc* supp_adjoint_aux_fc );
 
-      dQoI_1 += JxW[qp] * ( supp_adjoint_aux_fc*zc );
+      // dQoI_1 += JxW[qp] * ( supp_adjoint_aux_fc*zc );
 
-      dQoI_2 += JxW[qp] * k_d* ( supp_adjoint_grad_aux_c*grad_zc );
+      // dQoI_2 += JxW[qp] * k_d* ( supp_adjoint_grad_aux_c*grad_zc );
 
-      dQoI_3 += JxW[qp] * ( supp_adjoint_aux_c*(grad_zc*U) );
- 
-      dQoI_4 += JxW[qp] * 2*kr*( c*supp_adjoint_aux_c*zc );
+      // dQoI_3 += JxW[qp] * ( supp_adjoint_aux_c*(grad_zc*U) );
 
-      dQoI_5 += JxW[qp] * ( -k_d*(grad_c*supp_adjoint_grad_aux_zc) + (c*(supp_adjoint_grad_aux_zc*U)) + kr*(c*c*supp_adjoint_aux_zc) ) - ( fc*supp_adjoint_aux_zc );
+      // dQoI_4 += JxW[qp] * 2*kr*( c*supp_adjoint_aux_c*zc );
 
-      dQoI_6 += JxW[qp] * beta*( supp_adjoint_grad_fc*grad_aux_fc );
+      // dQoI_5 += JxW[qp] * ( -k_d*(grad_c*supp_adjoint_grad_aux_zc) + (c*(supp_adjoint_grad_aux_zc*U)) + kr*(c*c*supp_adjoint_aux_zc) ) - ( fc*supp_adjoint_aux_zc );
 
-      dQoI_7 += JxW[qp] * ( supp_adjoint_fc*aux_zc );
+      // dQoI_6 += JxW[qp] * beta*( supp_adjoint_grad_fc*grad_aux_fc );
 
-      dQoI_8 += JxW[qp] * 2*kr*( supp_adjoint_c*aux_c*zc );
+      // dQoI_7 += JxW[qp] * ( supp_adjoint_fc*aux_zc );
 
-      dQoI_9 += JxW[qp] * ( -k_d*(supp_adjoint_grad_c*grad_aux_zc) + (supp_adjoint_c*(grad_aux_zc*U)) + kr*(supp_adjoint_c*supp_adjoint_c*aux_zc) );
+      // dQoI_8 += JxW[qp] * 2*kr*( supp_adjoint_c*aux_c*zc );
 
-      dQoI_10 += JxW[qp] * ( aux_fc*supp_adjoint_zc ) ;
+      // dQoI_9 += JxW[qp] * ( -k_d*(supp_adjoint_grad_c*grad_aux_zc) + (supp_adjoint_c*(grad_aux_zc*U)) + kr*(supp_adjoint_c*supp_adjoint_c*aux_zc) );
 
-      dQoI_11 += JxW[qp] * k_d*(grad_aux_c*supp_adjoint_grad_zc);
+      // dQoI_10 += JxW[qp] * ( aux_fc*supp_adjoint_zc ) ;
 
-      dQoI_12 += JxW[qp] * (aux_c*(supp_adjoint_grad_zc*U));
+      // dQoI_11 += JxW[qp] * k_d*(grad_aux_c*supp_adjoint_grad_zc);
 
-      dQoI_13 += JxW[qp] * 2*kr*(c*aux_c*supp_adjoint_zc);
- 
+      // dQoI_12 += JxW[qp] * (aux_c*(supp_adjoint_grad_zc*U));
+
+      // dQoI_13 += JxW[qp] * 2*kr*(c*aux_c*supp_adjoint_zc);
+
 
 
     } // end of the quadrature point qp-loop

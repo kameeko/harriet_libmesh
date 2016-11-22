@@ -28,6 +28,7 @@
 
 #include "libmesh/getpot.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/gmv_io.h"
 
 // To impose Dirichlet boundary conditions
 #include "libmesh/dirichlet_boundaries.h"
@@ -84,6 +85,35 @@ int main (int argc, char** argv)
     // Print information about the mesh and systems to the screen.
     mesh.print_info();
     equation_systems.print_info();
+
+    System &read_system = equation_systems.get_system<System> ("ConvDiff_MprimeSys");
+
+    std::ostringstream file_name_gmv_primal;
+    file_name_gmv_primal << "primal.out.gmv."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << i;
+
+    GMVIO(mesh).write_equation_systems
+      (file_name_gmv_primal.str(), equation_systems);
+
+    NumericVector<Number> &primal_solution = (*read_system.solution);
+    NumericVector<Number> &dual_solution = read_system.get_adjoint_solution(0);
+
+    primal_solution.swap(dual_solution);
+
+    std::ostringstream file_name_gmv_dual;
+    file_name_gmv_dual << "dual.out.gmv."
+                    << std::setw(3)
+                    << std::setfill('0')
+                    << std::right
+                    << i;
+
+    GMVIO(mesh).write_equation_systems
+      (file_name_gmv_dual.str(), equation_systems);
+
+    primal_solution.swap(dual_solution);
 
     equation_systems.reinit();
   }
