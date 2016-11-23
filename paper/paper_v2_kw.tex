@@ -1,0 +1,81 @@
+\documentclass[review]{siamart0516}
+%%\usepackage{lgrind}
+
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
+%\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
+\usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{graphics}
+%\usepackage{epsfig}
+%%\usepackage[hang,raggedright]{subfigure}
+%\usepackage{epsf}
+%\usepackage{setspace}
+%\usepackage{hangcaption}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{multirow}
+%\usepackage{threeparttable}
+\usepackage{cancel}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{hyperref}
+
+%\usepackage{algorithmicx}
+%\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{varwidth}
+%\usepackage{caption}
+%\usepackage[font=small]{subcaption}
+%\usepackage{longtable}
+\usepackage{mathrsfs}
+\usepackage{upgreek}
+\usepackage[caption=false]{subfig} % for \subfloat
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\Reals}{{\mathbb{R}}}
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+\newcommand{\red}[1]{{\color{red}{#1}}}
+\newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
+
+%\newtheorem{theorem}{Theorem} %conflicts with sisc
+
+\graphicspath{{./figures/}}
+
+\begin{document}
+\raggedbottom %avoid weird vertical justification
+
+\title{Model Adaptivity for Goal-Oriented Inference using Adjoints}
+
+\author{Harriet Li, Vikram Garg, Karen Willcox}
+%\date{}
+\maketitle
+
+\begin{abstract}
+\input{abstract_v2_kw.tex}
+\end{abstract}
+
+\begin{keywords}
+  inference, goal-oriented adaptive modeling, a posteriori error estimation, multifidelity modeling, adjoints, PDEs
+\end{keywords}
+
+\begin{AMS}
+  35R30, 65G20, 62F35, 35R15
+\end{AMS}
+
+\input{intro_v2_kw.tex}
+\input{mathematical_formulation_v2_kw.tex}
+\input{algorithms_v2_kw.tex}
+\input{numerical_experiments_v2_kw.tex}
+\input{conclusions_v2_kw.tex}
+\input{acknow.tex}
+
+\bibliographystyle{siamplain}
+\bibliography{masterBib}
+\end{document}
