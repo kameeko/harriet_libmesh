@@ -1,0 +1,83 @@
+\documentclass[review,sort&compress]{elsarticle}
+%%\usepackage{lgrind}
+
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
+%\usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{graphics}
+%\usepackage{epsfig}
+%%\usepackage[hang,raggedright]{subfigure}
+%\usepackage{epsf}
+%\usepackage{setspace}
+%\usepackage{hangcaption}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{multirow}
+%\usepackage{threeparttable}
+\usepackage{cancel}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\usepackage{algorithmicx}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{varwidth}
+%\usepackage{caption}
+%\usepackage[font=small]{subcaption}
+%\usepackage{longtable}
+\usepackage{mathrsfs}
+\usepackage{upgreek}
+\usepackage[caption=false]{subfig} % for \subfloat
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\Reals}{{\mathbb{R}}}
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+\newcommand{\red}[1]{{\color{red}{#1}}}
+\newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\graphicspath{{./figures/}}
+
+\begin{document}
+\raggedbottom %avoid weird vertical justification
+
+\title{Model Adaptivity for Goal-Oriented Inference using Adjoints}
+
+\author{Harriet Li\textsuperscript{a,}\footnote{\red{Corresponding author ? \textit{Email address: foo@bar.edu}}}, Vikram Garg\textsuperscript{b}, Karen Willcox\textsuperscript{c}}
+\address{\textsuperscript{a} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}\protect\\
+\textsuperscript{b} Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}\protect\\
+\textsuperscript{c} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+%\date{}
+\maketitle
+
+\begin{abstract}
+\input{abstract_v3.tex}
+\end{abstract}
+
+\begin{keyword}
+  inference \sep goal-oriented adaptive modeling \sep a posteriori error estimation \sep multifidelity modeling \sep adjoints
+\end{keyword}
+
+\input{intro_v3_cmame.tex}
+\input{mathematical_formulation_v3_cmame.tex}
+\input{algorithms_v3_cmame.tex}
+\input{numerical_experiments_v3_cmame.tex}
+\input{conclusions_v3_cmame.tex}
+\input{acknow.tex}
+
+\section*{References}
+\bibliographystyle{plain}
+\bibliography{masterBib}
+\end{document}
