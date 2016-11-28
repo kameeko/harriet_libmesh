@@ -53,14 +53,7 @@ where $z\in U$ is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, 
 %
 where $\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
 
-Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. Let the variational form
-%
-\begin{equation}
-\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
-\label{eq:supadjsys}
-\end{equation}
-%
-represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function.
+Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. 
 Then, the error in the Quantity of Interest $I$ is given by
 %
 \begin{multline}
@@ -112,7 +105,14 @@ Note that, as a stationary point, $\Psi_{HF}$ satisfies~\Cref{eq:supadjsys}. Now
 \label{eq:supadjout}
 \end{equation}
 %
-Define the corresponding adjoint problem
+Let the variational form
+%
+\begin{equation}
+\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:supadjsys}
+\end{equation}
+%
+represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the corresponding adjoint problem
 %
 \begin{equation}
 \mathscr{R}_{\Psi}'(\Psi_{HF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
