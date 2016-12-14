@@ -30,6 +30,7 @@
 \usepackage{upgreek}
 \usepackage[caption=false]{subfig} % for \subfloat
 
+
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
     linkcolor=black,          % color of internal links
@@ -51,16 +52,26 @@
 \graphicspath{{./figures/}}
 
 \begin{document}
-\raggedbottom %avoid weird vertical justification
+%\raggedbottom %avoid weird vertical justification
+
+\begin{frontmatter}
 
 \title{Model Adaptivity for Goal-Oriented Inference using Adjoints}
 
-\author{Harriet Li\textsuperscript{a,}\footnote{\red{Corresponding author ? \textit{Email address: foo@bar.edu}}}, Vikram Garg\textsuperscript{b}, Karen Willcox\textsuperscript{c}}
-\address{\textsuperscript{a} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}\protect\\
-\textsuperscript{b} Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}\protect\\
-\textsuperscript{c} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+%\author{Harriet Li\textsuperscript{a,}\footnote{Corresponding author. \textit{Email address: kameeko@mit.edu}}, Vikram Garg\textsuperscript{b}, Karen Willcox\textsuperscript{c}}
+%\address{\textsuperscript{a} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}\protect\\
+%\textsuperscript{b} Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}\protect\\
+%\textsuperscript{c} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
 %\date{}
-\maketitle
+%\maketitle
+
+\author[adr1]{Harriet Li\corref{cor1}}
+\cortext[cor1]{Corresponding author. \textit{Email address: kameeko@mit.edu}}
+\address[adr1]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}}
+\author[adr2]{Vikram Garg}
+\address[adr2]{Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}}
+\author[adr3]{Karen Willcox}
+\address[adr3]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
 
 \begin{abstract}
 \input{abstract_v4.tex}
@@ -70,6 +81,8 @@
   inference \sep goal-oriented adaptive modeling \sep a posteriori error estimation \sep multi-fidelity modeling \sep adjoints
 \end{keyword}
 
+\end{frontmatter}
+
 \input{intro_v4_cmame.tex}
 \input{mathematical_formulation_v4_cmame.tex}
 \input{algorithms_v4_cmame.tex}
@@ -78,6 +91,7 @@
 \input{acknow.tex}
 
 \section*{References}
-\bibliographystyle{plain}
+%\bibliographystyle{plain}
+\bibliographystyle{elsarticle-harv} %this seems to get initials in bibliography, without doing name-year citation style as bst file claims?
 \bibliography{masterBib}
 \end{document}
