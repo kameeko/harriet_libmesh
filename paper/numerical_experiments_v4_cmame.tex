@@ -344,7 +344,6 @@ We now present the results of solving the inference problem using \Cref{alg:refS
 and use the solution as an initial guess for the high-fidelity problem; equivalently, we use two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$.
 %
 \begin{table}[htbp]
-\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.1\%$; relative errors are given with respect to the high-fidelity QoI estimate.}
 \label{tab:ref3D_diffmesh}
 \centering
 \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
@@ -359,6 +358,7 @@ MF04 & 22.0 & 24528 & 83902  & -711   & -855   & -1.03   \\
 MF05 & 27.7 & 27984 & 83119  & 32     & -72    & -0.087  \\
 HF   & 100  & 70785 & 83047  & --     & --     & --    \\ \hline
 \end{tabular}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.1\%$; relative errors are given with respect to the high-fidelity QoI estimate.}
 \end{table}
 %
 
@@ -397,7 +397,6 @@ To illustrate this offline-online application, we generate ten sets of noisy obs
 \Cref{tab:ref3D_newdata_QoI_diffmesh} shows the average QoI values, error estimates and solution times for the (non)linear solves. \Cref{tab:ref3D_newdata_times_diffmesh} shows the times needed to solve the inverse problems and to solve for the additional variables needed to obtain an error estimate. For six of the ten datasets, the high-fidelity inverse problem does not converge given the low-fidelity solution as an initial guess; these are solved using the $k_r=0$ solution as an initial guess so that true QoI errors can be calculated. The average high-fidelity inverse problem solution time shown in \Cref{tab:ref3D_newdata_times_diffmesh} includes only those cases (four of ten) that converged with the low-fidelity initial guess.
 %
 \begin{table}
-\caption{Average QoI values and errors from solving inverse problem with mixed- and high-fidelity models and noisy data; relative errors are with respect to true high-fidelity QoI.}
 \label{tab:ref3D_newdata_QoI_diffmesh}
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -412,6 +411,7 @@ MF04 & 22.0 & 83411  & -724  & -963   & -1.17  \\
 MF05 & 27.7 & 82664  & -18   & -216   & -0.26 \\
 HF   & 100  & 82500  & --    & --     & --  \\ \hline
 \end{tabular}
+\caption{Average QoI values and errors from solving inverse problem with mixed- and high-fidelity models and noisy data; relative errors are with respect to true high-fidelity QoI.}
 \end{table}
 
 %
