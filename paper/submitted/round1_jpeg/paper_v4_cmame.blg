@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: paper_v4_cmame.aux
+The style file: elsarticle-harv.bst
+Database file #1: masterBib.bib
+Warning--empty pages in WadErw90
+You've used 32 entries,
+            2821 wiz_defined-function locations,
+            861 strings with 11061 characters,
+and the built_in function-call counts, 17490 in all, are:
+= -- 1737
+> -- 1019
+< -- 19
++ -- 388
+- -- 346
+* -- 1610
+:= -- 3133
+add.period$ -- 100
+call.type$ -- 32
+change.case$ -- 275
+chr.to.int$ -- 32
+cite$ -- 33
+duplicate$ -- 603
+empty$ -- 1118
+format.name$ -- 461
+if$ -- 3504
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 35
+newline$ -- 105
+num.names$ -- 130
+pop$ -- 274
+preamble$ -- 1
+purify$ -- 242
+quote$ -- 0
+skip$ -- 456
+stack$ -- 0
+substring$ -- 963
+swap$ -- 96
+text.length$ -- 7
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 276
+warning$ -- 1
+while$ -- 132
+width$ -- 0
+write$ -- 360
+(There was 1 warning)
