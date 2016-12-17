@@ -1,0 +1,181 @@
+\begin{thebibliography}{32}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+
+\bibitem[{Aharonov et~al.(1997)Aharonov, Spiegelman, and Kelemen}]{Aha97}
+Aharonov, E., Spiegelman, M., Kelemen, P., 1997. Three-dimensional flow and
+  reaction in porous media: Implications for the earth's mantle and sedimentary
+  basins. Journal of Geophysical Research 102~(B7), 14821--114833.
+
+\bibitem[{Ainsworth and Oden(2011)}]{AinsOden11}
+Ainsworth, M., Oden, J.~T., 2011. A posteriori error estimation in finite
+  element analysis. Vol.~37. John Wiley \& Sons.
+
+\bibitem[{Alexander et~al.(2002)Alexander, Garcia, and
+  Tartakovsky}]{AlexGarTar02}
+Alexander, F.~J., Garcia, A.~L., Tartakovsky, D.~M., 2002. Algorithm refinement
+  for stochastic partial differential equations, 1: Linear diffusion. Journal
+  of Computational Physics 182, 47--66.
+
+\bibitem[{Balay et~al.(2016)Balay, Abhyankar, Adams, Brown, Brune, Buschelman,
+  Dalcin, Eijkhout, Gropp, Kaushik, Knepley, McInnes, Rupp, Smith, Zampini,
+  Zhang, and Zhang}]{petsc-user-ref}
+Balay, S., Abhyankar, S., Adams, M.~F., Brown, J., Brune, P., Buschelman, K.,
+  Dalcin, L., Eijkhout, V., Gropp, W.~D., Kaushik, D., Knepley, M.~G., McInnes,
+  L.~C., Rupp, K., Smith, B.~F., Zampini, S., Zhang, H., Zhang, H., 2016.
+  {PETS}c users manual. Tech. Rep. ANL-95/11 - Revision 3.7, Argonne National
+  Laboratory.
+\newline\urlprefix\url{http://www.mcs.anl.gov/petsc}
+
+\bibitem[{Battiato et~al.(2011)Battiato, Tartakovsky, Tartakovsky, and
+  Scheibe}]{battiato2011hybrid}
+Battiato, I., Tartakovsky, D.~M., Tartakovsky, A.~M., Scheibe, T.~D., 2011.
+  Hybrid models of reactive transport in porous and fractured media. Advances
+  in Water Resources 34~(9), 1140--1150.
+
+\bibitem[{Becker and Rannacher(2001)}]{BecRann01}
+Becker, R., Rannacher, R., 2001. An optimal control approach to a posteriori
+  error estimation in finite element methods. Acta Numerica 10, 1--102.
+
+\bibitem[{Becker and Vexler(2005)}]{BecVex05}
+Becker, R., Vexler, B., 2005. Mesh refinement and numerical sensitivity
+  analysis for parameter calibration of partial differential equations. Journal
+  of Computational Physics 206, 95--110.
+
+\bibitem[{Braack and Ern(2003)}]{BraackErn03}
+Braack, M., Ern, A., 2003. A posteriori control of modeling errors and
+  discretization errors. Multiscale Modeling \& Simulation 1~(2), 221--238.
+
+\bibitem[{Conrad et~al.(2014)Conrad, Marzouk, Pillai, and Smith}]{Con14}
+Conrad, P.~R., Marzouk, Y.~M., Pillai, N.~S., Smith, A., 2014. Accelerating
+  asymptotically exact {MCMC} for computationally intensive models via local
+  approximations. ArXiv e-prints.
+
+\bibitem[{Davis(1986)}]{Davis86}
+Davis, A.~D., 1986. Deterministic modeling of dispersion in heterogeneous
+  permeable media. Ground Water 24~(5).
+
+\bibitem[{Engl et~al.(2000)Engl, Hanke, and Neubauer}]{EngHanNeu00}
+Engl, H.~W., Hanke, M., Neubauer, A., 2000. Regularization of Inverse Problems.
+  Springer Science and Business Media.
+
+\bibitem[{Fatone et~al.(2001)Fatone, Gervasio, and Quarteroni}]{FatGerQua01}
+Fatone, L., Gervasio, P., Quarteroni, A., 2001. Multimodels for incompressible
+  flows: iterative solutions for the {N}avier-{S}tokes/{O}seen coupling. ESAIM:
+  Mathematical Modelling and Numerical Analysis 35~(3), 549--574.
+
+\bibitem[{Garcia et~al.(1999)Garcia, Bell, Crutchfield, and Alder}]{Garcetal99}
+Garcia, A.~L., Bell, J.~B., Crutchfield, W.~Y., Alder, B.~J., 1999. Adaptive
+  mesh and algorithm refinement using direct simulation {M}onte {C}arlo.
+  Journal of computational Physics 154~(1), 134--155.
+
+\bibitem[{Hao et~al.(2004)}]{Haoetal03}
+Hao, S., et~al., 2004. Multi-scale constitutive model and computational
+  framework for the design of ultra-high strength, high toughness steels.
+  Computer Methods in Applied Mechanics and Engineering 193, 1865--1908.
+
+\bibitem[{Jackson and Zenobia(1994)}]{Jack94}
+Jackson, J.~D., Zenobia, K., 1994. Using Microbial Kinetics in the
+  Bioremediation of Contaminated Soils. CRC Press, Ch.~28, pp. 681--690.
+
+\bibitem[{Khare et~al.(2008)Khare, Mielke, Schatz, and
+  Belytschko}]{Khareetal08}
+Khare, R., Mielke, S.~L., Schatz, G.~C., Belytschko, T., 2008. Multiscale
+  coupling schemes spanning the quantum mechanical, atomistic forcefield, and
+  continuum regimes. Computer Methods in Applied Mechanics and Engineering 197,
+  3190--3202.
+
+\bibitem[{Kirk et~al.(2006)Kirk, Peterson, Stogner, and Carey}]{libMeshPaper}
+Kirk, B.~S., Peterson, J.~W., Stogner, R.~H., Carey, G.~F., 2006.
+  {\texttt{libMesh}: A {C}++ Library for Parallel Adaptive Mesh
+  Refinement/Coarsening Simulations}. Engineering with Computers 22~(3--4),
+  237--254, \url{http://dx.doi.org/10.1007/s00366-006-0049-3}.
+
+\bibitem[{Lieberman and Willcox(2013)}]{LiebWill13}
+Lieberman, C., Willcox, K., 2013. Goal-oriented inference: Approach, linear
+  theory, and application to advection diffusion. SIAM Review 55~(3), 493--519.
+
+\bibitem[{Liu et~al.(2004)Liu, Karpov, Zhang, and Park}]{Liuetal03}
+Liu, W.~K., Karpov, E., Zhang, S., Park, H., 2004. An introduction to
+  computational nanomechanics and materials. Computer Methods in Applied
+  Mechanics and Engineering 193~(17), 1529--1578.
+
+\bibitem[{Lucia et~al.(2002)Lucia, King, and Beran}]{LucKinBer02}
+Lucia, D.~J., King, P.~I., Beran, P.~S., 2002. Domain decomposition for
+  reduced-order modeling of a flow with moving shocks. AIAA Journal 40~(11),
+  2360--2362.
+
+\bibitem[{Oden et~al.(2010)Oden, Prudhomme, Bauman, and
+  Chamoin}]{OdenPrudetal10}
+Oden, J.~T., Prudhomme, S., Bauman, P.~T., Chamoin, L., 2010. Estimation and
+  control of modeling error: A general approach to multiscale modeling. In:
+  Fish, J. (Ed.), Multiscale Methods: Bridging the Scales in Science and
+  Engineering. Oxford University Press, Ch.~10, pp. 285--304.
+
+\bibitem[{Oden et~al.(2006)Oden, Prudhomme, Romkes, and
+  Bauman}]{OdenPrudetal06}
+Oden, J.~T., Prudhomme, S., Romkes, A., Bauman, P.~T., 2006. Multiscale
+  modeling of physical phenomena: Adaptive control of models. SIAM Journal on
+  Scientific Computing 28~(6), 2359--2389.
+
+\bibitem[{Prudhomme et~al.(2008)Prudhomme, Dhia, Bauman, Elkhodja, and
+  Oden}]{Prudetal08}
+Prudhomme, S., Dhia, H.~B., Bauman, P.~T., Elkhodja, N., Oden, J.~T., 2008.
+  Computational analysis of modeling error for the coupling of particle and
+  continuum models by the {A}rlequin method. Computer Methods in Applied
+  Mechanics and Engineering 197~(41), 3399--3409.
+
+\bibitem[{Prudhomme and Oden(1999)}]{PrudOden99}
+Prudhomme, S., Oden, J.~T., 1999. On goal-oriented error estimation for
+  elliptic problems: application to the control of pointwise errors. Computer
+  Methods in Applied Mechanics and Engineering 173, 313--331.
+
+\bibitem[{Spantini et~al.(2016)Spantini, Cui, Willcox, Tenorio, and
+  Marzouk}]{Span16}
+Spantini, A., Cui, T., Willcox, K., Tenorio, L., Marzouk, Y., July 2016.
+  Goal-oriented optimal approximations of {B}ayesian linear inverse problems.
+  ArXiv e-prints.
+\newline\urlprefix\url{http://adsabs.harvard.edu/abs/2016arXiv160701881S}
+
+\bibitem[{Tartakovsky et~al.(2008)Tartakovsky, Tartakovsky, Scheibe, and
+  Meakin}]{tartakovsky2008hybrid}
+Tartakovsky, A.~M., Tartakovsky, D.~M., Scheibe, T.~D., Meakin, P., 2008.
+  Hybrid simulations of reaction-diffusion systems in porous media. SIAM
+  Journal on Scientific Computing 30~(6), 2799--2816.
+
+\bibitem[{van Opstal et~al.(2015)van Opstal, Bauman, Prudhomme, and van
+  Brummelen}]{vanOpstaletal15}
+van Opstal, T., Bauman, P., Prudhomme, S., van Brummelen, E., 2015.
+  Goal-oriented model adaptivity for viscous incompressible flows.
+  Computational Mechanics, 1--10.
+
+\bibitem[{Venditti and Darmofal(2000)}]{VendDarm00}
+Venditti, D.~A., Darmofal, D.~L., 2000. Adjoint error estimation and grid
+  adaptation for functional outputs: Application to quasi-one-dimensional flow.
+  Journal of Computational Physics 164, 204--227.
+
+\bibitem[{Vested et~al.(1993)Vested, Olesen, Refsgaard, Engesgaard, and
+  Malmgren-Hansen}]{Vestedetal93}
+Vested, H., Olesen, K., Refsgaard, A., Engesgaard, P., Malmgren-Hansen, A.,
+  1993. Advection-Dispersion Review: Rivers and Groundwater. EUR 15107 EN.
+  Commission of the European Communities.
+
+\bibitem[{Wadsworth and Erwin(1990)}]{WadErw90}
+Wadsworth, D., Erwin, D., 1990. One-dimensional hybrid continuum/particle
+  simulation approach for rarefied hypersonic flows. In: AIAA and ASME, 5th
+  Joint Thermophysics and Heat Transfer Conference. Vol.~1.
+
+\bibitem[{Weinan et~al.(2007)Weinan, Engquist, Li, Ren, and
+  Vanden-Eijnden}]{Weietal04}
+Weinan, E., Engquist, B., Li, X., Ren, W., Vanden-Eijnden, E., 2007.
+  Heterogeneous multiscale methods: a review. Commun. Comput. Phys 2~(3),
+  367--450.
+
+\bibitem[{Yano and Darmofal(2012)}]{Yano12}
+Yano, M., Darmofal, D.~L., 2012. An optimization framework for anisotropic
+  simplex mesh adaptation. Journal of Computational Physics 231~(22),
+  7626--7649.
+
+\end{thebibliography}

@@ -1,7 +1,7 @@
 \documentclass[review]{siamart0516}
 %DIF LATEXDIFF DIFFERENCE FILE
-%DIF DEL paper_v2_kw.tex   Wed Nov 23 15:30:36 2016
-%DIF ADD paper_v3.tex      Wed Nov 23 14:20:43 2016
+%DIF DEL paper_v2_kw.tex   Mon Nov 28 09:42:56 2016
+%DIF ADD paper_v3.tex      Thu Nov 10 18:08:56 2016
 %%\usepackage{lgrind}
 
 %\usepackage[square,comma,numbers,sort&compress]{natbib}
@@ -236,10 +236,10 @@ where $z\in U$ is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, 
 %
 where $\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
 
-Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. \DIFdelbegin \DIFdel{Consider the adjoint problem
-}\DIFdelend \DIFaddbegin \DIFadd{Let the variational form
-}\DIFaddend %
-\DIFdelbegin %DIFDELCMD < \begin{equation}
+Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. 
+\DIFdelbegin \DIFdel{Consider the adjoint problem
+%DIF < 
+}%DIFDELCMD < \begin{equation}
 %DIFDELCMD < \label{eq:superAdjEq}
 %DIFDELCMD < \mathcal{M}'_{HF,\Psi}(\Lambda;\Psi_{HF})(\Phi)=\mathcal{Q}(\Phi)=\mathcal M'_{HF}(\Psi_{LF})(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2,
 %DIFDELCMD < \end{equation}
@@ -248,13 +248,8 @@ Consider two models with which parameters can be inferred: a high-fidelity model
 %DIF <  I don't understand what the difference in notation means. Why drop the second subscript on the M'? and why the change in arguments? And neither instance is consistent with how the ' notation was defined above for the Lagrangian.
 %DIF <  You can't just introduce new notation and hope that the reader guesses what you mean. Everything must be defined! Every time you change an argument form, every time you change the form of the subscript, every time you change anything, ...
 %DIF <  KW: where is \mathcal{Q} defined?
-\DIFdelend \DIFaddbegin \begin{equation}
-\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
-\label{eq:supadjsys}
-\end{equation}
-\DIFaddend %
-\DIFdelbegin \DIFdel{for the supplementary adjoint $\Lambda$}\DIFdelend \DIFaddbegin \DIFadd{represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form}\DIFaddend , where $\Phi$ is a test function.
-Then, the error in the Quantity of Interest $I$ is given by
+%DIF < 
+\DIFdel{for the supplementary adjoint $\Lambda$, where $\Phi$ is a test function. }\DIFdelend Then, the error in the Quantity of Interest $I$ is given by
 \DIFdelbegin \DIFdel{,
 }\DIFdelend %
 \DIFdelbegin %DIFDELCMD < \begin{multline}
@@ -317,7 +312,14 @@ I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})
 \label{eq:supadjout}
 \end{equation}
 %DIF > 
-\DIFadd{Define the corresponding adjoint problem
+\DIFadd{Let the variational form
+%DIF > 
+}\begin{equation}
+\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:supadjsys}
+\end{equation}
+%DIF > 
+\DIFadd{represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the corresponding adjoint problem
 %DIF > 
 }\begin{equation}
 \mathscr{R}_{\Psi}'(\Psi_{HF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
