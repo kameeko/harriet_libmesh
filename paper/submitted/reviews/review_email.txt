@@ -1,0 +1,31 @@
+Comments from the editors and reviewers:
+-Editor
+
+  - Reviewer 4
+The paper is basically an application of [7] to modeling error demonstrated with rather transparent problems in 2D flow. The authors ignore the first papers on Goal-Oriented Estimation and modeling error laid out in the papers of Oden and Vemaganti in JCP in 2000, and extended by these authors in CMAME in 2001. The relationship between the current work and these papers should be clearly explained and cited. These revisions and re-review would be advised.
+
+
+-Reviewer 1
+
+  - Revisions are needed. See PDF comments.
+
+
+-Reviewer 2
+
+  -
+The authors consider goal-oriented modeling-error estimation for elliptic inverse problems. In particular, they have in mind the control of the partitioning in a hybrid (low/high fidelity) PDE model of diffusion-reaction type, so as to minimize the error in an output quantity of interest. 
+
+In my opinion, the aims of the authors are certainly worthy of investigation, as they connect well with current research efforts towards goal-oriented inference. The applications are relevant and the computations seem interesting. However, the current manuscript has several severe weaknesses, which need to be addressed before it is suitable for publication in CMAME. I expect that the authors need to re-submit a significantly altered version of their manuscript. The three main criticisms can be found below.
+
+1. The main results in the paper are Proposition 1 and Eq. (14). These results are very close to existing results as presented in [7]. It is not clearly explained in the introduction, and in Section 2, in what sense the current results follow from [7] and in what sense they are new. 
+
+2. The main theoretical section, Section 2, is vague, lacks proper structure and needs clarification. It is not clear how the high-fidelity and low-fidelity models are defined. These models should be the starting point of the section, not introduced in some proposition. Some degree of compatibility is assumed, but not explained. The proof of Proposition 1 refers to Proposition 3 in [7] which is worth stating in full in order to understand how it is employed. Given that (5) was stated as a Proposition 1, it is also natural to state the result in (14) as a proposition too. 
+
+3. Specifics of the models are introduced in Section 4 (numerical experiments), which is out of place. It would benefit the reader to move the relevant parts to after Section 2, as examples of the abstract framework. It would also help if the propositions would then be re-interpreted in terms of the specific low/high fidelity model setting: In other words, the authors should explain what is actually computed to do the model adaptivity. This is currently very unclear. (It is also necessary to explain the contents of Algorithm 1.)
+
+
+-Reviewer 3
+
+  - Revisions are needed. See attached pdf.
+
+

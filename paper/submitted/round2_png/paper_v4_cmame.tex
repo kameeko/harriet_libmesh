@@ -1,0 +1,102 @@
+\documentclass[review,sort&compress]{elsarticle}
+%%\usepackage{lgrind}
+
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
+%\usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{graphics}
+%\usepackage{epsfig}
+%%\usepackage[hang,raggedright]{subfigure}
+%\usepackage{epsf}
+%\usepackage{setspace}
+%\usepackage{hangcaption}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{multirow}
+%\usepackage{threeparttable}
+\usepackage{cancel}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\usepackage{algorithmicx}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{varwidth}
+%\usepackage{caption}
+%\usepackage[font=small]{subcaption}
+%\usepackage{longtable}
+\usepackage{mathrsfs}
+\usepackage{upgreek}
+\usepackage[caption=false]{subfig} % for \subfloat
+
+\usepackage{lineno} %line numbering
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\Reals}{{\mathbb{R}}}
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+\newcommand{\red}[1]{{\color{red}{#1}}}
+\newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\graphicspath{{./figures/}}
+
+\begin{document}
+%\raggedbottom %avoid weird vertical justification
+
+\begin{frontmatter}
+
+\title{Model Adaptivity for Goal-Oriented Inference using Adjoints}
+
+%\author{Harriet Li\textsuperscript{a,}\footnote{Corresponding author. \textit{Email address: kameeko@mit.edu}}, Vikram Garg\textsuperscript{b}, Karen Willcox\textsuperscript{c}}
+%\address{\textsuperscript{a} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}\protect\\
+%\textsuperscript{b} Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}\protect\\
+%\textsuperscript{c} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+%\date{}
+%\maketitle
+
+\author[adr1]{Harriet Li\corref{cor1}}
+\cortext[cor1]{Corresponding author. \textit{Email address: hli@alum.mit.edu}}
+\address[adr1]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{hli@alum.mit.edu}}
+\author[adr2]{Vikram Garg}
+\address[adr2]{Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}}
+\author[adr3]{Karen Willcox}
+\address[adr3]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+
+\begin{abstract}
+\input{abstract_v4.tex}
+\end{abstract}
+
+\begin{keyword}
+  inference \sep goal-oriented adaptive modeling \sep a posteriori error estimation \sep multi-fidelity modeling \sep adjoints
+\end{keyword}
+
+\end{frontmatter}
+
+%\linenumbers
+
+\input{intro_v4_cmame.tex}
+\input{mathematical_formulation_v4_cmame.tex}
+\input{algorithms_v4_cmame.tex}
+\input{numerical_experiments_v4_cmame.tex}
+\input{conclusions_v4_cmame.tex}
+\input{acknow.tex}
+
+%\nolinenumbers
+
+\section*{References}
+%\bibliographystyle{plain}
+\bibliographystyle{elsarticle-harv} %this seems to get initials in bibliography, without doing name-year citation style as bst file claims?
+\bibliography{masterBib}
+\end{document}
