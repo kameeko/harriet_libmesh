@@ -7,6 +7,7 @@ Based on the theoretical developments in the last section, we now give a goal-or
 %------------------------------------------------------------------------------------------------------------------------%
 
 Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,VendDarm00,PrudOden99,BecVex05,AinsOden11}, the error estimate \Cref{eq:finErrExp} can be localized to give elemental contributions and used to guide physics-based refinement over the domain to create a mixed-fidelity model. After refinement, the error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some error threshold is reached. \Cref{alg:refSeries} describes this approach. 
+%Note that the QoI error adjoint problem \Cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
 \begin{algorithm}[h!]

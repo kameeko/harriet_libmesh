@@ -47,32 +47,27 @@ cases, and conditions for which the algorithm is suitable, from the last paragra
 helpful. I believe the presentation would be strengthened by mentioning some of this earlier in the
 introduction.
 
-\answer{}
-\notdone
+\answer{We added a sentence about the use cases to the second paragraph of the introduction.}
 
 Although it is represented graphically in Figure 8, $\Omega_I$ for the final example is not defined in the text.
 
-\answer{}
-\notdone
+\answer{It is now defined just before Figure 8 is referenced.}
 
 At the beginning of the second paragraph of Section 4.3.2 (pg. 25) I think the reference to “Section
 4.3.2” should be Table 1.
 
-\answer{}
-\notdone
+\answer{Thanks for the catch. We've corrected the reference.}
 
 The sub-figures of Figure 9 could be larger. It is difficult to verify the claim in the text that “. . . the
-domain is refined completely in the x 3 direction first around the QoI region. . . ”. Even going as far as
+domain is refined completely in the $x_3$ direction first around the QoI region. . . ”. Even going as far as
 to include 2-D slices (as in Figure 8) may be warranted.
 
-\answer{}
-\notdone
+\answer{We made the figure larger, made the wording of that claim more specific, and included a 2D slice for each mixed-fidelity model that cuts through the QoI region, to aid in visual verification.}
 
 The second to last paragraph on page 28 starts “Section 4.3.2 shows the average QoI. . . ”. Again, I
 believe this is a reference to a table, Table 2 in this case.
 
-\answer{}
-\notdone
+\answer{Thanks for the catch. We've corrected the reference.}
 
 I find the potential to apply this approach to surrogate design, as discussed in the final paragraph, very
 interesting. I believe this is a good case for overcoming the cumulative cost of performing multiple
@@ -123,10 +118,6 @@ of delegating to a reference. The given description is quite “wordy” and not
 
 The spirit of the examples is fine, but I’m not following some of the details. They state for
 the example in Section 4.1 that f (q) = q, but then the exact underlying field varies in space.
-
-\answer{}
-\notdone
-
 To what space does f (q) belong? Based on the example in Section 4.2.1, it looks like it’s
 a constant. If the parameters are spatially dependent, what underlying basis is being used
 for its representation? Is the mesh refined enough to rule out pollution of the results due to
@@ -143,7 +134,7 @@ It could be illustrative to see how the parameters q change with the refinement 
 Figure 3 is not particularly illustrative, especially on linear scale. Perhaps some tuning of the
 refinement parameters? What were the refinement parameters for the examples?
 
-\answer{}
+\answer{Modified figures to be on log scale and include line for target QoI error, and removed 100\% refinement point, since we don't keep refining after target is reached...not sure what is meant by 'refinement parameters'...Figure 3 was only meant to show that error decreased with refinement and that only two iterations were necessary...the amount to refine in each iteration is arbitrarily/chosen-by-used...}
 \notdone
 
 \end{document}

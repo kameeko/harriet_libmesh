@@ -30,6 +30,7 @@
 \usepackage{upgreek}
 \usepackage[caption=false]{subfig} % for \subfloat
 
+\usepackage{lineno} %line numbering
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -83,12 +84,16 @@
 
 \end{frontmatter}
 
+\linenumbers
+
 \input{intro_v4_cmame.tex}
 \input{mathematical_formulation_v4_cmame.tex}
 \input{algorithms_v4_cmame.tex}
 \input{numerical_experiments_v4_cmame.tex}
 \input{conclusions_v4_cmame.tex}
 \input{acknow.tex}
+
+\nolinenumbers
 
 \section*{References}
 %\bibliographystyle{plain}

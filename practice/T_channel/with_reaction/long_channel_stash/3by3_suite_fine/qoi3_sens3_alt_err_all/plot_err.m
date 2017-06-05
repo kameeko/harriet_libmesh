@@ -17,8 +17,20 @@ qoiHF = 0.0033906304;
 relErrTrue = abs(errTrue/qoiHF);
 ref = [0; 0.0578; 0.105];
 
+% figure('Position',[470 580 765 205])
+% plot(100*[ref; 1], [relErrTrue; 0], '-*', 100*[ref; 1], [relErrEst; 0], '-*','LineWidth',1.5);
+% legend('True','Estimated')
+% title('True and Estimated Absolute Relative Error in QoI','FontWeight','normal')
+% ylabel({'Absolute Relative', '\quad Error in QoI'})
+% xlabel('$\%$ HF')
+% set(gca,'FontSize',fntsize); 
+
 figure('Position',[470 580 765 205])
-plot(100*[ref; 1], [relErrTrue; 0], '-*', 100*[ref; 1], [relErrEst; 0], '-*','LineWidth',1.5);
+semilogy(100*ref, relErrTrue, 'x','LineWidth',1.5,'Color',[.19,.5,.13]);
+xlim([0 100])
+hold on
+semilogy(100*ref, relErrEst, 'o','LineWidth',1.5,'Color',[255, 127, 80]/255);
+plot([0 100],[0.01 0.01],':','LineWidth',1.5,'Color',[0.5 0 0.5]); %level below which we stop refining
 legend('True','Estimated')
 title('True and Estimated Absolute Relative Error in QoI','FontWeight','normal')
 ylabel({'Absolute Relative', '\quad Error in QoI'})

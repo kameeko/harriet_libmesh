@@ -54,3 +54,26 @@ Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,Ven
 
 We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For ease of implementation, we can choose these basis functions to be the same as those spanning the space in which we solve for the primary, auxiliary, and supplementary adjoint variables. Near the interfaces between the low-fidelity and high-fidelity regions, basis functions may have their support divided between the two regions and thus have a nonzero error contribution. The basis functions with the largest error contributions are flagged, and the elements in their support are added to the high-fidelity subdomain. Basis functions whose support lie completely in the high-fidelity region will have a zero contribution and the elements in their support are never flagged for refinement again.
 
+%%%% FIX BELOW ONCE YOU HAVE NOTATION DOWN FOR SECTION 2
+
+We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. For convenience of notation in this section, we drop subscripts so that $\Psi=\Psi_{LF}$, $Q=Q_{HF}$, and $U=U_{HF}$; for our numerical experiments, we have $Q_{LF}\subseteq Q$ and $U_{LF}=U$. Note that the error estimate in \cref{eq:finErrExp} can be equivalently written as,
+%
+\begin{equation}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi)+\mathcal{R}(e^3). \nonumber
+\end{equation}
+%
+We consider a finite-dimensional \red{conforming} subspace $(Q^h\times U^h\times U^h)^3 \subset (Q\times U\times U)^3$ which contains the approximations $(\Lambda^h,\chi_\Psi^h)$. Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally supported functions such that span $\Phi^h=(Q^h\times U^h\times U^h)^3$; we can then write $(\Lambda^h,\chi_\Psi^h)=(\sum\limits_{i\in I}\varphi_i\lambda_i,\sum\limits_{i\in I}\upvarphi_i \chi_i)$. The error estimate,
+%
+\begin{equation}
+\epsilon = -\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\Lambda)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(\chi_\Psi) \leq \sum_{i\in I} \varepsilon_i,
+\end{equation}
+%
+where,
+%
+\begin{equation}\label{eq:basisblame}
+\varepsilon_i = \left| -\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi)(\lambda_i\varphi_i)+\mathcal{L}'_{HF,\xi}(\xi_\Psi)(x_i\upvarphi_i) \right|
+\end{equation}
+%
+can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$. Near the interfaces between the low-fidelity and high-fidelity regions, basis functions may have their support divided between the two regions and thus have a nonzero error contribution. The basis functions with the largest error contributions are flagged, and the elements in their support are refined.  
+
+

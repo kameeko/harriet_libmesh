@@ -54,7 +54,7 @@ I(q,u)=\int_{(x_1,x_2)\in \Omega_I} u \:\textrm{d}A,
 over a region $\Omega_I=[0.625,0.875]\times[0.375,0.625]$.
 
 The unknown parameters to be inferred correspond to the forcing field, so that in this case $f(q)=q$. The observations are sparse measurements of the state.
-\Cref{fig:baseSetup} shows the locations of the observations and the region $\Omega_I$ over which the QoI is calculated. For the low-fidelity model, the inverse problem is linear (i.e., the observations depend linearly on the parameters). Since the inverse problem is ill-posed, we use Tikhonov regularization~\cite{EngHanNeu00}; the regularization term in the objective function \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}A$, where $\beta=10^{-5}$ is the regularization coefficient.
+\Cref{fig:baseSetup} shows the locations of the observations and the region $\Omega_I$ over which the QoI is calculated. For the low-fidelity model, the inverse problem is linear (i.e., the observations depend linearly on the parameters). Since the inverse problem is ill-posed, we use Tikhonov regularization~\cite{EngHanNeu00}. The regularization term in the objective function \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}A$, where $\beta=10^{-5}$ is the regularization coefficient; in this work, $\beta$ is chosen arbitrarily, though methods exist for choosing optimal regularization coefficients~\cite{BelgeKilmerMiller02,Calvetal00}.
 %
 \begin{figure}[htbp]
 \centering
