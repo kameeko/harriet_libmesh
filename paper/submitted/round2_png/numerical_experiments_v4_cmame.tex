@@ -370,21 +370,29 @@ The multi-fidelity domain refinements for the five adaptive iterations are shown
 %
 \begin{figure}[htbp]
 \centering
+\subfloat[Slice location]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/slice_diagram.png}
+}
+\hfill
 \subfloat[MF$_1$ ($5.2\%$ HF)]{
-\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy1_whitebg_puff.png}
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy1_whitebg_puff_and_midslice.png}
 }
+\\
 \subfloat[MF$_2$ ($11.4\%$ HF)]{
-\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy2_whitebg_puff.png}
-}
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy2_whitebg_puff_and_midslice.png}
+} 
+\hfill
 \subfloat[MF$_3$ ($16.3\%$ HF)]{
-\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy3_whitebg_puff.png}
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy3_whitebg_puff_and_midslice.png}
 } \\
 \subfloat[MF$_4$ ($22.0\%$ HF)]{
-\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy4_whitebg_puff.png}
-}
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy4_whitebg_puff_and_midslice.png}
+} 
+\hfill
 \subfloat[MF$_5$ ($27.7\%$ HF)]{
-\includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy5_whitebg_puff.png}
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy5_whitebg_puff_and_midslice.png}
 }
+
 \caption{Domain division for mixed-fidelity models: low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion (intermediate colors due to transparency indicate a mix of the two models along the line of sight); $x_3$ direction scaled for clarity.}
 \label{fig:divvy3D_diffmesh}
 \end{figure}
