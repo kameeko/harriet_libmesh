@@ -64,7 +64,7 @@ The unknown parameters to be inferred correspond to the forcing field, so that i
 \end{figure}
 %
 
-For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with linear Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations.
+For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with first-order Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations.
 %\red{The library offers easy calculation of adjoint systems, error estimates and subdomain restricted variables.}\footnote{But we don't use Libmesh's error estimates or restrict variables to subdomains...}
 The domain is discretized by a regular mesh of quadrilaterals, with 250 and 50 elements along the $x_1$ and $x_2$ directions, respectively, for a total of 12,500 elements, resulting in 12,801 degrees of freedom per variable; all variables are represented by the same basis. The diffusion coefficient is such that the cell P\'{e}clet number never exceeds 0.1, and thus no stabilization is required.
 
@@ -211,13 +211,13 @@ In this subsection, we consider two models which differ in the space to which th
 
 We consider the same high-fidelity model as in \Cref{sec:cdvcdr}:
 \begin{equation}
-k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U,
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in H^1(\Omega),
 \end{equation}
 with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r = -42$. The low-fidelity model
 \begin{equation}
-k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in\R
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U_{LF}
 \end{equation}
-differs from the high-fidelity model only in that the parameter $q$ is a constant instead of a field; $f(q)$ is a constant function equal to $q$ everywhere in the domain. The intermediate mixed-fidelity models thus have parameter fields (and forcing functions) that are constant over the subregions of the domain where the low-fidelity model is used; disconnected low-fidelity regions still share the same parameter value. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. The domain, mesh, boundary conditions, and velocity field, as well as the observations and QoI, remain the same as described in \Cref{sec:cdvcdr}; we continue to infer for the forcing field. The forcing field (and its auxiliary and supplementary adjoint conterparts) are represented with the same basis functions as the other variables in the high-fidelity regions, and forced to be constant in the low-fidelity regions. As the inverse problem is ill-posed, except when the low-fidelity model is used throughout the domain, regularization is used; the Tikhonov regularization term in \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient. 
+differs from the high-fidelity model only in that $U_{LF}$ is limited to the space of constant functions over $\Omega$; we maintain $f(q)=q$. The intermediate mixed-fidelity models thus have parameter fields (and forcing functions) that are constant over the subregions of the domain where the low-fidelity model is used; disconnected low-fidelity regions still share the same parameter value. The domain, mesh, boundary conditions, and velocity field, as well as the observations and QoI, remain the same as described in \Cref{sec:cdvcdr}; we continue to infer for the forcing field. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. Also for ease of implementation and for localizing the error, the forcing field and its auxiliary and supplementary adjoint conterparts are represented with the same basis functions as the other variables in the high-fidelity regions, and forced to be constant in the low-fidelity regions using a penalty term. Although the chosen pair of models has the potential to give mixed-fidelity models with fewer degreees of freedom in the parameter, this is not the case in our implementation; however, we are not looking to demonstrate computational savings with this example, but rather to explore the behavior of \Cref{alg:refSeries} when applied to such a pair of models. As the inverse problem is ill-posed, except when the low-fidelity model is used throughout the domain, regularization is used; the Tikhonov regularization term in \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient. 
 
 %------------------------------------------------------------%
 \subsubsection{Adaptive Model Refinement Results}
@@ -275,6 +275,30 @@ As with the previous examples in \Cref{sec:cdvcdr}, the decomposition of the err
 %
 Comparing to \Cref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest observation location; here, all three observation locations and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models. 
 
+\Cref{fig:svfRefParams} shows the inferred parameters using some of the mixed-fidelity models and the high-fidelity model.
+%
+\begin{figure}[htbp]
+\centering
+\subfloat[MF$_1$ ($10\%$ HF)]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF01_clim_HF_whitebg.png}
+	\label{subfig:svfparamMF1}
+} \\
+\subfloat[MF$_3$ ($30\%$ HF)]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF03_clim_HF_whitebg.png}
+	\label{subfig:svfparamMF3}
+} \\
+\subfloat[MF$_6$ ($60\%$ HF)]{
+  \includegraphics[width=0.8\textwidth]{svf/svf_param_MF06_clim_HF_whitebg.png}
+  \label{subfig:svfparamMF6}
+} \\
+\subfloat[HF]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_params_HF_whitebg.png}
+	\label{subfig:svfparamHF}
+}
+\caption{Inferred parameters using mixed-fidelity (\protect\subref{subfig:svfparamMF1}--\protect\subref{subfig:svfparamMF6}) and high-fidelity (\protect\subref{subfig:svfparamHF}) models. All figures share the color-scale for the high-fidelity plot.}
+\label{fig:svfRefParams}
+\end{figure}
+%
 The corresponding true and estimated absolute errors in the QoI are shown in \Cref{fig:svfErr}.
 %
 \begin{figure}[htbp]
@@ -285,7 +309,11 @@ The corresponding true and estimated absolute errors in the QoI are shown in \Cr
 \label{fig:svfErr}
 \end{figure}
 %
-In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain. We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI.
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain (compare \Cref{subfig:svfparamMF6} and \Cref{subfig:svfparamHF}). We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. Note that although the inferred parameters in the first and third mixed-fidelity models (see \Cref{subfig:svfparamMF1} and \Cref{subfig:svfparamMF3}) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
+
+%compare MF01 and MF03, MF06 and HF
+%1 and 3 look very different but have very similar true errors - different params can give similar qoi, though in this case the qoi is not close to HF; more HF doesn't necessarily decrease error, interplay between having freedom to match data and all LF regions being flat...
+%6 and HF look very similar; most of HF is very flat
 
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Combining Meshes and Physics in 3D} \label{sec:diffvcdr3D}
@@ -346,7 +374,7 @@ We now present the results of solving the inference problem using \Cref{alg:refS
 \nabla\cdot(n\vec{V}u - nD\nabla u) + k_ru^2 = f(q)
 \end{equation}
 %
-and use the solution as an initial guess for the high-fidelity problem; equivalently, we use two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$.
+with $k_r=0$, and use the solution as an initial guess for the high-fidelity problem; this is equivalent to using two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$.
 %
 \begin{table}[htbp]
 \centering
