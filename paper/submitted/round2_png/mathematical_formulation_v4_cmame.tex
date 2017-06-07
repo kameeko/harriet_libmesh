@@ -1,19 +1,19 @@
 \section{Mathematical Formulation}\label{sec:form}
 %
-We first introduce the goal-oriented inverse problem. Then we derive a rigorous a posteriori error estimate for the error induced in the QoI due to the use of mixed-fidelity and/or lower-fidelity models.
+\edit{In this section, we clearly define the low, mixed and high fidelity inverse problems. We also develop theoretical results which extend the work of~\cite{} to multimodel settings, in particular obtaining a computable, rigorous error estimate for QoI targeted generation of mixed fidelity formulations of inverse problems.}
 
 %------------------------------------------------------------------------------%
 \subsection{Inverse Problem Formulation}  \label{sec:setup}
 %------------------------------------------------------------------------------%
 %
-Consider a model for which the Galerkin formulation of the weak form is written as
+We begin by defining a generic goal-oriented inverse problem. Given observations (data) $d\in\R^{n_d}$, we seek to infer parameter(s) $q\in Q$, where $Q$ is a Hilbert space. An observation operator $C:U\to\Reals^{n_d}$ relates the parameter to the observations via state variable(s) $u\in U$, where $u$ satisfies,
 \begin{equation}
 a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
 \label{eq:weakForm}
 \end{equation}
-where $u\in U$ is the state, $q\in Q$ are the unknown parameters, $\phi$ is a test function, and the state space $U$ and parameter space $Q$ are Hilbert spaces. The form $a$ and functional $\ell$ are linear with respect to the arguments in the second pair of parentheses (in \Cref{eq:weakForm}, they are linear with respect to $\phi$). Further, we define an observation operator $C:U\to\Reals^{n_d}$ that maps the state to $n_d$ predicted observations. The actual observations (data) are denoted by $d\in\R^{n_d}$.
+where $U$ is also a Hilbert space. Equation \Cref{eq:weakForm} is called the state equation. The form $a$, and the functional $\ell$ are linear with respect to the arguments in the second pair of parentheses (in \Cref{eq:weakForm}, they are linear with respect to $\phi$). Finally, our objective functional or the QoI, is a scalar functional $I(q,u)$, where $I:Q\times U\to\R$.
 
-The unknown parameter $q$ can be inferred by minimizing the difference between the predicted and actual observations, leading to an inverse problem. In our setting, such inverse problems are typically ill-posed, since the observations are sparse, and insufficiently informative to uniquely determine the parameters. To make the inverse problem well-posed, a regularization, denoted by $R(q)$, is used to inject prior information or beliefs about the parameters into the formulation. The regularized inverse problem can thus be written as a constrained optimization problem,
+The unknown parameter $q$ can be inferred by minimizing the difference between the predicted and actual observations, leading to an inverse problem. Such inverse problems are typically ill-posed, since the observations are sparse, and insufficiently informative to uniquely determine the parameters. To make the inverse problem well-posed, a regularization, denoted by $R(q)$, is used to inject prior information or beliefs about the parameters into the formulation. The regularized inverse problem can thus be written as a constrained optimization problem,
 %
 \begin{subequations}
 \label{eq:invOpt}
@@ -23,9 +23,33 @@ The unknown parameter $q$ can be inferred by minimizing the difference between t
 \end{align}
 \end{subequations}
 %
-Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the model given by \Cref{eq:weakForm}, which appears as a constraint in \Cref{eq:invOpt_cons}. The constraints \Cref{eq:invOpt_cons} are typically models of physical processes or systems. A given physical system can be described to varying degrees of fidelity using different models. This naturally introduces a hierarchy of models and a tradeoff between fidelity and computational expense; how one manages this tradeoff depends on what aspect of the solution is of interest.
+Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the model given by \Cref{eq:weakForm}, which appears as a constraint in \Cref{eq:invOpt_cons}.
 
-We consider the case of a {\em goal-oriented inverse problem}, where the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by $I(q,u)$, where $I:Q\times U\to\R$ is a functional that maps the parameters and state to our QoI. We then consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use. In the following, we introduce the QoI functional $I$ into the inverse problem formulation by introducing auxiliary variables and additional adjoint equations. We then use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those due to the use of different multi-fidelity models in the constraint \Cref{eq:invOpt_cons}.
+In an inverse problem, multiple choices are apparent for the structure of the inferred parameter $q$, the data $d$ and state equation. Together these constitute a model for formulating the inverse problem. For example, the parameter $q$ can be modeled as a single scalar value or an infinite dimensional field variable, the data $d$ can be the entire time series of measurements from a sensor, or simply a smaller subset of those measurements. The state equation can be complex, nonlinear relationship requiring an expensive computation to resolve (for e.g./ the Navier Stokes equations) or a linear, single physics diffusion model (for e.g./ Laplace's equation). All these different modeling choices lead to different versions of the optimization problem that would need to be solved to infer the unknown parameter.
+
+We assume that there exists an ideal model for solving the inverse problem, called the high fidelity model. Giving infinite computational resources, we would use this high fidelity to formulate and solve our inverse problem. Mathematically we differentiate this high fidelity inverse problem with the subscript $HF$,
+%
+\begin{subequations}
+\label{eq:invOpt}
+\begin{align}
+\min\limits_{q,u} & \quad J(q_{HF},u_{HF})=\frac{1}{2}\|d-C(u_{HF})\|_2^2 + R(q_{HF}), \label{eq:invOpt_obj} \\
+\textrm{s.t. }& \quad a(u_{HF},q_{HF})(\phi)=\ell(q_{HF})(\phi),\quad\forall\phi\in U_{HF}. \label{eq:invOpt_cons}
+\end{align}
+\end{subequations}
+%
+where $q \in Q_{HF}$. Due to the constraints presented by limited computational resources, one may instead attempt to infer the parameter $q$ using a different, less computationally demanding model, which we call the low fidelity model,
+%
+\begin{subequations}
+\label{eq:invOpt}
+\begin{align}
+\min\limits_{q,u} & \quad J(q_{LF},u_{LF})=\frac{1}{2}\|d-C(u_{LF})\|_2^2 + R(q_{LF}), \label{eq:invOpt_obj} \\
+\textrm{s.t. }& \quad a(u_{LF},q_{LF})(\phi)=\ell(q_{LF})(\phi),\quad\forall\phi\in U_{LF}. \label{eq:invOpt_cons}
+\end{align}
+\end{subequations}
+%
+where $q \in Q_{LF}$. If there is compatibility between the low fidelity and high fidelity solution spaces for $q$ and $u$, one may combine the two models to solve the inverse problem. The low fidelity model can be used in part of the computational domain, and the high fidelity in the remainder, and such a model is called a mixed fidelity model, which we distinguish by the subscript $MF$.
+
+We further consider the case of a {\em goal-oriented inverse problem}, where the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by  is a functional that maps the parameters and state to our QoI. We then consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use. In the following, we introduce the QoI functional $I$ into the inverse problem formulation by introducing auxiliary variables and additional adjoint equations. We then use this formulation to derive an a posteriori error estimate for $I$, where the errors considered are those due to the use of different multi-fidelity models in the constraint \Cref{eq:invOpt_cons}.
 %
 %------------------------------------------------------------------------------%
 \subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
@@ -53,7 +77,7 @@ where $z\in U$ is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, 
 %
 where $\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
 
-Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively. 
+Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and low-fidelity (LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ denote the stationary points of the high- and low- fidelity augmented Lagrangians $\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$, respectively.
 Then, the error in the Quantity of Interest $I$ is given by
 %
 \begin{multline}
