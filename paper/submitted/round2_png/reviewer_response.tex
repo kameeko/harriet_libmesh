@@ -1,0 +1,142 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{color}
+\usepackage{changepage}
+\usepackage{parskip}
+\usepackage[margin=0.75in]{geometry}
+
+\newcommand{\answer}[1]{\begin{adjustwidth}{1cm}{}{\color{blue}#1}\end{adjustwidth}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+
+\newcommand{\notdone}{{\color{red}{Changes not yet made.}}}
+\newcommand{\done}{{\color{green}{Changes made.}}}
+
+\begin{document}
+
+%%%%% ASK KAREN/ELIZABETH
+%do we need to refer to line numbers?
+%if a comment asks for clarification, do we reproduce it here or point to the changed lines/sections?
+
+\section*{Response to Referee Comments}
+
+We thank the reviewers for their detailed and insightful comments and helping us strengthen the manuscript. Our point-by-point responses to the critique are outlined below, with reviewer comments in black and \blue{responses in blue}. Reviewers are ordered by the order in which their comments were received.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Reviewer 4}
+
+The paper is basically an application of [7] to modeling error demonstrated with rather transparent problems in 2D flow. The authors ignore the first papers on Goal-Oriented Estimation and modeling error laid out in the papers of Oden and Vemaganti in JCP in 2000, and extended by these authors in CMAME in 2001. The relationship between the current work and these papers should be clearly explained and cited. These revisions and re-review would be advised.
+
+\answer{We apologize for not referencing the aforementioned papers; we had not encountered them in our literature review and did not intend to imply their irrelevance. Citations of these papers and explanation of their relevance to our work has been added in \red{Section x.x.x}}
+\notdone
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Reviewer 1}
+
+On page 8 (before equation 10), the sentence “Note that, ..” references equation 11 before it is
+presented. It may be better to move this comment to immediately follow the description of equation
+11.
+
+\answer{let vikram do his thing first}
+\notdone
+
+I found the motivation in the beginning of the manuscript somewhat lacking. The description of use
+cases, and conditions for which the algorithm is suitable, from the last paragraph on page 9 were very
+helpful. I believe the presentation would be strengthened by mentioning some of this earlier in the
+introduction.
+
+\answer{We added a sentence about the use cases to the second paragraph of the introduction.}
+
+Although it is represented graphically in Figure 8, $\Omega_I$ for the final example is not defined in the text.
+
+\answer{It is now defined just before Figure 8 (now Figure 9) is referenced.}
+
+At the beginning of the second paragraph of Section 4.3.2 (pg. 25) I think the reference to “Section
+4.3.2” should be Table 1.
+
+\answer{Thanks for the catch. We've corrected the reference.}
+
+The sub-figures of Figure 9 could be larger. It is difficult to verify the claim in the text that “. . . the
+domain is refined completely in the $x_3$ direction first around the QoI region. . . ”. Even going as far as
+to include 2-D slices (as in Figure 8) may be warranted.
+
+\answer{We made the figure (now Figure 10) larger, made the wording of that claim more specific, and included a 2D slice for each mixed-fidelity model that cuts through the QoI region, to aid in visual verification.}
+
+The second to last paragraph on page 28 starts “Section 4.3.2 shows the average QoI. . . ”. Again, I
+believe this is a reference to a table, Table 2 in this case.
+
+\answer{Thanks for the catch. We've corrected the reference.}
+
+I find the potential to apply this approach to surrogate design, as discussed in the final paragraph, very
+interesting. I believe this is a good case for overcoming the cumulative cost of performing multiple
+adaptive steps where the overall cost is comparable to evaluating the high-fidelity inverse problem.
+If the final adaptive step was significantly cheaper to evaluate (say 2X as in the last example) the
+cumulative cost of the adaptive algorithm would be amortized across a large number of posterior
+samples with the final mixed-fidelity model.
+
+\answer{???}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Reviewer 2}
+
+The main results in the paper are Proposition 1 and Eq. (14). These results are very close to existing results as presented in [7]. It is not clearly explained in the introduction, and in Section 2, in what sense the current results follow from [7] and in what sense they are new. 
+
+\answer{}
+\notdone
+
+The main theoretical section, Section 2, is vague, lacks proper structure and needs clarification. It is not clear how the high-fidelity and low-fidelity models are defined. These models should be the starting point of the section, not introduced in some proposition. Some degree of compatibility is assumed, but not explained. The proof of Proposition 1 refers to Proposition 3 in [7] which is worth stating in full in order to understand how it is employed. Given that (5) was stated as a Proposition 1, it is also natural to state the result in (14) as a proposition too. 
+
+\answer{}
+\notdone
+
+Specifics of the models are introduced in Section 4 (numerical experiments), which is out of place. It would benefit the reader to move the relevant parts to after Section 2, as examples of the abstract framework. It would also help if the propositions would then be re-interpreted in terms of the specific low/high fidelity model setting: In other words, the authors should explain what is actually computed to do the model adaptivity. This is currently very unclear. (It is also necessary to explain the contents of Algorithm 1.)
+
+\answer{}
+\notdone
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Reviewer 3}
+
+I'd like to actually see the statement and proof of Proposition 3 from reference 7 included in
+the manuscript. It is at the crux of the proof and it's frustrating to have to go dig up that
+detail.
+
+\answer{}
+\notdone
+
+I'd like to see the details of the error estimate localization included in the manuscript instead
+of delegating to a reference. The given description is quite “wordy” and not very precise.
+
+\answer{We've added the relevant parts of the reference to Section 3.2.}
+
+The spirit of the examples is fine, but I'm not following some of the details. They state for
+the example in Section 4.1 that $f (q) = q$, but then the exact underlying field varies in space.
+To what space does $f (q)$ belong? Based on the example in Section 4.2.1, it looks like it's
+a constant. If the parameters are spatially dependent, what underlying basis is being used
+for its representation? Is the mesh refined enough to rule out pollution of the results due to
+discretization error?
+
+\answer{We reworded the description of the parameters in Section 4.2.1 to be more clear/explicit about the relevant spaces and representations. \red{Not sure what to make of discretization error comment...}}
+\notdone
+
+It could be illustrative to see how the parameters q change with the refinement process.
+
+\answer{We added an additional figure (now Figure 7) showing the parameters $q$ for some of the refinement iterations, along with commentary.}
+
+Figure 3 is not particularly illustrative, especially on linear scale. Perhaps some tuning of the
+refinement parameters? What were the refinement parameters for the examples?
+
+\answer{Modified figures to be on log scale and include line for target QoI error, and removed 100\% refinement point, since we don't keep refining after target is reached...not sure what is meant by 'refinement parameters'...Figure 3 was only meant to show that error decreased with refinement and that only two iterations were necessary...the amount to refine in each iteration is arbitrarily/chosen-by-used...}
+\notdone
+
+\end{document}
