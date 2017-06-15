@@ -88,7 +88,7 @@ Let $\Psi_{LF}$ denote the stationary point of the low-fidelity augmented Lagran
 %
 \begin{multline}
 \label{eq:semifinErrExp}
-I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}\textrm{,}
 \end{multline}
 %
 where $\mathcal{R}$ is a remainder term that is third-order in the error $e=\Psi_{HF}-\Psi_{LF}$.
@@ -112,52 +112,98 @@ Extending the property in \Cref{eq:MeqI} to the augmented Lagrangians for the hi
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.}
 \end{multline}
 %
-Applying the output error representation described in Proposition 3 from~\cite{BecVex05} for the difference $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$,
+Following~\cite{BecVex05}, we rewrite the term $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$ using the Fundamental Theorem of Calculus,
+%
+\begin{equation}
+\label{eq:Mantiderivative}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \int\limits_{0}^{1} \mathcal{M}'_{HF}\left(\Psi_{HF} + se\right)\left(e\right) \, ds
+\end{equation}
+%
+Now using the trapezoidal rule for the integral in~\Cref{eq:Mantiderivative}, we further have,
+%
+\begin{equation}
+\label{eq:Mprimetrapezoid}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{HF})(e) + \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(e) + \mathcal{R}\textrm{.}
+\end{equation}
+%
+where the remainder $R$ is given as,
+%
+\begin{equation}
+\label{eq:trapezoidremainder}
+R = \frac{1}{2} \int\limits_{0}^{1} \mathcal{M}'''_{HF}\left(\Psi_{LF} + se\right)(e,e,e) \, s(s-1) \, ds
+\end{equation}
+%
+which is finite due to the third order differentiability assumptions in the Proposition. We further note that $\mathcal{M}'_{HF}(\Psi_{HF})(e)$ vanishes since $\Psi_{HF}$ is a stationary point of $\mathcal{M}_{HF}$, and~\Cref{eq:Mprimetrapezoid} can be simplified to,
+%
 \begin{equation}
 \label{eq:beckvex}
-\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}(e^3)\textrm{.}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}\textrm{.}
 \end{equation}
-Combining \Cref{eq:repIwithM} and \Cref{eq:beckvex} we obtain
+%
+Combining \Cref{eq:repIwithM} and \Cref{eq:beckvex} we obtain,
+%
 \begin{multline}
 \label{eq:preadj}
-I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}(e^3)\textrm{,}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}\textrm{,}
 \end{multline}
 which completes the proof.
 \end{proof}
 %
 
-The above proposition splits the error in the QoI into three components, a third order remainder term $\mathcal{R}(e^3)$, a computable `bias' term $\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})$, and a linear term $\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$. Although the linear term is not computable, it can be estimated using an appropriate dual problem. We describe one method of estimating this term below.
+The above proposition splits the error in the QoI into three components, a third order remainder term $\mathcal{R}$, a computable `bias' term $\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})$, and a linear term $\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$. Although the linear term is not computable, it can be estimated. We describe one method of estimating this term below, using an appropriate dual problem.
 
-Note that, as a stationary point, $\Psi_{HF}$ satisfies~\Cref{eq:supadjsys}. Now, let $\mathcal{Q}$ be an output defined by
+%
+\begin{proposition}
+\label{thm:error_estimate_dual}
+Let the hypotheses of Proposition~\ref{thm:error_estimate} hold. Let $Lambda$ be the solution of the dual problem,
 %
 \begin{equation}
-\mathcal{Q}(\Phi)=\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Phi).
+\mathcal{M}_{HF}'(\Psi_{LF};\Phi, \Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\end{equation}
+%
+where $\mathcal{Q}:(U \times U \times Q)^2 \to \R$ is a linear functional defined by,
+%
+\begin{equation}
+\mathcal{Q}(\Phi)=\mathcal{M}'_{HF}(\Psi_{LF})(\Phi).
 \label{eq:supadjout}
 \end{equation}
 %
-Let the variational form
+Then we have,
+%
+\begin{multline}
+\label{eq:finErrExp}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF}) + R_{\mathscr{R}} + R
+\end{multline}
+%
+where $R_{\mathscr{R}}$ is a second order term in the error $e=\Psi_{HF}-\Psi_{LF}$, and $R$ is as defined in Proposition~\ref{thm:error_estimate}.
+%
+\end{proposition}
+%
+\begin{proof}
+%
+The proof simply follows from the classic dual based a posteriori error estimation strategy. Note that, as a stationary point, $\Psi_{HF}$ satisfies~\Cref{eq:supadjsys}. Let the variational form
 %
 \begin{equation}
-\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\mathscr{R}(\Psi_{HF},\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
 \label{eq:supadjsys}
 \end{equation}
 %
-represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the corresponding adjoint problem
+represent the equation $\mathcal{M}'_{HF}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the corresponding adjoint problem
 %
 \begin{equation}
-\mathscr{R}_{\Psi}'(\Psi_{HF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\mathscr{R}'(\Psi_{LF};\Phi,\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
 \label{eq:superAdjEq}
 \end{equation}
-for the supplementary adjoint $\Lambda$, where $\mathscr{R}$ is defined in \Cref{eq:supadjsys}. The error in the output $\mathcal{Q}$ defined in \Cref{eq:supadjout} can then be expressed as a dual-weighted residual,
+%
+for the supplementary adjoint $\Lambda$. The error in the linear output $\mathcal{Q}$ defined in \Cref{eq:supadjout} can then be expressed as a dual-weighted residual,
+%
 \begin{equation}
 \label{eq:adjOutErr}
-\mathcal M'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})=-\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda).
+\mathcal{Q}(\Psi_{HF}-\Psi_{LF})=-\mathscr{R}(\Psi_{LF},\Lambda) + R_{\mathscr{R}}
 \end{equation}
 %
-Combining \Cref{eq:preadj} and \Cref{eq:adjOutErr}, we have,
-\begin{multline}
-\label{eq:finErrExp}
-I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3).
-\end{multline}
+where $R_{\mathscr{R}}$ is a second order remainder term due to the linearization of $\mathscr{R}$ about $\Psi_{LF}$. This implies the required result.
+%
+\end{proof}
 %
 Other approaches can become feasible in certain scenarios; for example, if the high- and low-fidelity models only differ in the computational grid used, the difference $\Psi_{HF}-\Psi_{LF}$ can be approximated using interpolation or patch recovery methods~\cite{BecVex05}.
