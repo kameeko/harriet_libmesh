@@ -6,7 +6,7 @@ Based on the theoretical developments in the last section, we now give a goal-or
 \subsection{Adaptive Model Mixing Algorithm}\label{sec:adapt_alg}
 %------------------------------------------------------------------------------------------------------------------------%
 
-Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,VendDarm00,PrudOden99,BecVex05,AinsOden11}, the error estimate \Cref{eq:finErrExp} can be localized to give elemental contributions and used to guide physics-based refinement over the domain to create a mixed-fidelity model. After refinement, the error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some error threshold is reached. \Cref{alg:refSeries} describes this approach. 
+Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,VendDarm00,PrudOden99,BecVex05,AinsOden11}, the error estimate obtained after dropping the remainder terms $\mathcal{R}$ and $\mathcal{R}_\mathscr{R}$ in \Cref{eq:finErrExp} can be localized to give elemental contributions and used to guide physics-based refinement over the domain to create a mixed-fidelity model. After refinement, the error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some error threshold is reached. \Cref{alg:refSeries} describes this approach. 
 %Note that the QoI error adjoint problem \Cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
 %
 \alglanguage{pseudocode}
@@ -24,7 +24,7 @@ Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,Ven
 	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for \par\hskip\algorithmicindent supplementary adjoint $\Lambda_0$ (see \Cref{eq:superAdjEq})}
 	\State{Compute QoI error estimate
 		
-	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
+	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
 	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
 	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))|>$ \texttt{errTol}}
 		\State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see \Cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
@@ -35,7 +35,7 @@ Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,Ven
 		$\quad\quad$supplementary adjoint $\Lambda_i$ (see \Cref{eq:superAdjEq})}
 		\State{Compute QoI error estimate
 		
-		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$}
+		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$}
 		\State{Calculate QoI $I(q_{MF_i},u_{MF_i})$}
 	\EndWhile \\
 \Return{model MF$_i$ and QoI estimate $I(q_{MF_i},u_{MF_i})$}
@@ -45,7 +45,7 @@ Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,Ven
 \end{algorithm}
 %
 
-\Cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh refinement, though in this case the method described in~\cite{BecVex05} would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF,\Psi}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
+\Cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space. The two models could also correspond to two levels of mesh refinement, though in this case the method described in~\cite{BecVex05} would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The derived error estimate is not applicable to all models, however. The two models have to be expressed in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models; namely, we assume that $\Psi_{LF}$ will be in a space admissible to $\mathcal{M}'_{HF}$, and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
 
 %------------------------------------------------------------------------------------------------------------------------%
 \subsection{Error Estimate Localization}\label{sec:errLocal}
@@ -56,13 +56,13 @@ Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,Ven
 We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. Recall the error estimate 
 %
 \begin{equation}
-\epsilon=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF})(\Lambda)+\mathcal M_{HF}(\Psi_{MF})-\mathcal M_{MF}(\Psi_{MF})
+\epsilon=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF})(\Lambda)+\mathcal M_{HF}(\Psi_{MF})-\mathcal M_{MF}(\Psi_{MF})
 \end{equation}
 %
 from \Cref{alg:refSeries}. Let $(Q^h\times U^h\times U^h)^3 \subset (Q\times U\times U)^3$ be the finite-dimensional conforming subspace in which we solve for the approximations $\Lambda^h$ and $\Psi_{MF}^h$; we seek to decompose the error estimate
 %
 \begin{equation}
-\epsilon^h=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF}^h)(\Lambda^h)+\mathcal M_{HF}(\Psi_{MF}^h)-\mathcal M_{MF}(\Psi_{MF}^h).
+\epsilon^h=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF}^h)(\Lambda^h)+\mathcal M_{HF}(\Psi_{MF}^h)-\mathcal M_{MF}(\Psi_{MF}^h).
 \end{equation}
 %
 Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally supported functions such that $\textrm{span}(\Phi^h)=(Q^h\times U^h\times U^h)^3$, so that we can write $(\Lambda^h,\Psi_{MF}^h)=(\sum\limits_{i\in I}\varphi_i\lambda_i,\sum\limits_{i\in I}\upvarphi_i \psi_i)$. Then the error estimate satisfies
@@ -74,7 +74,7 @@ Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally
 where,
 %
 \begin{equation}\label{eq:basisblame}
-\varepsilon^h_i = \left| -\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF})(\lambda_i\varphi_i)+\mathcal M_{HF}(\upvarphi_i \psi_i)-\mathcal M_{MF}(\upvarphi_i \psi_i) \right|
+\varepsilon^h_i = \left| -\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF})(\lambda_i\varphi_i)+\mathcal M_{HF}(\upvarphi_i \psi_i)-\mathcal M_{MF}(\upvarphi_i \psi_i) \right|
 \end{equation}
 %
 can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$. Near the interfaces between the low-fidelity and high-fidelity regions, basis functions may have their support divided between the two regions and thus have a nonzero error contribution. The basis functions with the largest error contributions are flagged, and the elements in their support are added to the high-fidelity subdomain. Basis functions whose support lie completely in the high-fidelity region will have a zero contribution and the elements in their support are never flagged for refinement again. 
