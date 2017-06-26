@@ -133,7 +133,7 @@ where the remainder $\mathcal{R}$ is given as,
 \mathcal{R} = \frac{1}{2} \int\limits_{0}^{1} \mathcal{M}'''_{HF}\left(\Psi_{LF} + se\right)(e,e,e) \, s(s-1) \, \textrm{d}s,
 \end{equation}
 %
-which is finite due to the third order differentiability assumptions. We further note that $\mathcal{M}'_{HF}(\Psi_{HF})(e)$ vanishes since $\Psi_{HF}$ is a stationary point of $\mathcal{M}_{HF}$, and~\Cref{eq:Mprimetrapezoid} can be simplified to,
+which is finite due to the third-order differentiability assumptions. We further note that $\mathcal{M}'_{HF}(\Psi_{HF})(e)$ vanishes since $\Psi_{HF}$ is a stationary point of $\mathcal{M}_{HF}$, and~\Cref{eq:Mprimetrapezoid} can be simplified to,
 %
 \begin{equation}
 \label{eq:beckvex}
@@ -155,11 +155,25 @@ The above \Cref{thm:error_estimate} splits the error in the QoI into three compo
 %
 \begin{proposition}
 \label{thm:error_estimate_dual}
-Let the hypotheses of Proposition~\ref{thm:error_estimate} hold. Let $\Lambda$ be the solution of the dual problem, \red{$\mathcal{M}'$ has just one '?}
+Let the hypotheses of Proposition~\ref{thm:error_estimate} hold. Let the variational form
 %
 \begin{equation}
-\mathcal{M}_{HF}'(\Psi_{LF};\Phi, \Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2,
+\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:supadjsys_prop}
 \end{equation}
+%
+represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define an adjoint problem
+%
+\begin{equation}
+\mathscr{R}'(\Psi_{LF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:superAdjEq}
+\end{equation}
+for the supplementary adjoint $\Lambda$, where $\mathscr{R}$ is defined in \Cref{eq:supadjsys_prop}, and where
+%Let $\Lambda$ be the solution of the dual problem, \red{$\mathcal{M}'$ has just one '?}
+%
+%\begin{equation}
+%\mathcal{M}_{HF}'(\Psi_{LF};\Phi, \Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2,
+%\end{equation}
 %
 where $\mathcal{Q}:(U_{HF} \times U_{HF} \times Q_{HF})^2 \to \R$ is a linear functional defined by,
 %
@@ -175,7 +189,7 @@ Then we have,
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF}) + \mathcal{R}_{\mathscr{R}} + \mathcal{R}
 \end{multline}
 %
-where $\mathcal{R}_{\mathscr{R}}$ is a second-order term in the error $e=\Psi_{HF}-\Psi_{LF}$, and $\mathcal{R}$ is as defined in \Cref{thm:error_estimate}. \red{Now that we've explicitly pointed out the second-order error term, can we really say that we derived "an adjoint-based third-order estimate" (in abstract and intro)?}
+where $\mathcal{R}_{\mathscr{R}}$ is a second-order term in the error $e=\Psi_{HF}-\Psi_{LF}$, and $\mathcal{R}$ is as defined in \Cref{thm:error_estimate}. %\red{Now that we've explicitly pointed out the second-order error term, can we really say that we derived "an adjoint-based third-order estimate" (in abstract and intro)?}
 %
 \end{proposition}
 %
@@ -184,14 +198,14 @@ where $\mathcal{R}_{\mathscr{R}}$ is a second-order term in the error $e=\Psi_{H
 The proof simply follows from the classic dual-based a posteriori error estimation strategy. Note that, as a stationary point, $\Psi_{HF}$ satisfies,
 %
 \begin{equation}
-\mathscr{R}(\Psi_{HF},\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
 \label{eq:supadjsys}
 \end{equation}
 %
-which is represents the equation $\mathcal{M}'_{HF}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the corresponding adjoint problem
+which is represents the equation $\mathcal{M}'_{HF}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the adjoint problem
 %
 \begin{equation}
-\mathscr{R}'(\Psi_{LF};\Phi,\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\mathscr{R}'(\Psi_{LF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
 \label{eq:superAdjEq}
 \end{equation}
 %
@@ -199,10 +213,10 @@ for the supplementary adjoint $\Lambda$. The error in the linear output $\mathca
 %
 \begin{equation}
 \label{eq:adjOutErr}
-\mathcal{Q}(\Psi_{HF}-\Psi_{LF})=-\mathscr{R}(\Psi_{LF},\Lambda) + R_{\mathscr{R}},
+\mathcal{Q}(\Psi_{HF}-\Psi_{LF})=-\mathscr{R}(\Psi_{LF})(\Lambda) + R_{\mathscr{R}},
 \end{equation}
 %
-where $R_{\mathscr{R}}$ is a second order remainder term due to the linearization of $\mathscr{R}$ about $\Psi_{LF}$. This implies the required result. \red{What is the classical notation for adjoint problems? Is it okay that we're breaking from the previous notation where a second pair of parentheses denotes things that we are linear in?}
+where $R_{\mathscr{R}}$ is a second order remainder term due to the linearization of $\mathscr{R}$ about $\Psi_{LF}$ in \Cref{eq:superAdjEq}. This implies the required result. %\red{What is the classical notation for adjoint problems? Is it okay that we're breaking from the previous notation where a second pair of parentheses denotes things that we are linear in?}
 %
 \end{proof}
 %
