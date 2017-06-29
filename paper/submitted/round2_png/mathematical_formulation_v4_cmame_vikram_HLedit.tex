@@ -220,4 +220,6 @@ where $R_{\mathscr{R}}$ is a second order remainder term due to the linearizatio
 %
 \end{proof}
 %
+If the state equations of the high fidelity model are linear, the derivative of the Lagrangian in~\Cref{eq:InvsOpt_auglag} is linear. In this case, the $R_{\mathscr{R}}$ term in~\Cref{eq:finErrExp} disappears, even if the QoI functional $I$ is nonlinear, and we get a fully third order error estimate.
+
 Other approaches to estimating the term $\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$ can become feasible in certain scenarios; for example, if the high- and low-fidelity models only differ in the computational grid used, the difference $\Psi_{HF}-\Psi_{LF}$ can be approximated using interpolation or patch recovery methods~\cite{BecVex05}.
