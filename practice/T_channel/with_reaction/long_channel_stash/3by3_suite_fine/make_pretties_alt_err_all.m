@@ -5,12 +5,14 @@ set(0,'defaultTextInterpreter','latex');
 set(0,'defaultAxesTickLabelInterpreter','latex');
 set(0,'defaultLegendInterpreter','latex');
 
-fntsize = 32;
+fntsize = 36; %32
+colorbar_fntsize = 42; %round2
 finer = true; %true = 250x50, false = 75x15
 
-refLevel = 'LF';
+refLevel = 'MF06';
 % dir_root = ['qoi3_sens3_alt_err_all/',refLevel,'/'];
-dir_root = 'vs_qoi_alt_err_all/qoi3_sens3/';
+% dir_root = 'vs_qoi_vs_data_alt_err_all/qoi3_sens3/';
+dir_root = ['../../../diff_param_res/with_reaction/long_channel_stash/qoi3_setup02_r42_basis_blame_all_fine/',refLevel,'/'];
 
 if finer
     if exist('fine_dof_info.mat','file') == 2
@@ -71,7 +73,7 @@ else
 end
 
 %read in things to plot
-err_dof = dlmread([dir_root,'error_est_breakdown_basis_blame3.dat'],' ');
+err_dof = dlmread([dir_root,'error_est_breakdown_basis_blame.dat'],' ');
 divFileID = ...
   fopen([dir_root,'divvy.txt'],'r');
 divFormatSpec = '%d %d';
@@ -98,44 +100,47 @@ xlabel('$x_1$');
 c = colorbar; set(c,'TickLabelInterpreter','latex');
 title('Local Contributions to QoI Error Estimate','FontWeight','normal')
 set(gca,'FontSize',fntsize); 
+caxis([0 1.e-8])
 set(findall(gcf,'type','text'),'FontSize',fntsize)
+set(c,'FontSize',colorbar_fntsize) 
 % set(gcf,'PaperPositionMode','auto','Position',[66 253 1535 297])
 % set(gcf,'PaperPositionMode','auto','Position',[66 140 1535 407])
 set(gcf,'PaperPositionMode','auto','Position',[88 202 1336 409])
-% print(h,[dir_root, 'err_breakdown_', refLevel],'-depsc');
-print(h,[dir_root, 'err_breakdown_', refLevel],'-dpng','-r300')
+print(h,[dir_root, 'err_breakdown_', refLevel],'-depsc'); %round2 revisions
+% print(h,[dir_root, 'err_breakdown_', refLevel],'-dpng','-r300')
 
-% %% plot divvy
-% 
-% if divFileID ~= -1
-%     B = fscanf(divFileID,divFormatSpec,divSizeMat);
-%     B = B';
-%     B = B(:,2);
-% else
-%     if finer
-%         B = zeros(50*250,1);
-%     else
-%         B = zeros(15*75,1);
-%     end
-% end
-% 
-% LFbits = (B == 0);
-% HFbits = (B == 1);
-% 
-% divvy = figure(2); 
-% % hold on;
-% % scatter(A(LFbits,1),A(LFbits,2),270,[227, 38, 54]/255,'s','filled');
-% % scatter(A(HFbits,1),A(HFbits,2),270,[91, 146, 229]/255,'s','filled');
-% map = [91, 146, 229; 227, 38, 54]/255;
-% squish = reshape(B,5*round(sqrt(length(HFbits)/5)),round(sqrt(length(HFbits)/5)))';
-% imagesc([0 5],[0 1],-squish); 
-% set(gca,'YDir','normal','Ticklength',[0 0]); colormap(map);
-% xlabel('$x_1$'); ylabel('$x_2$'); axis equal; axis tight;
-% title('Division of Domain','FontWeight','Normal')
-% set(gca,'FontSize',fntsize); 
-% set(findall(gcf,'type','text'),'FontSize',fntsize)
-% % set(gcf,'PaperPositionMode','auto','Position',[66 253 1475 297])
-% % set(gcf,'PaperPositionMode','auto','Position',[66 253 1150 297])
-% set(gcf,'PaperPositionMode','auto','Position',[66 218 1160 365])
-% % print(divvy,[dir_root, 'cd_cdr_', refLevel, '_divvy'],'-depsc');
+%% plot divvy
+
+if divFileID ~= -1
+    B = fscanf(divFileID,divFormatSpec,divSizeMat);
+    B = B';
+    B = B(:,2);
+else
+    if finer
+        B = zeros(50*250,1);
+    else
+        B = zeros(15*75,1);
+    end
+end
+
+LFbits = (B == 0);
+HFbits = (B == 1);
+
+divvy = figure(2); 
+% hold on;
+% scatter(A(LFbits,1),A(LFbits,2),270,[227, 38, 54]/255,'s','filled');
+% scatter(A(HFbits,1),A(HFbits,2),270,[91, 146, 229]/255,'s','filled');
+map = [91, 146, 229; 227, 38, 54]/255;
+squish = reshape(B,5*round(sqrt(length(HFbits)/5)),round(sqrt(length(HFbits)/5)))';
+imagesc([0 5],[0 1],-squish); 
+set(gca,'YDir','normal','Ticklength',[0 0]); colormap(map);
+xlabel('$x_1$'); ylabel('$x_2$'); axis equal; axis tight;
+title('Division of Domain','FontWeight','Normal')
+set(gca,'FontSize',fntsize); 
+set(findall(gcf,'type','text'),'FontSize',fntsize)
+% set(gcf,'PaperPositionMode','auto','Position',[66 253 1475 297])
+% set(gcf,'PaperPositionMode','auto','Position',[66 253 1150 297])
+% set(gcf,'PaperPositionMode','auto','Position',[66 218 1160 365]) %round1
+set(gcf,'PaperPositionMode','auto','Position',[66 218 1160 400])
+print(divvy,[dir_root, 'cd_cdr_', refLevel, '_divvy'],'-depsc'); %round2 revision
 % print(divvy,[dir_root, 'cd_cdr_', refLevel, '_divvy'],'-dpng','-r300')

@@ -55,17 +55,17 @@ We now present the results for solving the inference problem using \Cref{alg:ref
 %\captionsetup[subfloat]{captionskip=-5pt}
 \centering
 \subfloat[LF $\equiv$ MF$_0$ ($0\%$ HF)]{
-  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_LF_divvy.png}
-  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_LF.png}
+  \includegraphics[width=0.465\textwidth]{baseSeries/cd_cdr_LF_divvy.pdf} %0.46 round1 png
+  \includegraphics[width=0.52\textwidth]{baseSeries/err_breakdown_LF.pdf} %0.49 round1 png
   \label{fig:baseRef0}
 } \\
 \subfloat[MF$_1$ ($5\%$ HF)]{
-  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_MF01_divvy.png}
-  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF01.png}
+  \includegraphics[width=0.465\textwidth]{baseSeries/cd_cdr_MF01_divvy.pdf} %0.46 round1 png
+  \includegraphics[width=0.52\textwidth]{baseSeries/err_breakdown_MF01.pdf} %0.49 round1 png
 } \\
 \subfloat[MF$_2$ ($10\%$ HF)]{
-  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_MF02_divvy.png}
-  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF02.png}
+  \includegraphics[width=0.465\textwidth]{baseSeries/cd_cdr_MF02_divvy.pdf} %0.46 round1 png
+  \includegraphics[width=0.52\textwidth]{baseSeries/err_breakdown_MF02.pdf} %0.49 round1 png
 } \\
 \caption{Left: Multi-fidelity refinement over the domain (low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion). Right: local error contributions. }
 \label{fig:baseRef}
@@ -80,7 +80,7 @@ We see that the largest local error contributions are concentrated in the QoI re
 \begin{figure}[htbp]
 \centering
 %\includegraphics[width=0.8\textwidth]{baseSeries/err_est.pdf}
-\includegraphics[width=0.8\textwidth]{baseSeries/err_est_v2.pdf}
+\includegraphics[width=\textwidth]{baseSeries/err_est_v2.pdf}
 %\caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used.}
 \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used. In this case, only two refinement iterations are necessary to achieve the target relative QoI error (dotted line).}
 \label{fig:baseErr}
@@ -192,16 +192,16 @@ As with the previous examples in \Cref{sec:cdvcdr}, the decomposition of the err
 \begin{figure}[htbp]
 \centering
 \subfloat[MF$_0$ ($0\%$ HF)]{
-	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_LF_divvy.png}
-  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_LF.png}
+	\includegraphics[width=0.465\textwidth]{svf/cd_cdr_LF_divvy.pdf} %0.465 round1 png
+  \includegraphics[width=0.52\textwidth]{svf/err_breakdown_LF.pdf} %0.49 round1 png
 } \\
 \subfloat[MF$_1$ ($10\%$ HF)]{
-	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF01_divvy.png}
-  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF01.png}
+	\includegraphics[width=0.465\textwidth]{svf/cd_cdr_MF01_divvy.pdf} %0.465 round1 png
+  \includegraphics[width=0.52\textwidth]{svf/err_breakdown_MF01.pdf} %0.49 round1 png
 } \\
 \subfloat[MF$_2$ ($20\%$ HF)]{
-  \includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF02_divvy.png}
-  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF02.png}
+  \includegraphics[width=0.465\textwidth]{svf/cd_cdr_MF02_divvy.pdf} %0.465 round1 png
+  \includegraphics[width=0.52\textwidth]{svf/err_breakdown_MF02.pdf} %0.49 round1 png
 } \\
 %\begin{subfigure}[b]{\textwidth}
 %	\centering
@@ -228,8 +228,8 @@ As with the previous examples in \Cref{sec:cdvcdr}, the decomposition of the err
 %  \vspace{0.8\baselineskip}
 %\end{subfigure}
 \subfloat[MF$_6$ ($60\%$ HF)]{
-	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF06_divvy.png}
-  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF06.png}
+	\includegraphics[width=0.465\textwidth]{svf/cd_cdr_MF06_divvy.pdf} %0.465 round1 png
+  \includegraphics[width=0.52\textwidth]{svf/err_breakdown_MF06.pdf} %0.49 round1 png
 }
 \caption{Left: Multi-fidelity refinement over the domain (low-fidelity constant-parameter model used in red portion, high-fidelity field-parameter model used in blue portion). Right: local error contributions. The (weighted) residual, and thus the local error contribution, tends to spike sharply at the interface between the low- and high-fidelity regions; the color range is truncated to make the error distribution visible elsewhere in the domain.}
 \label{fig:svfRef}
@@ -241,23 +241,25 @@ Comparing to \Cref{fig:baseRef}, we see that in this case the local error contri
 %
 \begin{figure}[htbp]
 \centering
-\subfloat[MF$_1$ ($10\%$ HF)]{
-	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF01_clim_HF_whitebg.png}
-	\label{subfig:svfparamMF1}
-} \\
-\subfloat[MF$_3$ ($30\%$ HF)]{
-	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF03_clim_HF_whitebg.png}
-	\label{subfig:svfparamMF3}
-} \\
-\subfloat[MF$_6$ ($60\%$ HF)]{
-  \includegraphics[width=0.8\textwidth]{svf/svf_param_MF06_clim_HF_whitebg.png}
-  \label{subfig:svfparamMF6}
-} \\
-\subfloat[HF]{
-	\includegraphics[width=0.8\textwidth]{svf/svf_params_HF_whitebg.png}
-	\label{subfig:svfparamHF}
-}
-\caption{Inferred parameters using mixed-fidelity (\protect\subref{subfig:svfparamMF1}--\protect\subref{subfig:svfparamMF6}) and high-fidelity (\protect\subref{subfig:svfparamHF}) models. All figures share the color-scale for the high-fidelity plot.}
+%\subfloat[MF$_1$ ($10\%$ HF)]{
+%	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF01_clim_HF_whitebg.png}
+%	\label{subfig:svfparamMF1}
+%} \\
+%\subfloat[MF$_3$ ($30\%$ HF)]{
+%	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF03_clim_HF_whitebg.png}
+%	\label{subfig:svfparamMF3}
+%} \\
+%\subfloat[MF$_6$ ($60\%$ HF)]{
+%  \includegraphics[width=0.8\textwidth]{svf/svf_param_MF06_clim_HF_whitebg.png}
+%  \label{subfig:svfparamMF6}
+%} \\
+%\subfloat[HF]{
+%	\includegraphics[width=0.8\textwidth]{svf/svf_params_HF_whitebg.png}
+%	\label{subfig:svfparamHF}
+%}
+%\caption{Inferred parameters using mixed-fidelity (\protect\subref{subfig:svfparamMF1}--\protect\subref{subfig:svfparamMF6}) and high-fidelity (\protect\subref{subfig:svfparamHF}) models. All figures share the color-scale for the high-fidelity plot.}
+\includegraphics[width=0.95\textwidth]{svf/svf_param_fused.pdf}
+\caption{Inferred parameters using mixed-fidelity (top three) and high-fidelity (bottom) models. All figures share the color-scale for the high-fidelity plot.}
 \label{fig:svfRefParams}
 \end{figure}
 %
@@ -266,12 +268,18 @@ The corresponding true and estimated absolute errors in the QoI are shown in \Cr
 \begin{figure}[htbp]
 \centering
 %\includegraphics[width=0.8\textwidth]{svf/err_est.pdf}
-\includegraphics[width=0.8\textwidth]{svf/err_est_v2.pdf}
+\includegraphics[width=\textwidth]{svf/err_est_v2.pdf}
 \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity field-parameter model is used. The dotted line indicates the target relative QoI error.}
 \label{fig:svfErr}
 \end{figure}
 %
-In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain (compare \Cref{subfig:svfparamMF6} and \Cref{subfig:svfparamHF}). We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. Note that although the inferred parameters in the first and third mixed-fidelity models (see \Cref{subfig:svfparamMF1} and \Cref{subfig:svfparamMF3}) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain (compare 
+%\Cref{subfig:svfparamMF6} and \Cref{subfig:svfparamHF}
+the bottom two figures of \Cref{fig:svfRefParams}
+). We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. Note that although the inferred parameters in the first and third mixed-fidelity models (see 
+%\Cref{subfig:svfparamMF1} and \Cref{subfig:svfparamMF3}
+the top two figures of \Cref{fig:svfRefParams}
+) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
 
 %compare MF01 and MF03, MF06 and HF
 %1 and 3 look very different but have very similar true errors - different params can give similar qoi, though in this case the qoi is not close to HF; more HF doesn't necessarily decrease error, interplay between having freedom to match data and all LF regions being flat...

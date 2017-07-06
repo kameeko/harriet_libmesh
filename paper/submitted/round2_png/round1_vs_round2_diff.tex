@@ -1,0 +1,1511 @@
+\documentclass[review,sort&compress]{elsarticle}
+%DIF LATEXDIFF DIFFERENCE FILE
+%DIF DEL paper_v4_cmame.tex          Sat Jul  1 07:37:11 2017
+%DIF ADD paper_v4_cmame_vikram.tex   Tue Jun 20 15:59:15 2017
+%%\usepackage{lgrind}
+
+%\usepackage[square,comma,numbers,sort&compress]{natbib}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym} %amsthm inclusion conflicts with sisc...
+%\usepackage{amsmath,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{graphics}
+%\usepackage{epsfig}
+%%\usepackage[hang,raggedright]{subfigure}
+%\usepackage{epsf}
+%\usepackage{setspace}
+%\usepackage{hangcaption}
+\usepackage{graphicx}    % needed for including graphics e.g. EPS, PS
+\usepackage{multirow}
+%\usepackage{threeparttable}
+\usepackage{cancel}
+\usepackage{enumerate}
+\usepackage{color}
+\usepackage{hyperref}
+\usepackage{cleveref}
+
+\usepackage{algorithmicx}
+\usepackage[ruled]{algorithm}
+\usepackage{algpseudocode}
+\usepackage{varwidth}
+%\usepackage{caption}
+%\usepackage[font=small]{subcaption}
+%\usepackage{longtable}
+\usepackage{mathrsfs}
+\usepackage{upgreek}
+\usepackage[caption=false]{subfig} % for \subfloat
+
+\usepackage{lineno} %line numbering
+
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=black,          % color of internal links
+    citecolor=black,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=blue           % color of external links
+}
+
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\Reals}{{\mathbb{R}}}
+\newcommand{\bit}{\begin{itemize}}
+\newcommand{\eit}{\end{itemize}}
+\newcommand{\red}[1]{{\color{red}{#1}}}
+%DIF 48a48
+\newcommand{\blue}[1]{{\color{blue}{#1}}} %DIF > 
+%DIF -------
+\newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}{Proposition}
+
+\graphicspath{{./figures/}}
+%DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
+%DIF UNDERLINE PREAMBLE %DIF PREAMBLE
+\RequirePackage[normalem]{ulem} %DIF PREAMBLE
+\RequirePackage{color}\definecolor{RED}{rgb}{1,0,0}\definecolor{BLUE}{rgb}{0,0,1} %DIF PREAMBLE
+\providecommand{\DIFaddtex}[1]{{\protect\color{blue}\uwave{#1}}} %DIF PREAMBLE
+\providecommand{\DIFdeltex}[1]{{\protect\color{red}\sout{#1}}}                      %DIF PREAMBLE
+%DIF SAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddbegin}{} %DIF PREAMBLE
+\providecommand{\DIFaddend}{} %DIF PREAMBLE
+\providecommand{\DIFdelbegin}{} %DIF PREAMBLE
+\providecommand{\DIFdelend}{} %DIF PREAMBLE
+%DIF FLOATSAFE PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFaddFL}[1]{\DIFadd{#1}} %DIF PREAMBLE
+\providecommand{\DIFdelFL}[1]{\DIFdel{#1}} %DIF PREAMBLE
+\providecommand{\DIFaddbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFaddendFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelbeginFL}{} %DIF PREAMBLE
+\providecommand{\DIFdelendFL}{} %DIF PREAMBLE
+%DIF HYPERREF PREAMBLE %DIF PREAMBLE
+\providecommand{\DIFadd}[1]{\texorpdfstring{\DIFaddtex{#1}}{#1}} %DIF PREAMBLE
+\providecommand{\DIFdel}[1]{\texorpdfstring{\DIFdeltex{#1}}{}} %DIF PREAMBLE
+\newcommand{\DIFscaledelfig}{0.5}
+%DIF HIGHLIGHTGRAPHICS PREAMBLE %DIF PREAMBLE
+\RequirePackage{settobox} %DIF PREAMBLE
+\RequirePackage{letltxmacro} %DIF PREAMBLE
+\newsavebox{\DIFdelgraphicsbox} %DIF PREAMBLE
+\newlength{\DIFdelgraphicswidth} %DIF PREAMBLE
+\newlength{\DIFdelgraphicsheight} %DIF PREAMBLE
+% store original definition of \includegraphics %DIF PREAMBLE
+\LetLtxMacro{\DIFOincludegraphics}{\includegraphics} %DIF PREAMBLE
+\newcommand{\DIFaddincludegraphics}[2][]{{\color{blue}\fbox{\DIFOincludegraphics[#1]{#2}}}} %DIF PREAMBLE
+\newcommand{\DIFdelincludegraphics}[2][]{% %DIF PREAMBLE
+\sbox{\DIFdelgraphicsbox}{\DIFOincludegraphics[#1]{#2}}% %DIF PREAMBLE
+\settoboxwidth{\DIFdelgraphicswidth}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\settoboxtotalheight{\DIFdelgraphicsheight}{\DIFdelgraphicsbox} %DIF PREAMBLE
+\scalebox{\DIFscaledelfig}{% %DIF PREAMBLE
+\parbox[b]{\DIFdelgraphicswidth}{\usebox{\DIFdelgraphicsbox}\\[-\baselineskip] \rule{\DIFdelgraphicswidth}{0em}}\llap{\resizebox{\DIFdelgraphicswidth}{\DIFdelgraphicsheight}{% %DIF PREAMBLE
+\setlength{\unitlength}{\DIFdelgraphicswidth}% %DIF PREAMBLE
+\begin{picture}(1,1)% %DIF PREAMBLE
+\thicklines\linethickness{2pt} %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\framebox(1,1){}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,0){\line( 1,1){1}}}% %DIF PREAMBLE
+{\color[rgb]{1,0,0}\put(0,1){\line(1,-1){1}}}% %DIF PREAMBLE
+\end{picture}% %DIF PREAMBLE
+}\hspace*{3pt}}} %DIF PREAMBLE
+} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbegin}{\DIFaddbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddend}{\DIFaddend} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbegin}{\DIFdelbegin} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelend}{\DIFdelend} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbegin}{\DIFOaddbegin \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbegin}{\DIFOdelbegin \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelend}{\DIFOaddend \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddbeginFL}{\DIFaddbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOaddendFL}{\DIFaddendFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelbeginFL}{\DIFdelbeginFL} %DIF PREAMBLE
+\LetLtxMacro{\DIFOdelendFL}{\DIFdelendFL} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddbeginFL}{\DIFOaddbeginFL \let\includegraphics\DIFaddincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFaddendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelbeginFL}{\DIFOdelbeginFL \let\includegraphics\DIFdelincludegraphics} %DIF PREAMBLE
+\DeclareRobustCommand{\DIFdelendFL}{\DIFOaddendFL \let\includegraphics\DIFOincludegraphics} %DIF PREAMBLE
+%DIF END PREAMBLE EXTENSION ADDED BY LATEXDIFF
+
+\begin{document}
+%\raggedbottom %avoid weird vertical justification
+
+\begin{frontmatter}
+
+\title{Model Adaptivity for Goal-Oriented Inference using Adjoints}
+
+%\author{Harriet Li\textsuperscript{a,}\footnote{Corresponding author. \textit{Email address: kameeko@mit.edu}}, Vikram Garg\textsuperscript{b}, Karen Willcox\textsuperscript{c}}
+%\address{\textsuperscript{a} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kameeko@mit.edu}\protect\\
+%\textsuperscript{b} Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}\protect\\
+%\textsuperscript{c} Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+%\date{}
+%\maketitle
+
+\author[adr1]{Harriet Li\corref{cor1}}
+\cortext[cor1]{Corresponding author. \textit{Email address: hli@alum.mit.edu}}
+\address[adr1]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{hli@alum.mit.edu}}
+\author[adr2]{Vikram Garg}
+\address[adr2]{Institute for Computational Engineering and Sciences, University of Texas, Austin, TX, 78712, USA; \texttt{vikram.v.garg@gmail.com}}
+\author[adr3]{Karen Willcox}
+\address[adr3]{Department of Aeronautics and Astronautics, Massachusetts Institute of Technology, Cambridge, MA, 02139, USA; \texttt{kwillcox@mit.edu}}
+
+\begin{abstract}
+An inverse problem seeks to infer unknown model parameters using observed data. We consider a \textit{goal-oriented inverse problem}, where the goal of inferring parameters is to use them in predicting a quantity of interest (QoI). Recognizing that multiple models of varying fidelity and computational cost may be available to describe the physical system, we formulate a goal-oriented model adaptivity approach that leverages multiple models while controlling the error in the QoI prediction. In particular, we adaptively form a mixed-fidelity model by using models of different levels of fidelity in different subregions of the domain. Taking the solution of the inverse problem with the highest-fidelity model as our reference QoI prediction, we \DIFdelbegin \DIFdel{derive an adjoint-based }\DIFdelend \DIFaddbegin \DIFadd{extend previous results to obtain a }\DIFaddend third-order estimate\DIFaddbegin \DIFadd{, evaluated using an adjoint approach, }\DIFaddend for the QoI error from using a lower-fidelity model. Localization of this error then guides the formation of mixed-fidelity models. We demonstrate the method for example problems described by convection-diffusion-reaction models. For these examples, our mixed-fidelity models use the high-fidelity model over only a small portion of the domain, but result in QoI estimates with small relative errors. We also demonstrate that the mixed-fidelity inverse problems can be cheaper to solve and less sensitive to the initial guess than the high-fidelity inverse problems.
+
+
+\end{abstract}
+
+\begin{keyword}
+  inference \sep goal-oriented adaptive modeling \sep a posteriori error estimation \sep multi-fidelity modeling \sep adjoints
+\end{keyword}
+
+\end{frontmatter}
+
+%\linenumbers
+
+\section{Introduction}
+
+Physical and engineering systems are often described using sophisticated mathematical models, such as coupled, nonlinear partial differential equations (PDEs). The inverse problem seeks to infer unknown model parameters using observed data; often these observations are limited, noisy and provide only indirect information about the unknown parameters. Many such inverse problems present a major computational challenge, since their solution involves repeated solutions of the mathematical model. In many cases, a given physical system can be represented with varying degrees of fidelity by different models. A higher-fidelity model more accurately represents reality, but is also usually more computationally expensive to solve. Lower-fidelity models can be solved inexpensively, at the expense of introducing approximations. In this work, we formulate an approach for leveraging multiple models of varying fidelities in solution of an inverse problem.
+
+The choice of model should be informed by one's goal: for a range of applications, the parameters may be numerous, such as when corresponding to a discretized field, and yet what is ultimately of interest may be some low-dimensional quantity of interest (QoI). We consider this \textit{goal-oriented inverse problem}, where the goal of inferring parameters is to use them in predicting a QoI. In this context, one may choose a lower-fidelity model for the inference problem, sacrificing accuracy in the state and/or parameter estimates in exchange for reduced computational costs while keeping the error in the QoI to within some acceptable tolerance. \DIFaddbegin \DIFadd{Compared to the highest-fidelity model, the lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter space; this generalizes the setup where one only refines the mesh to create high-fidelity models. }\DIFaddend This paper formally poses the problem of managing the fidelity of modeling choices in solving the goal-oriented inverse problem, and develops an adjoint-based model adaptivity approach that achieves a desired level of accuracy in the QoI prediction. In particular, we adaptively form a mixed-fidelity model by using models of different levels of fidelity in different parts of the domain. %DIF > Compared to the high-fidelity model, inclusion of low-fidelity regions can make this mixed-fidelity model less nonlinear, and/or have a reduced state and/or parameter space;. 
+
+The simultaneous use of multiple models of varying fidelity for forward simulations is well established in some fields. Ref.~\cite{Liuetal03} categorizes two main strategies for combining models: hierarchical and concurrent methods. Hierarchical methods (also known as information-passing or sequential methods) take the results of a simulation using the high-fidelity model and use them to inform a lower-fidelity model that is used globally. An example application is the modeling of the molecular structure of a material to determine parameters for constitutive equations~\cite{Haoetal03,Weietal04}. In contrast, concurrent methods (also called hybrid methods) simultaneously solve the higher- and lower-fidelity models in different parts of the domain. Applications include computational mechanics~\cite{Khareetal08,Prudetal08}, porous media flow~\cite{tartakovsky2008hybrid,battiato2011hybrid}, and fluid dynamics~\cite{AlexGarTar02,FatGerQua01,Garcetal99,LucKinBer02,vanOpstaletal15,WadErw90}. We focus on concurrent methods of combining models, which have desirable features: in the case where the high-fidelity model is nonlinear, replacing it with a linear lower-fidelity model in most of the domain can reduce the number of iterative solves needed; when the high-fidelity model has a fine resolution and/or many parameters, replacing it with a lower-fidelity model can reduce the number of degrees of freedom of the mixed-fidelity model.
+
+Goal-oriented approaches prioritize accuracy in the QoI over accuracy in the states and/or parameters; one aims to reduce the cost of solving the problem (whether forward or inverse) while maintaining an acceptably low error tolerance for the QoI. In the context of the forward problem, goal-oriented methods have been developed for mesh refinement \cite{BecRann01,Park04,PrudOden99,VendDarm00,Yano12} and for \DIFaddbegin \DIFadd{more general }\DIFaddend model adaptivity~\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\cite{BraackErn03,OdenPrudetal06}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\cite{OdenVem00,VemOden01,BraackErn03,OdenPrudetal06}}\hspace{0pt}%DIFAUXCMD
+}\DIFaddend . These methods derive an adjoint-based a posteriori error estimate for an output functional, and this estimate is used to guide adaptive mesh and/or model refinement. \DIFaddbegin \DIFadd{Approaches for the goal-oriented forward problem can be applied to the inverse problem by treating the optimality conditions of the inverse problem as a forward model, though one more complex than the original forward model. Methods tailored to the goal-oriented inverse problem, including the one proposed in this work, make use of the particular structure of the inverse problem. 
+}\DIFaddend 
+
+For inverse problems, computational cost has been addressed by employing surrogate and reduced-order models \cite{MarzNajmRahn07, WangZab04, StefSanNav15, Frangosetal10}. For the particular case of a goal-oriented inverse problem, methods exploit the possibility of accurately computing the QoI without fully resolving the parameters. For example, for a discretized linear inverse problem, one can find a low-dimensional subspace of the parameter space that is both informed by observations and informative to the QoI~\cite{LiebWill13}. This subspace provides a low-dimensional map from the observations directly to the QoI, sacrificing accuracy in the inferred parameters for accuracy in the QoI that is computed from them. For the linear Gaussian Bayesian inverse problem, one can calculate an optimal approximation to the predictive posterior of the QoI without fully calculating the posterior distribution of the parameters~\cite{Span16}. Mesh refinement in the goal-oriented inverse problem is addressed in~\cite{BecVex05}; that work derives an a posteriori estimate of the error in the QoI caused by discretizing the infinite-dimensional inverse problem, and uses this error estimate to adaptively refine the mesh. The idea of goal-oriented model adaptivity for an inverse problem is introduced in~\cite{OdenPrudetal10}, which outlines a possible extension of the adjoint-based adaptivity method of~\cite{OdenPrudetal06}.
+
+In this paper, we target model adaptivity in the solution of goal-oriented inverse problems. We present a robust, adaptive framework that identifies the subregions of the domain where high-fidelity representation of physics and parameters is important to achieving a desired accuracy in the QoI. To achieve this, we combine ideas from goal-oriented model adaptivity for forward problems and goal-oriented methods for inverse problems. In particular, our method allows one to systematically manage the use of multiple models in the context of the goal-oriented inverse problem, so as to minimize the error in a QoI prediction. Taking the inverse problem with the highest-fidelity model as our reference QoI prediction, we \DIFdelbegin \DIFdel{derive }\DIFdelend \DIFaddbegin \DIFadd{obtain }\DIFaddend a third-order estimate\DIFaddbegin \DIFadd{, evaluated using an adjoint approach, }\DIFaddend for the QoI error from using a lower-fidelity model. This estimate can be localized, and the error decomposition then used to guide the formation of mixed-fidelity models with which to solve the inverse problem, while minimizing the error in the QoI. 
+%We note that while the approach outlined in~\cite{OdenPrudetal10} could be applied to the same task, one main difference is that we compute additional quantities to obtain a higher-order QoI error estimate.
+
+The remainder of this paper is organized as follows, \Cref{sec:form} presents the mathematical formulation and error analysis for the multi-model inverse problem. \Cref{sec:alg} discusses the goal-oriented inference algorithm and presents a computational complexity analysis. \Cref{sec:numexp} shows the application of this algorithm to a model problem and a contaminant flow problem. Finally, we present conclusions and directions for future work in \Cref{sec:conc}.
+
+
+\section{Mathematical Formulation}\label{sec:form}
+%
+\DIFdelbegin \DIFdel{We first introduce the goal-oriented inverse problem. Then we derive a rigorous a posteriori error estimate for the error induced }\DIFdelend \DIFaddbegin \DIFadd{In this section, we introduce the high-, low- and mixed-fidelity inverse problems. We develop theoretical results which extend the work in~\mbox{%DIFAUXCMD
+\cite{BecVex05} }\hspace{0pt}%DIFAUXCMD
+to multi-model settings; in particular, we obtain a computable error estimate }\DIFaddend in the QoI \DIFdelbegin \DIFdel{due to the use }\DIFdelend \DIFaddbegin \DIFadd{that can be used for targeted generation }\DIFaddend of mixed-fidelity \DIFdelbegin \DIFdel{and/or lower-fidelity models}\DIFdelend \DIFaddbegin \DIFadd{formulations of inverse problems}\DIFaddend .
+
+%------------------------------------------------------------------------------%
+\subsection{Inverse Problem Formulation}  \label{sec:setup}
+%------------------------------------------------------------------------------%
+%
+Consider \DIFdelbegin \DIFdel{a model for which the Galerkin formulation of the weak form is written as
+}\begin{displaymath}
+\DIFdel{a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
+%DIFDELCMD < \label{eq:weakForm}%%%
+}\end{displaymath}
+%DIFAUXCMD
+\DIFdel{where$u\in U$ is the state, }\DIFdelend \DIFaddbegin \DIFadd{the inverse problem where, given observations (data) $d\in\R^{n_d}$, we seek to infer parameter(s) }\DIFaddend $q\in Q$\DIFdelbegin \DIFdel{are the unknown parameters, $\phi$ is a test function }\DIFdelend , \DIFdelbegin \DIFdel{and the state space $U$ and parameter space }\DIFdelend \DIFaddbegin \DIFadd{where $Q$ is some function space. In this exposition, we assume that }\DIFaddend $Q$ \DIFdelbegin \DIFdel{are Hilbert spaces. }\DIFdelend \DIFaddbegin \DIFadd{is a Hilbert space. An observation operator $C:U\to\Reals^{n_d}$ relates the parameter to the observations via state variable(s) $u\in U$, with $u$ satisfying,
+%DIF > 
+}\begin{equation}
+\DIFadd{a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
+\label{eq:weakForm}
+}\end{equation}
+%DIF > 
+\DIFadd{where $U$ is also a Hilbert space. Equation~\ref{eq:weakForm} is called the state equation. }\DIFaddend The form $a$\DIFdelbegin \DIFdel{and }\DIFdelend \DIFaddbegin \DIFadd{, and the }\DIFaddend functional $\ell$ are linear with respect to the arguments in the second pair of parentheses (in \Cref{eq:weakForm}, they are linear with respect to $\phi$).
+\DIFdelbegin \DIFdel{Further, we define an observation operator $C:U\to\Reals^{n_d}$ that maps the state to $n_d$ predicted observations. The actual observations (data) are denoted by $d\in\R^{n_d}$.
+}\DIFdelend 
+
+The unknown parameter $q$ can be inferred by minimizing the difference between the predicted and actual observations \DIFaddbegin \DIFadd{in a chosen norm}\DIFaddend , leading to an inverse problem. \DIFdelbegin \DIFdel{In our setting, such inverse problems are typically }\DIFdelend \DIFaddbegin \DIFadd{We consider the case where observations are sparse; this leads to inverse problems that are }\DIFaddend ill-posed, since the \DIFdelbegin \DIFdel{observations are sparse, and }\DIFdelend \DIFaddbegin \DIFadd{sparse observations are }\DIFaddend insufficiently informative to uniquely determine the parameters. To make the inverse problem well-posed, a regularization, denoted by $R(q)$, is used to inject prior information or beliefs about the parameters into the formulation. The regularized inverse problem can thus be written as a constrained optimization problem,
+%
+\begin{subequations}
+\label{eq:invOpt}
+\begin{align}
+\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q), \label{eq:invOpt_obj} \\
+\textrm{s.t. }& \quad a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U. \label{eq:invOpt_cons}
+\end{align}
+\end{subequations}
+%
+Thus, we aim to minimize the cost function $J$, which includes the mismatch between predicted and actual observations and a regularization term $R(q)$, subject to the state $u$ and parameters $q$ satisfying the model given by \Cref{eq:weakForm}, which appears as a constraint in \Cref{eq:invOpt_cons}.
+\DIFdelbegin \DIFdel{The constraints \mbox{%DIFAUXCMD
+\Cref{eq:invOpt_cons} }\hspace{0pt}%DIFAUXCMD
+are typically models of physical processes or systems. }\DIFdelend \DIFaddbegin 
+
+\DIFaddend A given physical system can be described to varying degrees of fidelity using different models. \DIFdelbegin \DIFdel{This naturally introduces a hierarchy of models and a tradeoff between fidelity and computational expense; how one manages this tradeoff depends on }\DIFdelend \DIFaddbegin \DIFadd{One has a choice in how to define the stucture of the inferred parameters $q$, as well as how to define the state equation and variables. For example, the parameter $q$ can be modeled as a single scalar value or as an infinite-dimensional distributed field variable. The state equation can be nonlinear and multiscale, requiring an expensive computation to resolve (e.g.\ the Navier-Stokes equations) or a linear, single physics model (e.g.\ Laplace's equation). All these different modeling choices lead to different versions of the optimization problem described by \mbox{%DIFAUXCMD
+\Cref{eq:invOpt} }\hspace{0pt}%DIFAUXCMD
+that would need to be solved to infer the unknown parameters.
+}
+
+\DIFadd{We assume that there exists an `ideal' model for solving the inverse problem, which we will call the high-fidelity model; given adequate computational resources, we would use this high-fidelity to formulate and solve our inverse problem. We use the subscript $_{HF}$ to denote the high-fidelity inverse problem,
+%DIF > 
+}\begin{subequations}
+\label{eq:invOptHF}
+\begin{align}
+\DIFadd{q_{HF},u_{HF} }&\DIFadd{=}&\DIFadd{\arg\min\limits_{q,u} }& \DIFadd{\quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q), \label{eq:invOpt_objHF} }\\
+&&\DIFadd{\textrm{s.t. }}& \DIFadd{\quad a_{HF}(u,q)(\phi)=\ell_{HF}(q)(\phi),\quad\forall\phi\in U_{HF} \label{eq:invOpt_consHF}
+}\end{align}
+\end{subequations}
+%DIF > 
+\DIFadd{where $q_{HF} \in Q_{HF}$ and $u_{HF}\in U_{HF}$ are the inferred parameters and corresponding state. In practice, one has limited computational resources, so one may need to instead infer the parameters using a less computationally demanding model, which we call the low-fidelity model. We use the subscript $_{LF}$ to denote the low-fidelity inverse problem,
+%DIF > 
+}\begin{subequations}
+\label{eq:invOptLF}
+\begin{align}
+\DIFadd{q_{LF},u_{LF} }&\DIFadd{=}& \DIFadd{\arg\min\limits_{q,u} }& \DIFadd{\quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 + R(q), \label{eq:invOpt_objLF} }\\
+&& \DIFadd{\textrm{s.t. }}& \DIFadd{\quad a_{LF}(u,q)(\phi)=\ell_{LF}(q)(\phi),\quad\forall\phi\in U_{LF}, \label{eq:invOpt_consLF}
+}\end{align}
+\end{subequations}
+%DIF > 
+\DIFadd{where $q_{LF} \in Q_{LF}$ and $u_{LF}\in U_{LF}$ are the inferred parameters and corresponding state. If there is compatibility between the low-fidelity and high-fidelity solution spaces for the parameter and state variables (the solutions of one can be interpreted in the context of the other; see \mbox{%DIFAUXCMD
+\Cref{sec:adapt_alg} }\hspace{0pt}%DIFAUXCMD
+for more details), one may combine the two models to form a mixed-fidelity model and corresponding inverse problem. The low-fidelity model can be used in part of the computational domain, and the high fidelity in the remainder; we denote the mixed-fidelity model and its variables with the subscript $_{MF}$. How one chooses to combine the low- and high-fidelity models can be informed by }\DIFaddend what aspect of the \DIFdelbegin \DIFdel{solution }\DIFdelend \DIFaddbegin \DIFadd{inferred parameters }\DIFaddend is of interest.
+
+\DIFdelbegin \DIFdel{We consider the case of }\DIFdelend \DIFaddbegin \DIFadd{In }\DIFaddend a {\em goal-oriented inverse problem}, \DIFdelbegin \DIFdel{where }\DIFdelend the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by \DIFdelbegin \DIFdel{$I(q,u)$, where $I:Q\times U\to\R$ is }\DIFdelend a functional that maps the parameters and state to our QoI\DIFdelbegin \DIFdel{. We then }\DIFdelend \DIFaddbegin \DIFadd{, $I:Q \times U \to \R$. The QoIs evaluated with the high- ($I(q_{HF},u_{HF})$), low- ($I(q_{LF},u_{LF})$), or mixed- ($I(q_{MF},u_{MF})$) fidelity models correspondingly map parameters and state from the high-, low- or mixed- fidelity function spaces to QoI values. We }\DIFaddend consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use\DIFdelbegin \DIFdel{. In the following, we }\DIFdelend \DIFaddbegin \DIFadd{, seeking computable estimates for the error incurred in approximating the high-fidelity model with lower-fidelity models. Such an estimate allows us to adaptively choose regions where the high-fidelity model is used, starting from an initial low- or mixed- fidelity model.
+}
+
+%DIF > We build on the work in~\cite{BecVex05, becker2004posteriori} which utilize the special structure of the coupled system of PDEs induced by deriving optimality conditions for~\Cref{eq:invOpt_cons}, and derives error estimates for the discretization error in a single model setting. Details of why such an approach is effective for the nature of systems and QoIs we encounter in inverse problems can be found in~\cite{becker2004posteriori} (see Section 3.1 in particular). Here we extend the work in~\cite{BecVex05} to include the situation where the model structure differs, and it is the modeling error that needs to be estimated.
+
+\DIFadd{We build on the work in~\mbox{%DIFAUXCMD
+\cite{BecVex05, becker2004posteriori} }\hspace{0pt}%DIFAUXCMD
+which utilize the special structure of the coupled system of PDEs corresponding to the optimality conditions for~\mbox{%DIFAUXCMD
+\Cref{eq:invOpt} }\hspace{0pt}%DIFAUXCMD
+to derive estimates for the QoI error due to discretization in a single model setting; they consider the case where the high- and low-fidelity models represent different discretizations in the variables corresponding to the same infinite-dimensional model. Details of how the structure of the goal-oriented inverse problem is exploited can be found in~\mbox{%DIFAUXCMD
+\cite{becker2004posteriori} }\hspace{0pt}%DIFAUXCMD
+(see Section 3.1 in particular). Here we extend the work in~\mbox{%DIFAUXCMD
+\cite{BecVex05} }\hspace{0pt}%DIFAUXCMD
+to include the situation where state equations the high- and low-fidelity models differ in more than the discretization of the variable spaces, and it is the QoI error induced by modeling differences that needs to be estimated.
+}
+
+\DIFadd{As in~\mbox{%DIFAUXCMD
+\cite{BecVex05}}\hspace{0pt}%DIFAUXCMD
+, we }\DIFaddend introduce the QoI functional $I$ into the inverse problem formulation by introducing auxiliary variables and additional adjoint equations. We then use this formulation to derive an a posteriori error estimate for \DIFdelbegin \DIFdel{$I$}\DIFdelend \DIFaddbegin \DIFadd{the QoI}\DIFaddend , where the errors considered are those due to the use of different multi-fidelity models\DIFdelbegin \DIFdel{in the constraint \mbox{%DIFAUXCMD
+\Cref{eq:invOpt_cons}}\hspace{0pt}%DIFAUXCMD
+. }\DIFdelend \DIFaddbegin \DIFadd{. However, unlike in~\mbox{%DIFAUXCMD
+\cite{BecVex05}}\hspace{0pt}%DIFAUXCMD
+, this estimate cannot be computed by patch recovery or projection techniques, since the low- and high- fidelity solutions do not differ merely in mesh resolution, but in the underlying equations being discretized. To compute this error estimate, we instead introduce additional supplementary adjoint variables; these new variables serve a similar role to the patch recovery or projection techniques in that they carry information about the high-fidelity solution to the error estimate.
+}
+
+\DIFaddend %
+%------------------------------------------------------------------------------%
+\subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
+%------------------------------------------------------------------------------%
+%
+For a given hierarchy of models, \DIFdelbegin \DIFdel{consider }\DIFdelend \DIFaddbegin \DIFadd{we take }\DIFaddend the QoI calculated from inferring the parameters with the highest-fidelity model \DIFdelbegin \DIFdel{; we take this QoI }\DIFdelend to be the \DIFdelbegin \DIFdel{value with which we compare other QoI estimates. In this section we }\DIFdelend \DIFaddbegin \DIFadd{`exact' or `true' solution; we now }\DIFaddend derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model.
+%
+\begin{proposition}
+\label{thm:error_estimate}
+Consider the \DIFdelbegin \DIFdel{inverse problem }\DIFdelend \DIFaddbegin \DIFadd{high- and low-fidelity inverse problems }\DIFaddend described by the constrained optimization \DIFdelbegin \DIFdel{problem \mbox{%DIFAUXCMD
+\Cref{eq:invOpt}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{problems in \mbox{%DIFAUXCMD
+\Cref{eq:invOptHF,eq:invOptLF}}\hspace{0pt}%DIFAUXCMD
+}\DIFaddend . Let the \DIFdelbegin \DIFdel{form $a:U \times U \to \Reals$ }\DIFdelend \DIFaddbegin \DIFadd{forms $a_{HF/LF}:U_{HF/LF} \times Q_{HF/LF} \times U_{HF/LF} \to \Reals$ }\DIFaddend be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator \DIFdelbegin \DIFdel{$C:U\to\Reals^{n_d}$ }\DIFdelend \DIFaddbegin \DIFadd{$C:U_{HF/LF}\to\Reals^{n_d}$ }\DIFaddend be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator \DIFdelbegin \DIFdel{$R:Q\to\Reals$ }\DIFdelend \DIFaddbegin \DIFadd{$R:Q_{HF/LF}\to\Reals$ }\DIFaddend be differentiable with respect to the parameter $q$, and the \DIFdelbegin \DIFdel{functional $I:Q\times U\to\Reals$ }\DIFdelend \DIFaddbegin \DIFadd{Quantity of Interest (QoI) functional $I:Q_{HF/LF}\times U_{HF/LF}\to\Reals$ }\DIFaddend be differentiable with respect to the state $u$ and parameter $q$.
+
+Consider the Lagrangian equation induced by \DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\Cref{eq:invOpt}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{eq:invOptHF}}\hspace{0pt}%DIFAUXCMD
+}\DIFaddend ,
+%
+\begin{equation}
+\label{eq:InvsOpt_lag}
+\mathcal{L}\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (q,u,z)= J\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (q,u)-(a\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (u,q)(z)-\ell\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (q)(z)),
+\end{equation}
+%
+where \DIFdelbegin \DIFdel{$z\in U$ }\DIFdelend \DIFaddbegin \DIFadd{$z\in U_{HF}$ }\DIFaddend is the adjoint. Denoting the primary variables as $\xi=(q,u,z)$, introduce corresponding auxiliary variables \DIFdelbegin \DIFdel{$\chi=(p,v,y)\in Q\times U\times U$}\DIFdelend \DIFaddbegin \DIFadd{$\chi=(p,v,y)\in Q_{HF}\times U_{HF}\times U_{HF}$}\DIFaddend . Let the augmented Lagrangian be defined as
+%
+\begin{equation}
+\label{eq:InvsOpt_auglag}
+\mathcal{M}\DIFaddbegin \DIFadd{_{HF}}\DIFaddend ((q,u,z),(p,v,y)) = I(q,u) + \mathcal{L}\DIFdelbegin \DIFdel{_{quz}}\DIFdelend '\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (q,u,z)(p,v,y),
+\end{equation}
+%
+where \DIFdelbegin \DIFdel{$\mathcal{L}_{quz}'(q,u,z)(p,v,y)$ }\DIFdelend \DIFaddbegin \DIFadd{$\mathcal{L}'_{HF}(q,u,z)(p,v,y)$ }\DIFaddend denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. \DIFdelbegin \DIFdel{Let $\Psi = (\xi_\Psi,\chi_\Psi)$ denote the stationary point of $\mathcal{M}$.
+}%DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdel{Consider two models with which parameters can be inferred: a high-fidelity model and a lower-fidelity model. Let the high-fidelity (HF) and }\DIFdelend \DIFaddbegin \DIFadd{One can define a similar Langrangian $\mathcal{L}_{LF}$ induced by \mbox{%DIFAUXCMD
+\Cref{eq:invOptLF}}\hspace{0pt}%DIFAUXCMD
+, and a corresponding augmented Lagrangian $\mathcal{M}_{LF}$, for the }\DIFaddend low-fidelity \DIFdelbegin \DIFdel{(LF) models, and their corresponding variables, Lagrangians, and augmented Lagrangians, be distinguished by the subscripts $_{HF}$ and $_{LF}$, respectively. In particular, let $\Psi_{HF}$ and $\Psi_{LF}$ }\DIFdelend \DIFaddbegin \DIFadd{model. Let $\Psi_{HF}= (\xi_{HF},\chi_{HF})=((q_{HF},u_{HF},z_{HF}),(p_{HF},v_{HF},y_{HF}))$ and $\Psi_{LF}= (\xi_{LF},\chi_{LF})=((q_{LF},u_{LF},z_{LF}),(p_{LF},v_{LF},y_{LF}))$ }\DIFaddend denote the stationary points of the high- and low- fidelity augmented Lagrangians\DIFdelbegin \DIFdel{$\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$}\DIFdelend , respectively. Then, the error in the \DIFdelbegin \DIFdel{Quantity of Interest $I$ }\DIFdelend \DIFaddbegin \DIFadd{QoI }\DIFaddend is given by\DIFaddbegin \DIFadd{,
+}\DIFaddend %
+\begin{multline}
+\label{eq:semifinErrExp}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'\DIFdelbegin \DIFdel{_{HF,\Psi}}\DIFdelend \DIFaddbegin \DIFadd{_{HF}}\DIFaddend (\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}\DIFdelbegin \DIFdel{(e^3)}\DIFdelend \textrm{,}
+\end{multline}
+%
+where $\mathcal{R}$ is a remainder term that is third-order in the error $e=\Psi_{HF}-\Psi_{LF}$.
+\end{proposition}
+%
+\begin{proof}
+%
+Observe that
+%
+\begin{equation}
+\label{eq:MeqI}
+\mathcal{M}\DIFaddbegin \DIFadd{_{HF}}\DIFaddend (\Psi\DIFaddbegin \DIFadd{_{HF}}\DIFaddend )=I(q\DIFaddbegin \DIFadd{_{HF}}\DIFaddend ,u\DIFaddbegin \DIFadd{_{HF}}\DIFaddend )\DIFaddbegin \quad\textrm{\DIFadd{and}}\quad\DIFadd{\mathcal{M}_{LF}(\Psi_{LF})=I(q_{LF}}\DIFaddend ,\DIFaddbegin \DIFadd{u_{LF}),
+}\DIFaddend \end{equation}
+%
+since taking variations of \DIFdelbegin \DIFdel{$\mathcal{M}$ }\DIFdelend \DIFaddbegin \DIFadd{$\mathcal{M}_{HF}$ and $\mathcal{M}_{LF}$ }\DIFaddend with respect to the auxiliary variables gives that \DIFdelbegin \DIFdel{$\xi_\Psi$ is a stationary point of $\mathcal{L}$}\DIFdelend \DIFaddbegin \DIFadd{$\xi_{HF}$ and $\xi_{LF}$ are stationary points of $\mathcal{L}_{HF}$ and $\mathcal{L}_{LF}$, respectively}\DIFaddend .
+
+Extending the property in \Cref{eq:MeqI} to the augmented Lagrangians for the high- and low-fidelity models, we have\DIFaddbegin \DIFadd{,
+}\DIFaddend %
+\begin{multline}
+\label{eq:repIwithM}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.}
+\end{multline}
+%
+\DIFdelbegin \DIFdel{Applying the output error representation described inProposition 3 from~\mbox{%DIFAUXCMD
+\cite{BecVex05} }\hspace{0pt}%DIFAUXCMD
+for the difference $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$,
+}\DIFdelend \DIFaddbegin \DIFadd{Following~\mbox{%DIFAUXCMD
+\cite{BecVex05}}\hspace{0pt}%DIFAUXCMD
+, we rewrite the term $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$ using the Fundamental Theorem of Calculus,
+%DIF > 
+}\begin{equation}
+\DIFadd{\label{eq:Mantiderivative}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \int\limits_{0}^{1} \mathcal{M}'_{HF}\left(\Psi_{HF} + se\right)\left(e\right) \, \textrm{d}s.
+}\end{equation}
+%DIF > 
+\DIFadd{Applying the trapezoidal rule to the integral in~\mbox{%DIFAUXCMD
+\Cref{eq:Mantiderivative} }\hspace{0pt}%DIFAUXCMD
+gives,
+%DIF > 
+}\begin{equation}
+\DIFadd{\label{eq:Mprimetrapezoid}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{HF})(e) + \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(e) + \mathcal{R}\textrm{.}
+}\end{equation}
+%DIF > 
+\DIFadd{where the remainder $\mathcal{R}$ is given as,
+%DIF > 
+}\DIFaddend \begin{equation}
+\DIFdelbegin %DIFDELCMD < \label{eq:beckvex}
+%DIFDELCMD < %%%
+\DIFdel{\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) }\DIFdelend \DIFaddbegin \label{eq:trapezoidremainder}
+\DIFadd{\mathcal{R} = \frac{1}{2} \int\limits_{0}^{1} \mathcal{M}'''_{HF}\left(\Psi_{LF} + se\right)(e,e,e) \, s(s-1) \, \textrm{d}s,}\DIFaddend \end{equation}
+%DIF > 
+\DIFaddbegin \DIFadd{which is finite due to the third-order differentiability assumptions. We further note that $\mathcal{M}'_{HF}(\Psi_{HF})(e)$ vanishes since $\Psi_{HF}$ is a stationary point of $\mathcal{M}_{HF}$, and~\mbox{%DIFAUXCMD
+\Cref{eq:Mprimetrapezoid} }\hspace{0pt}%DIFAUXCMD
+can be simplified to,
+%DIF > 
+}\begin{equation}
+\DIFadd{\label{eq:beckvex}
+\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF}) = \frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{R}\textrm{.}
+}\end{equation}
+%DIF > 
+\DIFaddend Combining \Cref{eq:repIwithM} and \Cref{eq:beckvex} we obtain\DIFaddbegin \DIFadd{,
+%DIF > 
+}\DIFaddend \begin{multline}
+\label{eq:preadj}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\frac{1}{2}\mathcal{M}'\DIFdelbegin \DIFdel{_{HF,\Psi}}\DIFdelend \DIFaddbegin \DIFadd{_{HF}}\DIFaddend (\Psi_{LF})(\Psi_{HF}-\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})+\mathcal{R}\DIFdelbegin \DIFdel{(e^3)}\DIFdelend \textrm{,}
+\end{multline}
+which completes the proof.
+\end{proof}
+%
+
+The above \DIFdelbegin \DIFdel{proposition }\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{thm:error_estimate} }\hspace{0pt}%DIFAUXCMD
+}\DIFaddend splits the error in the QoI into three components\DIFdelbegin \DIFdel{, }\DIFdelend \DIFaddbegin \DIFadd{: }\DIFaddend a third-order remainder term \DIFdelbegin \DIFdel{$\mathcal{R}(e^3)$}\DIFdelend \DIFaddbegin \DIFadd{$\mathcal{R}$}\DIFaddend , a computable `bias' term $\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})$, and a linear term \DIFdelbegin \DIFdel{$\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$}\DIFdelend \DIFaddbegin \DIFadd{$\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$}\DIFaddend . Although the linear term is not computable \DIFaddbegin \DIFadd{without solving for $\Psi_{HF}$}\DIFaddend , it can be estimated\DIFdelbegin \DIFdel{using an appropriate dual problem}\DIFdelend . We describe one method of estimating this term\DIFaddbegin \DIFadd{, using an appropriate dual problem, in \mbox{%DIFAUXCMD
+\Cref{thm:error_estimate_dual} }\hspace{0pt}%DIFAUXCMD
+}\DIFaddend below.
+
+\DIFdelbegin \DIFdel{Note that, as a stationary point, $\Psi_{HF}$ satisfies~\mbox{%DIFAUXCMD
+\Cref{eq:supadjsys}}\hspace{0pt}%DIFAUXCMD
+. Now, let $\mathcal{Q}$ be an output defined by
+}\DIFdelend %
+\DIFdelbegin \begin{displaymath}
+\DIFdel{\mathcal{Q}(\Phi)=\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Phi).
+%DIFDELCMD < \label{eq:supadjout}%%%
+}\end{displaymath}
+%DIFAUXCMD
+%DIF < 
+\DIFdelend \DIFaddbegin \begin{proposition}
+\label{thm:error_estimate_dual}
+\DIFadd{Let the hypotheses of Proposition~\ref{thm:error_estimate} hold. }\DIFaddend Let the variational form
+%
+\begin{equation}
+\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\DIFdelbegin %DIFDELCMD < \label{eq:supadjsys}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \label{eq:supadjsys_prop}
+\DIFaddend \end{equation}
+%
+represent the equation $\mathcal{M}'_{HF,\Psi}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define \DIFdelbegin \DIFdel{the corresponding }\DIFdelend \DIFaddbegin \DIFadd{an }\DIFaddend adjoint problem
+%
+\begin{equation}
+\mathscr{R}\DIFdelbegin \DIFdel{_{\Psi}}\DIFdelend '(\Psi\DIFdelbegin \DIFdel{_{HF}}\DIFdelend \DIFaddbegin \DIFadd{_{LF}}\DIFaddend ,\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:superAdjEq}
+\end{equation}
+for the supplementary adjoint $\Lambda$, where $\mathscr{R}$ is defined in \DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\Cref{eq:supadjsys}}\hspace{0pt}%DIFAUXCMD
+. The error in the }\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{eq:supadjsys_prop}}\hspace{0pt}%DIFAUXCMD
+, and where
+%DIF > Let $\Lambda$ be the solution of the dual problem, \red{$\mathcal{M}'$ has just one '?}
+%DIF > 
+%DIF > \begin{equation}
+%DIF > \mathcal{M}_{HF}'(\Psi_{LF};\Phi, \Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2,
+%DIF > \end{equation}
+%DIF > 
+where $\mathcal{Q}:(U_{HF} \times U_{HF} \times Q_{HF})^2 \to \R$ is a linear functional defined by,
+%DIF > 
+}\begin{equation}
+\DIFadd{\mathcal{Q}(\Phi)=\mathcal{M}'_{HF}(\Psi_{LF})(\Phi).
+\label{eq:supadjout}
+}\end{equation}
+%DIF > 
+\DIFadd{Then we have,
+%DIF > 
+}\begin{multline}
+\DIFadd{\label{eq:finErrExp}
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=}\\\DIFadd{-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF}) + \mathcal{R}_{\mathscr{R}} + \mathcal{R}
+}\end{multline}
+%DIF > 
+\DIFadd{where $\mathcal{R}_{\mathscr{R}}$ is a second-order term in the error $e=\Psi_{HF}-\Psi_{LF}$, and $\mathcal{R}$ is as defined in \mbox{%DIFAUXCMD
+\Cref{thm:error_estimate}}\hspace{0pt}%DIFAUXCMD
+. %DIF > \red{Now that we've explicitly pointed out the second-order error term, can we really say that we derived "an adjoint-based third-order estimate" (in abstract and intro)?}
+%DIF > 
+}\end{proposition}
+%DIF > 
+\begin{proof}
+%DIF > 
+\DIFadd{The proof simply follows from the classic dual-based a posteriori error estimation strategy. Note that, as a stationary point, $\Psi_{HF}$ satisfies,
+%DIF > 
+}\begin{equation}
+\DIFadd{\mathscr{R}(\Psi_{HF})(\Phi)=0,\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:supadjsys}
+}\end{equation}
+%DIF > 
+\DIFadd{which is represents the equation $\mathcal{M}'_{HF}(\Psi_{HF})(\Phi)=0$ in residual form, where $\Phi$ is a test function. Define the adjoint problem
+%DIF > 
+}\begin{equation}
+\DIFadd{\mathscr{R}'(\Psi_{LF},\Phi)(\Lambda)=\mathcal{Q}(\Phi),\quad\forall\Phi\in(Q_{HF}\times U_{HF}\times U_{HF})^2
+\label{eq:superAdjEq}
+}\end{equation}
+%DIF > 
+\DIFadd{for the supplementary adjoint $\Lambda$. The error in the linear }\DIFaddend output $\mathcal{Q}$ defined in \Cref{eq:supadjout} can then be expressed as a dual-weighted residual,
+\DIFdelbegin \begin{displaymath}
+\DIFdel{%DIFDELCMD < \label{eq:adjOutErr}%%%
+\mathcal M'_{HF,\Psi}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})=-\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda).
+}\end{displaymath}
+%DIFAUXCMD
+\DIFdelend %
+\DIFdelbegin \DIFdel{Combining \mbox{%DIFAUXCMD
+\Cref{eq:preadj} }\hspace{0pt}%DIFAUXCMD
+and \mbox{%DIFAUXCMD
+\Cref{eq:adjOutErr} }\hspace{0pt}%DIFAUXCMD
+, we have,
+}\begin{align*}
+\DIFdel{%DIFDELCMD < \label{eq:finErrExp}%%%
+I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=}\\\DIFdel{-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{LF})(\Lambda)+\mathcal M_{HF}(\Psi_{LF})-\mathcal M_{LF}(\Psi_{LF})+\mathcal{R}(e^3).
+}\end{align*}
+%DIFAUXCMD
+%DIF < 
+\DIFdel{Other approaches }\DIFdelend \DIFaddbegin \begin{equation}
+\DIFadd{\label{eq:adjOutErr}
+\mathcal{Q}(\Psi_{HF}-\Psi_{LF})=-\mathscr{R}(\Psi_{LF})(\Lambda) + R_{\mathscr{R}},
+}\end{equation}
+%DIF > 
+\DIFadd{where $R_{\mathscr{R}}$ is a second order remainder term due to the linearization of $\mathscr{R}$ about $\Psi_{LF}$ in \mbox{%DIFAUXCMD
+\Cref{eq:superAdjEq}}\hspace{0pt}%DIFAUXCMD
+. This implies the required result. %DIF > \red{What is the classical notation for adjoint problems? Is it okay that we're breaking from the previous notation where a second pair of parentheses denotes things that we are linear in?}
+%DIF > 
+}\end{proof}
+%DIF > 
+\DIFadd{We note that if the state equations of the high-fidelity model are linear, the remainder term $R_\mathscr{R}$ in the supplementary adjoint formulation in \mbox{%DIFAUXCMD
+\Cref{eq:adjOutErr} }\hspace{0pt}%DIFAUXCMD
+vanishes, and the error estimate in \mbox{%DIFAUXCMD
+\Cref{eq:finErrExp} }\hspace{0pt}%DIFAUXCMD
+becomes fully third-order. This occurs even if the QoI functional $I$ is nonlinear.
+%DIF > If the state equations of the high fidelity model are linear, the derivative of the Lagrangian in~\Cref{eq:InvsOpt_auglag} is linear. In this case, the $R_{\mathscr{R}}$ term in~\Cref{eq:finErrExp} disappears, even if the QoI functional $I$ is nonlinear, and we get a fully third order error estimate.
+}
+
+\DIFadd{Other approaches to estimating the term $\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$ }\DIFaddend can become feasible in certain scenarios; for example, if the high- and low-fidelity models only differ in the computational grid used, the difference $\Psi_{HF}-\Psi_{LF}$ can be approximated using interpolation or patch recovery methods~\cite{BecVex05}.
+
+\section{Goal-Oriented Inference Algorithm}\label{sec:alg}
+%
+Based on the theoretical developments in the last section, we now give a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Adaptive Model Mixing Algorithm}\label{sec:adapt_alg}
+%------------------------------------------------------------------------------------------------------------------------%
+
+Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,VendDarm00,PrudOden99,BecVex05,AinsOden11}, the error estimate \DIFaddbegin \DIFadd{obtained after dropping the remainder terms $\mathcal{R}$ and $\mathcal{R}_\mathscr{R}$ in }\DIFaddend \Cref{eq:finErrExp} can be localized to give elemental contributions and used to guide physics-based refinement over the domain to create a mixed-fidelity model. After refinement, the error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some error threshold is reached. \Cref{alg:refSeries} describes this approach. 
+%Note that the QoI error adjoint problem \Cref{eq:superAdjEq} involves linearization about $\Psi_{HF}$, which is not available, so in the case of a nonlinear goal-oriented inverse problem, the QoI error adjoint problem is approximated by linearizing about $\Psi_{LF}$ instead.
+%
+\alglanguage{pseudocode}
+\begin{algorithm}[h!]
+\small
+\caption{An algorithm to adaptively build a mixed-fidelity model for low error in the QoI.}
+\label{alg:refSeries}
+\begin{algorithmic}[1]
+\State{Define maximum acceptable absolute relative QoI error \texttt{errTol}}
+\State{Define maximum number of adaptive iterations \texttt{maxIter}}
+\Procedure{$\texttt{BuildMixedFidelity}$}{HF model, LF model, \texttt{errTol}, \texttt{maxIter}}
+	\State{Let the model MF$_0$ be the LF model applied everywhere in the domain.}
+	\State{$i\gets0$}
+	\State{Solve for stationary point $\Psi_{MF_0}$ of augmented Lagrangian $\mathcal{M}_{MF_0}$}
+	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for \par\hskip\algorithmicindent supplementary adjoint $\Lambda_0$ (see \Cref{eq:superAdjEq})}
+	\DIFdelbegin %DIFDELCMD < \State{Compute QoI error estimate
+%DIFDELCMD < 		
+
+%DIFDELCMD < 	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
+%DIFDELCMD < 	%%%
+\DIFdelend \DIFaddbegin \State{Compute QoI error estimate
+
+	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
+	\DIFaddend \State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
+	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))|>$ \texttt{errTol}}
+		\DIFdelbegin %DIFDELCMD < \State{\begin{varwidth}[t]{\linewidth}Localize $\epsilon_i$ (see \Cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$\end{varwidth}}
+%DIFDELCMD < 		%%%
+\DIFdelend \DIFaddbegin \State{Localize $\epsilon_i$ (see \Cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$}
+		\DIFaddend \State{$i\gets i+1$}
+		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
+		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for
+
+		$\quad\quad$supplementary adjoint $\Lambda_i$ (see \Cref{eq:superAdjEq})}
+		\DIFdelbegin %DIFDELCMD < \State{Compute QoI error estimate
+%DIFDELCMD < 		
+
+%DIFDELCMD < 		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF,\Psi}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$}
+%DIFDELCMD < 		%%%
+\DIFdelend \DIFaddbegin \State{Compute QoI error estimate
+
+		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$\label{alg-line:MFerrorest}}
+		\DIFaddend \State{Calculate QoI $I(q_{MF_i},u_{MF_i})$}
+	\EndWhile \\
+\Return{model MF$_i$ and QoI estimate $I(q_{MF_i},u_{MF_i})$}
+\EndProcedure
+\Statex
+\end{algorithmic}
+\end{algorithm}
+%
+
+\DIFaddbegin \DIFadd{As an example, consider a pair of low- and high-fidelity models described by the convection-diffusion and convection-diffusion-reaction equations
+}\begin{subequations}
+\begin{align}
+\DIFadd{\textrm{low-fidelity:   } }& \DIFadd{k_d\nabla^2 u - \vec{V}\cdot\nabla u = q, \label{eq:cdvcdrLF}}\\
+\DIFadd{\textrm{high-fidelity:   } }& \DIFadd{k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2 = q, \label{eq:cdvcdrHF}
+}\end{align}
+\end{subequations}
+\DIFadd{where $k_d$ and $k_r$ are diffusion and reaction coefficients, respectively, and the state $u$ and parameters $q$ are continuous functions over a domain $\Omega$ with homogenous Dirichlet boundary conditions. To form the mixed-fidelity models, we divide the domain into complementary subdomains, $\Omega_{HF}$ and $\Omega_{LF}$, where the high- and low-fidelity models are solved, respectively; initially, $\Omega_{LF}=\Omega$. The resulting mixed-fidelity models can be described by,
+%DIF > 
+}\begin{equation}
+\DIFadd{k_d\nabla^2 u - \vec{V}\cdot\nabla u + k^{MF}_ru^2= q,
+}\end{equation}
+%DIF > 
+\DIFadd{where $k^{MF}_r$ is a piecewise-constant reaction coefficient, %DIF > that's zero in the $\Omega_{LF}$ and equal to $k_r$ in $\Omega_{HF}$; 
+%DIF > 
+}\begin{equation}
+\DIFadd{k^{MF}_r=
+\begin{cases}
+k_r & \textrm{if }x\in\Omega_{HF} \\
+0 & \textrm{if }x\in\Omega_{LF}.
+\end{cases}
+}\end{equation}
+%DIF > 
+\DIFadd{Let the QoI be described by $I(q,u)=\int_{\Omega_I} u \:\textrm{d}\Omega$, where $\Omega_I\subset\Omega$ is the QoI region. Let the observations be of the state at some set of locations, so that the data-misfit term is $\frac{1}{2}\int_\Omega \delta_{obs}(u-d)^2\:\textrm{d}\Omega$, where $\delta_{obs}$ is a sum of Dirac delta functions indicating the locations of the observations. Since the inverse problem is ill-posed, we use Tikhonov regularization~\mbox{%DIFAUXCMD
+\cite{EngHanNeu00}}\hspace{0pt}%DIFAUXCMD
+, with $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla q\|_2^2\:\textrm{d}\Omega$, where $\beta$ is a regularization coefficient. Assuming divergence-free velocity $\vec{V}$, the mixed-fidelity model has augmented Lagrangian
+}\begin{eqnarray}
+\DIFadd{\mathcal{M}_{MF}((q,u,z)(p,v,y)) }&\DIFadd{=}& \DIFadd{\int_{\Omega_I\subset\Omega} u \:\textrm{d}\Omega \nonumber}\\
+&\DIFadd{+}& \DIFadd{\int_\Omega p(-\beta\nabla^2q+z) \nonumber}\\
+&\DIFadd{+}& \DIFadd{v(k_d\nabla^2z+\vec{V}\cdot\nabla z+2k^{MF}_rzu+\delta_{obs}(u-d)) \nonumber}\\ 
+&\DIFadd{+}& \DIFadd{y(k_d\nabla^2u-\vec{V}\cdot\nabla u+k^{MF}_ru^2+q)\:\textrm{d}\Omega.
+}\end{eqnarray}
+\DIFadd{Taking variations with respect to the auxiliary variables $(p,v,y)$ recovers the equations for the primary variables; taking variations with respect to the primary variables gives the equations for the auxiliary variables. Solving for the primary variables and then the auxiliary variables gives the stationary point $\Psi_{MF}$ of $\mathcal{M}_{MF}$. 
+The high-fidelity versions of these primary and auxiliary systems are satisfied by $\Psi_{HF}$; we seek the error in the linear functional described by \mbox{%DIFAUXCMD
+\Cref{eq:supadjout} }\hspace{0pt}%DIFAUXCMD
+induced by applying it to $\Psi_{MF}$ instead of $\Psi_{HF}$. We take the classical dual-weighted residual approach and solve for the supplementary adjoint $\Lambda$, linearizing about $\Psi_{MF}$ instead of $\Psi_{HF}$ when necessary, since the later is not available; the components of the supplementary adjoint corresponding to the primary and auxiliary systems can be solved separately. Having obtained $\Psi_{MF}$ and the supplementary adjoint $\Lambda$, we evaluate the error estimate (see Step \ref{alg-line:MFerrorest} of \mbox{%DIFAUXCMD
+\Cref{alg:refSeries}}\hspace{0pt}%DIFAUXCMD
+), localize it (see \mbox{%DIFAUXCMD
+\Cref{sec:errLocal}}\hspace{0pt}%DIFAUXCMD
+), and use the localization to guide the selection of elements currently in $\Omega_{LF}$ to include in $\Omega_{HF}$ in the next iteration. We return to this example and give results of applying \mbox{%DIFAUXCMD
+\Cref{alg:refSeries} }\hspace{0pt}%DIFAUXCMD
+to this pair of models in \mbox{%DIFAUXCMD
+\Cref{sec:cdvcdr}}\hspace{0pt}%DIFAUXCMD
+.
+%DIF > The weighted residual of the high-fidelity primary and auxiliary equations, evaluated at $\Psi_{MF}$, describes a linear functional in the weights (see \Cref{eq:supadjout}). Taking the adjoint of these high-fidelity primary and auxiliary systems, with output described by this linear functional, gives the supplementary adjoint; the components of the supplementary adjoint corresponding to the primary and auxiliary systems can be solved separately. Having obtained $\Psi_{MF}$ and the supplementary adjoint $\Lambda$, we evaluate the error estimate (see Step \ref{alg-line:MFerrorest} of \Cref{alg:refSeries}), localize it (see \Cref{sec:errLocal}), and use the localization to guide the selection of elements currently in $\Omega_{LF}$ to include in $\Omega_{HF}$ in the next iteration. We return to this example and give results of applying \Cref{alg:refSeries} to this pair of models in \Cref{sec:cdvcdr}.
+}
+
+\DIFaddend \Cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena, be a reduced-order model, or have a reduced parameter \DIFaddbegin \DIFadd{and/or state }\DIFaddend space. The \DIFdelbegin \DIFdel{two models could also correspond to two levels of mesh refinement, though in this case the method described in~\mbox{%DIFAUXCMD
+\cite{BecVex05} }\hspace{0pt}%DIFAUXCMD
+would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead. The }\DIFdelend derived error estimate is not applicable to all models, however. \DIFdelbegin \DIFdel{The two models have to be expressed }\DIFdelend \DIFaddbegin \DIFadd{It is assumed that the two models share the same domain; for example, the low-fidelity model can not be a one-dimensional average of a two-dimensional high-fidelity model. The low- and high-fidelity models must by expressible }\DIFaddend in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models\DIFdelbegin \DIFdel{; namely, we assume }\DIFdelend \DIFaddbegin \DIFadd{, in that we require the low-fidelity solutions to be interpretable in the context of the high-fidelity model; specifically, we require }\DIFaddend that $\Psi_{LF}$ \DIFdelbegin \DIFdel{will }\DIFdelend be in a space admissible to \DIFdelbegin \DIFdel{$\mathcal{M}'_{HF,\Psi}$, }\DIFdelend \DIFaddbegin \DIFadd{$\mathcal{M}'_{HF}$ }\DIFaddend and \DIFdelbegin \DIFdel{that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$.
+}\DIFdelend \DIFaddbegin \DIFadd{$\mathcal{M}_{HF}$. For example, compared to the high-fidelity model, low-fidelity model may have a coarser mesh, basis functions of a lower order, or basis functions spanning a reduced subspace. The high-fidelity model could describe changes in states that have a fixed nominal value in the low-fidelity model; the high-fidelity model could allow anisotropy of the inferred parameters while the low-fidelity model could constrain their components and require isotropy. We note that in the case where the two models correspond to two levels of mesh refinement, method described in~\mbox{%DIFAUXCMD
+\cite{BecVex05} }\hspace{0pt}%DIFAUXCMD
+would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead.
+%DIF > , and that the QoI functional $I$ is applicable to both $(q_{HF},u_{HF})$ and $(q_{LF},u_{LF})$. %implied by admissibility of LF to HF
+}\DIFaddend 
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Error Estimate Localization}\label{sec:errLocal}
+%------------------------------------------------------------------------------------------------------------------------%
+\DIFaddbegin 
+
+\DIFaddend \Cref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
+
+We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. \DIFdelbegin \DIFdel{For ease of implementation, we can choose these basis functions to be the same as those spanning the space }\DIFdelend \DIFaddbegin \DIFadd{Recall the error estimate 
+%DIF > 
+}\begin{equation}
+\DIFadd{\epsilon=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF})(\Lambda)+\mathcal M_{HF}(\Psi_{MF})-\mathcal M_{MF}(\Psi_{MF})
+}\end{equation}
+%DIF > 
+\DIFadd{from \mbox{%DIFAUXCMD
+\Cref{alg:refSeries}}\hspace{0pt}%DIFAUXCMD
+. Let $(Q^h\times U^h\times U^h)^3 \subset (Q\times U\times U)^3$ be the finite-dimensional conforming subspace }\DIFaddend in which we solve for the \DIFdelbegin \DIFdel{primary, auxiliary,
+and supplementary adjoint variables}\DIFdelend \DIFaddbegin \DIFadd{approximations $\Lambda^h$ and $\Psi_{MF}^h$; we seek to decompose the error estimate
+%DIF > 
+}\begin{equation}
+\DIFadd{\epsilon^h=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF}^h)(\Lambda^h)+\mathcal M_{HF}(\Psi_{MF}^h)-\mathcal M_{MF}(\Psi_{MF}^h).
+}\end{equation}
+%DIF > 
+\DIFadd{Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally supported functions such that $\textrm{span}(\Phi^h)=(Q^h\times U^h\times U^h)^3$, so that we can write $(\Lambda^h,\Psi_{MF}^h)=(\sum\limits_{i\in I}\varphi_i\lambda_i,\sum\limits_{i\in I}\upvarphi_i \psi_i)$. Then the error estimate satisfies
+%DIF > 
+}\begin{equation}
+\DIFadd{\epsilon^h \leq \sum_{i\in I} \varepsilon^h_i,
+}\end{equation}
+%DIF > 
+\DIFadd{where,
+%DIF > 
+}\begin{equation}\DIFadd{\label{eq:basisblame}
+\varepsilon^h_i = \left| -\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF}^h)(\lambda_i\varphi_i)+\mathcal M_{HF}(\upvarphi_i \psi_i)-\mathcal M_{MF}(\upvarphi_i \psi_i) \right|
+}\end{equation}
+%DIF > 
+\DIFadd{can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$}\DIFaddend . Near the interfaces between the low-fidelity and high-fidelity regions, basis functions may have their support divided between the two regions and thus have a nonzero error contribution. The basis functions with the largest error contributions are flagged, and the elements in their support are added to the high-fidelity subdomain. Basis functions whose support lie completely in the high-fidelity region will have a zero contribution and the elements in their support are never flagged for refinement again. 
+
+
+\section{Numerical Experiments}\label{sec:numexp}
+%
+We now use \Cref{alg:refSeries} to solve goal-oriented inverse problems in a multi-model setting; the method used to localize the error estimate is described in \Cref{sec:errLocal}. We first consider two-dimensional models in order to explore the behavior of the algorithm as well as the effect of varying the placement of observations and QoI regions. In \Cref{sec:cdvcdr}, the high-fidelity model is a convection-diffusion-reaction nonlinear model, and the low-fidelity model is a linear convection-diffusion model. We apply \Cref{alg:refSeries} to this pair of models, and then examine how the localized error estimate is affected by changes in sensor placement and in the QoI region. In \Cref{sec:constvfield}, both the high- and low-fidelity models are convection-diffusion-reaction nonlinear models, but they differ in how the parameter is represented. In \Cref{sec:diffvcdr3D}, we consider a more realistic pair of three-dimensional models, again targeting a convection-diffusion-reaction problem.
+
+%In all experiments, starting the simulation with the low fidelity model, we seek to add regions of high fidelity, until the estimated relative error in the target QoI is less than 1$\%$.
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Variable Physics: Convection-Diffusion(-Reaction)} \label{sec:cdvcdr}
+%------------------------------------------------------------------------------------------------------------------------%
+In this section, we consider a pair of models which differ in the physics included. In \Cref{sec:cdvcdrSetup} we describe a baseline setup for a simple two-dimensional problem. \Cref{sec:cdvcdrBaseRef} describes the results of applying \Cref{alg:refSeries} to the baseline problem, and \Cref{sec:qoivdata} describes the results of changing the placement of the observations or the QoI region from the baseline.
+%
+%------------------------------------------------------------%
+\subsubsection{Problem Setup} \label{sec:cdvcdrSetup}
+%------------------------------------------------------------%
+%
+We consider a rectangular domain $\Omega(x_1,x_2)=[0,5]\times[0,1]$, where $x_1$ and $x_2$ are the spatial coordinates. \DIFaddbegin \DIFadd{Recall the pair of models introduced in \mbox{%DIFAUXCMD
+\Cref{sec:adapt_alg}}\hspace{0pt}%DIFAUXCMD
+. }\DIFaddend The high-fidelity model is a single-species convection-diffusion-reaction equation with a nonlinear reaction term, described by \DIFdelbegin \DIFdel{,
+%DIF < 
+}%DIFDELCMD < \begin{subequations}
+%DIFDELCMD < \label{eq:cdvcdrHF}
+%DIFDELCMD < %%%
+\begin{align*}
+\DIFdel{k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2 = f(q) \quad }&\DIFdel{\text{in } \Omega,  }\\
+\DIFdel{u = 0 \quad }&\DIFdel{\text{on } \partial \Omega, 
+}\end{align*}
+%DIFAUXCMD
+%DIFDELCMD < \end{subequations}
+%DIFDELCMD < %%%
+%DIF < 
+\DIFdel{where the state $u$ is the species concentration and $f(q)$ is a forcing field described by the parameters}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{eq:cdvcdrHF}}\hspace{0pt}%DIFAUXCMD
+. The low-fidelity model, described by \mbox{%DIFAUXCMD
+\Cref{eq:cdvcdrLF}}\hspace{0pt}%DIFAUXCMD
+, differs only in the removal of the reaction term}\DIFaddend . We have a divergence-free parabolic-profile velocity field $\vec{V}(x_1,x_2) = (2x_2(1-x_2),0)$; the diffusion and reaction coefficients are $k_d = 0.1$ and $k_r = -42.0$, respectively. \DIFdelbegin \DIFdel{The low-fidelity model,
+%DIF < 
+}\begin{displaymath}
+\DIFdel{k_d\nabla^2 u - \vec{V}\cdot\nabla u = f(q)
+}\end{displaymath}
+%DIFAUXCMD
+%DIF < 
+\DIFdel{differs only in the removal of the reaction term. To form the mixed-fidelity models, we divide the domain into complementary subdomains, $\Omega_{HF}$ and $\Omega_{LF}$, where the high- and low-fidelity models are solved, respectively. The resulting mixed-fidelity models can be described by,
+%DIF < 
+}\begin{displaymath}
+\DIFdel{k_d\nabla^2 u - \vec{V}\cdot\nabla u + k^{MF}_ru^2= f(q),
+}\end{displaymath}
+%DIFAUXCMD
+%DIF < 
+\DIFdel{where $k^{MF}_r$ is a piecewise-constant reaction coefficient,
+%DIF < 
+}\begin{displaymath}
+\DIFdel{k^{MF}_r=
+\begin{cases}
+k_r & \textrm{if }x\in\Omega_{HF} \\
+0 & \textrm{if }x\in\Omega_{LF}.
+\end{cases}
+}\end{displaymath}
+%DIFAUXCMD
+%DIF < 
+\DIFdelend Homogeneous Dirichlet boundary conditions are applied on the entire boundary of the domain. 
+\DIFdelbegin \DIFdel{The QoI we wish to calculate is the integral of the state,
+%DIF < 
+}\begin{displaymath}
+\DIFdel{I(q,u)=\int_{(x_1,x_2)\in \Omega_I} u \:\textrm{d}A,
+}\end{displaymath}
+%DIFAUXCMD
+%DIF < 
+\DIFdel{over a region }\DIFdelend \DIFaddbegin 
+
+\DIFadd{The QoI region is }\DIFaddend $\Omega_I=[0.625,0.875]\times[0.375,0.625]$. \DIFdelbegin %DIFDELCMD < 
+
+%DIFDELCMD < %%%
+\DIFdel{The unknown parameters to be inferred }\DIFdelend \DIFaddbegin \DIFadd{The parameters $q$ we wish to infer }\DIFaddend correspond to the forcing \DIFdelbegin \DIFdel{field, so that in this case $f(q)=q$}\DIFdelend \DIFaddbegin \DIFadd{function}\DIFaddend . The observations are sparse measurements of the state.
+\Cref{fig:baseSetup} shows the locations of the observations and the region $\Omega_I$ over which the QoI is calculated. \DIFdelbegin \DIFdel{For }\DIFdelend \DIFaddbegin \DIFadd{Note that for }\DIFaddend the low-fidelity model, the inverse problem is linear (i.e., the observations depend linearly on the parameters). \DIFdelbegin \DIFdel{Since the inverse problem is ill-posed, we use Tikhonov regularization ~\mbox{%DIFAUXCMD
+\cite{EngHanNeu00}}\hspace{0pt}%DIFAUXCMD
+. The regularization term in the objective function \mbox{%DIFAUXCMD
+\Cref{eq:invOpt_obj} }\hspace{0pt}%DIFAUXCMD
+is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}A$, where }\DIFdelend \DIFaddbegin \DIFadd{We arbitarily choose the regularization coefficient to be }\DIFaddend $\beta=10^{-5}$\DIFdelbegin \DIFdel{is the regularization coefficient }\DIFdelend ; in this work, $\beta$ is chosen arbitrarily, though methods exist for choosing optimal regularization coefficients~\cite{BelgeKilmerMiller02,Calvetal00}.
+%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.8\textwidth]{baseSeries/setup_3_3.pdf}
+\caption{Locations of the observations and the QoI region.}
+\label{fig:baseSetup}
+\end{figure}
+%
+
+For the numerical simulations, we use the finite element method (FEM), employing a continuous Galerkin formulation with \DIFaddbegin \DIFadd{first-order }\DIFaddend Lagrange elements. We use the \texttt{libMesh} library~\cite{libMeshPaper} for the FEM calculations.
+%\red{The library offers easy calculation of adjoint systems, error estimates and subdomain restricted variables.}\footnote{But we don't use Libmesh's error estimates or restrict variables to subdomains...}
+The domain is discretized by a regular mesh of quadrilaterals, with 250 and 50 elements along the $x_1$ and $x_2$ directions, respectively, for a total of 12,500 elements, resulting in 12,801 degrees of freedom per variable\DIFaddbegin \DIFadd{; all variables are represented by the same basis}\DIFaddend . The diffusion coefficient is such that the cell P\'{e}clet number never exceeds 0.1, and thus no stabilization is required.
+
+Synthetic observations consisting of the state at three points in the domain are artificially generated by running the high-fidelity model on a finer mesh with the true forcing field
+%
+\begin{equation}
+f_{true}(x_1,x_2)=
+\begin{cases}
+1.0 & \textrm{if }(x_1,x_2)\in[0.125,0.375]\times[0.125,0.375] \\
+0.8 & \textrm{if }(x_1,x_2)\in[2.375,2.625]\times[0.375,0.625] \\
+0 & \textrm{otherwise}.
+\end{cases}
+\end{equation}
+%
+%
+%------------------------------------------------------------%
+\subsubsection{Adaptive Model Refinement Results} \label{sec:cdvcdrBaseRef}
+%------------------------------------------------------------%
+%
+
+We now present the results for solving the inference problem using \Cref{alg:refSeries}. Once the QoI error estimate is calculated using \Cref{eq:finErrExp}, the error estimate is then decomposed into local contributions. At each iteration, based on this decomposition, we choose the basis functions with the largest error contributions until an additional 5\% of the elements has been marked for refinement. This is repeated until the estimated absolute relative error in the QoI, calculated as $\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))$, is less than $1\%$.
+
+\Cref{fig:baseRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the series of mixed-fidelity models thus generated. %Each linear Lagrange basis function's contribution is plotted at its nonzero node.
+%
+\begin{figure}[htbp]
+%\captionsetup[subfloat]{captionskip=-5pt}
+\centering
+\subfloat[LF $\equiv$ MF$_0$ ($0\%$ HF)]{
+  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_LF_divvy.png}
+  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_LF.png}
+  \label{fig:baseRef0}
+} \\
+\subfloat[MF$_1$ ($5\%$ HF)]{
+  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_MF01_divvy.png}
+  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF01.png}
+} \\
+\subfloat[MF$_2$ ($10\%$ HF)]{
+  \includegraphics[width=0.46\textwidth]{baseSeries/cd_cdr_MF02_divvy.png}
+  \includegraphics[width=0.49\textwidth]{baseSeries/err_breakdown_MF02.png}
+} \\
+\caption{Left: Multi-fidelity refinement over the domain (low-fidelity convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion). Right: local error contributions. }
+\label{fig:baseRef}
+\end{figure}
+%
+Note that the error contribution of each basis function whose support is entirely within the high-fidelity regions is zero.
+
+We see that the largest local error contributions are concentrated in the QoI region and around the observation location closest to the QoI. In the first decomposition of the error (\Cref{fig:baseRef0}), the region where the elemental error is greatest is around the leftmost observation location. Since the constraining model is an elliptic PDE, with weak convection, information flow is localized, and is weakly convected from left to right. Therefore, for the calculation of the QoI, it is most important to refine the region near the leftmost observation location, and then around the QoI region. After that, the error decomposition suggests refinement in regions upstream and around the middle observation location, and then the rightmost observation location.
+
+\Cref{fig:baseErr} shows the true and estimated absolute relative errors in the QoI for the various mixed-fidelity models generated by \Cref{alg:refSeries}; the true and estimated relative errors are calculated relative to the true and estimated high-fidelity QoI, respectively. In this case, we see that QoI error of $1\%$ is attained with a mixed-fidelity model where the high-fidelity model is used in only about $10\%$ of the domain. We note that while here the error is seen to decrease with increasing refinement, in general there is no guarantee that either the error in the QoI or the relative error in the error estimate will decrease monotonically as more of the domain is refined.
+%
+\begin{figure}[htbp]
+\centering
+\DIFdelbeginFL %DIFDELCMD < \includegraphics[width=0.8\textwidth]{baseSeries/err_est.pdf}
+%DIFDELCMD < %%%
+\DIFdelendFL %DIF > \includegraphics[width=0.8\textwidth]{baseSeries/err_est.pdf}
+\DIFaddbeginFL \includegraphics[width=0.8\textwidth]{baseSeries/err_est_v2.pdf}
+%DIF > \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used.}
+\DIFaddendFL \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity convection-diffusion-reaction model is used. \DIFaddbeginFL \DIFaddFL{In this case, only two refinement iterations are necessary to achieve the target relative QoI error (dotted line).}\DIFaddendFL }
+\label{fig:baseErr}
+\end{figure}
+%
+
+%------------------------------------------------------------%
+\subsubsection{Interaction of Observations and QoI} \label{sec:qoivdata}
+%------------------------------------------------------------%
+%
+The error estimate decomposition suggests the use of the high-fidelity model in areas of the domain that are important to the interaction between the observations and QoI; the interaction between these two can be complex, and the areas suggested for refinement may be nonintuitive. To see this, we compare the error estimate decomposition for three sizes of the QoI region $\Omega_I$ given the same set of observation locations, and for three nested sets of observation locations given the same QoI region. For the sake of illustration, we make two refinement iterations for each combination of observations and QoI region, regardless of the magnitude of the relative error estimate. However, in conducting the numerical experiments, it was observed that the number of iterations needed to achieve a given tolerance tended to increase as the QoI region increased.
+
+\DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\Cref{fig:qoiStudy} }\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{subfig:obsSetup} }\hspace{0pt}%DIFAUXCMD
+}\DIFaddend shows the domain for three cases considered, with the same set of observations but increasingly large, nested QoI regions $\Omega_I$.
+The error decompositions for each case are \DIFdelbegin \DIFdel{also shown in \mbox{%DIFAUXCMD
+\Cref{fig:qoiStudy}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{shown in \mbox{%DIFAUXCMD
+\Cref{subfig:obsLF,subfig:obsMF1,subfig:obsMFlast}}\hspace{0pt}%DIFAUXCMD
+}\DIFaddend . The bottom row gives the baseline case presented in \Cref{sec:cdvcdrBaseRef}, although here we choose the basis functions $i$ whose error $\varepsilon_i$ are among the largest $5\%$, rather than only enough basis functions to cover 5\% of the domain in their support, so the proportion of elements marked for refinement in each iteration will be slightly larger than in \Cref{sec:cdvcdrBaseRef}.
+% KW: I don't understand this last sentence. What's the difference with Section 4.1.2?
+Although refinement is still most important around the observation location closest to $x_1=0$, as the QoI region expands the other two observation locations become more important in that the error decomposition suggests refinement around them earlier. As the QoI region expands, it is also more clearly noticeable that refinement is not equally important in all parts of the QoI region.
+
+\begin{figure}[htbp]
+\centering
+\captionsetup{justification=centering}
+\subfloat[Locations of observations and QoI region $\Omega_I$][Locations of \\observations and \\QoI region $\Omega_I$]{
+  %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_setup.png}
+  \includegraphics[width=0.21\textwidth]{vs_qoi/vs_qoi_setup_sidetrim.png}
+  \label{subfig:obsSetup}
+}
+\captionsetup{justification=centering}
+\subfloat[MF$_0$ ($0\%$ HF)][MF$_0$ \\($0\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err0.png}
+  \includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err0_nobar.png}
+  \label{subfig:obsLF}
+}
+\captionsetup{justification=centering}
+\DIFdelbeginFL %DIFDELCMD < \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
+%DIFDELCMD <   %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err1.png}
+%DIFDELCMD <   \includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err1_nobar.png}
+%DIFDELCMD < }
+%DIFDELCMD < %%%
+\DIFdelendFL \DIFaddbeginFL \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err1.png}
+  \includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err1_nobar.png}
+  \label{subfig:obsMF1}
+}
+\DIFaddendFL \captionsetup{justification=centering}
+\subfloat[MF$_2$ ($\sim10\%$ HF)][MF$_2$ \\($\sim10\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2.png}
+  \includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2_barnorm.png}
+  \label{subfig:obsMFlast}
+}
+  \caption{Effects of increasing the QoI region. Column \protect\subref{subfig:obsSetup}: configuration of observations (teal points) and QoI region (purple box). Columns \protect\subref{subfig:obsLF}--\protect\subref{subfig:obsMFlast}: the relative error estimate decompositions for different mixed-fidelity models, relative to the largest localized error contribution; note the locations of regions of relatively large error compared to the observation locations and QoI region.}
+  \label{fig:qoiStudy}
+\end{figure}
+
+\Cref{fig:dataStudy} shows another set of cases considered, now with the same QoI region $\Omega_I$ but with increasing, nested sets of observations.
+The error decomposition for the three cases is shown in \DIFdelbegin \DIFdel{\mbox{%DIFAUXCMD
+\Cref{fig:dataStudy}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{subfig:obsLF2,subfig:obsMF1_2,subfig:obsMFlast2}}\hspace{0pt}%DIFAUXCMD
+}\DIFaddend . The bottom row is the same as that in \Cref{fig:qoiStudy}. Refinement appears to be consistently most important around the observation location closest to $x_1=0$ and the QoI region. However, as more observation locations are added, it becomes no longer necessarily true that refinement becomes less important around observation locations as their distance from the QoI region increases. In the second and third rows, one can see that after the areas around the QoI region and the two closest observation locations have been refined, the next area to be refined is not around the third closest observation location, but rather around one near the middle of the domain. This suggests that interactions between observation locations and the QoI may be non-intuitive, and in these cases a rigorous method for forming a mixed-fidelity model leads to well-supported modeling choices.
+
+\begin{figure}[htbp]
+\centering
+\captionsetup{justification=centering}
+\subfloat[Locations of observations and QoI region $\Omega_I$][Locations of \\observations and \\QoI region $\Omega_I$]{
+  %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_setup.png}
+  \includegraphics[width=0.21\textwidth]{vs_data/vs_data_setup_sidetrim.png}
+  \label{subfig:obsSetup2}
+}
+\captionsetup{justification=centering}
+\subfloat[MF$_0$ ($0\%$ HF)][MF$_0$ \\($0\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err0.png}
+  \includegraphics[width=0.16\textwidth]{vs_data/vs_data_err0_nobar.png}
+  \label{subfig:obsLF2}
+}
+\captionsetup{justification=centering}
+\DIFdelbeginFL %DIFDELCMD < \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
+%DIFDELCMD <   %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err1.png}
+%DIFDELCMD <   \includegraphics[width=0.16\textwidth]{vs_data/vs_data_err1_nobar.png}
+%DIFDELCMD < }
+%DIFDELCMD < %%%
+\DIFdelendFL \DIFaddbeginFL \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err1.png}
+  \includegraphics[width=0.16\textwidth]{vs_data/vs_data_err1_nobar.png}
+  \label{subfig:obsMF1_2}
+}
+\DIFaddendFL \captionsetup{justification=centering}
+\subfloat[MF$_2$ ($\sim10\%$ HF)][MF$_2$ \\($\sim10\%$ HF)]{
+  %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2.png}
+  \includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2_barnorm.png}
+  \label{subfig:obsMFlast2}
+}
+  \caption{Effects of increasing the number of observations. Column \protect\subref{subfig:obsSetup2}: configuration of observations (teal points) and QoI region (purple box). Columns \protect\subref{subfig:obsLF2}--\protect\subref{subfig:obsMFlast2}: the relative error estimate decompositions for different mixed-fidelity models, relative to the largest localized error contribution; note the locations of regions of relatively large error compared to the observation locations and QoI region.}
+  \label{fig:dataStudy}
+\end{figure}
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Variable Parameterization: Constant vs.\ Field Parameters} \label{sec:constvfield}
+%------------------------------------------------------------------------------------------------------------------------%
+
+In this subsection, we consider two models which differ in the space to which the parameter belongs, with the low-fidelity model having fewer degrees of freedom. 
+
+%------------------------------------------------------------%
+\subsubsection{Problem Setup}
+%------------------------------------------------------------%
+
+We consider the same high-fidelity model as in \Cref{sec:cdvcdr}:
+\begin{equation}
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in \DIFdelbegin \DIFdel{U}\DIFdelend \DIFaddbegin \DIFadd{H^1(\Omega)}\DIFaddend ,
+\end{equation}
+with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r = -42$. The low-fidelity model
+\begin{equation}
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in \DIFdelbegin \DIFdel{\R
+}\DIFdelend \DIFaddbegin \DIFadd{U_{LF}
+}\DIFaddend \end{equation}
+differs from the high-fidelity model only in that \DIFdelbegin \DIFdel{the parameter $q$ is a constant instead of a field}\DIFdelend \DIFaddbegin \DIFadd{$U_{LF}$ is limited to the space of constant functions over $\Omega$; we maintain $f(q)=q$}\DIFaddend . The intermediate mixed-fidelity models thus have parameter fields \DIFaddbegin \DIFadd{(and forcing functions) }\DIFaddend that are constant over the subregions of the domain where the low-fidelity model is used\DIFdelbegin \DIFdel{. }\DIFdelend \DIFaddbegin \DIFadd{; disconnected low-fidelity regions still share the same parameter value. The domain, mesh, boundary conditions, and velocity field, as well as the observations and QoI, remain the same as described in \mbox{%DIFAUXCMD
+\Cref{sec:cdvcdr}}\hspace{0pt}%DIFAUXCMD
+; we continue to infer for the forcing field. }\DIFaddend For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. \DIFdelbegin \DIFdel{The domain, mesh, boundary conditions, and velocity field, as well as the observations, unknown parameters to be inferred, and QoI, remain the same as described in \mbox{%DIFAUXCMD
+\Cref{sec:cdvcdr}}\hspace{0pt}%DIFAUXCMD
+}\DIFdelend \DIFaddbegin \DIFadd{Also for ease of implementation and for localizing the error, the forcing field and its auxiliary and supplementary adjoint conterparts are represented with the same basis functions as the other variables in the high-fidelity regions, and forced to be constant in the low-fidelity regions using a penalty term. Although the chosen pair of models has the potential to give mixed-fidelity models with fewer degreees of freedom in the parameter, this is not the case in our implementation; however, we are not looking to demonstrate computational savings with this example, but rather to explore the behavior of \mbox{%DIFAUXCMD
+\Cref{alg:refSeries} }\hspace{0pt}%DIFAUXCMD
+when applied to such a pair of models}\DIFaddend . As the inverse problem is ill-posed, except when the low-fidelity model is used throughout the domain, regularization is used; the Tikhonov regularization term in \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient. 
+
+%------------------------------------------------------------%
+\subsubsection{Adaptive Model Refinement Results}
+%------------------------------------------------------------%
+
+As with the previous examples in \Cref{sec:cdvcdr}, the decomposition of the error estimate is used to select additional regions of the domain in which to use the high-fidelity model. The number of degrees of freedom in the inverse problem increases with the proportion of the domain in which the high-fidelity model is used. With each iteration, an additional $10\%$ of the elements are marked for refinement. This is repeated until the estimated absolute relative error in the QoI is less than $1\%$.
+
+\Cref{fig:svfRef} shows the local error contributions, as well as the subdomains where the low- and high-fidelity models are used, for the first two and last mixed-fidelity model thus generated. 
+%
+\begin{figure}[htbp]
+\centering
+\subfloat[MF$_0$ ($0\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_LF_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_LF.png}
+} \\
+\subfloat[MF$_1$ ($10\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF01_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF01.png}
+} \\
+\subfloat[MF$_2$ ($20\%$ HF)]{
+  \includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF02_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF02.png}
+} \\
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF03_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF03.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_3$ ($30\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF04_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF04.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_4$ ($40\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+%\begin{subfigure}[b]{\textwidth}
+%	\centering
+%	\includegraphics[width=0.48\textwidth]{svf/cd_cdr_MF05_divvy.png}
+%  \includegraphics[width=0.51\textwidth]{svf/err_breakdown_MF05.png}
+%  \vspace{-0.7\baselineskip}
+%  \caption{MF$_5$ ($50\%$ HF)}
+%  \vspace{0.8\baselineskip}
+%\end{subfigure}
+\subfloat[MF$_6$ ($60\%$ HF)]{
+	\includegraphics[width=0.46\textwidth]{svf/cd_cdr_MF06_divvy.png}
+  \includegraphics[width=0.49\textwidth]{svf/err_breakdown_MF06.png}
+}
+\caption{Left: Multi-fidelity refinement over the domain (low-fidelity constant-parameter model used in red portion, high-fidelity field-parameter model used in blue portion). Right: local error contributions. The (weighted) residual, and thus the local error contribution, tends to spike sharply at the interface between the low- and high-fidelity regions; the color range is truncated to make the error distribution visible elsewhere in the domain.}
+\label{fig:svfRef}
+\end{figure}
+%
+Comparing to \Cref{fig:baseRef}, we see that in this case the local error contribution is not as greatly concentrated around the QoI region and the nearest observation location; here, all three observation locations and the QoI region have associated regions of sufficiently similar high local error that all are refined in the first iteration. This reflects the global nature of the differences between the low- and high-fidelity models. 
+
+\DIFaddbegin \DIFadd{\mbox{%DIFAUXCMD
+\Cref{fig:svfRefParams} }\hspace{0pt}%DIFAUXCMD
+shows the inferred parameters using some of the mixed-fidelity models and the high-fidelity model.
+%DIF > 
+}\begin{figure}[htbp]
+\centering
+\subfloat[MF$_1$ ($10\%$ HF)]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF01_clim_HF_whitebg.png}
+	\label{subfig:svfparamMF1}
+} \\
+\subfloat[MF$_3$ ($30\%$ HF)]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_param_MF03_clim_HF_whitebg.png}
+	\label{subfig:svfparamMF3}
+} \\
+\subfloat[MF$_6$ ($60\%$ HF)]{
+  \includegraphics[width=0.8\textwidth]{svf/svf_param_MF06_clim_HF_whitebg.png}
+  \label{subfig:svfparamMF6}
+} \\
+\subfloat[HF]{
+	\includegraphics[width=0.8\textwidth]{svf/svf_params_HF_whitebg.png}
+	\label{subfig:svfparamHF}
+}
+\caption{\DIFaddFL{Inferred parameters using mixed-fidelity (}\protect\subref{subfig:svfparamMF1}\DIFaddFL{--}\protect\subref{subfig:svfparamMF6}\DIFaddFL{) and high-fidelity (}\protect\subref{subfig:svfparamHF}\DIFaddFL{) models. All figures share the color-scale for the high-fidelity plot.}}
+\label{fig:svfRefParams}
+\end{figure}
+%DIF > 
+\DIFaddend The corresponding true and estimated absolute errors in the QoI are shown in \Cref{fig:svfErr}.
+%
+\begin{figure}[htbp]
+\centering
+\DIFdelbeginFL %DIFDELCMD < \includegraphics[width=0.8\textwidth]{svf/err_est.pdf}
+%DIFDELCMD < %%%
+\DIFdelendFL %DIF > \includegraphics[width=0.8\textwidth]{svf/err_est.pdf}
+\DIFaddbeginFL \includegraphics[width=0.8\textwidth]{svf/err_est_v2.pdf}
+\DIFaddendFL \caption{True and estimated absolute relative error in QoI, plotted as a function of the percentage area of the domain in which the high-fidelity field-parameter model is used. \DIFaddbeginFL \DIFaddFL{The dotted line indicates the target relative QoI error.}\DIFaddendFL }
+\label{fig:svfErr}
+\end{figure}
+%
+In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain \DIFaddbegin \DIFadd{(compare \mbox{%DIFAUXCMD
+\Cref{subfig:svfparamMF6} }\hspace{0pt}%DIFAUXCMD
+and \mbox{%DIFAUXCMD
+\Cref{subfig:svfparamHF}}\hspace{0pt}%DIFAUXCMD
+)}\DIFaddend . We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. \DIFaddbegin \DIFadd{Note that although the inferred parameters in the first and third mixed-fidelity models (see \mbox{%DIFAUXCMD
+\Cref{subfig:svfparamMF1} }\hspace{0pt}%DIFAUXCMD
+and \mbox{%DIFAUXCMD
+\Cref{subfig:svfparamMF3}}\hspace{0pt}%DIFAUXCMD
+) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
+}\DIFaddend 
+
+%DIF > compare MF01 and MF03, MF06 and HF
+%DIF > 1 and 3 look very different but have very similar true errors - different params can give similar qoi, though in this case the qoi is not close to HF; more HF doesn't necessarily decrease error, interplay between having freedom to match data and all LF regions being flat...
+%DIF > 6 and HF look very similar; most of HF is very flat
+\DIFaddbegin 
+
+\DIFaddend %------------------------------------------------------------------------------------------------------------------------%
+\subsection{Combining Meshes and Physics in 3D} \label{sec:diffvcdr3D}
+%------------------------------------------------------------------------------------------------------------------------%
+
+In the previous examples, although the low- and high-fidelity models are sufficiently different to illustrate the behavior of \Cref{alg:refSeries}, they are both simple enough and similar enough that using \Cref{alg:refSeries} saves little, if any, computational effort. In this section, we consider a pair of models that differ in both the physics included and the mesh resolution, and we demonstrate computational savings using the multi-fidelity approach. In \Cref{sec:setup3D_diffmesh} we describe the setup of the models and their inverse problems, and in \Cref{sec:ref3D_diffmesh} we describe the results of applying \Cref{alg:refSeries} to this pair of models.
+
+%------------------------------------------------------------%
+\subsubsection{Problem Setup} \label{sec:setup3D_diffmesh}
+%------------------------------------------------------------%
+
+The two models share a box domain $\Omega(x_1,x_2,x_3)$ which is $2300$m, $1650$m, and $100$m long in the $x_1$, $x_2$, and $x_3$ directions, respectively. We will refer to the positive and negative directions in $x_1$ as ``east" and ``west", respectively. The high-fidelity model is a single-species convection-diffusion-reaction equation with a nonlinear reaction term, described by
+%
+\begin{subequations}
+\label{eq:cdvcdrHF3D}
+\begin{align}
+\nabla\cdot(n\vec{V}u - nD\nabla u) + k_ru^2 = f(q) \quad &\text{in } \Omega, \label{eq:HFeq3D}\\
+u = 0 \quad &\text{on } \partial \Omega_{west}, \\
+\frac{\partial u}{\partial n} = 0 \quad &\text{on }\partial\Omega_{east}, \\
+\hat{n}\cdot(n\vec{V}u - nD\nabla u) = 0 \quad &\text{on }\partial\Omega\backslash(\partial\Omega_{east}\cup\partial\Omega_{west}),
+\end{align}
+\end{subequations}
+%
+where the state $u$ is the mass-fraction (in parts-per-billion) of some contaminant species and $f(q)$ is a source/sink field. The velocity field is a constant $\vec{V}=(2.1,0,0)$ m/day. Given this velocity field and letting the molecular diffusion be negligible, we follow \cite{Vestedetal93} to express the (diagonal) dispersion tensor $D$ as $D_{11}=\alpha_{LH}V_1$, $D_{22}=\alpha_{TH}V_1$, and $D_{33}=\alpha_{TV}V_1$, where $\alpha_{LH}=100$m, $\alpha_{TH}=40$m, and $\alpha_{TV}=4$m are the longitudinal horizontal, transverse horizontal, and transverse vertical dispersivities, respectively; the dispersivity values were drawn from within the range of observed values in various porous media \cite{Davis86}. We have porosity $n=0.1$. The reaction coefficient is $k_r=4.2\cdot10^{-4}$ 1/day, chosen from within the wide range of reaction-rate coefficients for second-order reactions. Although the reaction term $k_ru^2$ does not correspond to any particular reaction of any particular species, we note that, in addition to second-order elementary reactions, a quadratic reaction term can appear in models of dissolution/precipitation processes in porous media \cite{Aha97} and biochemical degradation of petroleum hydrocarbons in soils \cite{Jack94}.
+
+The low-fidelity model,
+%
+\begin{equation}
+\nabla\cdot(- nk_d\nabla u) = f(q) \quad \text{in } \Omega, \label{eq:LFeq3D}
+\end{equation}
+%
+differs in the removal of the reaction and convection terms and the anisotropy of the dispersion tensor; the dispersion tensor $D$ is replaced with a scalar $k_d=D_{11}$. The boundary conditions remain unchanged. As in the previous examples in \Cref{sec:cdvcdr}, the mixed-fidelity models are formed by dividing the domain into complementary subdomains $\Omega_{HF}$ and $\Omega_{LF}$, where \Cref{eq:HFeq3D,eq:LFeq3D} are solved, respectively. The QoI we wish to calculate is the integral of the state over a region $\Omega_I$.
+
+The unknown parameters we wish to infer correspond to the source term $f(q)=q$; we impose $f(q)=q=0$ on the boundary $\partial\Omega$. Synthetic observations at 18 points in the domain are generated by running the high-fidelity model on a finer mesh. The locations of the observations as well as the QoI region \DIFdelbegin \DIFdel{$\Omega_I$ }\DIFdelend \DIFaddbegin \DIFadd{$\Omega_I=[1100\textrm{m},1200\textrm{m}]\times[775\textrm{m},875\textrm{m}]\times[80\textrm{m},100\textrm{m}]$ }\DIFaddend are shown in \Cref{fig:setup3D}. We set the regularization term in \Cref{eq:invOpt_obj} to be $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2\:\textrm{d}V$.
+%
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\textwidth]{series3D/setup_aerial_nolegend.pdf} \hfill
+\includegraphics[width=0.55\textwidth]{series3D/setup_3view.pdf} \\
+\vspace{\baselineskip}
+\includegraphics[width=0.6\textwidth]{series3D/setup_side_view.pdf}
+\caption{Three views of the locations of the observations and the QoI region.}
+\label{fig:setup3D}
+\end{figure}
+%
+
+We use a FEM with a continuous Galerkin formulation and Lagrange elements. The lack of a convection term allows the low-fidelity model to be solved on a coarser mesh. For the high-fidelity model, the domain is discretized by 32, 64, and 32 elements along the $x_1$, $x_2$, and $x_3$ directions, respectively; for the low-fidelity model, the domain is discretized by 16, 32, and 16 elements along the $x_1$, $x_2$, and $x_3$ directions, respectively. The cell P\'{e}clet number is less than one and so stabilization is not required.
+
+%------------------------------------------------------------%
+\subsubsection{Adaptive Model Refinement Results} \label{sec:ref3D_diffmesh}
+%------------------------------------------------------------%
+
+We now present the results of solving the inference problem using \Cref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the $2\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration is usually greater than for the 2D examples. All simulations are run on a single processor; we use the default nonlinear solver in \texttt{libMesh} \cite{libMeshPaper} (Newton's method with Brent line-search), and linear solves are performed using PETSc's \cite{petsc-user-ref} GMRES solver, preconditioned by incomplete factorization.
+
+\Cref{tab:ref3D_diffmesh} shows the error at the end of each adaptive iteration. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The number of degrees of freedom of each of the primary (and, if applicable, auxiliary) variables at each iteration is also given; the supplementary adjoint is solved on the high-fidelity mesh and thus each of its variables has the same number of degrees of freedom as each of the primary variables in the high-fidelity inverse problem. The high-fidelity inverse problem does not converge when the low-fidelity solution is used as an initial guess. Instead, we solve the inverse problem for an intermediate model
+%
+\begin{equation}
+\nabla\cdot(n\vec{V}u - nD\nabla u) + k_ru^2 = f(q)
+\end{equation}
+%
+\DIFaddbegin \DIFadd{with $k_r=0$, }\DIFaddend and use the solution as an initial guess for the high-fidelity problem; \DIFdelbegin \DIFdel{equivalently, we use }\DIFdelend \DIFaddbegin \DIFadd{this is equivalent to using }\DIFaddend two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$.
+%
+\begin{table}[htbp]
+\DIFdelbeginFL %DIFDELCMD < \label{tab:ref3D_diffmesh}
+%DIFDELCMD < %%%
+\DIFdelendFL \centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{DOFs} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative \\
+& & & & (Estimated) & (Actual) & Error (Actual)  \\ \hline
+LF   & 0    & 9537  & 168710 & -16463 & -85663 & -103    \\
+MF01 & 5.2  & 13417 & 167366 & -7207  & -84319 & -102    \\
+MF02 & 11.4 & 17895 & 89777  & -6208  & -6730  & -8.10   \\
+MF03 & 16.3 & 21001 & 85880  & -2473  & -2833  & -3.41   \\
+MF04 & 22.0 & 24528 & 83902  & -711   & -855   & -1.03   \\
+MF05 & 27.7 & 27984 & 83119  & 32     & -72    & -0.087  \\
+HF   & 100  & 70785 & 83047  & --     & --     & --    \\ \hline
+\end{tabular}
+\caption{Runtime and relative errors of adaptive algorithm iterations given relative error tolerance of $0.1\%$; relative errors are given with respect to the high-fidelity QoI estimate.}
+\DIFaddbeginFL \label{tab:ref3D_diffmesh}
+\DIFaddendFL \end{table}
+%
+
+We notice that, compared to the results in \Cref{fig:baseErr}, the error estimates for the low-fidelity and first mixed-fidelity models are far from the true errors. This can be attributed to the linearization about $\Psi_{LF}$ and $\Psi_{MF_{1}}$ instead of $\Psi_{HF}$ in solving the supplementary adjoints as well as the third-order term that is ignored in the error estimate; the large differences in the QoI for the LF and MF01 models compared to the high-fidelity QoI indicate that $\Psi_{LF}$ and $\Psi_{MF_{1}}$ are significantly different from $\Psi_{HF}$. Compared to the pair of models in \Cref{sec:cdvcdrSetup}, the low- and high-fidelity models in this case are more dissimilar, even though in both \Cref{sec:cdvcdrSetup} and this case the nonlinear term in the high-fidelity model \Cref{eq:cdvcdrHF} and \Cref{eq:cdvcdrHF3D} is a quadratic reaction term. % KW: don't know what last part of this sentence means. what hi-fi models?
+%The possibility of large inaccuracies in the error estimates of low-fidelity and mostly unrefined mixed-fidelity models suggests that one should use more than just the error estimate to decide when to stop the adaptive algorithm; a possible additional criterion could be to require that the estimated high-fidelity QoI ($I(q_{MF},u_{MF})+\epsilon_i$) for two consecutive iterations agree to within some tolerance. % KW: what behavior? this last sentence doesn't follow from the previous one. and what predicted hi-fi QOI? Do you mean mixed-fi? I'm not sure this is a good idea. I'd probably delete this last sentence.
+% or just let the reader decide how to deal with possibly inaccurate initial error estimates?
+
+The multi-fidelity domain refinements for the five adaptive iterations are shown in \Cref{fig:divvy3D_diffmesh}. Similarly to the behavior seen in \Cref{sec:cdvcdrBaseRef}, the QoI region and the areas around some of the measurement points are first targeted for refinement, with those measurement points furthest downstream of the QoI being the last to receive refinement. We also see that the domain is refined completely in the $x_3$ direction first \DIFdelbegin \DIFdel{around }\DIFdelend \DIFaddbegin \DIFadd{in an area slightly upstream of }\DIFaddend the QoI region \DIFaddbegin \DIFadd{(see \mbox{%DIFAUXCMD
+\Cref{subfig:3DMF2}}\hspace{0pt}%DIFAUXCMD
+)}\DIFaddend , reflecting the large difference in the high-fidelity dispersion tensor $D$ and the low-fidelity dispersion coefficient in the $x_3$ direction.
+%
+\begin{figure}[htbp]
+\centering
+\DIFdelbeginFL %DIFDELCMD < \subfloat[MF$_1$ ($5.2\%$ HF)]{
+%DIFDELCMD < \includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy1_whitebg_puff.png}
+%DIFDELCMD < }
+%DIFDELCMD < \subfloat[MF$_2$ ($11.4\%$ HF)]{
+%DIFDELCMD < \includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy2_whitebg_puff.png}
+%DIFDELCMD < }
+%DIFDELCMD < \subfloat[MF$_3$ ($16.3\%$ HF)]{
+%DIFDELCMD < \includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy3_whitebg_puff.png}
+%DIFDELCMD < } %%%
+\DIFdelendFL \DIFaddbeginFL \subfloat[Slice location and color key]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/slice_diagram.png}
+\label{subfig:3Dsliceloc}
+}
+\hfill
+\subfloat[MF$_1$ ($5.2\%$ HF)]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy1_whitebg_puff_and_midslice.png}
+\label{subfig:3DMF1}
+}
+\DIFaddendFL \\
+\DIFdelbeginFL %DIFDELCMD < \subfloat[MF$_4$ ($22.0\%$ HF)]{
+%DIFDELCMD < \includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy4_whitebg_puff.png}
+%DIFDELCMD < }
+%DIFDELCMD < \subfloat[MF$_5$ ($27.7\%$ HF)]{
+%DIFDELCMD < \includegraphics[width=0.31\textwidth]{series3D/run_diff_mesh/divvy5_whitebg_puff.png}
+%DIFDELCMD < }
+%DIFDELCMD < %%%
+\DIFdelendFL \DIFaddbeginFL \subfloat[MF$_2$ ($11.4\%$ HF)]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy2_whitebg_puff_and_midslice.png}
+\label{subfig:3DMF2}
+} 
+\hfill
+\subfloat[MF$_3$ ($16.3\%$ HF)]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy3_whitebg_puff_and_midslice.png}
+} \\
+\subfloat[MF$_4$ ($22.0\%$ HF)]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy4_whitebg_puff_and_midslice.png}
+} 
+\hfill
+\subfloat[MF$_5$ ($27.7\%$ HF)]{
+\includegraphics[width=0.42\textwidth]{series3D/run_diff_mesh/divvy5_whitebg_puff_and_midslice.png}
+\label{subfig:3Dfinref}
+}
+
+\DIFaddendFL \caption{Domain division for mixed-fidelity models \DIFaddbeginFL \DIFaddFL{(}\protect\subref{subfig:3DMF1}\DIFaddFL{--}\protect\subref{subfig:3Dfinref}\DIFaddFL{)}\DIFaddendFL : \DIFdelbeginFL \DIFdelFL{low-fidelity }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{3D view with 2D slice through domain below (see }\protect\subref{subfig:3Dsliceloc} \DIFaddFL{for slice location and orientation). Low-fidelity }\DIFaddendFL convection-diffusion model used in red portion, high-fidelity convection-diffusion-reaction model used in blue portion (intermediate colors \DIFaddbeginFL \DIFaddFL{in 3D view }\DIFaddendFL due to transparency indicate a mix of the two models along the line of sight)\DIFdelbeginFL \DIFdelFL{; }\DIFdelendFL \DIFaddbeginFL \DIFaddFL{. Slices cut through QoI region, indicated by purple box. }\DIFaddendFL $x_3$ direction scaled for clarity.}
+\label{fig:divvy3D_diffmesh}
+\end{figure}
+%
+
+In this case, although the mixed-fidelity models have fewer degrees of freedom than the high-fidelity model, it is faster to solve the high-fidelity inverse problem than to adaptively seek a mixed-fidelity model with a small QoI error, starting from the low-fidelity model. This can be attributed to multiple factors: the high-fidelity problem is mildly nonlinear and has a close initial guess that is a solution to a linear system (when $k_r=0$), and the supplementary adjoint is solved on the high-fidelity mesh. Generally, as the nonlinearity of the high-fidelity model increases, one would expect solving the high-fidelity inverse problem to require more time relative to using the adaptive algorithm. However, one can also consider an ``offline-online" setting, where the mixed-fidelity models are identified up-front by applying \Cref{alg:refSeries} to a set of representative observations $d^*$. Then when actual/new data are received, one can solve the inverse problem with the mixed-fidelity model and the new data, and, if desired, compute an updated error estimate for the QoI. The mixed-fidelity inverse problems are expected to require less time to solve than the high-fidelity inverse problems.
+
+To illustrate this offline-online application, we generate ten sets of noisy observations to represent the actual data gained during the online phase; the noisy observations are generated by taking the observations used in the adaptive algorithm and adding Gaussian white noise with standard deviation of $\sigma=0.02$ (equivalent to, on average, $5\%$ of the observed values). We then solve the inverse problem using each of the mixed-fidelity models depicted in \Cref{tab:ref3D_diffmesh} and \Cref{fig:divvy3D_diffmesh} as well as the high-fidelity model. The low-fidelity inverse problem is first solved and used as an initial guess for the higher-fidelity problems; we note that although there is a linear model that is more similar to the high-fidelity model than the low-fidelity model (i.e., convection-diffusion with anisotropic diffusivity and $k_r=0$ on the high-fidelity mesh) and thus would serve as a better initial guess, its existence is specific to our particular choice of models. The auxiliary and supplementary adjoint variables use a zero initial guess.
+
+\Cref{tab:ref3D_newdata_QoI_diffmesh} shows the average QoI values, error estimates and solution times for the (non)linear solves. \Cref{tab:ref3D_newdata_times_diffmesh} shows the times needed to solve the inverse problems and to solve for the additional variables needed to obtain an error estimate. For six of the ten datasets, the high-fidelity inverse problem does not converge given the low-fidelity solution as an initial guess; these are solved using the $k_r=0$ solution as an initial guess so that true QoI errors can be calculated. The average high-fidelity inverse problem solution time shown in \Cref{tab:ref3D_newdata_times_diffmesh} includes only those cases (four of ten) that converged with the low-fidelity initial guess.
+%
+\begin{table}
+\DIFdelbeginFL %DIFDELCMD < \label{tab:ref3D_newdata_QoI_diffmesh}
+%DIFDELCMD < %%%
+\DIFdelendFL \centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multirow{2}{*}{Case} & \multirow{2}{*}{$\%$HF} & \multirow{2}{*}{QoI} & Error & Error & $\%$ Relative  \\
+& & & (Estimated) & (Actual) & Error (Actual) \\ \hline
+LF   & 0    & 166774 & --    & -84326 & -102.3 \\
+MF01 & 5.2  & 164597 & 4347  & -82149 & -99.65  \\
+MF02 & 11.4 & 88867  & -5921 & -6418  & -7.79  \\
+MF03 & 16.3 & 85237  & -2414 & -2789  & -3.38  \\
+MF04 & 22.0 & 83411  & -724  & -963   & -1.17  \\
+MF05 & 27.7 & 82664  & -18   & -216   & -0.26 \\
+HF   & 100  & 82500  & --    & --     & --  \\ \hline
+\end{tabular}
+\caption{Average QoI values and errors from solving inverse problem with mixed- and high-fidelity models and noisy data; relative errors are with respect to true high-fidelity QoI.}
+\DIFaddbeginFL \label{tab:ref3D_newdata_QoI_diffmesh}
+\DIFaddendFL \end{table}
+
+%
+\begin{table}
+\DIFdelbeginFL %DIFDELCMD < \caption{%
+{%DIFAUXCMD
+\DIFdelFL{Average times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy datasets.}}
+%DIFAUXCMD
+%DIFDELCMD < \label{tab:ref3D_newdata_times_diffmesh}
+%DIFDELCMD < %%%
+\DIFdelendFL \centering
+\begin{tabular}{ccc|c|c|c}
+\cline{4-5}
+ & & & \multicolumn{2}{|c|}{Error Estimation} & \\
+\cline{1-6}
+\multicolumn{1}{|c|}{\multirow{3}{*}{Case}} & \multicolumn{1}{|c|}{\multirow{3}{*}{DOFs}} & Inverse & Auxiliary & Supplementary & \multicolumn{1}{|c|}{Total} \\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Problem & Variables & Adjoint & \multicolumn{1}{|c|}{Solution}\\
+\multicolumn{1}{|c|}{} & \multicolumn{1}{|c|}{} & Time (s) &  Time (s) & Time (s) & \multicolumn{1}{|c|}{Time (s)}\\
+\cline{1-6}
+\multicolumn{1}{|c|}{LF}    & \multicolumn{1}{|c|}{9537}   & 16   & --  & -- & \multicolumn{1}{|c|}{--} \\ \hline
+\multicolumn{1}{|c|}{MF01}  & \multicolumn{1}{|c|}{13147}  & 185  & 107 & 235 & \multicolumn{1}{|c|}{526} \\ \hline
+\multicolumn{1}{|c|}{MF02}  & \multicolumn{1}{|c|}{17895}  & 328  & 169 & 206 & \multicolumn{1}{|c|}{703} \\ \hline
+\multicolumn{1}{|c|}{MF03}  & \multicolumn{1}{|c|}{21001}  & 435  & 202 & 185 & \multicolumn{1}{|c|}{821} \\ \hline
+\multicolumn{1}{|c|}{MF04}  & \multicolumn{1}{|c|}{24528}  & 406  & 201 & 188 & \multicolumn{1}{|c|}{795} \\ \hline
+\multicolumn{1}{|c|}{MF05}  & \multicolumn{1}{|c|}{27984}  & 498  & 263 & 198 & \multicolumn{1}{|c|}{959} \\ \hline
+\multicolumn{1}{|c|}{HF}    & \multicolumn{1}{|c|}{70785}  & 1185 & --  & --  & \multicolumn{1}{|c|}{1185} \\ \hline
+\end{tabular}
+\DIFaddbeginFL \caption{\DIFaddFL{Average times to solve inverse problem and obtain error estimate with mixed- and high-fidelity models and noisy datasets.}}
+\label{tab:ref3D_newdata_times_diffmesh}
+\DIFaddendFL \end{table}
+%
+We see that the mixed-fidelity models, when applied to noisy datasets different to those with which they were generated, continue to perform well in achieving a small error in the QoI while limiting the use of the high-fidelity model to less than a third of the domain. Given the same initial guess, the mixed-fidelity inverse problems takes less time on average than the high-fidelity inverse problem to solve, and they converge consistently.
+
+
+\section{Conclusion}\label{sec:conc}
+
+We adaptively create mixed-fidelity models to solve goal-oriented inverse problems. The paper develops an error estimator that drives the adaptation, so as to minimize the error in the QoI calculated from the inferred parameters. We applied this method to pairs of low- and high-fidelity models of convection-diffusion-reaction phenomena. The results showed QoI estimates with a small relative error even when the high-fidelity model was used only in a small portion of the domain. In these cases, the localization of the error estimate also indicated regions of the domain that were important to the interactions between the observations and the QoI. A direction for extension of this work is to the case of the statistical inverse problem.  One way we could potentially apply this work to the statistical inverse problem is by reducing the parameter space that needs to be sampled. Such a direction is suggested by the results presented in \Cref{sec:diffvcdr3D}, where the mixed-fidelity model had significantly fewer degrees of freedom in its parameter field than the high-fidelity model, and thus a smaller parameter space. One could explore creation of an alternative statistical inverse problem that, by utilizing a mixed-fidelity model with fewer degrees of freedom in its parameter field, requires exploration of a small parameter space with minimal compromise in the predictive posterior.
+
+Another potential approach would be to extend our method to the creation of mixed-fidelity models that are used as surrogates; these surrogate models can be evaluated in place of the high-fidelity model, thus decoupling the number of expensive forward evaluations of the high-fidelity model needed from the number of posterior parameter distribution samples that is desired \cite{Con14}. \DIFaddbegin \DIFadd{In such a case, the cost of creating the mixed-fidelity model would be amortized over a large number of posterior samples using the cheaper mixed-fidelity model in place of the high-fidelity model.
+}\DIFaddend 
+
+\section*{Acknowledgements}
+
+This work was supported by the U.S. Department of Energy Office of Science, Office of Advanced Scientific
+Computing Research, Applied Mathematics program under Award Number DE-FC02-13ER26129/DE-SC0009297 as part of the
+DiaMonD Multifaceted Mathematics Integrated Capability Center.
+
+
+%\nolinenumbers
+
+\section*{References}
+%\bibliographystyle{plain}
+\bibliographystyle{elsarticle-harv} %this seems to get initials in bibliography, without doing name-year citation style as bst file claims?
+\DIFdelbegin %DIFDELCMD < \begin{thebibliography}{39}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \begin{thebibliography}{42}
+\DIFaddend \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+
+\bibitem[{Aharonov et~al.(1997)Aharonov, Spiegelman, and Kelemen}]{Aha97}
+Aharonov, E., Spiegelman, M., Kelemen, P., 1997. Three-dimensional flow and
+  reaction in porous media: Implications for the earth's mantle and sedimentary
+  basins. Journal of Geophysical Research 102~(B7), 14821--114833.
+
+\bibitem[{Ainsworth and Oden(2011)}]{AinsOden11}
+Ainsworth, M., Oden, J.~T., 2011. A posteriori error estimation in finite
+  element analysis. Vol.~37. John Wiley \& Sons, Ltd.
+
+\bibitem[{Alexander et~al.(2002)Alexander, Garcia, and
+  Tartakovsky}]{AlexGarTar02}
+Alexander, F.~J., Garcia, A.~L., Tartakovsky, D.~M., 2002. Algorithm refinement
+  for stochastic partial differential equations, 1: Linear diffusion. Journal
+  of Computational Physics 182, 47--66.
+
+\bibitem[{Balay et~al.(2016)Balay, Abhyankar, Adams, Brown, Brune, Buschelman,
+  Dalcin, Eijkhout, Gropp, Kaushik, Knepley, McInnes, Rupp, Smith, Zampini,
+  Zhang, and Zhang}]{petsc-user-ref}
+Balay, S., Abhyankar, S., Adams, M.~F., Brown, J., Brune, P., Buschelman, K.,
+  Dalcin, L., Eijkhout, V., Gropp, W.~D., Kaushik, D., Knepley, M.~G., McInnes,
+  L.~C., Rupp, K., Smith, B.~F., Zampini, S., Zhang, H., Zhang, H., 2016.
+  {PETS}c users manual. Tech. Rep. ANL-95/11 - Revision 3.7, Argonne National
+  Laboratory.
+\newline\urlprefix\url{http://www.mcs.anl.gov/petsc}
+
+\bibitem[{Battiato et~al.(2011)Battiato, Tartakovsky, Tartakovsky, and
+  Scheibe}]{battiato2011hybrid}
+Battiato, I., Tartakovsky, D.~M., Tartakovsky, A.~M., Scheibe, T.~D., 2011.
+  Hybrid models of reactive transport in porous and fractured media. Advances
+  in Water Resources 34~(9), 1140--1150.
+
+\bibitem[{Becker and Rannacher(2001)}]{BecRann01}
+Becker, R., Rannacher, R., 2001. An optimal control approach to a posteriori
+  error estimation in finite element methods. Acta Numerica 10, 1--102.
+
+\DIFaddbegin \bibitem[{Becker and Vexler(2004)}]{becker2004posteriori}
+\DIFadd{Becker, R., Vexler, B., 2004. A posteriori error estimation for finite element
+  discretization of parameter identification problems. Numerische Mathematik
+  96~(3), 435--459.
+}
+
+\DIFaddend \bibitem[{Becker and Vexler(2005)}]{BecVex05}
+Becker, R., Vexler, B., 2005. Mesh refinement and numerical sensitivity
+  analysis for parameter calibration of partial differential equations. Journal
+  of Computational Physics 206, 95--110.
+
+\bibitem[{Belge et~al.(2002)Belge, Kilmer, and Miller}]{BelgeKilmerMiller02}
+Belge, M., Kilmer, M.~E., Miller, E.~L., 2002. Efficient determination of
+  multiple regularization parameters in a generalized {L}-curve framework.
+  Inverse Problems 18~(4), 1161.
+
+\bibitem[{Braack and Ern(2003)}]{BraackErn03}
+Braack, M., Ern, A., 2003. A posteriori control of modeling errors and
+  discretization errors. Multiscale Modeling \& Simulation 1~(2), 221--238.
+
+\bibitem[{Calvetti et~al.(2000)Calvetti, Morigi, Reichel, and
+  Sgallari}]{Calvetal00}
+Calvetti, D., Morigi, S., Reichel, L., Sgallari, F., 2000. Tikhonov
+  regularization and the {L}-curve for large discrete ill-posed problems.
+  Journal of Computational and Applied Mathematics 123~(1–2), 423 -- 446,
+  {N}umerical Analysis 2000. Vol. III: Linear Algebra.
+
+\bibitem[{Conrad et~al.(2016)Conrad, Marzouk, Pillai, and Smith}]{Con14}
+Conrad, P.~R., Marzouk, Y.~M., Pillai, N.~S., Smith, A., 2016. Accelerating
+  asymptotically exact {MCMC} for computationally intensive models via local
+  approximations. Journal of the American Statistical Association 111~(516),
+  1591--1607.
+
+\bibitem[{Davis(1986)}]{Davis86}
+Davis, A.~D., 1986. Deterministic modeling of dispersion in heterogeneous
+  permeable media. Ground Water 24~(5).
+
+\bibitem[{Engl et~al.(2000)Engl, Hanke, and Neubauer}]{EngHanNeu00}
+Engl, H.~W., Hanke, M., Neubauer, A., 2000. Regularization of Inverse Problems.
+  Springer Science and Business Media.
+
+\bibitem[{Fatone et~al.(2001)Fatone, Gervasio, and Quarteroni}]{FatGerQua01}
+Fatone, L., Gervasio, P., Quarteroni, A., 2001. Multimodels for incompressible
+  flows: iterative solutions for the {N}avier-{S}tokes/{O}seen coupling. ESAIM:
+  Mathematical Modelling and Numerical Analysis 35~(3), 549--574.
+
+\bibitem[{Frangos et~al.(2010)Frangos, Marzouk, Willcox, and van
+  Bloemen~Waanders}]{Frangosetal10}
+Frangos, M., Marzouk, Y., Willcox, K., van Bloemen~Waanders, B., 2010.
+  Surrogate and reduced-order modeling: A comparison of approaches for
+  large-scale statistical inverse problems. In: Biegler, L., et~al. (Eds.),
+  Large-Scale Inverse Problems and Quantification of Uncertainty. John Wiley \&
+  Sons, Ltd, Ch.~7, pp. 123--149.
+
+\bibitem[{Garcia et~al.(1999)Garcia, Bell, Crutchfield, and Alder}]{Garcetal99}
+Garcia, A.~L., Bell, J.~B., Crutchfield, W.~Y., Alder, B.~J., 1999. Adaptive
+  mesh and algorithm refinement using direct simulation {M}onte {C}arlo.
+  Journal of computational Physics 154~(1), 134--155.
+
+\bibitem[{Hao et~al.(2004)Hao, Liu, Moran, Vernerey, and Olson}]{Haoetal03}
+Hao, S., Liu, W.~K., Moran, B., Vernerey, F., Olson, G.~B., 2004. Multi-scale
+  constitutive model and computational framework for the design of ultra-high
+  strength, high toughness steels. Computer Methods in Applied Mechanics and
+  Engineering 193, 1865--1908.
+
+\bibitem[{Jackson and Zenobia(1994)}]{Jack94}
+Jackson, J.~D., Zenobia, K., 1994. Using Microbial Kinetics in the
+  Bioremediation of Contaminated Soils. CRC Press, Ch.~28, pp. 681--690.
+
+\bibitem[{Khare et~al.(2008)Khare, Mielke, Schatz, and
+  Belytschko}]{Khareetal08}
+Khare, R., Mielke, S.~L., Schatz, G.~C., Belytschko, T., 2008. Multiscale
+  coupling schemes spanning the quantum mechanical, atomistic forcefield, and
+  continuum regimes. Computer Methods in Applied Mechanics and Engineering 197,
+  3190--3202.
+
+\bibitem[{Kirk et~al.(2006)Kirk, Peterson, Stogner, and Carey}]{libMeshPaper}
+Kirk, B.~S., Peterson, J.~W., Stogner, R.~H., Carey, G.~F., 2006.
+  {\texttt{libMesh}: A {C}++ Library for Parallel Adaptive Mesh
+  Refinement/Coarsening Simulations}. Engineering with Computers 22~(3--4),
+  237--254, \url{http://dx.doi.org/10.1007/s00366-006-0049-3}.
+
+\bibitem[{Lieberman and Willcox(2013)}]{LiebWill13}
+Lieberman, C., Willcox, K., 2013. Goal-oriented inference: Approach, linear
+  theory, and application to advection diffusion. SIAM Review 55~(3), 493--519.
+
+\bibitem[{Liu et~al.(2004)Liu, Karpov, Zhang, and Park}]{Liuetal03}
+Liu, W.~K., Karpov, E., Zhang, S., Park, H., 2004. An introduction to
+  computational nanomechanics and materials. Computer Methods in Applied
+  Mechanics and Engineering 193~(17), 1529--1578.
+
+\bibitem[{Lucia et~al.(2002)Lucia, King, and Beran}]{LucKinBer02}
+Lucia, D.~J., King, P.~I., Beran, P.~S., 2002. Domain decomposition for
+  reduced-order modeling of a flow with moving shocks. AIAA Journal 40~(11),
+  2360--2362.
+
+\bibitem[{Marzouk et~al.(2007)Marzouk, Najm, and Rahn}]{MarzNajmRahn07}
+Marzouk, Y.~M., Najm, H.~N., Rahn, L.~A., 2007. Stochastic spectral methods for
+  efficient {B}ayesian solution of inverse problems. Journal of Computational
+  Physics 224~(2), 560--586.
+
+\bibitem[{Oden et~al.(2010)Oden, Prudhomme, Bauman, and
+  Chamoin}]{OdenPrudetal10}
+Oden, J.~T., Prudhomme, S., Bauman, P.~T., Chamoin, L., 2010. Estimation and
+  control of modeling error: A general approach to multiscale modeling. In:
+  Fish, J. (Ed.), Multiscale Methods: Bridging the Scales in Science and
+  Engineering. Oxford University Press, Ch.~10, pp. 285--304.
+
+\bibitem[{Oden et~al.(2006)Oden, Prudhomme, Romkes, and
+  Bauman}]{OdenPrudetal06}
+Oden, J.~T., Prudhomme, S., Romkes, A., Bauman, P.~T., 2006. Multiscale
+  modeling of physical phenomena: Adaptive control of models. SIAM Journal on
+  Scientific Computing 28~(6), 2359--2389.
+
+\DIFaddbegin \bibitem[{Oden and Vemaganti(2000)}]{OdenVem00}
+\DIFadd{Oden, J.~T., Vemaganti, K.~S., 2000. Estimation of local modeling error and
+  goal-oriented adaptive modeling of heterogeneous materials: }{\DIFadd{I}}\DIFadd{. }{\DIFadd{E}}\DIFadd{rror
+  estimates and adaptive algorithms. Journal of Computational Physics 164~(1),
+  22--47.
+}
+
+\DIFaddend \bibitem[{Park(2004)}]{Park04}
+Park, M.~A., 2004. Adjoint-based, three-dimensional error prediction and grid
+  adaptation. AIAA journal 42~(9), 1854--1862.
+
+\bibitem[{Prudhomme et~al.(2008)Prudhomme, Dhia, Bauman, Elkhodja, and
+  Oden}]{Prudetal08}
+Prudhomme, S., Dhia, H.~B., Bauman, P.~T., Elkhodja, N., Oden, J.~T., 2008.
+  Computational analysis of modeling error for the coupling of particle and
+  continuum models by the {A}rlequin method. Computer Methods in Applied
+  Mechanics and Engineering 197~(41), 3399--3409.
+
+\bibitem[{Prudhomme and Oden(1999)}]{PrudOden99}
+Prudhomme, S., Oden, J.~T., 1999. On goal-oriented error estimation for
+  elliptic problems: application to the control of pointwise errors. Computer
+  Methods in Applied Mechanics and Engineering 173, 313--331.
+
+\bibitem[{Spantini et~al.(2016)Spantini, Cui, Willcox, Tenorio, and
+  Marzouk}]{Span16}
+Spantini, A., Cui, T., Willcox, K., Tenorio, L., Marzouk, Y., July 2016.
+  Goal-oriented optimal approximations of {B}ayesian linear inverse problems.
+  ArXiv e-prints.
+\newline\urlprefix\url{https://arxiv.org/abs/1607.01881}
+
+\bibitem[{{\c{S}}tef{\u{a}}nescu et~al.(2015){\c{S}}tef{\u{a}}nescu, Sandu, and
+  Navon}]{StefSanNav15}
+{\c{S}}tef{\u{a}}nescu, R., Sandu, A., Navon, I.~M., 2015. {POD}/{DEIM}
+  reduced-order strategies for efficient four dimensional variational data
+  assimilation. Journal of Computational Physics 295, 569--595.
+
+\bibitem[{Tartakovsky et~al.(2008)Tartakovsky, Tartakovsky, Scheibe, and
+  Meakin}]{tartakovsky2008hybrid}
+Tartakovsky, A.~M., Tartakovsky, D.~M., Scheibe, T.~D., Meakin, P., 2008.
+  Hybrid simulations of reaction-diffusion systems in porous media. SIAM
+  Journal on Scientific Computing 30~(6), 2799--2816.
+
+\bibitem[{van Opstal et~al.(2015)van Opstal, Bauman, Prudhomme, and van
+  Brummelen}]{vanOpstaletal15}
+van Opstal, T., Bauman, P., Prudhomme, S., van Brummelen, E., 2015.
+  Goal-oriented model adaptivity for viscous incompressible flows.
+  Computational Mechanics, 1--10\DIFaddbegin \DIFadd{.
+}
+
+\bibitem[{Vemaganti and Oden(2001)}]{VemOden01}
+\DIFadd{Vemaganti, K.~S., Oden, J.~T., 2001. Estimation of local modeling error and
+  goal-oriented adaptive modeling of heterogeneous materials: }{\DIFadd{P}}\DIFadd{art }{\DIFadd{II}}\DIFadd{: a
+  computational environment for adaptive modeling of heterogeneous elastic
+  solids. Computer Methods in Applied Mechanics and Engineering 190~(46),
+  6089--6124}\DIFaddend .
+
+\bibitem[{Venditti and Darmofal(2000)}]{VendDarm00}
+Venditti, D.~A., Darmofal, D.~L., 2000. Adjoint error estimation and grid
+  adaptation for functional outputs: Application to quasi-one-dimensional flow.
+  Journal of Computational Physics 164, 204--227.
+
+\bibitem[{Vested et~al.(1993)Vested, Olesen, Refsgaard, Engesgaard, and
+  Malmgren-Hansen}]{Vestedetal93}
+Vested, H., Olesen, K., Refsgaard, A., Engesgaard, P., Malmgren-Hansen, A.,
+  1993. Advection-Dispersion Review: Rivers and Groundwater. EUR 15107 EN.
+  Commission of the European Communities.
+
+\bibitem[{Wadsworth and Erwin(1990)}]{WadErw90}
+Wadsworth, D., Erwin, D., 1990. One-dimensional hybrid continuum/particle
+  simulation approach for rarefied hypersonic flows. In: AIAA and ASME, 5th
+  Joint Thermophysics and Heat Transfer Conference. Vol.~1.
+
+\bibitem[{Wang and Zabaras(2004)}]{WangZab04}
+Wang, J., Zabaras, N., 2004. Hierarchical {B}ayesian models for inverse
+  problems in heat conduction. Inverse Problems 21~(1), 183--206.
+
+\bibitem[{Weinan et~al.(2007)Weinan, Engquist, Li, Ren, and
+  Vanden-Eijnden}]{Weietal04}
+Weinan, E., Engquist, B., Li, X., Ren, W., Vanden-Eijnden, E., 2007.
+  Heterogeneous multiscale methods: a review. Commun. Comput. Phys 2~(3),
+  367--450.
+
+\bibitem[{Yano and Darmofal(2012)}]{Yano12}
+Yano, M., Darmofal, D.~L., 2012. An optimization framework for anisotropic
+  simplex mesh adaptation. Journal of Computational Physics 231~(22),
+  7626--7649.
+
+\end{thebibliography}
+
+\end{document}

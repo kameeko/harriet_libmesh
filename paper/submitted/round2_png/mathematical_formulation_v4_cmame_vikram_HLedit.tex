@@ -6,7 +6,7 @@ In this section, we introduce the high-, low- and mixed-fidelity inverse problem
 \subsection{Inverse Problem Formulation}  \label{sec:setup}
 %------------------------------------------------------------------------------%
 %
-Consider the inverse problem where, given observations (data) $d\in\R^{n_d}$, we seek to infer parameter(s) $q\in Q$, where $Q$ is some function space. In this exposition, we assume that $Q$ is a Hilbert space. An observation operator $C:U\to\Reals^{n_d}$ relates the parameter to the observations via state variable(s) $u\in U$, with $u$ satisfying,
+Consider the inverse problem where, given observations (data) $d\in\R^{n_d}$, we seek to infer parameter(s) $q\in Q$, where $Q$ is a Hilbert space. An observation operator $C:U\to\Reals^{n_d}$ relates the parameter to the observations via state variable(s) $u\in U$, with $u$ satisfying,
 %
 \begin{equation}
 a(u,q)(\phi)=\ell(q)(\phi),\quad\forall\phi\in U,
@@ -39,7 +39,7 @@ q_{HF},u_{HF} &=&\arg\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2 
 \end{align}
 \end{subequations}
 %
-where $q_{HF} \in Q_{HF}$ and $u_{HF}\in U_{HF}$ are the inferred parameters and corresponding state. In practice, one has limited computational resources, so one may need to instead infer the parameters using a less computationally demanding model, which we call the low-fidelity model. We use the subscript $_{LF}$ to denote the low-fidelity inverse problem,
+where $q_{HF} \in Q_{HF}$ and $u_{HF}\in U_{HF}$ are the inferred parameters and corresponding state, respectively. In practice, one has limited computational resources, so one may need to instead infer the parameters using a less computationally demanding model, which we call the low-fidelity model. We use the subscript $_{LF}$ to denote the low-fidelity inverse problem,
 %
 \begin{subequations}
 \label{eq:invOptLF}
@@ -49,7 +49,7 @@ q_{LF},u_{LF} &=& \arg\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2
 \end{align}
 \end{subequations}
 %
-where $q_{LF} \in Q_{LF}$ and $u_{LF}\in U_{LF}$ are the inferred parameters and corresponding state. If there is compatibility between the low-fidelity and high-fidelity solution spaces for the parameter and state variables (the solutions of one can be interpreted in the context of the other; see \Cref{sec:adapt_alg} for more details), one may combine the two models to form a mixed-fidelity model and corresponding inverse problem. The low-fidelity model can be used in part of the computational domain, and the high fidelity in the remainder; we denote the mixed-fidelity model and its variables with the subscript $_{MF}$. How one chooses to combine the low- and high-fidelity models can be informed by what aspect of the inferred parameters is of interest.
+where $q_{LF} \in Q_{LF}$ and $u_{LF}\in U_{LF}$ are the inferred parameters and corresponding state, respectively. If there is compatibility between the low-fidelity and high-fidelity solution spaces for the parameter and state variables (i.e., if the solutions of one can be interpreted in the context of the other; see \Cref{sec:adapt_alg} for more details), one may combine the two models to form a mixed-fidelity model and corresponding inverse problem. The low-fidelity model can be used in part of the computational domain, and the high fidelity in the remainder; we denote the mixed-fidelity model and its variables with the subscript $_{MF}$. How one chooses to combine the low- and high-fidelity models can be informed by what aspect of the inferred parameters is of interest.
 
 In a {\em goal-oriented inverse problem}, the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by a functional that maps the parameters and state to our QoI, $I:Q \times U \to \R$. The QoIs evaluated with the high- ($I(q_{HF},u_{HF})$), low- ($I(q_{LF},u_{LF})$), or mixed- ($I(q_{MF},u_{MF})$) fidelity models correspondingly map parameters and state from the high-, low- or mixed- fidelity function spaces to QoI values. We consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use, seeking computable estimates for the error incurred in approximating the high-fidelity model with lower-fidelity models. Such an estimate allows us to adaptively choose regions where the high-fidelity model is used, starting from an initial low- or mixed- fidelity model.
 
@@ -84,7 +84,7 @@ where $z\in U_{HF}$ is the adjoint. Denoting the primary variables as $\xi=(q,u,
 \mathcal{M}_{HF}((q,u,z),(p,v,y)) = I(q,u) + \mathcal{L}'_{HF}(q,u,z)(p,v,y),
 \end{equation}
 %
-where $\mathcal{L}'_{HF}(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. One can define a similar Langrangian $\mathcal{L}_{LF}$ induced by \Cref{eq:invOptLF}, and a corresponding augmented Lagrangian $\mathcal{M}_{LF}$, for the low-fidelity model. Let $\Psi_{HF}= (\xi_{HF},\chi_{HF})=((q_{HF},u_{HF},z_{HF}),(p_{HF},v_{HF},y_{HF}))$ and $\Psi_{LF}= (\xi_{LF},\chi_{LF})=((q_{LF},u_{LF},z_{LF}),(p_{LF},v_{LF},y_{LF}))$ denote the stationary points of the high- and low- fidelity augmented Lagrangians, respectively. Then, the error in the QoI is given by,
+where $\mathcal{L}'_{HF}(q,u,z)(p,v,y)$ denotes the Fr\'{e}chet derivative of the Lagrangian about the primary variables $(q,u,z)$, in the direction of the auxiliary variables $(p,v,y)$. One can define a similar Lagrangian $\mathcal{L}_{LF}$ induced by \Cref{eq:invOptLF}, and a corresponding augmented Lagrangian $\mathcal{M}_{LF}$, for the low-fidelity model. Let $\Psi_{HF}= (\xi_{HF},\chi_{HF})=((q_{HF},u_{HF},z_{HF}),(p_{HF},v_{HF},y_{HF}))$ and $\Psi_{LF}= (\xi_{LF},\chi_{LF})=((q_{LF},u_{LF},z_{LF}),(p_{LF},v_{LF},y_{LF}))$ denote the stationary points of the high- and low- fidelity augmented Lagrangians, respectively. Then, the error in the QoI is given by,
 %
 \begin{multline}
 \label{eq:semifinErrExp}
@@ -220,6 +220,7 @@ where $R_{\mathscr{R}}$ is a second order remainder term due to the linearizatio
 %
 \end{proof}
 %
-If the state equations of the high fidelity model are linear, the derivative of the Lagrangian in~\Cref{eq:InvsOpt_auglag} is linear. In this case, the $R_{\mathscr{R}}$ term in~\Cref{eq:finErrExp} disappears, even if the QoI functional $I$ is nonlinear, and we get a fully third order error estimate.
+We note that if the state equations of the high-fidelity model are linear, the remainder term $R_\mathscr{R}$ in the supplementary adjoint formulation in \Cref{eq:adjOutErr} vanishes, and the error estimate in \Cref{eq:finErrExp} becomes fully third-order. This occurs even if the QoI functional $I$ is nonlinear.
+%If the state equations of the high fidelity model are linear, the derivative of the Lagrangian in~\Cref{eq:InvsOpt_auglag} is linear. In this case, the $R_{\mathscr{R}}$ term in~\Cref{eq:finErrExp} disappears, even if the QoI functional $I$ is nonlinear, and we get a fully third order error estimate.
 
 Other approaches to estimating the term $\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{LF})(\Psi_{HF}-\Psi_{LF})$ can become feasible in certain scenarios; for example, if the high- and low-fidelity models only differ in the computational grid used, the difference $\Psi_{HF}-\Psi_{LF}$ can be approximated using interpolation or patch recovery methods~\cite{BecVex05}.
