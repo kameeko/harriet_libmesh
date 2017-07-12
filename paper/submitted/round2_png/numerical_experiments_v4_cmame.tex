@@ -16,7 +16,7 @@ In this section, we consider a pair of models which differ in the physics includ
 We consider a rectangular domain $\Omega(x_1,x_2)=[0,5]\times[0,1]$, where $x_1$ and $x_2$ are the spatial coordinates. Recall the pair of models introduced in \Cref{sec:adapt_alg}. The high-fidelity model is a single-species convection-diffusion-reaction equation with a nonlinear reaction term, described by \Cref{eq:cdvcdrHF}. The low-fidelity model, described by \Cref{eq:cdvcdrLF}, differs only in the removal of the reaction term. We have a divergence-free parabolic-profile velocity field $\vec{V}(x_1,x_2) = (2x_2(1-x_2),0)$; the diffusion and reaction coefficients are $k_d = 0.1$ and $k_r = -42.0$, respectively. Homogeneous Dirichlet boundary conditions are applied on the entire boundary of the domain. 
 
 The QoI region is $\Omega_I=[0.625,0.875]\times[0.375,0.625]$. The parameters $q$ we wish to infer correspond to the forcing function. The observations are sparse measurements of the state.
-\Cref{fig:baseSetup} shows the locations of the observations and the region $\Omega_I$ over which the QoI is calculated. Note that for the low-fidelity model, the inverse problem is linear (i.e., the observations depend linearly on the parameters). We arbitarily choose the regularization coefficient to be $\beta=10^{-5}$; in this work, $\beta$ is chosen arbitrarily, though methods exist for choosing optimal regularization coefficients~\cite{BelgeKilmerMiller02,Calvetal00}.
+\Cref{fig:baseSetup} shows the locations of the observations and the region $\Omega_I$ over which the QoI is calculated. Note that for the low-fidelity model, the inverse problem is linear (i.e., the observations depend linearly on the parameters). We arbitrarily choose the regularization coefficient to be $\beta=10^{-5}$; in this work, $\beta$ is chosen arbitrarily, though methods exist for choosing optimal regularization coefficients~\cite{BelgeKilmerMiller02,Calvetal00}.
 %
 \begin{figure}[htbp]
 \centering
@@ -103,25 +103,29 @@ Although refinement is still most important around the observation location clos
 \captionsetup{justification=centering}
 \subfloat[Locations of observations and QoI region $\Omega_I$][Locations of \\observations and \\QoI region $\Omega_I$]{
   %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_setup.png}
-  \includegraphics[width=0.21\textwidth]{vs_qoi/vs_qoi_setup_sidetrim.png}
+  %\includegraphics[width=0.21\textwidth]{vs_qoi/vs_qoi_setup_sidetrim.png}
+  \includegraphics[width=0.19\textwidth]{vs_qoi/yarp.pdf}
   \label{subfig:obsSetup}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_0$ ($0\%$ HF)][MF$_0$ \\($0\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err0.png}
-  \includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err0_nobar.png}
+  %\includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err0_nobar.png}
+  \includegraphics[width=0.166\textwidth]{vs_qoi/yarp0.pdf}
   \label{subfig:obsLF}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err1.png}
-  \includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err1_nobar.png}
+  %\includegraphics[width=0.16\textwidth]{vs_qoi/vs_qoi_err1_nobar.png}
+  \includegraphics[width=0.166\textwidth]{vs_qoi/yarp1.pdf}
   \label{subfig:obsMF1}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_2$ ($\sim10\%$ HF)][MF$_2$ \\($\sim10\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2.png}
-  \includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2_barnorm.png}
+  %\includegraphics[width=0.23\textwidth]{vs_qoi/vs_qoi_err2_barnorm.png}
+  \includegraphics[width=0.224\textwidth]{vs_qoi/yarp2.pdf}
   \label{subfig:obsMFlast}
 }
   \caption{Effects of increasing the QoI region. Column \protect\subref{subfig:obsSetup}: configuration of observations (teal points) and QoI region (purple box). Columns \protect\subref{subfig:obsLF}--\protect\subref{subfig:obsMFlast}: the relative error estimate decompositions for different mixed-fidelity models, relative to the largest localized error contribution; note the locations of regions of relatively large error compared to the observation locations and QoI region.}
@@ -136,25 +140,29 @@ The error decomposition for the three cases is shown in \Cref{subfig:obsLF2,subf
 \captionsetup{justification=centering}
 \subfloat[Locations of observations and QoI region $\Omega_I$][Locations of \\observations and \\QoI region $\Omega_I$]{
   %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_setup.png}
-  \includegraphics[width=0.21\textwidth]{vs_data/vs_data_setup_sidetrim.png}
+  %\includegraphics[width=0.21\textwidth]{vs_data/vs_data_setup_sidetrim.png}
+  \includegraphics[width=0.19\textwidth]{vs_data/yarp.pdf}
   \label{subfig:obsSetup2}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_0$ ($0\%$ HF)][MF$_0$ \\($0\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err0.png}
-  \includegraphics[width=0.16\textwidth]{vs_data/vs_data_err0_nobar.png}
+  %\includegraphics[width=0.16\textwidth]{vs_data/vs_data_err0_nobar.png}
+  \includegraphics[width=0.162\textwidth]{vs_data/yarp0.pdf}
   \label{subfig:obsLF2}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_1$ ($\sim5\%$ HF)][MF$_1$ \\($\sim5\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err1.png}
-  \includegraphics[width=0.16\textwidth]{vs_data/vs_data_err1_nobar.png}
+  %\includegraphics[width=0.16\textwidth]{vs_data/vs_data_err1_nobar.png}
+  \includegraphics[width=0.171\textwidth]{vs_data/yarp1.pdf}
   \label{subfig:obsMF1_2}
 }
 \captionsetup{justification=centering}
 \subfloat[MF$_2$ ($\sim10\%$ HF)][MF$_2$ \\($\sim10\%$ HF)]{
   %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2.png}
-  \includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2_barnorm.png}
+  %\includegraphics[width=0.23\textwidth]{vs_data/vs_data_err2_barnorm.png}
+  \includegraphics[width=0.224\textwidth]{vs_data/yarp2.pdf}
   \label{subfig:obsMFlast2}
 }
   \caption{Effects of increasing the number of observations. Column \protect\subref{subfig:obsSetup2}: configuration of observations (teal points) and QoI region (purple box). Columns \protect\subref{subfig:obsLF2}--\protect\subref{subfig:obsMFlast2}: the relative error estimate decompositions for different mixed-fidelity models, relative to the largest localized error contribution; note the locations of regions of relatively large error compared to the observation locations and QoI region.}
@@ -179,7 +187,7 @@ with the same diffusion coefficient $k_d = 0.1$  and reaction coefficient $k_r =
 \begin{equation}
 k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2= f(q),\quad q\in U_{LF}
 \end{equation}
-differs from the high-fidelity model only in that $U_{LF}$ is limited to the space of constant functions over $\Omega$; we maintain $f(q)=q$. The intermediate mixed-fidelity models thus have parameter fields (and forcing functions) that are constant over the subregions of the domain where the low-fidelity model is used; disconnected low-fidelity regions still share the same parameter value. The domain, mesh, boundary conditions, and velocity field, as well as the observations and QoI, remain the same as described in \Cref{sec:cdvcdr}; we continue to infer for the forcing field. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. Also for ease of implementation and for localizing the error, the forcing field and its auxiliary and supplementary adjoint conterparts are represented with the same basis functions as the other variables in the high-fidelity regions, and forced to be constant in the low-fidelity regions using a penalty term. Although the chosen pair of models has the potential to give mixed-fidelity models with fewer degreees of freedom in the parameter, this is not the case in our implementation; however, we are not looking to demonstrate computational savings with this example, but rather to explore the behavior of \Cref{alg:refSeries} when applied to such a pair of models. As the inverse problem is ill-posed, except when the low-fidelity model is used throughout the domain, regularization is used; the Tikhonov regularization term in \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient. 
+differs from the high-fidelity model only in that $U_{LF}$ is limited to the space of constant functions over $\Omega$; we maintain $f(q)=q$. The intermediate mixed-fidelity models thus have parameter fields (and forcing functions) that are constant over the subregions of the domain where the low-fidelity model is used; disconnected low-fidelity regions still share the same parameter value. The domain, mesh, boundary conditions, and velocity field, as well as the observations and QoI, remain the same as described in \Cref{sec:cdvcdr}; we continue to infer for the forcing field. For ease of implementation, we require that the resulting parameter field remain continuous at the interface between the low-fidelity and high-fidelity subdomains, although this constraint is not necessary for the theory to hold. Also for ease of implementation and for localizing the error, the forcing field and its auxiliary and supplementary adjoint counterparts are represented with the same basis functions as the other variables in the high-fidelity regions, and forced to be constant in the low-fidelity regions using a penalty term. Although the chosen pair of models has the potential to give mixed-fidelity models with fewer degrees of freedom in the parameter, this is not the case in our implementation; however, we are not looking to demonstrate computational savings with this example, but rather to explore the behavior of \Cref{alg:refSeries} when applied to such a pair of models. As the inverse problem is ill-posed, except when the low-fidelity model is used throughout the domain, regularization is used; the Tikhonov regularization term in \Cref{eq:invOpt_obj} is $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla f(q)\|_2^2+f(q)^2\:\textrm{d}A$, where $\beta=10^{-3}$ is a regularization coefficient. 
 
 %------------------------------------------------------------%
 \subsubsection{Adaptive Model Refinement Results}
@@ -275,11 +283,9 @@ The corresponding true and estimated absolute errors in the QoI are shown in \Cr
 %
 In this case, we see that we must use the high-fidelity model in most of the domain in order to get an accurate QoI. The adaptive algorithm requires us to use the field representation of the high-fidelity model in much of the left half of the domain; this reflects the topology of the inferred parameter field in the high-fidelity inverse problem, which is only relatively constant towards the right portion of the domain (compare 
 %\Cref{subfig:svfparamMF6} and \Cref{subfig:svfparamHF}
-the bottom two figures of \Cref{fig:svfRefParams}
-). We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. Note that although the inferred parameters in the first and third mixed-fidelity models (see 
+the bottom two figures of \Cref{fig:svfRefParams}). We also see that in this case, in contrast to the example in \Cref{sec:cdvcdrBaseRef}, increasing the proportion of the domain in which the high-fidelity model is used does not monotonically decrease the error in the QoI. Note that although the inferred parameters in the first and third mixed-fidelity models (see 
 %\Cref{subfig:svfparamMF1} and \Cref{subfig:svfparamMF3}
-the top two figures of \Cref{fig:svfRefParams}
-) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
+the top two figures of \Cref{fig:svfRefParams}) are very different, they give very similar QoI error; the same is true for the second and fourth mixed-fidelity models. These provide additional examples supporting the idea that using inferring parameters with models of different mixtures of fidelities can produce similar QoIs.
 
 %compare MF01 and MF03, MF06 and HF
 %1 and 3 look very different but have very similar true errors - different params can give similar qoi, though in this case the qoi is not close to HF; more HF doesn't necessarily decrease error, interplay between having freedom to match data and all LF regions being flat...
@@ -338,13 +344,13 @@ We use a FEM with a continuous Galerkin formulation and Lagrange elements. The l
 
 We now present the results of solving the inference problem using \Cref{alg:refSeries}, with a relative error tolerance of $0.1\%$. At each iteration, we choose the $2\%$ of the basis functions with the largest error for model refinement; since each linear Lagrange basis function has eight elements in its support, the number of additional elements marked for refinement in each iteration is usually greater than for the 2D examples. All simulations are run on a single processor; we use the default nonlinear solver in \texttt{libMesh} \cite{libMeshPaper} (Newton's method with Brent line-search), and linear solves are performed using PETSc's \cite{petsc-user-ref} GMRES solver, preconditioned by incomplete factorization.
 
-\Cref{tab:ref3D_diffmesh} shows the error at the end of each adaptive iteration. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The number of degrees of freedom of each of the primary (and, if applicable, auxiliary) variables at each iteration is also given; the supplementary adjoint is solved on the high-fidelity mesh and thus each of its variables has the same number of degrees of freedom as each of the primary variables in the high-fidelity inverse problem. The high-fidelity inverse problem does not converge when the low-fidelity solution is used as an initial guess. Instead, we solve the inverse problem for an intermediate model
+\Cref{tab:ref3D_diffmesh} shows the error at the end of each adaptive iteration. Each iteration of the adaptive algorithm uses the solution of the previous iteration as its initial guess. The number of degrees of freedom of each of the primary (and, if applicable, auxiliary) variables at each iteration is also given; the supplementary adjoint is solved on the high-fidelity mesh and thus each of its variables has the same number of degrees of freedom as each of the primary variables in the high-fidelity inverse problem. We note that convergence of the high-fidelity inverse problem is sensitive to the initial guess; the solve does not converge when the low-fidelity solution is used as an initial guess. Instead, we solve the inverse problem for an intermediate model
 %
 \begin{equation}
 \nabla\cdot(n\vec{V}u - nD\nabla u) + k_ru^2 = f(q)
 \end{equation}
 %
-with $k_r=0$, and use the solution as an initial guess for the high-fidelity problem; this is equivalent to using two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$.
+with $k_r=0$, and use the solution as an initial guess for the high-fidelity problem; this is equivalent to using two steps of natural continuation on the reaction parameter: $k_r=0$, then $k_r=4.2\cdot10^{-4}$. In comparison, the adaptive algorithm needs no such continuation in $k_r$ to converge; each step can be viewed as implicit continuation in the addition of high-fidelity regions.
 %
 \begin{table}[htbp]
 \centering
