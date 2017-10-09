@@ -1,0 +1,113 @@
+\section{Goal-Oriented Inference Algorithm}\label{sec:alg}
+%
+Based on the theoretical developments in the last section, we now give a goal-oriented inference algorithm that allows one to combine models of varying fidelity, while maintaining rigorous control of QoI error.
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Adaptive Model Mixing Algorithm}\label{sec:adapt_alg}
+%------------------------------------------------------------------------------------------------------------------------%
+
+Just as error estimates can be used to guide mesh refinement~\cite{BecRann01,VendDarm00,PrudOden99,BecVex05,AinsOden11}, the error estimate obtained after dropping the remainder terms $\mathcal{R}$ and $\mathcal{R}_\mathscr{R}$ in \Cref{eq:finErrExp} can be localized to give elemental contributions and used to guide physics-based refinement over the domain to create a mixed-fidelity model. After refinement, the error estimate can be calculated again, using the mixed-fidelity model as the lower-fidelity model. This process can be repeated, successively increasing the proportion of the domain in which the high-fidelity model is used, until some error threshold is reached. \Cref{alg:refSeries} describes this approach. 
+%
+\alglanguage{pseudocode}
+\begin{algorithm}[h!]
+\small
+\caption{An algorithm to adaptively build a mixed-fidelity model for low error in the QoI.}
+\label{alg:refSeries}
+\begin{algorithmic}[1]
+\State{Define maximum acceptable absolute relative QoI error \texttt{errTol}}
+\State{Define maximum number of adaptive iterations \texttt{maxIter}}
+\Procedure{$\texttt{BuildMixedFidelity}$}{HF model, LF model, \texttt{errTol}, \texttt{maxIter}}
+	\State{Let the model MF$_0$ be the LF model applied everywhere in the domain.}
+	\State{$i\gets0$}
+	\State{Solve for stationary point $\Psi_{MF_0}$ of augmented Lagrangian $\mathcal{M}_{MF_0}$}
+	\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_0}$, for \par\hskip\algorithmicindent supplementary adjoint $\Lambda_0$ (see \Cref{eq:superAdjEq})}
+	\State{Compute QoI error estimate
+		
+	$\epsilon_0=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_0})(\Lambda_0)+\mathcal M_{HF}(\Psi_{MF_0})-\mathcal M_{MF_0}(\Psi_{MF_0})$}
+	\State{Calculate QoI $I(q_{MF_0},u_{MF_0})$}
+	\While{$i<$ \texttt{maxIter} and $|\epsilon_i/(\epsilon_i+I(q_{MF_i},u_{MF_i}))|>$ \texttt{errTol}}
+		\State{Localize $\epsilon_i$ (see \Cref{sec:errLocal}) and use this decomposition to guide \par\hskip\algorithmicindent formation of new mixed-fidelity model MF$_{i+1}$}
+		\State{$i\gets i+1$}
+		\State{Solve for stationary point $\Psi_{MF_i}$ of augmented Lagrangian $\mathcal{M}_{MF_i}$}
+		\State{Solve QoI error adjoint equation, linearized about $\Psi_{MF_i}$, for
+		
+		$\quad\quad$supplementary adjoint $\Lambda_i$ (see \Cref{eq:superAdjEq})}
+		\State{Compute QoI error estimate
+		
+		$\quad\quad \epsilon_i=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF_i})(\Lambda_i)+\mathcal M_{HF}(\Psi_{MF_i})-\mathcal M_{MF_i}(\Psi_{MF_i})$\label{alg-line:MFerrorest}}
+		\State{Calculate QoI $I(q_{MF_i},u_{MF_i})$}
+	\EndWhile \\
+\Return{model MF$_i$ and QoI estimate $I(q_{MF_i},u_{MF_i})$}
+\EndProcedure
+\Statex
+\end{algorithmic}
+\end{algorithm}
+%
+
+As an example, consider a pair of low- and high-fidelity models described by the convection-diffusion and convection-diffusion-reaction equations
+\begin{subequations}
+\begin{align}
+\textrm{low-fidelity:   } & k_d\nabla^2 u - \vec{V}\cdot\nabla u = q, \label{eq:cdvcdrLF}\\
+\textrm{high-fidelity:   } & k_d\nabla^2 u - \vec{V}\cdot\nabla u + k_ru^2 = q, \label{eq:cdvcdrHF}
+\end{align}
+\end{subequations}
+where $k_d$ and $k_r$ are diffusion and reaction coefficients, respectively, and the state $u$ and parameters $q$ are continuous functions over a domain $\Omega$ with homogeneous Dirichlet boundary conditions. To form the mixed-fidelity models, we divide the domain into complementary subdomains, $\Omega_{HF}$ and $\Omega_{LF}$, where the high- and low-fidelity models are solved, respectively; initially, $\Omega_{LF}=\Omega$. The resulting mixed-fidelity models can be described by,
+%
+\begin{equation}
+k_d\nabla^2 u - \vec{V}\cdot\nabla u + k^{MF}_ru^2= q,
+\end{equation}
+%
+where $k^{MF}_r$ is a piecewise-constant reaction coefficient,
+%
+\begin{equation}
+k^{MF}_r=
+\begin{cases}
+k_r & \textrm{if }x\in\Omega_{HF} \\
+0 & \textrm{if }x\in\Omega_{LF}.
+\end{cases}
+\end{equation}
+%
+Let the QoI be described by $I(q,u)=\int_{\Omega_I} u \:\textrm{d}\Omega$, where $\Omega_I\subset\Omega$ is the QoI region. Let the observations be of the state at some set of locations, so that the data-misfit term is $\frac{1}{2}\int_\Omega \delta_{obs}(u-d)^2\:\textrm{d}\Omega$, where $\delta_{obs}$ is a sum of Dirac delta functions indicating the locations of the observations. Since the inverse problem is ill-posed, we use Tikhonov regularization~\cite{EngHanNeu00}, with $R(q)=\frac{\beta}{2}\int_\Omega \|\nabla q\|_2^2\:\textrm{d}\Omega$, where $\beta$ is a regularization coefficient. Assuming divergence-free velocity $\vec{V}$, the mixed-fidelity model has augmented Lagrangian
+\begin{eqnarray}
+\mathcal{M}_{MF}((q,u,z)(p,v,y)) &=& \int_{\Omega_I\subset\Omega} u \:\textrm{d}\Omega \nonumber\\
+&+& \int_\Omega p(-\beta\nabla^2q+z) \nonumber\\
+&+& v(k_d\nabla^2z+\vec{V}\cdot\nabla z+2k^{MF}_rzu+\delta_{obs}(u-d)) \nonumber\\ 
+&+& y(k_d\nabla^2u-\vec{V}\cdot\nabla u+k^{MF}_ru^2+q)\:\textrm{d}\Omega.
+\end{eqnarray}
+Taking variations with respect to the auxiliary variables $(p,v,y)$ recovers the equations for the primary variables; taking variations with respect to the primary variables gives the equations for the auxiliary variables. Solving for the primary variables and then the auxiliary variables gives the stationary point $\Psi_{MF}$ of $\mathcal{M}_{MF}$. 
+The high-fidelity versions of these primary and auxiliary systems are satisfied by $\Psi_{HF}$; we seek the error in the linear functional described by \Cref{eq:supadjout} induced by applying it to $\Psi_{MF}$ instead of $\Psi_{HF}$. We take the classical dual-weighted residual approach and solve for the supplementary adjoint $\Lambda$, linearizing about $\Psi_{MF}$ instead of $\Psi_{HF}$ when necessary, since the latter is not available; the components of the supplementary adjoint corresponding to the primary and auxiliary systems can be solved separately. Having obtained $\Psi_{MF}$ and the supplementary adjoint $\Lambda$, we evaluate the error estimate (see Step \ref{alg-line:MFerrorest} of \Cref{alg:refSeries}), localize it (see \Cref{sec:errLocal}), and use the localization to guide the selection of elements currently in $\Omega_{LF}$ to include in $\Omega_{HF}$ in the next iteration. We return to this example and give results of applying \Cref{alg:refSeries} to this pair of models in \Cref{sec:cdvcdr}.
+
+\Cref{alg:refSeries} is applicable to a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena (as in the example above), or be a reduced-order model, or have a reduced parameter and/or state space. The derived error estimate is not applicable to all models, however. It is assumed that the two models share the same domain; for example, the low-fidelity model can not be a one-dimensional average of a two-dimensional high-fidelity model. The low- and high-fidelity models must be expressible in a weak form, so this cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. We need some degree of compatibility between the two models, in that we require the low-fidelity solutions to be interpretable in the context of the high-fidelity model; specifically, we require that $\Psi_{LF}$ be in a space admissible to $\mathcal{M}'_{HF}$ and $\mathcal{M}_{HF}$. For example, compared to the high-fidelity model, the low-fidelity model may have a coarser mesh, basis functions of a lower order, or basis functions spanning a reduced subspace. The high-fidelity model could describe changes in states that have a fixed nominal value in the low-fidelity model; the high-fidelity model could allow anisotropy of the inferred parameters while the low-fidelity model could constrain their components and require isotropy. We note that in the case where the two models correspond to two levels of mesh refinement, method described in~\cite{BecVex05} would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead.
+
+%------------------------------------------------------------------------------------------------------------------------%
+\subsection{Error Estimate Localization}\label{sec:errLocal}
+%------------------------------------------------------------------------------------------------------------------------%
+
+\Cref{alg:refSeries} does not require a specific method for localizing the error estimate. A na\"{i}ve approach would be to write the error estimate as a sum of integrals over elements and their boundaries, and calculate the error contribution by each element as the integral over that element. While simple, this method can lead to non-zero error contributions from elements in which the high-fidelity model is already being used, making the error decomposition more difficult to interpret and use for refinement.
+
+We instead use the alternative method described in \cite{vanOpstaletal15}, decomposing the error estimate into contributions from locally supported basis functions rather than elements. Recall the error estimate 
+%
+\begin{equation}
+\epsilon=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF})(\Lambda)+\mathcal M_{HF}(\Psi_{MF})-\mathcal M_{MF}(\Psi_{MF})
+\end{equation}
+%
+from \Cref{alg:refSeries}. Let $(Q^h\times U^h\times U^h)^3 \subset (Q\times U\times U)^3$ be the finite-dimensional conforming subspace in which we solve for the approximations $\Lambda^h$ and $\Psi_{MF}^h$; we seek to decompose the error estimate
+%
+\begin{equation}
+\epsilon^h=-\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF}^h)(\Lambda^h)+\mathcal M_{HF}(\Psi_{MF}^h)-\mathcal M_{MF}(\Psi_{MF}^h).
+\end{equation}
+%
+Define a basis $\Phi^h=\{(\varphi,\upvarphi)_i\}_{i\in I}$ consisting of locally supported functions such that $\textrm{span}(\Phi^h)=(Q^h\times U^h\times U^h)^3$, so that we can write $(\Lambda^h,\Psi_{MF}^h)=(\sum\limits_{i\in I}\varphi_i\lambda_i,\sum\limits_{i\in I}\upvarphi_i \psi_i)$. Then the error estimate satisfies
+%
+\begin{equation}
+\epsilon^h \leq \sum_{i\in I} \varepsilon^h_i,
+\end{equation}
+%
+where,
+%
+\begin{equation}\label{eq:basisblame}
+\varepsilon^h_i = \left| -\frac{1}{2}\mathcal{M}'_{HF}(\Psi_{MF}^h)(\lambda_i\varphi_i)+\mathcal M_{HF}(\upvarphi_i \psi_i)-\mathcal M_{MF}(\upvarphi_i \psi_i) \right|
+\end{equation}
+%
+can be interpreted as the error contribution from the basis function $(\varphi,\upvarphi)_i$. Near the interfaces between the low-fidelity and high-fidelity regions, basis functions may have their support divided between the two regions and thus have a nonzero error contribution. The basis functions with the largest error contributions are flagged, and the elements in their support are added to the high-fidelity subdomain. Basis functions whose support lie completely in the high-fidelity region will have a zero contribution and the elements in their support are never flagged for refinement again. 
+
