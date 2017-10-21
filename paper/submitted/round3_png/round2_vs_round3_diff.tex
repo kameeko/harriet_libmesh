@@ -1,7 +1,7 @@
 \documentclass[review,sort&compress]{elsarticle}
 %DIF LATEXDIFF DIFFERENCE FILE
 %DIF DEL ../round2_png/cleaned_for_submit/paper_v5_cmame.tex   Mon Oct  9 12:07:31 2017
-%DIF ADD paper_v6_cmame.tex                                    Mon Oct  9 09:41:15 2017
+%DIF ADD paper_v6_cmame.tex                                    Sat Oct 21 10:35:00 2017
 %%\usepackage{lgrind}
 
 %\usepackage[square,comma,numbers,sort&compress]{natbib}
@@ -50,8 +50,15 @@
 \newcommand{\red}[1]{{\color{red}{#1}}}
 \newcommand{\orderof}[1]{{\ensuremath{ {\cal O}(#1)}}}
 
+%DIF 50a50
+\theoremstyle{plain} %DIF > 
+%DIF -------
 \newtheorem{theorem}{Theorem}
 \newtheorem{proposition}{Proposition}
+%DIF 52a53-54
+\theoremstyle{definition} %DIF > 
+\newtheorem{definition}{Definition} %DIF > 
+%DIF -------
 
 \graphicspath{{./figures/}}
 %DIF PREAMBLE EXTENSION ADDED BY LATEXDIFF
@@ -225,9 +232,9 @@ q_{LF},u_{LF} &=& \arg\min\limits_{q,u} & \quad J(q,u)=\frac{1}{2}\|d-C(u)\|_2^2
 \end{subequations}
 %
 where $q_{LF} \in Q_{LF}$ and $u_{LF}\in U_{LF}$ are the inferred parameters and corresponding state, respectively. 
-\DIFdelbegin \DIFdel{If there is compatibility between the low-fidelity }\DIFdelend \DIFaddbegin 
+\DIFdelbegin \DIFdel{If there is compatibility between the low-fidelity and high-fidelity solution spaces for the parameter and state variables (i.e., if the solutions of one can be interpreted in the context of the other; see \Cref{sec:adapt_alg} for more details), one may }\DIFdelend \DIFaddbegin 
 
-\DIFadd{Assume the high- }\DIFaddend and \DIFdelbegin \DIFdel{high-fidelity solution spaces for the parameter and state variables (i. e., if the solutions of one can be interpreted in the context of the other; see \Cref{sec:adapt_alg} for more details), one may }\DIFdelend \DIFaddbegin \DIFadd{low-fidelity models are \emph{compatible}, in that $U_{LF}\subseteq U_{HF}$ and $Q_{LF}\subseteq Q_{HF}$. Then this compatibility allows one to }\DIFaddend combine the two models to form a mixed-fidelity model and corresponding mixed-fidelity inverse problem. The low-fidelity model can be used in part of the computational domain, and the high fidelity in the remainder; we denote the mixed-fidelity model and its variables with the subscript $_{MF}$. How one chooses to combine the low- and high-fidelity models can be informed by what aspect of the inferred parameters is of interest.
+\DIFadd{Assume the high- and low-fidelity models are compatible (formally defined in \Cref{defn:comp}), so that one can }\DIFaddend combine the two models to form a mixed-fidelity model and corresponding mixed-fidelity inverse problem. The low-fidelity model can be used in part of the computational domain, and the high fidelity in the remainder; we denote the mixed-fidelity model and its variables with the subscript $_{MF}$. How one chooses to combine the low- and high-fidelity models can be informed by what aspect of the inferred parameters is of interest.
 
 In a {\em goal-oriented inverse problem}, the ultimate purpose of inferring the unknown parameters is to calculate some quantity of interest (QoI). We denote a scalar QoI by a functional that maps the parameters and state to our QoI, $I:Q \times U \to \R$. The QoIs evaluated with the high- ($I(q_{HF},u_{HF})$), low- ($I(q_{LF},u_{LF})$), or mixed- ($I(q_{MF},u_{MF})$) fidelity models correspondingly map parameters and state from the high-, low- or mixed- fidelity function spaces to QoI values. We consider the tradeoff between the error in the QoI and the fidelity (and corresponding computational expense) of the model we use, seeking computable estimates for the error incurred in approximating the high-fidelity model with lower-fidelity models. Such an estimate allows us to adaptively choose regions where the high-fidelity model is used, starting from an initial low- or mixed- fidelity model.
 
@@ -242,11 +249,18 @@ As in~\cite{BecVex05}, we introduce the QoI functional $I$ into the inverse prob
 \subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
 %------------------------------------------------------------------------------%
 %
-For a given hierarchy of \DIFaddbegin \DIFadd{compatible }\DIFaddend models, we take the QoI calculated from inferring the parameters with the highest-fidelity model to be the `exact' or `true' solution; we now derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model.
+For a given hierarchy of \DIFaddbegin \DIFadd{compatible }\DIFaddend models, we take the QoI calculated from inferring the parameters with the highest-fidelity model to be the `exact' or `true' solution\DIFdelbegin \DIFdel{; we }\DIFdelend \DIFaddbegin \DIFadd{. Let compatibility be formally defined as follows:
+%DIF > 
+}\begin{definition}
+\DIFadd{The high- and low-fidelity models described by \Cref{eq:invOpt_consHF} and \Cref{eq:invOpt_consLF}, respectively, are \emph{compatible} if $U_{LF}\subseteq U_{HF}$ and $Q_{LF}\subseteq Q_{HF}$. Compatibility allows one to evaluate residuals associated with the high-fidelity inverse problem, such as optimality conditions, at solutions to the low-fidelity inverse problem.
+}\label{defn:comp}
+\end{definition}
+%DIF >  
+\DIFadd{We }\DIFaddend now derive an a posteriori estimate for the error in the QoI from inferring the parameters with a lower-fidelity model.
 %
 \begin{proposition}
 \label{thm:error_estimate}
-Consider the high- and low-fidelity inverse problems described by the constrained optimization problems in \Cref{eq:invOptHF,eq:invOptLF}. Let the \DIFaddbegin \DIFadd{high- and low-fidelity models be compatible ($U_{LF}\subseteq U_{HF}$ and $Q_{LF}\subseteq Q_{HF}$), and let the }\DIFaddend forms $a_{HF/LF}:U_{HF/LF} \times Q_{HF/LF} \times U_{HF/LF} \to \Reals$ be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator $C:U_{HF/LF}\to\Reals^{n_d}$ be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator $R:Q_{HF/LF}\to\Reals$ be differentiable with respect to the parameter $q$, and the QoI functional $I:Q_{HF/LF}\times U_{HF/LF}\to\Reals$ be differentiable with respect to the state $u$ and parameter $q$.
+Consider the high- and low-fidelity inverse problems described by the constrained optimization problems in \Cref{eq:invOptHF,eq:invOptLF}. Let the \DIFaddbegin \DIFadd{high- and low-fidelity models be compatible (in the sense of \Cref{defn:comp}), and let the }\DIFaddend forms $a_{HF/LF}:U_{HF/LF} \times Q_{HF/LF} \times U_{HF/LF} \to \Reals$ be three times continuously differentiable with respect to the state $u$ and parameters $q$. Let the observation operator $C:U_{HF/LF}\to\Reals^{n_d}$ be three times continuously differentiable with respect to the state $u$. Also, let the regularization operator $R:Q_{HF/LF}\to\Reals$ be differentiable with respect to the parameter $q$, and the QoI functional $I:Q_{HF/LF}\times U_{HF/LF}\to\Reals$ be differentiable with respect to the state $u$ and parameter $q$.
 
 Consider the Lagrangian equation induced by \Cref{eq:invOptHF},
 %
@@ -290,7 +304,7 @@ Extending the property in \Cref{eq:MeqI} to the augmented Lagrangians for the hi
 I(q_{HF},u_{HF})-I(q_{LF},u_{LF})=\\\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})+\mathcal{M}_{HF}(\Psi_{LF})-\mathcal{M}_{LF}(\Psi_{LF})\textrm{.}
 \end{multline}
 %
-Following~\cite{BecVex05}, we rewrite the term $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$ using the Fundamental Theorem of Calculus,
+\DIFaddbegin \DIFadd{Note that $\mathcal{M}_{HF}(\Psi_{LF})$ is well-defined due to model compatibility. }\DIFaddend Following~\cite{BecVex05}, we rewrite the term $\mathcal{M}_{HF}(\Psi_{HF})-\mathcal{M}_{HF}(\Psi_{LF})$ using the Fundamental Theorem of Calculus,
 %
 \begin{equation}
 \label{eq:Mantiderivative}
@@ -482,7 +496,7 @@ Let the QoI be described by $I(q,u)=\int_{\Omega_I} u \:\textrm{d}\Omega$, where
 Taking variations with respect to the auxiliary variables $(p,v,y)$ recovers the equations for the primary variables; taking variations with respect to the primary variables gives the equations for the auxiliary variables. Solving for the primary variables and then the auxiliary variables gives the stationary point $\Psi_{MF}$ of $\mathcal{M}_{MF}$. 
 The high-fidelity versions of these primary and auxiliary systems are satisfied by $\Psi_{HF}$; we seek the error in the linear functional described by \Cref{eq:supadjout} induced by applying it to $\Psi_{MF}$ instead of $\Psi_{HF}$. We take the classical dual-weighted residual approach and solve for the supplementary adjoint $\Lambda$, linearizing about $\Psi_{MF}$ instead of $\Psi_{HF}$ when necessary, since the latter is not available; the components of the supplementary adjoint corresponding to the primary and auxiliary systems can be solved separately. Having obtained $\Psi_{MF}$ and the supplementary adjoint $\Lambda$, we evaluate the error estimate (see Step \ref{alg-line:MFerrorest} of \Cref{alg:refSeries}), localize it (see \Cref{sec:errLocal}), and use the localization to guide the selection of elements currently in $\Omega_{LF}$ to include in $\Omega_{HF}$ in the next iteration. We return to this example and give results of applying \Cref{alg:refSeries} to this pair of models in \Cref{sec:cdvcdr}.
 
-\Cref{alg:refSeries} is applicable to \DIFdelbegin \DIFdel{a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena (as in the example above), or be a reduced-order model, or have a reduced parameter and/or state space. The derived error estimate is not applicable to allmodels, however. It is assumed that the two models share the same domain; for example, the low-fidelity model can not be a one-dimensional average of a two-dimensional high-fidelity model. The }\DIFdelend \DIFaddbegin \DIFadd{many, though not all, models. One restriction to note is that the }\DIFaddend low- and high-fidelity models must be expressible in a weak form, so \DIFdelbegin \DIFdel{this }\DIFdelend \DIFaddbegin \DIFadd{\Cref{alg:refSeries} }\DIFaddend cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. \DIFdelbegin \DIFdel{We need some degree of compatibility between }\DIFdelend \DIFaddbegin \DIFadd{The models must also be compatible (see \Cref{sec:setup}). Note that this implies }\DIFaddend the two models \DIFdelbegin \DIFdel{, in that we require }\DIFdelend \DIFaddbegin \DIFadd{must share the same domain; for example, }\DIFaddend the low-fidelity \DIFdelbegin \DIFdel{solutions to be interpretable in the context of the }\DIFdelend \DIFaddbegin \DIFadd{model can not be a one-dimensional average of a two-dimensional }\DIFaddend high-fidelity model\DIFdelbegin \DIFdel{; specifically, we require that $\Psi_{LF}$ be in a space admissible to $\mathcal{M}'_{HF}$ and $\mathcal{M}_{HF}$. For example, compared to the high-fidelity model, the }\DIFdelend \DIFaddbegin \DIFadd{. 
+\Cref{alg:refSeries} is applicable to \DIFdelbegin \DIFdel{a large class of models. The lower-fidelity model could, for example, be a simplified model including fewer physical phenomena (as in the example above), or be a reduced-order model, or have a reduced parameter and/or state space. The derived error estimate is not applicable to allmodels, however. It is assumed that the two models share the same domain; for example, the low-fidelity model can not be a one-dimensional average of a two-dimensional high-fidelity model. The }\DIFdelend \DIFaddbegin \DIFadd{many, though not all, models. One restriction to note is that the }\DIFaddend low- and high-fidelity models must be expressible in a weak form, so \DIFdelbegin \DIFdel{this }\DIFdelend \DIFaddbegin \DIFadd{\Cref{alg:refSeries} }\DIFaddend cannot be applied to, for example, a model of chemical reactions using kinetic Monte Carlo. \DIFdelbegin \DIFdel{We need some degree of compatibility between }\DIFdelend \DIFaddbegin \DIFadd{The models must also be compatible (see \Cref{defn:comp}). Note that this implies }\DIFaddend the two models \DIFdelbegin \DIFdel{, in that we require }\DIFdelend \DIFaddbegin \DIFadd{must share the same domain; for example, }\DIFaddend the low-fidelity \DIFdelbegin \DIFdel{solutions to be interpretable in the context of the }\DIFdelend \DIFaddbegin \DIFadd{model can not be a one-dimensional average of a two-dimensional }\DIFaddend high-fidelity model\DIFdelbegin \DIFdel{; specifically, we require that $\Psi_{LF}$ be in a space admissible to $\mathcal{M}'_{HF}$ and $\mathcal{M}_{HF}$. For example, compared to the high-fidelity model, the }\DIFdelend \DIFaddbegin \DIFadd{. 
 }
 
 \DIFadd{The requirements for compatibility are loose enough so that \Cref{alg:refSeries} is applicable to a large class of models. Models that differ in discretization can be compatible; the }\DIFaddend low-fidelity model may have a coarser mesh, basis functions of a lower order, or basis functions spanning a reduced subspace. \DIFdelbegin \DIFdel{The }\DIFdelend \DIFaddbegin \DIFadd{Models that have different states and/or parameters can also be compatible; for example, the }\DIFaddend high-fidelity model could describe changes in states that have a fixed \DIFdelbegin \DIFdel{nominal value }\DIFdelend \DIFaddbegin \DIFadd{value (often zero) }\DIFaddend in the low-fidelity model\DIFdelbegin \DIFdel{; the }\DIFdelend \DIFaddbegin \DIFadd{. The }\DIFaddend high-fidelity model could allow anisotropy \DIFdelbegin \DIFdel{of the inferred }\DIFdelend \DIFaddbegin \DIFadd{in its }\DIFaddend parameters while the low-fidelity model could constrain their components and require isotropy. We note that in the case where the two models correspond to two levels of mesh refinement, method described in~\cite{BecVex05} would likely be more efficient, since interpolation could be used to estimate $\Psi_{HF}-\Psi_{LF}$ instead.
@@ -1161,12 +1175,19 @@ Prudhomme, S., Oden, J.~T., 1999. On goal-oriented error estimation for
   elliptic problems: application to the control of pointwise errors. Computer
   Methods in Applied Mechanics and Engineering 173, 313--331.
 
-\bibitem[{Spantini et~al.(2016)Spantini, Cui, Willcox, Tenorio, and
+\DIFdelbegin %DIFDELCMD < \bibitem[{Spantini et~al.(2016)Spantini, Cui, Willcox, Tenorio, and
+%DIFDELCMD <   Marzouk}]{Span16}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \bibitem[{Spantini et~al.(In press)Spantini, Cui, Willcox, Tenorio, and
   Marzouk}]{Span16}
-Spantini, A., Cui, T., Willcox, K., Tenorio, L., Marzouk, Y., July 2016.
-  Goal-oriented optimal approximations of {B}ayesian linear inverse problems.
-  ArXiv e-prints.
-\newline\urlprefix\url{https://arxiv.org/abs/1607.01881}
+\DIFaddend Spantini, A., Cui, T., Willcox, K., Tenorio, L., Marzouk, Y., \DIFdelbegin \DIFdel{July 2016.
+  }\DIFdelend \DIFaddbegin \DIFadd{In press.
+  }\DIFaddend Goal-oriented optimal approximations of {B}ayesian linear inverse problems.
+  \DIFdelbegin \DIFdel{ArXiv e-prints.
+}%DIFDELCMD < \newline\urlprefix\url{https://arxiv.org/abs/1607.01881}
+%DIFDELCMD < %%%
+\DIFdelend \DIFaddbegin \DIFadd{SIAM Journal on Scientific Computing.
+}\DIFaddend 
 
 \bibitem[{{\c{S}}tef{\u{a}}nescu et~al.(2015){\c{S}}tef{\u{a}}nescu, Sandu, and
   Navon}]{StefSanNav15}
