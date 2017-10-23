@@ -66,10 +66,10 @@ As in~\cite{BecVex05}, we introduce the QoI functional $I$ into the inverse prob
 \subsection[Error Estimate for a Goal-Oriented Inverse Problem]{Error Estimate for a Goal-Oriented Inverse Problem}  \label{sec:deriv}
 %------------------------------------------------------------------------------%
 %
-For a given hierarchy of compatible models, we take the QoI calculated from inferring the parameters with the highest-fidelity model to be the `exact' or `true' solution. Let compatibility be formally defined as follows:
+For a given hierarchy of compatible models, we take the QoI calculated from inferring the parameters with the highest-fidelity model to be the `exact' or `true' solution. Compatibility allows one to evaluate residuals associated with the high-fidelity inverse problem, such as optimality conditions, at solutions to the low-fidelity inverse problem. Let compatibility be formally defined as follows:
 %
 \begin{definition}
-The high- and low-fidelity models described by \Cref{eq:invOpt_consHF} and \Cref{eq:invOpt_consLF}, respectively, are \emph{compatible} if $U_{LF}\subseteq U_{HF}$ and $Q_{LF}\subseteq Q_{HF}$. Compatibility allows one to evaluate residuals associated with the high-fidelity inverse problem, such as optimality conditions, at solutions to the low-fidelity inverse problem.
+The high- and low-fidelity models described by \Cref{eq:invOpt_consHF} and \Cref{eq:invOpt_consLF}, respectively, are \emph{compatible} if $U_{LF}\subseteq U_{HF}$ and $Q_{LF}\subseteq Q_{HF}$. 
 \label{defn:comp}
 \end{definition}
 % 
