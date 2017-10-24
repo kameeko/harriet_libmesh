@@ -1,0 +1,40 @@
+\documentclass[12pt, letterpaper]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath,amsthm,amssymb,amsfonts,amsbsy,latexsym}
+\usepackage{color}
+\usepackage{changepage}
+\usepackage{parskip}
+\usepackage[margin=0.75in]{geometry}
+
+\newcommand{\answer}[1]{\begin{adjustwidth}{1cm}{}{\color{blue}#1}\end{adjustwidth}}
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+
+\newcommand{\notdone}{{\color{red}{Changes not yet made.}}}
+\newcommand{\done}{{\color{green}{Changes made.}}}
+
+\begin{document}
+
+\section*{Response to Referee Comments}
+
+We thank the reviewers for their detailed and insightful comments and helping us strengthen the manuscript. Our point-by-point responses to the critique are outlined below, with reviewer comments in black and \blue{responses in blue}. 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection*{Reviewer 2}
+
+I had three major concerns with the previous version.
+
+My first and last concern have been dealt with.
+
+However, my second concern (on the degree of compatibility) is not dealt with adequately (in particular, Proposition 1 is not true in general). I therefore recommend that the authors re-submit an updated version for a subsequent review. My concern is further outlined below.
+
+Although the part below Eqs (4a) and (4b) contains some explanation regarding compatibility of $U_{HF}$ and $U_{LF}$, this is not made mathematically explicit.
+Therefore the result (7) of Proposition 1 is not necessarily true. For example, there is no reason why a low-fidelity solution can be substituted in a high-fidelity (bi)linear form, as done in (7). This requires suitable compatibility of the low-fidelity space with the high-fidelity space that has not been made mathematically explicit (some inclusion is actually assumed). In the proof, for example, eq. (9) is not necessarily true.
+I have two recommendations: 1. restrict the assumption of different spaces to it being the same space, or 2. introduce suitable required inclusions for these spaces. 
+
+\answer{We added a formal definition of compatibility just before Proposition 1.}
+
+\end{document}
